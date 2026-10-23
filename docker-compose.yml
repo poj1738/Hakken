@@ -1,0 +1,28 @@
+# Our app plus the synthetic silo service.
+# Zetaris and Nightshift are NOT here: they run on the host, per the
+# Participant Setup Guide. Containers reach them via host.docker.internal.
+
+services:
+  app:
+    build: .
+    env_file: [.env]
+    environment:
+      # Override the host-facing URLs for in-container networking.
+      ZETARIS_REST_URL: http://host.docker.internal:8888/api/v1.0
+      METERLESS_BASE_URL: http://host.docker.internal:8088/v1
+      DATASVC_PUBLIC_URL: http://datasvc:8100
+      PORT: "8000"
+    ports: ["8000:8000"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    volumes:
+      - ./logs:/app/logs
+      - ./.state:/app/.state
+    depends_on: [datasvc]
+
+  datasvc:
+    build: .
+    command: ["python", "-m", "uvicorn", "datasvc.main:app", "--host", "0.0.0.0", "--port", "8100"]
+    # Published on the host too, so the Zetaris containers can reach it at
+    # host.docker.internal:8100 when registering REST tables.
+    ports: ["8100:8100"]
+    extra_hosts: ["host.docker.internal:host-gateway"]

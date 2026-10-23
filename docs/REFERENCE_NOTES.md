@@ -13,6 +13,20 @@ record the discrepancy here.
 
 ## 1. Zetaris (data layer)
 
+### 1.0 Local environment state — not yet exercised
+
+As of 2026-10-23 the Zetaris stack has **never been started on this machine**. The
+`zetaris-platform` `docker compose pull` was still in progress (the `zetaris-ndp-driver`
+image mid-download; `postgres:16-alpine`, `zetaris-ndp-api` and `zetaris-new-ui` already
+local), and `up -d` / `verify.sh` had not been run. Registry authentication already
+succeeded. Nothing has been pruned or wiped, and there is no prior state to recover:
+zero containers before `up -d` is the expected condition.
+
+So every Zetaris check below is **unverified against a live instance** — it is read from
+the reference repo, not confirmed here. The API key will be created for the first time
+(not replaced) in the Zetaris UI once the stack is up. Owner: Arpon runs `up -d`,
+`verify.sh` and the key creation; we do not touch the stack.
+
 ### 1.1 The REST call shape — binding
 
 From `.refs/zetaris/scripts/zetaris_sql.py` (`RestChannel`):
@@ -169,26 +183,48 @@ So the adapter must capture `response.model` **and** this `meterless` body block
 That is our NVIDIA-award evidence. Using `with_raw_response` for headers alone would
 record nothing on this build.
 
-Unresolved: on these (failing) calls `provider_model` and `mode` both came back
-`auto` even when a concrete `nvidia/...` id was requested. Whether lane pinning is
-honoured on a **successful** call is untested — recheck as soon as a call succeeds,
-and do not claim lane control in the README until a real response proves it.
+**Resolved on a successful call: lane pinning is NOT honoured.** `provider_model`
+returns `meterless/auto` on every call regardless of what is requested — it reports the
+resolved *mode*, not the model. Requesting `nvidia/nemotron-3-super-120b-a12b` was
+served by `nemotron-3.5-lightning-30b-a3b`; `meterless/deep` came back with
+`mode_coerced: true`. Every request races six lanes under
+`routing.policy: "learned-router"`. The field that names the actual model is
+`routed_model` / `winning_route.model`. Full evidence and consequences in
+`docs/DECISIONS.md`; the receipt shape is in §2.6 below.
 
-### 2.4 Blocker found **[live]** — no model call currently succeeds
+### 2.4 Provider-key blocker — found and fixed **[live]**
 
-Every chat completion fails, including on `meterless/auto`:
+Initially **every** chat completion failed with HTTP 502 wrapping
+`meterless_detail: "nvidia_401: {...\"detail\":\"Invalid unsecured/JWS/JWE header:
+Invalid JSON object\"}"` — NVIDIA rejecting the key stored in Nightshift, while our
+Runtime token was fine (it had authenticated `/v1/models`). Replacing the key in
+**Nightshift → Setup → Providers** fixed it; calls now return 200. `meterless/local`
+separately returned `privacy_floor_blocks_all_routes`, a Nightshift privacy setting,
+with no on-device model cached.
 
-- All NVIDIA-backed routes (`meterless/auto|fast|deep` and every concrete
-  `nvidia/nemotron-*`) → **HTTP 502** wrapping
-  `meterless_detail: "nvidia_401: {...\"detail\":\"Invalid unsecured/JWS/JWE header:
-  Invalid JSON object\"}"`. That is **NVIDIA rejecting Nightshift's stored API key** —
-  our Runtime token is fine (it authenticated `/v1/models`). Only the user can fix it,
-  in **Nightshift → Setup → Providers**.
-- `meterless/local` → **502**, `meterless_detail: "privacy_floor_blocks_all_routes"`,
-  a Nightshift privacy setting, with no on-device model cached yet.
+Diagnostic worth keeping: an upstream provider failure surfaces as **our** 502, so
+always read `error.meterless_detail` before blaming our own code. The prefix names the
+real culprit (`nvidia_401`, `privacy_floor_blocks_all_routes`,
+`<model>_empty_response`).
 
-Until the provider key is replaced, the Power rule cannot be demonstrated. This is why
-the offline reasoner for `SAMPLE_MODE` must be genuinely independent of the provider.
+### 2.6 The compute receipt **[live]**
+
+A successful response's `meterless` block is a `meterless.compute_receipt.v1`, far
+richer than the contract doc implies, and it is where our sponsor evidence comes from:
+`routed_model` and `winning_route{model,label,provider,kind,tier}` (which Nemotron
+answered), `request_id`/`receipt_id`/`decision_id`, `phases[]` with per-phase model and
+tokens, `usage`, `cost{actual_usd,naive_usd,baseline}` and `savings`, `cache.status`,
+`privacy.path`, `egress{destination,sent,withheld}`, `routing{policy,width,predicted,
+winner}`, `consensus`, `host_pressure`, and a provider-side
+`cross_check{status,checks[],requires_review,recommended_action}` safety gate.
+
+It is an undocumented, build-specific shape, so read it defensively — every field
+optional, and degrade to `response.model` alone if the receipt is missing.
+
+**Operational trap:** do **not** send a tight `max_tokens`. These lanes spend hidden
+reasoning tokens, so a one-word answer cost 42–49 completion tokens; `max_tokens: 16`
+truncated it to nothing and failed as `<model>_empty_response`, which reads like an
+outage. Leave it unset or ≥512.
 
 ### 2.5 Structured output
 

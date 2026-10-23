@@ -1,0 +1,72 @@
+# Working rules for this repo
+
+Team Hakken — Open Agent Hackathon 2026. **Hard deadline 2026-10-27 23:45 UTC**
+(Wed 28 Oct 10:45 AEDT). Time is the scarcest resource: ship the smallest working
+vertical slice, then improve.
+
+## Hard rules (violating any of these can disqualify us)
+
+1. **Zetaris is the data layer and must be load-bearing.** Agents get facts by sending
+   SQL to Zetaris over its REST API, never by reading files directly.
+2. **Meterless, two separate requirements.**
+   - *Engine:* at least one Meterless engine implemented and working in a
+     **user-facing feature**, with a passing conformance test we can show. Mentioning
+     it, copying a prompt or adding an unused dependency fails the rule.
+   - *Power:* **Nightshift is the primary AI provider.** Every model call in the
+     product goes through it.
+3. **NVIDIA:** Nemotron is reached *through Nightshift*. The NVIDIA API key lives
+   **only** in Nightshift → Setup → Providers — never in our code, `.env`, logs,
+   README, video or slides. Traces must show which model handled each request.
+4. **AI coding tools:** Cursor is **optional** — any coding tool is fine (Claude Code,
+   Copilot, Codex, none). The official resources are inconsistent about whether Cursor
+   is mandatory, so we keep the repo Cursor-ready (`.cursor/rules/project.mdc` mirrors
+   this file) without depending on it. What the AI Usage Policy actually requires is an
+   **honest declaration of which tools we used** — log it in `docs/AI_TOOLS_USAGE.md`.
+5. **Secrets only from environment variables.** `.env` is gitignored; only
+   `.env.example` is committed. Never print, log or echo a secret value, and never
+   read `.env` back into the chat. Refer to secrets by variable name only.
+6. **No hardcoded outputs, no fake agents, no hand-written traces, no mocked sponsor
+   integrations presented as real.** Outputs must change with inputs.
+   `output_examples/` must come from real runs.
+7. **Data:** open or synthetic only. No real personal, clinical or financial records.
+   Document every source: origin, licence, subset, how to regenerate. Anything
+   prepared before 2026-10-22 00:00 UTC must be declared.
+8. **Judges have limited time:** `POST /run` and `python run.py` both work, Docker
+   builds, a run finishes in 5–10 min CPU-only, ≥3 sample inputs with real outputs,
+   and **`SAMPLE_MODE=true` runs real agent logic with no Zetaris, no Nightshift and
+   no network**.
+9. **Responsible AI:** input validation, stated limitations, a human-review gate for
+   high-risk outputs, and a clear "not medical advice / synthetic data" disclaimer.
+
+## Working agreement
+
+- **Read-only first.** Ask before anything that creates or drops objects in Zetaris,
+  installs system packages, rewrites git history or deletes files.
+- **Do not touch the Zetaris stack.** Arpon runs `docker compose up -d`, `verify.sh`
+  and the API-key creation. We only talk to it over REST once told it is up.
+- **Never invent** model ids, table names, endpoints or response fields. Discover them
+  (`GET /v1/models`, `SHOW …`/`DESCRIBE …`, a recorded real response) and record them
+  in `docs/DECISIONS.md`.
+- **The conformance suite beats the prose.** Where an engine's spec and its
+  conformance runner disagree, the runner wins; document the discrepancy and never
+  weaken a check to make it pass.
+- Every external call has a timeout and a fallback. Every loop is bounded.
+- Smallest working slice first: run it, read the logs, test, then refine.
+- Commit often with clear messages, on a feature branch per phase. The pre-commit
+  secret scan must pass (`make scan`).
+- Keep `docs/DECISIONS.md` (decision, why, date) and `TODO.md` ordered by judging impact.
+- **Be honest in the README:** claim only what the code and traces show.
+
+## Known environment facts (verified 2026-10-23)
+
+- Nightshift: `http://127.0.0.1:8088/v1`, state `online`. Returns **no `meterless-*`
+  response headers** — the evidence is the `meterless` compute receipt in the response
+  **body**. Record `routed_model`, not `provider_model` (always `meterless/auto`).
+- **Lane pinning is not honoured**: every request races six lanes under a learned
+  router. Role→disposition routing is *intent*; the trace records what answered.
+- **Never send a tight `max_tokens`** — hidden reasoning tokens make a one-word answer
+  cost ~45 completion tokens, and a small budget fails as `<model>_empty_response`.
+- Zetaris REST: `http://localhost:8888/api/v1.0`, org `1`. **Never call port 8889.**
+  Lightning SQL only, one statement per call, no trailing semicolon, qualified names.
+  Values come back as **strings**; cast before comparing.
+- From inside a container use `host.docker.internal`, not `localhost`.

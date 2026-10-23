@@ -1,0 +1,66 @@
+{
+  "project_name": "Hakken Agent",
+  "one_liner": "TBD - set when the track is chosen.",
+  "track": "TBD",
+  "team": [
+    {
+      "name": "Anshuman",
+      "github": "",
+      "role": ""
+    },
+    {
+      "name": "Arpon",
+      "github": "poj1738",
+      "role": ""
+    },
+    {
+      "name": "Arnav",
+      "github": "",
+      "role": ""
+    }
+  ],
+  "repo_url": "https://github.com/poj1738/Hakken",
+  "sponsor_tech": {
+    "zetaris": {
+      "role": "data layer; agents get every fact by sending Lightning SQL to the Zetaris REST API",
+      "integration": "app/adapters/zetaris.py (Phase 2)",
+      "status": "pending - stack not yet started on the dev machine"
+    },
+    "meterless": {
+      "engines": [
+        "hmem",
+        "world_model"
+      ],
+      "provider": "Meterless Nightshift Runtime, OpenAI-compatible, primary AI provider for every model call",
+      "integration": "app/adapters/meterless.py, app/engines/ (Phase 2/4)",
+      "status": "provider verified online and answering; engines pending"
+    },
+    "cursor": {
+      "status": "optional",
+      "cursor_ready": true,
+      "rules_file": ".cursor/rules/project.mdc",
+      "note": "Cursor is optional for this project; the repo is Cursor-ready but not dependent on it.",
+      "ai_tools_log": "docs/AI_TOOLS_USAGE.md"
+    },
+    "nvidia": {
+      "models_observed": [
+        "nvidia/nemotron-3.5-super-vl-120b-a12b",
+        "nvidia/nemotron-3.5-lightning-30b-a3b"
+      ],
+      "reached_via": "Nightshift lanes only; the NVIDIA API key lives solely in Nightshift -> Setup -> Providers",
+      "evidence": "meterless.routed_model and winning_route in every trace event",
+      "note": "lane pinning is not honoured on Runtime m1-m4; the router chooses and we record what answered"
+    }
+  },
+  "entry_points": {
+    "http": "POST /run",
+    "cli": "python run.py --input input_examples/example_1.json",
+    "docker": "docker compose up"
+  },
+  "sample_mode": {
+    "env": "SAMPLE_MODE=true",
+    "description": "runs real agent logic with no Zetaris, no Nightshift and no network"
+  },
+  "data_sources": [],
+  "preexisting_components": []
+}
