@@ -11,6 +11,59 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-24 — Keep the pinned role→route mapping; it satisfies the NVIDIA rule but does not choose a lane **[live — Arpon's machine, 24 Oct, 24 samples]**
+
+**Decision.** Keep sending a pinned disposition on every call — `METERLESS_MODEL_FAST`
+and `METERLESS_MODEL_DEEP`, mapped by role in `app.config.lane_for()`, never `auto`.
+Keep recording what actually answered. Do **not** claim the route selects the model.
+
+**What was tested.** The full procedure: discover route ids from `GET /v1/models`, put
+them in `.env`, map role→route in code, then verify from `response.model`. Eight
+samples per route with distinct prompts to avoid cache hits.
+
+| Requested route | Answered by | Samples |
+|---|---|---|
+| `meterless/fast` | `nvidia/nemotron-3.5-super-vl-120b-a12b` | 8/8 |
+| `meterless/deep` | `nvidia/nemotron-3.5-super-vl-120b-a12b` | 8/8 |
+| `meterless/auto` | `nvidia/nemotron-3.5-super-vl-120b-a12b` | 8/8 |
+
+**Two findings, and they point in opposite directions.**
+
+1. **The NVIDIA requirement is satisfied.** 24/24 calls were answered by an NVIDIA
+   Nemotron, and `response.model` names which one. By the test "if it shows a Nemotron
+   id, the pin is working", it works.
+2. **The route does not choose the lane.** `fast`, `deep` and `auto` are
+   indistinguishable — all three converge on the same model, and every response still
+   carries `mode_coerced: true`. There is nothing to pin *between*.
+
+**Why an earlier test looked like the lanes differed.** A 3-sample run had
+`meterless/fast` return `nemotron-3.5-lightning-30b-a3b` once and `super-vl-120b`
+twice, which read as a real distribution difference. It was not: the receipt's
+`routing` block shows `policy: "learned-router"` with `reason: "cold-explore"` and
+`confidence: 0`. The router was exploring. Once it converged it chose `super-vl-120b`
+every time regardless of route. **Three samples were not enough to tell exploration
+from routing policy** — worth remembering before concluding anything else from a small
+sample against this runtime.
+
+This also corrects the earlier entry below, which inferred "pinning is not honoured"
+from a single call per id. The direction was right, the mechanism was not: it is not
+that a requested id is overridden arbitrarily, it is that **every mode is coerced to
+`auto`** and one learned router decides.
+
+**Where lane control would actually live.** Not in our code. The published API surface
+is only `GET /v1/models`, `GET /healthz` and `POST /v1/chat/completions`, and none
+takes a lane. The receipt exposes `app_policy{has_rule, lanes, race_width}` — `lanes`
+is `null` for us and `race_width` is 6 — so Nightshift has a per-app policy concept
+selected by our `meterless-app` header. Configuring it is a Nightshift-side action on
+one machine, not a repo change. Arpon's Nightshift has lanes `deep-reasoner`,
+`fast-tools` and `deep-verifier` defined, and **none of them appear in
+`GET /v1/models`**, so they are internal fleet lanes, not addressable routes.
+
+**What we therefore claim.** That every model call goes through Nightshift to an NVIDIA
+Nemotron, and that we record exactly which one per request. Not that we direct a role
+to a specific model. Re-test if a later Nightshift build exposes `app_policy.lanes` or
+stops coercing the mode.
+
 ## 2026-10-23 — Record `routed_model`, not `provider_model`, as the model-per-request evidence **[live — Arpon's machine, 23 Oct]**
 
 **Decision.** The trace field that names which model answered is
@@ -26,7 +79,7 @@ NVIDIA award asks for the model.
 
 ---
 
-## 2026-10-23 — Lane pinning is NOT honoured; fall back to dispositions **[live — Arpon's machine, 23 Oct]**
+## 2026-10-23 — Lane pinning is NOT honoured; fall back to dispositions **[live — Arpon's machine, 23 Oct — superseded in detail by the 24 Oct entry above]**
 
 **Decision.** Abandon pinning concrete `nvidia/nemotron-*` ids to the FAST and DEEP
 lanes. Use the dispositions (`meterless/fast`, `meterless/deep`) and record the model
