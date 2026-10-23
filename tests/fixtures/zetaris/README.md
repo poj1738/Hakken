@@ -1,8 +1,15 @@
 # Recorded Zetaris responses
 
-Captured from a **real local Zetaris 2.4.3.1 instance on 2026-10-23** by a read-only
-query, so the adapter's parser is tested against the actual envelope rather than a
-guess. No secrets and no personal data: these are `SELECT` literals and a catalogue
+**Recorded from Arpon's local Zetaris instance** (version 2.4.3.1) on **2026-10-23**,
+by read-only queries, so the adapter's parser is tested against a real envelope rather
+than a guess.
+
+**Provenance matters here.** These are one instance's responses on one day, on one
+Zetaris version — not a published contract. If your own instance returns a different
+shape, that is a finding worth recording, not a reason to bend the parser: add your own
+fixture alongside these and note the difference in `docs/DECISIONS.md`. The two rows in
+`show_lightning_databases.json` are the sample databases that shipped with **his**
+install, so a fresh install may list something else. No secrets and no personal data: these are `SELECT` literals and a catalogue
 listing. `timeUsed` is stripped because it is a latency measurement, not part of the
 shape we parse.
 

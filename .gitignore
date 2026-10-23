@@ -7,6 +7,9 @@
 secrets/
 credentials/
 
+# ── Per-machine notes (yours alone; never shared)
+CLAUDE.local.md
+
 # ── Reference clones (read-only, not shipped)
 .refs/
 

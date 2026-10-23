@@ -3,7 +3,16 @@
 What the sponsor reference repos actually require of us. Read from `.refs/zetaris`
 (github.com/zetaris/getting-started) and `.refs/meterless`
 (github.com/Meterless/Meterless), both cloned `--depth 1` and gitignored.
-Verified against this machine on 2026-10-23 where marked **[live]**.
+
+Two kinds of statement are mixed here, and the difference matters:
+
+- **Unmarked** — read from a published contract or reference repo. Applies to everyone.
+- **[live — Arpon's machine, 23 Oct]** — *observed on Arpon's machine on 23 Oct 2026*, against his Zetaris
+  2.4.3.1 install and his Nightshift build `m1-m4`. One machine, one day, one build.
+  It may not reproduce on yours. **Re-verify before depending on it**, and add your own
+  observation rather than overwriting his.
+
+Nobody else has run either service yet — see `docs/ENVIRONMENTS.md`.
 
 Rule of thumb from both repos: the spec documents intent, the **conformance suite /
 live response is binding**. Where they disagree, follow the runnable artefact and
@@ -13,9 +22,12 @@ record the discrepancy here.
 
 ## 1. Zetaris (data layer)
 
-### 1.0 Local environment state **[live, 2026-10-23]**
+### 1.0 One machine's state — not a team-wide fact **[live — Arpon's machine, 23 Oct]**
 
-The stack is **up and verified**. `scripts/preflight.py` reports 22 pass / 0 fail:
+On **Arpon's machine** the stack was up and verified on 23 Oct 2026;
+`scripts/preflight.py` reported 22 pass / 0 fail there. It has since been shut down, so
+that result is stale, and **no other teammate has run Zetaris at all.** The findings
+below describe that one instance:
 `SELECT 1` returns `1`, `GET /datasource/datasources` returns 200, and
 `SHOW LIGHTNING DATABASES` lists two pre-existing sample databases.
 
@@ -26,7 +38,8 @@ running. Zero containers before `up -d` is the expected condition, not evidence 
 loss. Arpon owns `up -d`, `verify.sh` and API-key creation; we only talk to the
 instance over REST.
 
-**Pre-existing data on the instance:** `NY_TAXI` (15 tables: trips, drivers,
+**Pre-existing data on *that* instance** (yours may differ, and a fresh install's
+sample data is whatever the sponsor's bundle ships)**:** `NY_TAXI` (15 tables: trips, drivers,
 customers, surge_pricing, taxi_zones, ...) and `TPCDS_DB` (308 tables). These shipped
 with the sponsor's install, so they predate the build window and are declared in
 `docs/PREEXISTING.md`. Our own synthetic silos will be separate Lightning databases.
@@ -82,7 +95,7 @@ Error meanings (from `AGENTS.md` and the troubleshooting tables):
   convert before comparing — this directly affects the Evaluator's number re-derivation.
 - `SHOW DATASOURCES` does **not** list REST or file registrations. Use
   `SHOW LIGHTNING DATABASES` for those. Our schema discovery must use both.
-  **Confirmed [live]:** on this instance `SHOW DATASOURCES` returns **0 rows** while
+  **Confirmed [live — Arpon's machine, 23 Oct]:** on this instance `SHOW DATASOURCES` returns **0 rows** while
   `SHOW LIGHTNING DATABASES` returns `NY_TAXI` and `TPCDS_DB`. Discovery that relied on
   `SHOW DATASOURCES` alone would conclude the instance is empty.
 - `SHOW TABLES IN <db>` works and returns
@@ -166,9 +179,13 @@ Definition of done (the contract's own): a wrong token shows `unauthorized` not
 `offline`, Auto Detect finds the runtime, and a plain-text request on `meterless/auto`
 returns a string.
 
-### 2.2 What this runtime actually returned **[live, 2026-10-23]**
+### 2.2 What one runtime actually returned **[live — Arpon's machine, 23 Oct]**
 
-Build `m1-m4`, served at `http://127.0.0.1:8088`, `engine_ready: true`.
+Arpon's build `m1-m4`, served at `http://127.0.0.1:8088`, `engine_ready: true`. The
+model list and lane behaviour below are **that machine's configuration**: his Nightshift
+has lanes `deep-reasoner`, `fast-tools` and `deep-verifier`, all cloud Nemotron with no
+local models. A teammate's runtime will expose a different set. **Never write code that
+assumes a lane name or a specific model id exists** — read `GET /v1/models` at runtime.
 
 - `GET /healthz` → 200, and reports `providers.cloud.keys: ["nvidia"]`, so an NVIDIA
   key **is** configured in Nightshift. It also warns no device model is cached yet.
@@ -193,7 +210,7 @@ this build**, so `meterless/fast` and `meterless/deep` are the only disposition-
 handles, and the concrete `nvidia/nemotron-*` ids are the only way to name a specific
 Nemotron.
 
-### 2.3 Trace evidence lives in the response **body**, not the headers **[live]**
+### 2.3 Trace evidence lives in the response **body**, not the headers **[live — Arpon's machine, 23 Oct]**
 
 `meterless-*` **response headers: none returned.** Instead every response carries a
 `meterless` object, which on a failed call looked like:
@@ -218,7 +235,7 @@ served by `nemotron-3.5-lightning-30b-a3b`; `meterless/deep` came back with
 `routed_model` / `winning_route.model`. Full evidence and consequences in
 `docs/DECISIONS.md`; the receipt shape is in §2.6 below.
 
-### 2.4 Provider-key blocker — found and fixed **[live]**
+### 2.4 Provider-key blocker — found and fixed **[live — Arpon's machine, 23 Oct]**
 
 Initially **every** chat completion failed with HTTP 502 wrapping
 `meterless_detail: "nvidia_401: {...\"detail\":\"Invalid unsecured/JWS/JWE header:
@@ -233,7 +250,7 @@ always read `error.meterless_detail` before blaming our own code. The prefix nam
 real culprit (`nvidia_401`, `privacy_floor_blocks_all_routes`,
 `<model>_empty_response`).
 
-### 2.6 The compute receipt **[live]**
+### 2.6 The compute receipt **[live — Arpon's machine, 23 Oct]**
 
 A successful response's `meterless` block is a `meterless.compute_receipt.v1`, far
 richer than the contract doc implies, and it is where our sponsor evidence comes from:

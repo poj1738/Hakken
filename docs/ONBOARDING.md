@@ -33,6 +33,12 @@ cp .env.example .env
 Then fill it in with **your own** tokens. `.env` is gitignored and the pre-commit hook
 blocks it — do not work around either.
 
+**Also create your own `CLAUDE.local.md`** (gitignored) for notes true only on your
+machine: where your Zetaris lives, your Nightshift lane names, your last preflight
+result. Keep that out of `CLAUDE.md`, which is shared and must hold only what is true
+on every machine. Then add a short summary to your section of `docs/ENVIRONMENTS.md`
+so the team knows who can run what — **no credentials in either file.**
+
 **Nobody shares credentials.** Not in chat, not in an issue, not in a PR. Each person
 runs their own Zetaris and Nightshift. If a token is ever exposed, rotate it.
 

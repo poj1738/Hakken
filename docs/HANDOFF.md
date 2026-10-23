@@ -27,6 +27,45 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-24 11:15 AEDT · Arpon · arpon/team-workflow
+
+**Did:** Separated shared rules from per-machine facts. `CLAUDE.md` had grown a "Known
+environment facts" block that was really *my laptop's* state — Zetaris up, preflight
+green, observed model ids — presented as if true for everyone. Replaced it with
+provider/API behaviour that holds anywhere, and moved the machine-specific half out.
+Also tightened the Zetaris rule: nobody starts, stops, reconfigures or deletes any
+Zetaris stack, and nobody creates or rotates API keys — each person manages their own
+install and we talk to it only over REST.
+
+New: `CLAUDE.local.md` (gitignored) for my own machine notes, `docs/ENVIRONMENTS.md`
+with a section per person, and a `.state/preflight.json` output from `make preflight`.
+Every "verified"/"works" claim in `PROGRESS.md`, `docs/DECISIONS.md`,
+`docs/REFERENCE_NOTES.md` and `README.md` now says **where and when** — all of them
+read "Arpon's machine, 23 Oct". The Zetaris fixtures are marked as recorded from my
+instance, with a note that a different shape on your instance is a finding to record,
+not a reason to bend the parser.
+
+**Changed shared files:** `CLAUDE.md` (Zetaris rule rewritten; machine facts removed;
+new "Facts about your own setup live elsewhere" + "API behaviour that holds everywhere"
+sections), `.gitignore` (`CLAUDE.local.md`), `scripts/preflight.py` (saves
+`.state/preflight.json`, new `--no-save`), `PROGRESS.md`, `README.md`,
+`docs/DECISIONS.md`, `docs/REFERENCE_NOTES.md`, `docs/ONBOARDING.md`,
+`tests/fixtures/zetaris/README.md`. New: `docs/ENVIRONMENTS.md`.
+
+**Broken:** Nothing. 52 tests green, secret scan clean, `make preflight` 19/19 on my
+machine just now (services came back up). Caveat: `gh` still not installed here, so the
+PR has to be opened through the GitHub web UI and I cannot watch CI from the terminal.
+
+**Needs from teammates:** Anshuman and Arnav — fill in your section of
+`docs/ENVIRONMENTS.md` and create your own `CLAUDE.local.md`. Do **not** put
+credentials in either. You do not need Zetaris or Nightshift to start: `make test` runs
+with no `.env` and no network, which is how CI runs it.
+
+**Next:** Still blocked on the **track decision** — see `TODO.md`. Nothing in Phase 2
+should start before that, and roles remain unassigned.
+
+---
+
 ### 2026-10-24 09:30 AEDT · Arpon · arpon/team-workflow
 
 **Did:** Set up the team workflow, no features. Removed `.cursor/` and every reference

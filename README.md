@@ -23,19 +23,20 @@ Two pieces of working code:
 
 | Piece | State |
 |---|---|
-| `scripts/preflight.py` (`make preflight`) | **works.** Read-only. Checks tooling, which env-var *names* are set, Zetaris REST reachability, and the Meterless Nightshift provider contract. Currently reports 22 pass / 0 fail. |
+| `scripts/preflight.py` (`make preflight`) | **works.** Read-only. Checks tooling, which env-var *names* are set, Zetaris REST reachability, and the Meterless Nightshift provider contract. Last run **22 pass / 0 fail on Arpon's machine, 23 Oct**; run it on your own. |
 | `app/config.py` | **works.** Validated settings; secrets held as `SecretStr` so they cannot leak through `repr`/`str`/`model_dump`; `safe_dump()` reports presence only. |
 | `scripts/secret_scan.py` (`make scan`) | **works.** 8 patterns, installed as a pre-commit hook, verified to block a commit. Supporting, not a product feature. |
 
 ### What is verified but *not* built
 
-Reachability is not a feature. The preflight proves these services answer us; **no
-application code uses either one yet.**
+Reachability is not a feature. The preflight proved these services answered **on one
+machine on one day**; **no application code uses either one yet**, and no other
+teammate has run them (see `docs/ENVIRONMENTS.md`).
 
-| | Verified on 2026-10-23 | Built? |
+| | Observed on Arpon's machine, 23 Oct 2026 | Built? |
 |---|---|---|
 | Meterless Nightshift | state `online`; a request on `meterless/auto` was answered by `nvidia/nemotron-3.5-super-vl-120b-a12b`, returning a plain string | **no** — `app/adapters/meterless.py` is a stub |
-| Zetaris | `SELECT 1` → `1`; catalogue discovery works; the response envelope is recorded in `tests/fixtures/zetaris/` | **no** — `app/adapters/zetaris.py` is a stub |
+| Zetaris | `SELECT 1` → `1`; catalogue discovery worked; the response envelope is recorded from that instance in `tests/fixtures/zetaris/` | **no** — `app/adapters/zetaris.py` is a stub |
 
 ### Not started
 
@@ -122,14 +123,16 @@ and its conformance runner disagree.
 ## AI and model usage
 
 - **Models** reach us only through the **Meterless Nightshift Runtime**
-  (OpenAI-compatible, `http://127.0.0.1:8088/v1`). Verified online 2026-10-23; a
-  request on `meterless/auto` was answered by `nvidia/nemotron-3.5-super-vl-120b-a12b`.
+  (OpenAI-compatible, default `http://127.0.0.1:8088/v1`). Observed `online` on Arpon's
+  machine on 23 Oct 2026, where a request on `meterless/auto` was answered by
+  `nvidia/nemotron-3.5-super-vl-120b-a12b`. Each teammate runs their own runtime.
 - **Which model answered** *will be* recorded per request from the `meterless` compute
   receipt in the response body (`routed_model` / `winning_route`), not from the route we
-  asked for. The receipt shape is confirmed live, but no tracing code exists yet.
-  **Lane pinning is not honoured** on this Runtime build: every request races six lanes
-  under a learned router, so role→disposition routing can only ever be a declared
-  intent, and the trace will record what actually ran. See `docs/DECISIONS.md`.
+  asked for. The receipt shape was confirmed on Arpon's runtime, but no tracing code
+  exists yet. **Lane pinning was not honoured** there (build `m1-m4`): every request
+  raced six lanes under a learned router, so role→disposition routing can only ever be
+  a declared intent, and the trace will record what actually ran. Lane configuration is
+  per-machine. See `docs/DECISIONS.md`.
 - **AI coding tools used:** **Claude Code**, logged per session in
   `docs/AI_TOOLS_USAGE.md`. `CLAUDE.md` holds the working rules. Cursor is not used —
   see that log for why.
@@ -153,8 +156,9 @@ outputs, and a clear **not medical advice** disclaimer. None of it is implemente
 
 - **The product does not exist yet.** Two scripts and a config layer work; the agent,
   data layer, engines and UI are unbuilt.
-- The Zetaris and Meterless *adapters* are stubs, though both services and the Zetaris
-  response envelope are verified live.
+- The Zetaris and Meterless *adapters* are stubs. Both services and the Zetaris
+  response envelope were verified on **one machine on one day** (Arpon's, 23 Oct) and
+  on no other; see `docs/ENVIRONMENTS.md` for who can currently run what.
 - We cannot choose *which* Nemotron answers a request (see above).
 - The Nightshift compute receipt we rely on for evidence is an undocumented,
   build-specific response shape; the adapter must degrade gracefully without it.
