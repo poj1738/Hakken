@@ -63,7 +63,9 @@ class Settings(BaseSettings):
     zetaris_rest_url: str = "http://localhost:8888/api/v1.0"
     zetaris_org_id: str = "1"
     zetaris_api_key: SecretStr = SecretStr("")
-    zetaris_timeout_s: float = 60.0
+    # Measured: trivial queries ~4s warm, a 2-table JOIN 91s, and one attempt
+    # timed out entirely. 60s was below the observed worst case.
+    zetaris_timeout_s: float = 180.0
     zetaris_query_limit: int = Field(default=1000, gt=0)
 
     # -- Meterless Nightshift (primary AI provider) --------------------------

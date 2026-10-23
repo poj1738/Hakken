@@ -53,6 +53,8 @@ submission. **Hard deadline 2026-10-27 23:45 UTC** (Wed 28 Oct 10:45 AEDT).
 - [ ] `datasvc/` serving each silo whole at one URL (no paging — a REST table binds one
       fixed URL); `CACHE TABLE` immediately after each registration or every query
       re-hits the source.
+- [ ] **Pre-join in SchemaStore views at registration time.** Agents query flat views;
+      they must never compute a join live. Same result, paid once at setup.
 - [ ] `data/zetaris/NN_*_create.sql` + `_select.sql`; `scripts/register_sources.py`
       with `--dry-run` and `--skip-exists` (`CREATE SCHEMASTORE CONTAINER` has no
       `IF NOT EXISTS`), then verify row counts against the source.
@@ -70,7 +72,11 @@ submission. **Hard deadline 2026-10-27 23:45 UTC** (Wed 28 Oct 10:45 AEDT).
 - [ ] Orchestrator: bounded Planner → Executor → Evaluator → Writer with at least one
       real critique → revise loop; `RUN_TIMEOUT_S` returns `status: "partial"`.
 - [ ] Evaluator independently re-queries Zetaris to re-derive every cited number and
-      blocks unsupported claims. **Cast the strings first.**
+      blocks unsupported claims. **Cast the strings first**, and **batch the checks into
+      one query** — a 2-table join was measured at 91 s, so one query per claim blows
+      the 5-10 min judging budget (see `docs/DECISIONS.md`).
+- [ ] Orchestrator needs a **per-run Zetaris query budget**, not just an iteration cap:
+      ~4 s per trivial query warm means 30 queries is 2 minutes before any model call.
 - [ ] `app/tracing.py` — JSONL per run, official fields + our extensions + the receipt,
       with secret masking.
 

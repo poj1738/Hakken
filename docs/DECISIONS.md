@@ -11,6 +11,48 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-24 — Zetaris latency is the binding constraint on the whole design **[live — Arpon's machine, 24 Oct]**
+
+**Measured**, against the install's own `NY_TAXI` sample data:
+
+| Query | Rows involved | Time |
+|---|---|---|
+| `SELECT 1` | — | ~1.1 s |
+| `SHOW LIGHTNING DATABASES` | 2 | 0.15 s |
+| `COUNT(*) FROM taxi_zones` | 789 | 20.7 s cold, then 11.2 / 3.9 / 6.1 s warm |
+| `SELECT * ... LIMIT 5` | 789 | 5.8 / 3.4 / 3.7 s |
+| 2-table `JOIN` + `GROUP BY` | ~8 k ⋈ 789 | **timed out once, then 91.2 s** |
+
+**This is per-query engine overhead, not data volume.** A `COUNT` on 789 rows costs
+~4 s warm. Smaller synthetic silos will not make it meaningfully faster — the floor
+stays. It is Lightning/Spark planning and dispatch on every REST call.
+
+**Decisions that follow.**
+
+1. **`ZETARIS_TIMEOUT_S` raised from 60 to 180.** 60 was below the observed worst case:
+   the 91 s join would have failed, and one attempt timed out outright. A too-low
+   timeout would have read as "Zetaris is broken" rather than "the query is slow".
+2. **`CACHE TABLE` after registration is mandatory, not an optimisation.** Already
+   required because a REST table re-calls its source per query; now doubly so.
+3. **Push joins into `CREATE SCHEMASTORE VIEW` at registration time.** Agents should
+   query flat, pre-joined views, not compute joins live. A 91 s join inside an agent
+   loop is unaffordable; the same join computed once at setup costs nothing per run.
+4. **The Evaluator must batch verification.** Re-deriving each cited number with its
+   own query — the obvious implementation — is the single easiest way to blow the
+   judging budget. One query returning all the figures to check, not one per claim.
+5. **The orchestrator needs a per-run query budget**, not just `MAX_AGENT_ITERATIONS`.
+   At ~4 s per trivial query, 30 queries is 2 minutes of pure latency before any model
+   call. `RUN_TIMEOUT_S=600` must cover Zetaris time, model time and retries together.
+6. **Keep the synthetic silos genuinely small** and prefer `LIMIT`-ed reads.
+
+**Why this matters for judging.** The brief requires a run that finishes in 5–10 minutes
+on a CPU-only machine. Model calls are fast (~0.4–1.2 s to a Nemotron). **Zetaris, not
+the model, is the latency budget.** Any design that issues joins per claim fails that
+requirement on timing alone, with correct code.
+
+Re-measure on each machine: these numbers are from one install under Docker Desktop on
+Apple Silicon, with the driver sharing the host.
+
 ## 2026-10-24 — Two datasvc URLs, because two networks reach it
 
 **Decision.** `DATASVC_PUBLIC_URL` is what **Zetaris** uses and goes verbatim into the
