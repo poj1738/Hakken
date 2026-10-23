@@ -6,6 +6,10 @@ waiting on Docker.
 **Read `CLAUDE.md` first** — it holds the hard rules (the ones that can disqualify us)
 and the team workflow. This page is only about getting a working machine.
 
+Using a coding agent? `docs/AGENT_KICKOFF.md` has a self-contained prompt to paste in;
+it covers everything below plus the prohibitions, so your agent does not have to infer
+them.
+
 ## 1. Clone and install
 
 ```bash
@@ -109,6 +113,7 @@ At session end: `make test`, `python3 scripts/secret_scan.py --all`, update
 | Looking for | File |
 |---|---|
 | The rules, and the team workflow | `CLAUDE.md` |
+| A kickoff prompt for your coding agent | `docs/AGENT_KICKOFF.md` |
 | What state the project is in | `PROGRESS.md` |
 | What happened in previous sessions | `docs/HANDOFF.md` |
 | What to build next | `TODO.md` |
