@@ -11,6 +11,89 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-24 — `finish_reason` cannot be trusted to detect truncation **[live — Arpon's machine, 24 Oct]**
+
+**Decision.** The Meterless adapter must detect a truncated response by comparing
+`usage.completion_tokens` against the `max_tokens` we sent, **not** by reading
+`finish_reason`. On truncation it must raise, not return the partial text.
+
+**Why.** Same prompt, two budgets:
+
+| `max_tokens` | `finish_reason` | `completion_tokens` | Output |
+|---|---|---|---|
+| 2048 | **`"stop"`** | 2048 (exactly the cap) | cut off mid-table, mid-sentence |
+| 8192 | `"stop"` | 3001 | complete, ends on a full sentence |
+
+`finish_reason` reported `"stop"` in **both** cases. A truncated answer is
+indistinguishable from a complete one by that field alone. Left unchecked, the Writer
+would emit half an evidence table and the Evaluator would validate truncated JSON as
+if it were whole — exactly the failure the Evaluator exists to prevent.
+
+The tell is `completion_tokens == max_tokens`. Treat that as truncation, always.
+
+**Consequence for the agent loop.** Reasoning-heavy roles need a generous budget: a
+single hard analytical prompt legitimately consumed **3001 completion tokens**. Combined
+with the earlier finding that a one-word answer costs ~45 tokens, the rule is: never
+set a tight cap, and always verify the response was not cut off.
+
+---
+
+## 2026-10-24 — The Nightshift race settings are a ceiling, not behaviour; disable the nondeterministic ones for reproducibility, not provenance **[live — Arpon's machine, 24 Oct, ~40 calls]**
+
+**Context.** Nightshift's global Preferences expose race width (set to 6), optimistic
+streaming, consensus escalation, adaptive compute, self-refine and answer fusion. The
+worry was that these could put a non-Nemotron model into a request and weaken our
+NVIDIA evidence.
+
+**What the receipts actually show.** Across roughly forty calls, including a
+deliberately hard analytical prompt chosen because that is when adaptive compute is
+supposed to engage:
+
+- **Race width is a ceiling, not a behaviour.** Observed `routing.width` of **1–2 out
+  of 4 ready lanes**, never 6, and the router narrows itself by confidence
+  (`reason: "confident-exploit"` → width 1; `"leaning"` → width 2).
+- **`consensus.raced` was `1` on every single call.** One lane produces the answer. No
+  multi-model race is happening in practice.
+- **Every optional feature was null, every time:** `fusion`, `synthesis`, `refine`,
+  `gen_verifier`, `debate`, `quality_race`, `reasoning_scaffold`, `test_time_compute`,
+  `consensus_escalation`, `budget_degrade`. Self-refine is **not** firing on our calls.
+- **One phase per response** (`final_synthesis`), one model. No draft-then-upgrade, so
+  optimistic streaming is not splicing in another model.
+- **`egress.destination: "nvidia"` on every call**, and every answering model was a
+  Nemotron.
+
+**So the provenance risk is low, for a reason unrelated to those settings:** all four
+ready lanes are cloud Nemotron, no on-device model is cached, and `meterless/local`
+returns `privacy_floor_blocks_all_routes`. Optimistic streaming has no local model to
+draft with even if it fired.
+
+**The real reason to turn them off is reproducibility.** The answering model still
+alternates run to run between `nemotron-3.5-super-vl-120b-a12b` and
+`nemotron-3.5-lightning-30b-a3b` on identical input. Our outputs must change with
+*inputs*; they should not change randomly between identical runs, or `output_examples/`
+and the demo become unexplainable. So before recording examples or demoing, disable the
+nondeterministic features — and note in the README that the model can vary.
+
+**Keep cross-check on.** It returned `status: "passed"` with
+`recommended_action: "allow"` and per-check results for destructive actions, PII and
+schema validity. That is free, provider-side governance evidence toward the
+human-review requirement.
+
+**Turn self-refine off anyway**, despite it not currently firing: if Nightshift ever
+critiques and revises internally, our own Evaluator → Planner loop gets less credit and
+the traces become harder to explain.
+
+**Receipts are unsigned, confirmed.** `served: "in-tab"` and `receipt_envelope: null`
+on every call, consistent with `meterlessd` answering 501 — the app window is serving
+without a daemon signature. Signed receipts would be stronger evidence, so this is
+worth a mentor question. Not blocking: `routed_model` and the rest of the receipt are
+present either way.
+
+**`syncTraceRetention` is not findable from outside the app.** It does not appear
+anywhere in the Meterless repo, and Nightshift's application-support directory holds
+only `keys.json` (the provider key — deliberately not opened). Settings live in the
+app's own web storage, so Engineer mode / the command palette are the only route in.
+
 ## 2026-10-24 — Keep the pinned role→route mapping; it satisfies the NVIDIA rule but does not choose a lane **[live — Arpon's machine, 24 Oct, 24 samples]**
 
 **Decision.** Keep sending a pinned disposition on every call — `METERLESS_MODEL_FAST`

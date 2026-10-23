@@ -10,7 +10,13 @@ Implementation notes already established by live testing (docs/DECISIONS.md):
     build returns no `meterless-*` response headers.
   - Never send a tight `max_tokens`: hidden reasoning tokens made a one-word
     answer cost 42-49 completion tokens, and max_tokens=16 failed as
-    `<model>_empty_response`.
+    `<model>_empty_response`. One hard analytical prompt legitimately used
+    3001 completion tokens.
+  - DETECT TRUNCATION BY TOKEN COUNT, NOT `finish_reason`. A response cut off
+    mid-sentence at exactly max_tokens still reported `finish_reason: "stop"`.
+    Treat `usage.completion_tokens == max_tokens` as truncation and raise;
+    never return the partial text. Otherwise the Writer emits half an evidence
+    table and the Evaluator validates truncated JSON as whole.
   - Lane pinning is not honoured; role->disposition routing is intent only.
 """
 
