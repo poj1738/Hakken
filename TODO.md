@@ -1,47 +1,102 @@
 # TODO
 
 Ordered by judging impact. Scoring /100: Impact 30, Technical 20, Innovation 15,
-Demo 15, Product & UX 10, Sponsor tech 10.
+Demo 15, Product & UX 10, Sponsor tech 10. Ties go to Impact, then the earlier
+submission. **Hard deadline 2026-10-27 23:45 UTC** (Wed 28 Oct 10:45 AEDT).
 
-## Blocked on someone else
+## Done
 
-- [ ] **Zetaris stack up** — Arpon runs `docker compose up -d` + `verify.sh`, creates an
-      API key, puts it in `.env`, then tells us to re-run `make preflight`.
-- [ ] Decide the **track**, then write the domain pack (§12 of the kickoff brief).
+- [x] Phase 0 — reference review (`docs/REFERENCE_NOTES.md`), preflight script.
+- [x] Phase 1 — skeleton, `app/config.py`, `.env.example`, `.gitignore`, secret scan
+      with a pre-commit hook, 52 tests.
+- [x] Preflight green, 22 pass / 0 fail: Zetaris answering, Nightshift `online` and a
+      Nemotron returning a string.
+- [x] Zetaris response envelope resolved and recorded as fixtures
+      (`headers` + `data`, every value a string).
 
-## Phase 2 — adapters (next)
+## Blocking decision — do this first
 
-- [ ] `app/adapters/meterless.py`: client, lane routing, receipt capture into traces,
-      offline reasoner for SAMPLE_MODE. Unit-test status states and URL normalisation.
-- [ ] `app/adapters/zetaris.py`: **inspect one real 200 response first** to find where
-      column names live, then the parser, read-only SQL guard, schema discovery,
-      retries, typed errors, fixture-backed sample mode.
+- [ ] **Pick the track.** Everything below is shaped by it, and the domain-pack
+      contract (`app/domain/`) cannot be written without it. The three candidates and
+      which engines each emphasises are in the kickoff brief §12.
+- [ ] Decide whether to use the sponsor's pre-existing `NY_TAXI` (15 relational tables,
+      already on the instance, declared in `docs/PREEXISTING.md`) alongside or instead
+      of generating synthetic silos. It is open data and genuinely relational, which
+      suits a cross-source reconciliation story; synthetic-only is the safer read of
+      the rules. **Arpon's call.**
+
+## Phase 2 — adapters (next to build; both now fully unblocked)
+
+- [ ] `app/adapters/meterless.py` — the contract is fully known:
+      - URL normalisation is already implemented and tested in `app/config.py`; reuse it.
+      - `Authorization: Bearer`, `meterless-app` on every call, `meterless-scope: user`
+        on chat, 180 s timeout.
+      - Status from `GET /v1/models`: 401/403 → `unauthorized`, 200 with `meterless/*`
+        → `online`, else `offline`. Keep unknown `meterless/*` ids.
+      - Auto Detect across 8088/8090/8787/11434 on three hosts.
+      - **Never send a tight `max_tokens`** (see `docs/DECISIONS.md`).
+      - Capture the whole `meterless` receipt into the trace; read it defensively and
+        degrade to `response.model` if absent.
+      - Structured JSON by prompt + pydantic validation + exactly one repair retry;
+        do not rely on native tool-calling.
+- [ ] `app/adapters/zetaris.py` — parse `headers` + `data` into dicts, cast strings,
+      read-only guard (`SELECT`/`SHOW`/`DESCRIBE`/`WITH` only, enforced `LIMIT`),
+      schema discovery via `SHOW LIGHTNING DATABASES` **and** `SHOW TABLES IN <db>`
+      (not `SHOW DATASOURCES`, which returns 0 rows), timeouts, bounded retries,
+      typed `ZetarisError`. Unit-test against `tests/fixtures/zetaris/`.
+- [ ] Offline reasoner for `SAMPLE_MODE`: real rule-based work on cached data,
+      labelled `offline-heuristic`. Must not replay saved model text.
 
 ## Phase 3 — data layer
 
 - [ ] `scripts/generate_synthetic.py` — 3 seeded silos with deliberate inconsistencies.
-- [ ] `datasvc/` serving each silo whole at one URL; `CACHE TABLE` after each register.
+- [ ] `datasvc/` serving each silo whole at one URL (no paging — a REST table binds one
+      fixed URL); `CACHE TABLE` immediately after each registration or every query
+      re-hits the source.
 - [ ] `data/zetaris/NN_*_create.sql` + `_select.sql`; `scripts/register_sources.py`
-      with `--dry-run` / `--skip-exists`, then verify row counts against the source.
-- [ ] **Spike first:** prove Zetaris can reach `host.docker.internal:8100`. Fallbacks in
-      order: datasvc on the Zetaris compose network → MinIO/Parquet → Postgres JDBC.
+      with `--dry-run` and `--skip-exists` (`CREATE SCHEMASTORE CONTAINER` has no
+      `IF NOT EXISTS`), then verify row counts against the source.
+- [ ] **Spike first:** prove the Zetaris containers can reach
+      `host.docker.internal:8100`. Fallbacks in order: datasvc on the Zetaris compose
+      network → MinIO/Parquet → Postgres as a JDBC datasource. Record the winner.
+- [ ] **Ask Arpon before running any create script for real.** Dry-run first.
 
 ## Phase 4 — engines and agent loop
 
-- [ ] H-MEM in Python + 13 ported conformance checks + a memory-carries-over feature test.
-- [ ] World Model in Python + 8 ported conformance checks (merge band **0.85**).
-- [ ] Orchestrator: bounded Planner/Executor/Evaluator/Writer with a critique→revise loop.
-- [ ] `app/tracing.py`: JSONL per run, official fields + receipt, secret masking.
+- [ ] H-MEM in Python + the 13 ported conformance checks + a memory-carries-over
+      feature test (run 1 learns, run 2 visibly uses it).
+- [ ] World Model in Python + the 8 ported conformance checks. Merge band **0.85**,
+      per the runner and against its own prose spec.
+- [ ] Orchestrator: bounded Planner → Executor → Evaluator → Writer with at least one
+      real critique → revise loop; `RUN_TIMEOUT_S` returns `status: "partial"`.
+- [ ] Evaluator independently re-queries Zetaris to re-derive every cited number and
+      blocks unsupported claims. **Cast the strings first.**
+- [ ] `app/tracing.py` — JSONL per run, official fields + our extensions + the receipt,
+      with secret masking.
 
-## Phase 5 — entry points, Docker, UI, Cursor
+## Phase 5 — entry points, Docker, UI
 
-- [ ] `run.py --input` and `run.py serve` for real; verify `docker build` and `docker run`.
-- [ ] `web/`: timeline, evidence table, memory panel, Nightshift status pill, feedback thumbs.
-- [ ] Keep `docs/AI_TOOLS_USAGE.md` current — one row per session, whichever tool is used.
+- [ ] `run.py --input` and `run.py serve` for real.
+- [ ] **Actually build and run the Docker image** — the Dockerfile and compose file are
+      written but have never been executed.
+- [ ] `web/`: question box, live agent timeline, evidence table linking each number to
+      its SQL, "what memory was used" panel, Nightshift status pill, feedback thumbs.
+      Accessible: labels, keyboard nav, contrast.
 
 ## Phase 6 — judge-proofing
 
-- [ ] ≥3 genuinely different `input_examples/`; `scripts/generate_examples.py` from real runs.
+- [ ] ≥3 genuinely different `input_examples/`; `scripts/generate_examples.py` writing
+      `output_examples/` from real runs; a test asserting the outputs differ.
 - [ ] `scripts/validate_submission.sh` — the full disqualification checklist, including
-      the step people skip: no `.env`, services unreachable, `SAMPLE_MODE=true`, still succeeds.
-- [ ] Finish README, `docs/SPONSOR_TECH.md`, `metadata.json`, `docs/DATA_SOURCES.md`.
+      the step people skip: fresh clone, no `.env`, both services unreachable,
+      `SAMPLE_MODE=true`, and a run must still succeed with real logic.
+- [ ] Finish `README.md`, `docs/SPONSOR_TECH.md`, `metadata.json`,
+      `docs/DATA_SOURCES.md`, `docs/ARCHITECTURE.md` (mermaid from real code).
+- [ ] Keep `docs/AI_TOOLS_USAGE.md` current — one row per session, whichever tool.
+- [ ] **Make the repo public before submission** (it is private now).
+
+## Housekeeping
+
+- [ ] **Rotate both credentials after the event.** The Nightshift Runtime token and the
+      Zetaris API key were pasted into a chat transcript. Neither is in git history
+      (verified), but both are exposed to anyone with that transcript.
