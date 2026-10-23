@@ -13,19 +13,23 @@ record the discrepancy here.
 
 ## 1. Zetaris (data layer)
 
-### 1.0 Local environment state — not yet exercised
+### 1.0 Local environment state **[live, 2026-10-23]**
 
-As of 2026-10-23 the Zetaris stack has **never been started on this machine**. The
-`zetaris-platform` `docker compose pull` was still in progress (the `zetaris-ndp-driver`
-image mid-download; `postgres:16-alpine`, `zetaris-ndp-api` and `zetaris-new-ui` already
-local), and `up -d` / `verify.sh` had not been run. Registry authentication already
-succeeded. Nothing has been pruned or wiped, and there is no prior state to recover:
-zero containers before `up -d` is the expected condition.
+The stack is **up and verified**. `scripts/preflight.py` reports 22 pass / 0 fail:
+`SELECT 1` returns `1`, `GET /datasource/datasources` returns 200, and
+`SHOW LIGHTNING DATABASES` lists two pre-existing sample databases.
 
-So every Zetaris check below is **unverified against a live instance** — it is read from
-the reference repo, not confirmed here. The API key will be created for the first time
-(not replaced) in the Zetaris UI once the stack is up. Owner: Arpon runs `up -d`,
-`verify.sh` and the key creation; we do not touch the stack.
+History worth keeping, because it misled us once: before `docker compose up -d` the
+machine had zero containers and zero volumes, which is **indistinguishable from a
+pruned install**. It was simply never started — the `docker compose pull` was still
+running. Zero containers before `up -d` is the expected condition, not evidence of
+loss. Arpon owns `up -d`, `verify.sh` and API-key creation; we only talk to the
+instance over REST.
+
+**Pre-existing data on the instance:** `NY_TAXI` (15 tables: trips, drivers,
+customers, surge_pricing, taxi_zones, ...) and `TPCDS_DB` (308 tables). These shipped
+with the sponsor's install, so they predate the build window and are declared in
+`docs/PREEXISTING.md`. Our own synthetic silos will be separate Lightning databases.
 
 ### 1.1 The REST call shape — binding
 
@@ -41,11 +45,27 @@ body:    {"queryId": "<uuid4>", "sql": "<ONE statement, no trailing ;>",
           "source": "SqlEditor", "limit": <n>}
 ```
 
-Rows come back in `response["data"]` as a **list of lists** — positional, not dicts.
-**Where column names live is still unknown**: the reference client discards
-everything except `data`. Our adapter must inspect one real 200 response and write
-the parser against it, with a recorded fixture test. Do not guess the field name.
-`scripts/preflight.py` prints the response's top-level keys for exactly this reason.
+**The envelope, resolved against a live instance [live, 2026-10-23]:**
+
+```json
+{
+  "headers": ["col", ...],      // column names, positionally aligned with each row
+  "data":    [["v", ...], ...], // rows as positional lists
+  "total":   2,                 // row count
+  "timeUsed": 294               // milliseconds
+}
+```
+
+Column names live in **`headers`**, zipped positionally with each row in `data`. The
+reference client discards everything but `data`, which is why this had to be observed
+rather than read. Recorded fixtures are in `tests/fixtures/zetaris/`.
+
+**Every value arrives as a string**, confirmed directly: `SELECT 1` yields `"1"`,
+`2.5` yields `"2.5"`, `true` yields `"true"`. The adapter must cast, and the Evaluator
+must cast before re-deriving any cited number. An empty result is `data: []` with
+`total: 0` and populated `headers` — **not** an error.
+
+The same envelope is used by `SHOW` and `SELECT` alike, so one parser covers both.
 
 Error meanings (from `AGENTS.md` and the troubleshooting tables):
 - `401` → bad `ZETARIS_API_KEY` (regenerate in the UI; shown in plaintext once).
@@ -62,6 +82,12 @@ Error meanings (from `AGENTS.md` and the troubleshooting tables):
   convert before comparing — this directly affects the Evaluator's number re-derivation.
 - `SHOW DATASOURCES` does **not** list REST or file registrations. Use
   `SHOW LIGHTNING DATABASES` for those. Our schema discovery must use both.
+  **Confirmed [live]:** on this instance `SHOW DATASOURCES` returns **0 rows** while
+  `SHOW LIGHTNING DATABASES` returns `NY_TAXI` and `TPCDS_DB`. Discovery that relied on
+  `SHOW DATASOURCES` alone would conclude the instance is empty.
+- `SHOW TABLES IN <db>` works and returns
+  `headers: ["table_identifier", "catalog_name", "catalog_type"]`, with the identifier
+  already qualified (`NY_TAXI.taxi_trips`). That is the catalogue the Planner sees.
 - Referencing the same `UNION ALL`-of-`explode()` view twice in one query fails with
   `MISSING_ATTRIBUTES.RESOLVED_ATTRIBUTE_APPEAR_IN_OPERATION`. Use a window function
   in one pass instead of a self-join or an `IN`/`HAVING` subquery.

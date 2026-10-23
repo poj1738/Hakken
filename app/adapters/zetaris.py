@@ -1,15 +1,20 @@
 """Zetaris REST adapter -- the data layer. Agents get facts by sending SQL here.
 
-PHASE 2 STUB, deliberately not guessed. Two things must be learned from a live
-instance before this can be written honestly:
+PHASE 2 STUB -- but no longer blocked: the response envelope was observed on a
+live instance on 2026-10-23 and recorded in tests/fixtures/zetaris/.
 
-  1. Where column names live in a 200 response. The reference client
-     (.refs/zetaris/scripts/zetaris_sql.py) keeps only `response["data"]`, which
-     is a list of positional lists, and discards everything else. We inspect one
-     real response and write the parser against it, with a recorded fixture.
-  2. Whether SHOW/DESCRIBE return the same envelope as SELECT.
+    {"headers": ["col", ...],       # column names, positional per row
+     "data":    [["v", ...], ...],  # rows as positional lists
+     "total":   <row count>,
+     "timeUsed": <ms>}
 
-Call shape, already confirmed from the reference client:
+Three confirmed behaviours the parser must honour:
+  1. Zip `headers` with each row in `data` to get dicts.
+  2. **Every value is a string** ("1", "2.5", "true"). Cast before comparing.
+  3. An empty result is `data: []` with `total: 0` and populated `headers` -- not
+     an error. SHOW and SELECT share this envelope, so one parser covers both.
+
+Call shape, confirmed from the reference client and live:
     POST {ZETARIS_REST_URL}/sql-editor/sqls/run
     headers: Authorization: Bearer <key>, X-Org-ID, X-Request-ID (uuid4),
              Content-Type: application/json

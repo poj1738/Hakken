@@ -353,8 +353,11 @@ def check_meterless(do_chat: bool) -> None:
             "meterless-scope": "user",
             "Content-Type": "application/json",
         },
+        # No tight max_tokens: these lanes spend hidden reasoning tokens, so a
+        # one-word answer costs ~45 completion tokens and a small budget fails
+        # as "<model>_empty_response", which looks like an outage. 512 is slack.
         body={"model": model, "messages": [{"role": "user", "content": "Reply with the single word: ready"}],
-              "max_tokens": 16},
+              "max_tokens": 512},
         timeout=timeout,
     )
     latency_ms = int((time.monotonic() - started) * 1000)

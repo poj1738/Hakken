@@ -18,8 +18,8 @@ TBD — set when the track is chosen.
 | Preflight (`make preflight`) | **working** — checks tools, env-var names, Zetaris REST, the Nightshift contract |
 | Secret scan + pre-commit hook (`make scan`) | **working**, with tests |
 | Config layer (`app/config.py`) | **working** — validated settings, secrets as `SecretStr` |
-| Nightshift provider | **verified reachable and answering**; adapter is Phase 2 |
-| Zetaris data layer | **not yet exercised** — stack not started on the dev machine |
+| Nightshift provider | **verified answering** — a Nemotron returned a string; adapter is Phase 2 |
+| Zetaris data layer | **reachable and verified** — `SELECT 1`, catalogue discovery and the response envelope confirmed live; adapter is Phase 2 |
 | Agents, engines, UI, Docker run | **not built yet** (Phases 2–6) |
 
 Nothing in this repo fakes a result. The stubs raise `NotImplementedError` or exit
@@ -122,7 +122,8 @@ flag on high-risk outputs, and a clear **not medical advice** disclaimer.
 
 ## Limitations
 
-- Zetaris integration is unverified against a live instance as of this commit.
+- The Zetaris *adapter* is not written yet, though the instance and its response
+  envelope are verified.
 - We cannot choose *which* Nemotron answers a request (see above).
 - The Nightshift compute receipt we rely on for evidence is an undocumented,
   build-specific response shape; the adapter must degrade gracefully without it.

@@ -1,0 +1,17 @@
+{
+  "headers": [
+    "one",
+    "label",
+    "decimal_col",
+    "flag"
+  ],
+  "data": [
+    [
+      "1",
+      "text",
+      "2.5",
+      "true"
+    ]
+  ],
+  "total": 1
+}

@@ -1,0 +1,20 @@
+{
+  "headers": [
+    "name",
+    "description",
+    "id"
+  ],
+  "data": [
+    [
+      "NY_TAXI",
+      "NY Taxi sample data",
+      "6"
+    ],
+    [
+      "TPCDS_DB",
+      "TPC-DS benchmark sample data",
+      "308"
+    ]
+  ],
+  "total": 2
+}

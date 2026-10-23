@@ -1,0 +1,38 @@
+{
+  "select_1": {
+    "sql": "SELECT 1",
+    "keys": [
+      "data",
+      "headers",
+      "total"
+    ],
+    "total": 1
+  },
+  "select_typed_columns": {
+    "sql": "SELECT 1 AS one, 'text' AS label, 2.5 AS decimal_col, true AS flag",
+    "keys": [
+      "data",
+      "headers",
+      "total"
+    ],
+    "total": 1
+  },
+  "show_lightning_databases": {
+    "sql": "SHOW LIGHTNING DATABASES",
+    "keys": [
+      "data",
+      "headers",
+      "total"
+    ],
+    "total": 2
+  },
+  "empty_result": {
+    "sql": "SELECT 1 AS n WHERE 1 = 0",
+    "keys": [
+      "data",
+      "headers",
+      "total"
+    ],
+    "total": 0
+  }
+}

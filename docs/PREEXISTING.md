@@ -9,6 +9,8 @@ declared here. Open-source libraries do not need declaring.
 | World Model specification + conformance runner | `github.com/Meterless/Meterless` (Apache-2.0) | pre-existing | Same: read-only reference; the 8 inline checks are translated to pytest during the window. |
 | Zetaris getting-started repo | `github.com/zetaris/getting-started` | pre-existing | Read-only reference for the REST call shape and the REST-table registration recipe. Not shipped. |
 | `zetaris-platform` Docker install | Sponsor-provided | installed 2026-10-12 | The local Zetaris instance. Infrastructure, not part of our submission. |
+| `NY_TAXI` sample database (15 tables) | Shipped with the sponsor's Zetaris install | pre-existing | Present on the instance before the build window. **Declared, not used** unless explicitly chosen later; our own data lives in separate Lightning databases. |
+| `TPCDS_DB` sample database (308 tables) | Shipped with the sponsor's Zetaris install | pre-existing | As above: present on the instance, declared for completeness. |
 
 **Everything in `app/`, `datasvc/`, `scripts/`, `tests/`, `data/`, `web/` and `docs/`
 was written inside the build window.**
