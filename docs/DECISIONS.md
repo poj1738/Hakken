@@ -11,6 +11,29 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-24 — Two datasvc URLs, because two networks reach it
+
+**Decision.** `DATASVC_PUBLIC_URL` is what **Zetaris** uses and goes verbatim into the
+`CREATE LIGHTNING REST TABLE ... endpoint` SQL. `DATASVC_INTERNAL_URL` is what **our own
+app** uses. `docker-compose.yml` overrides only the internal one, and `config.py`
+rejects a `datasvc:` host for the public one.
+
+**Why.** The first draft of `docker-compose.yml` set
+`DATASVC_PUBLIC_URL: http://datasvc:8100` — correct for our app on our compose network,
+and wrong for its documented purpose. Zetaris runs in a **separate compose project** and
+cannot resolve `datasvc`. The registration SQL would have embedded that hostname, the
+`CREATE` would have succeeded, and every query against the table would then have failed.
+
+That is precisely the failure the Zetaris HOWTO warns about — "a successful `CREATE`
+alone does not confirm a usable table" — and it is slow to diagnose, because the symptom
+appears one step away from the cause. Caught by reading the compose file against
+`.env.example`, before Phase 3 existed to be broken by it. A validator now makes the
+mistake impossible to reintroduce silently, with a test for both directions.
+
+**Still unproven:** whether the Zetaris containers can reach `host.docker.internal:8100`
+at all. That is the Phase 3 spike, with fallbacks in order: put datasvc on the Zetaris
+compose network, MinIO/Parquet, then Postgres over JDBC.
+
 ## 2026-10-24 — `finish_reason` cannot be trusted to detect truncation **[live — Arpon's machine, 24 Oct]**
 
 **Decision.** The Meterless adapter must detect a truncated response by comparing

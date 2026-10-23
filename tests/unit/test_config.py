@@ -156,3 +156,28 @@ class TestOtherValidation:
             make_settings(max_agent_iterations=0)
         with pytest.raises(ValidationError):
             make_settings(zetaris_query_limit=0)
+
+
+class TestDatasvcUrls:
+    """Two URLs, two networks. Confusing them makes registration silently
+    useless: CREATE LIGHTNING REST TABLE succeeds and every query then fails.
+    """
+
+    def test_rejects_a_compose_only_host_for_the_zetaris_facing_url(self, make_settings) -> None:
+        with pytest.raises(ValidationError, match="Zetaris containers"):
+            make_settings(datasvc_public_url="http://datasvc:8100")
+
+    def test_accepts_host_docker_internal(self, make_settings) -> None:
+        s = make_settings(datasvc_public_url="http://host.docker.internal:8100")
+        assert s.datasvc_public_url == "http://host.docker.internal:8100"
+
+    def test_accepts_a_lan_address(self, make_settings) -> None:
+        assert make_settings(datasvc_public_url="http://192.168.1.20:8100/").datasvc_public_url == (
+            "http://192.168.1.20:8100"
+        )
+
+    def test_internal_url_may_be_a_compose_name(self, make_settings) -> None:
+        """The app's own calls run on our compose network, so this is correct."""
+        assert make_settings(datasvc_internal_url="http://datasvc:8100").datasvc_internal_url == (
+            "http://datasvc:8100"
+        )

@@ -10,7 +10,11 @@ services:
       # Override the host-facing URLs for in-container networking.
       ZETARIS_REST_URL: http://host.docker.internal:8888/api/v1.0
       METERLESS_BASE_URL: http://host.docker.internal:8088/v1
-      DATASVC_PUBLIC_URL: http://datasvc:8100
+      # Only the INTERNAL url is a compose hostname. DATASVC_PUBLIC_URL is
+      # deliberately NOT overridden: it is baked into the registration SQL and
+      # must stay reachable from the Zetaris containers, which are in a
+      # different compose project and cannot resolve "datasvc".
+      DATASVC_INTERNAL_URL: http://datasvc:8100
       PORT: "8000"
     ports: ["8000:8000"]
     extra_hosts: ["host.docker.internal:host-gateway"]

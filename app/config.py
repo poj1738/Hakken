@@ -83,7 +83,11 @@ class Settings(BaseSettings):
     max_retries: int = Field(default=2, ge=0)
     run_timeout_s: float = Field(default=600.0, gt=0)
     state_dir: Path = Path(".state")
+    # The URL Zetaris uses to reach datasvc. Goes verbatim into the
+    # registration SQL, so it must resolve from inside the Zetaris containers.
     datasvc_public_url: str = "http://host.docker.internal:8100"
+    # The URL our own app uses. A compose hostname here is fine.
+    datasvc_internal_url: str = "http://localhost:8100"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     port: int = 8000
 
@@ -104,6 +108,27 @@ class Settings(BaseSettings):
     @classmethod
     def _normalise(cls, v: str) -> str:
         return normalise_meterless_base(v)
+
+    @field_validator("datasvc_public_url")
+    @classmethod
+    def _zetaris_reachable(cls, v: str) -> str:
+        """Reject a URL only our own compose network can resolve.
+
+        This value is embedded in `CREATE LIGHTNING REST TABLE ... endpoint`.
+        Zetaris runs in a different compose project, so a service name like
+        `datasvc` resolves for us and not for it -- the CREATE succeeds and
+        every later query fails, which is slow to diagnose.
+        """
+        v = v.strip().rstrip("/")
+        host = re.sub(r"^https?://", "", v).split("/")[0].split(":")[0]
+        if host == "datasvc":
+            raise ValueError(
+                "DATASVC_PUBLIC_URL must be reachable from the Zetaris containers, "
+                "not a name on our own compose network. Use host.docker.internal:8100 "
+                "(or the host's LAN address). Set DATASVC_INTERNAL_URL=http://datasvc:8100 "
+                "for our app's own calls instead."
+            )
+        return v
 
     @field_validator("state_dir")
     @classmethod
@@ -181,6 +206,7 @@ class Settings(BaseSettings):
             "run_timeout_s": self.run_timeout_s,
             "state_dir": str(self.state_dir),
             "datasvc_public_url": self.datasvc_public_url,
+            "datasvc_internal_url": self.datasvc_internal_url,
             "log_level": self.log_level,
             "port": self.port,
         }
