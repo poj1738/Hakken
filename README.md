@@ -130,9 +130,9 @@ and its conformance runner disagree.
   **Lane pinning is not honoured** on this Runtime build: every request races six lanes
   under a learned router, so role→disposition routing can only ever be a declared
   intent, and the trace will record what actually ran. See `docs/DECISIONS.md`.
-- **AI coding tools used:** logged honestly in `docs/AI_TOOLS_USAGE.md`. Cursor is
-  optional for this project — the repo is Cursor-ready (`.cursor/rules/project.mdc`)
-  but not tied to it, and Claude Code did the work recorded so far.
+- **AI coding tools used:** **Claude Code**, logged per session in
+  `docs/AI_TOOLS_USAGE.md`. `CLAUDE.md` holds the working rules. Cursor is not used —
+  see that log for why.
 - **Open-source code to be materially adapted:** the H-MEM and World Model
   specifications and conformance vectors from the Meterless repo (Apache-2.0). Nothing
   is ported yet; when it is, each ported test file will carry an Apache-2.0 attribution

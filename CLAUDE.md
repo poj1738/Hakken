@@ -17,11 +17,12 @@ vertical slice, then improve.
 3. **NVIDIA:** Nemotron is reached *through Nightshift*. The NVIDIA API key lives
    **only** in Nightshift → Setup → Providers — never in our code, `.env`, logs,
    README, video or slides. Traces must show which model handled each request.
-4. **AI coding tools:** Cursor is **optional** — any coding tool is fine (Claude Code,
-   Copilot, Codex, none). The official resources are inconsistent about whether Cursor
-   is mandatory, so we keep the repo Cursor-ready (`.cursor/rules/project.mdc` mirrors
-   this file) without depending on it. What the AI Usage Policy actually requires is an
-   **honest declaration of which tools we used** — log it in `docs/AI_TOOLS_USAGE.md`.
+4. **AI coding tools:** we build with **Claude Code**. This file is the single source
+   of our working rules — no mirrored rules file, because a copy drifts and then
+   misleads. Cursor is not used; the official resources disagree on whether it is
+   mandatory, and we declare what we actually used rather than what looks compliant.
+   What the AI Usage Policy requires is an **honest declaration** — log every session
+   in `docs/AI_TOOLS_USAGE.md`.
 5. **Secrets only from environment variables.** `.env` is gitignored; only
    `.env.example` is committed. Never print, log or echo a secret value, and never
    read `.env` back into the chat. Refer to secrets by variable name only.
@@ -56,6 +57,65 @@ vertical slice, then improve.
   secret scan must pass (`make scan`).
 - Keep `docs/DECISIONS.md` (decision, why, date) and `TODO.md` ordered by judging impact.
 - **Be honest in the README:** claim only what the code and traces show.
+
+## Team workflow
+
+Three people, different hours, one five-day deadline. The cost of getting this wrong is
+two people building the same adapter, or a silent conflict in `app/schemas.py`.
+
+### At session start
+
+```bash
+git pull origin main
+```
+
+Then read **`PROGRESS.md`** (current state, what is blocked, what is next) and the
+**latest 3 entries in `docs/HANDOFF.md`**. The SessionStart hook prints all of this
+automatically — if it did not run, run `bash scripts/session_start.sh` yourself.
+
+### While working
+
+- Work on a branch named **`<name>/<topic>`** — for example `arpon/zetaris-adapter`.
+  Never commit directly to `main`.
+- **Claim your task in a handoff entry before starting it**, so nobody duplicates work.
+- **Never commit `.env`.** It is gitignored and the pre-commit hook blocks it; do not
+  work around either.
+
+### At session end
+
+Run these, in order:
+
+```bash
+make test                       # must be green
+python3 scripts/secret_scan.py --all   # must be clean
+```
+
+Then:
+
+1. Update **`PROGRESS.md`** — it holds current state only; overwrite it.
+2. Add an entry to **`docs/HANDOFF.md`** — append-only, newest first, using the
+   template in that file. Fill every field; "Broken: nothing" is a useful sentence.
+3. Log the session in **`docs/AI_TOOLS_USAGE.md`**.
+4. Push your branch and open or update a PR:
+   ```bash
+   git push -u origin <name>/<topic>
+   gh pr create --fill        # or update the existing PR
+   ```
+5. Merge to `main` only when **CI is green**.
+
+### Shared files — say so twice
+
+If you change any of these, call it out **in your handoff entry and in the PR
+description**, because a teammate will either hit a conflict or silently depend on it:
+
+`app/schemas.py` · `app/config.py` · `.env.example` · `CLAUDE.md` ·
+`requirements.txt` · `Makefile` · `.github/workflows/ci.yml`
+
+### Credentials are personal
+
+Everyone runs their own Zetaris and Nightshift and uses their own tokens in their own
+local `.env`. **Never share a token, and never paste one into a chat, an issue or a PR.**
+If one is exposed, rotate it. New teammates start at `docs/ONBOARDING.md`.
 
 ## Known environment facts (verified 2026-10-23)
 

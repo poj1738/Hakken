@@ -55,14 +55,17 @@ not respected. Our role→disposition mapping (Planner/Executor → fast,
 Evaluator/Writer → deep) is therefore a declared *intent*; the trace records the model
 that actually ran. We do not claim lane control.
 
-## AI coding tools (Cursor optional)
+## AI coding tools
 
-The repo ships `.cursor/rules/project.mdc`, mirroring `CLAUDE.md`, so the same working
-rules apply if a teammate works in Cursor. We treat Cursor as **optional**: the
-official resources disagree on whether it is mandatory, so the repo is Cursor-ready
-without being dependent on it, and any coding tool is acceptable. Every tool actually
-used is declared in `docs/AI_TOOLS_USAGE.md`, which is what the AI Usage Policy asks
-for. We do not claim Cursor usage we did not have.
+We build with **Claude Code**, and `CLAUDE.md` carries the working rules the agent
+follows. Every session is logged in `docs/AI_TOOLS_USAGE.md`, which is what the AI
+Usage Policy asks for.
+
+**We do not use Cursor.** The official resources disagree on whether it is mandatory —
+the event page reads as required, other resources call it optional. We would rather
+declare honestly what we used than claim a tool we did not touch. The repo briefly
+carried a mirrored `.cursor/rules` file; it was removed because a duplicated rules file
+drifts from the original.
 
 ## What was unique
 
