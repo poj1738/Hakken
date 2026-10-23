@@ -1,24 +1,30 @@
 # AI coding tool usage log
 
-**Cursor is optional for us.** The event's resource docs are inconsistent — the event
-page's rules read as "must use Cursor", while other official resources call it
-optional — so we keep the repo Cursor-ready (`.cursor/rules/project.mdc` mirrors
-`CLAUDE.md`) without being tied to it. Any AI coding tool is fine: Cursor, Claude Code,
-Copilot, Windsurf, Codex, or none.
+**We build with Claude Code.** `CLAUDE.md` is the single source of our working rules —
+there is no second rules file to keep in sync.
+
+## On Cursor
+
+The event's resources are inconsistent: the event page's rules read as "must use
+Cursor", while other official resources call it optional. We are not using it. The repo
+previously carried a `.cursor/rules/project.mdc` mirroring `CLAUDE.md`; it has been
+removed, because a duplicated rules file drifts from the original and then quietly
+misleads whoever reads the stale copy.
+
+If a teammate does choose to work in Cursor, point it at `CLAUDE.md` directly rather
+than reintroducing a mirror, and add a row below.
 
 What the AI Usage Policy actually requires is that we **declare honestly which tools we
-used**. That is the point of this log. Fill in one row per session as work happens, and
-do not backfill guesses. If a tool was never used, leave it out rather than listing it
-to look compliant.
+used**. That is what this log is for.
+
+## The log
+
+One row per working session. Fill it in as work happens; do not backfill guesses. If a
+tool was never used, leave it out rather than listing it to look compliant.
 
 | Date (AEDT) | Who | Tool | Model / mode | What was built |
 |---|---|---|---|---|
 | 2026-10-23 | Arpon | Claude Code | Opus 5 | Phase 0 reference review and preflight; Phase 1 skeleton, config layer, secret scan |
+| 2026-10-24 | Arpon | Claude Code | Opus 5 | Team workflow: handoff log, session-start hook, CI, onboarding docs |
 
 The README's **AI and model usage** section summarises this for judges.
-
-## Note on the `.cursor/` directory
-
-`.cursor/rules/project.mdc` is generated from `CLAUDE.md` so both tools get identical
-working rules. If you edit the rules, edit `CLAUDE.md` and re-mirror it; do not let the
-two drift.

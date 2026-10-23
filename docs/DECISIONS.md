@@ -1,11 +1,17 @@
 # Decisions
 
-Decision, why, date. Newest first. Anything discovered live is marked **[live]** with
-the date it was observed, so a later reader can tell evidence from assumption.
+Decision, why, date. Newest first.
+
+Anything discovered by observation rather than from a published contract is marked
+**[live]** with **whose machine and when**, so a later reader can tell evidence from
+assumption — and can tell a team-wide fact from one person's setup. A `[live]` finding
+is one data point: it may not reproduce on your machine, on a different runtime build,
+or after a provider update. Re-verify before depending on it, and add your own
+observation rather than editing someone else's.
 
 ---
 
-## 2026-10-23 — Record `routed_model`, not `provider_model`, as the model-per-request evidence **[live]**
+## 2026-10-23 — Record `routed_model`, not `provider_model`, as the model-per-request evidence **[live — Arpon's machine, 23 Oct]**
 
 **Decision.** The trace field that names which model answered is
 `meterless.routed_model` (cross-checked against `meterless.winning_route.model` and
@@ -20,7 +26,7 @@ NVIDIA award asks for the model.
 
 ---
 
-## 2026-10-23 — Lane pinning is NOT honoured; fall back to dispositions **[live]**
+## 2026-10-23 — Lane pinning is NOT honoured; fall back to dispositions **[live — Arpon's machine, 23 Oct]**
 
 **Decision.** Abandon pinning concrete `nvidia/nemotron-*` ids to the FAST and DEEP
 lanes. Use the dispositions (`meterless/fast`, `meterless/deep`) and record the model
@@ -52,7 +58,7 @@ happened next to it. Recheck if a later Nightshift build exposes `app_policy.lan
 
 ---
 
-## 2026-10-23 — Never send a small `max_tokens` **[live]**
+## 2026-10-23 — Never send a small `max_tokens` **[live — Arpon's machine, 23 Oct]**
 
 **Decision.** Do not set a tight `max_tokens` on any Nightshift call. Leave it unset,
 or set it generously (≥512) with an explicit comment saying why.
@@ -67,7 +73,7 @@ into a 200 with the content `"ready"`.
 
 ---
 
-## 2026-10-23 — Capture the whole `meterless` receipt into the trace, not response headers **[live]**
+## 2026-10-23 — Capture the whole `meterless` receipt into the trace, not response headers **[live — Arpon's machine, 23 Oct]**
 
 **Decision.** The adapter records the `meterless` object from the **response body** on
 every call. `with_raw_response` for headers is not sufficient.

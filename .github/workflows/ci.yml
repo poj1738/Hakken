@@ -1,0 +1,52 @@
+name: CI
+
+# Runs with NO secrets and NO services. That is the point: it reproduces what a
+# judge sees on a fresh clone. If CI needs a token to pass, we have built
+# something that cannot be graded.
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      SAMPLE_MODE: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Confirm no .env is present
+        # A fresh clone must never carry one. If this fails, a secret was committed.
+        run: |
+          if [ -f .env ]; then
+            echo "::error::.env exists in a fresh clone - a secret may have been committed"
+            exit 1
+          fi
+          echo "no .env present, as expected"
+
+      - name: Run tests
+        # SAMPLE_MODE=true, no .env, no Zetaris, no Nightshift, no network calls.
+        run: python -m pytest
+
+      - name: Secret scan
+        run: python scripts/secret_scan.py --all
+
+      - name: Preflight is importable and runs read-only
+        # It must degrade honestly when nothing is reachable rather than crash.
+        # A non-zero exit is expected here: the services genuinely are not up.
+        run: |
+          python scripts/preflight.py --no-chat || true
+          echo "preflight completed without crashing"

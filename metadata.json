@@ -36,10 +36,8 @@
       "status": "provider verified online and answering; engines pending"
     },
     "cursor": {
-      "status": "optional",
-      "cursor_ready": true,
-      "rules_file": ".cursor/rules/project.mdc",
-      "note": "Cursor is optional for this project; the repo is Cursor-ready but not dependent on it.",
+      "used": false,
+      "note": "Not used. We build with Claude Code; CLAUDE.md is the single source of working rules.",
       "ai_tools_log": "docs/AI_TOOLS_USAGE.md"
     },
     "nvidia": {
@@ -50,7 +48,10 @@
       "reached_via": "Nightshift lanes only; the NVIDIA API key lives solely in Nightshift -> Setup -> Providers",
       "evidence": "meterless.routed_model and winning_route in every trace event",
       "note": "lane pinning is not honoured on Runtime m1-m4; the router chooses and we record what answered"
-    }
+    },
+    "ai_coding_tools": [
+      "claude-code"
+    ]
   },
   "entry_points": {
     "http": "POST /run",

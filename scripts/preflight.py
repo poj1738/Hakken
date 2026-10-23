@@ -18,11 +18,13 @@ import argparse
 import json
 import os
 import re
+import platform
 import socket
 import subprocess
 import sys
 import time
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -383,6 +385,38 @@ def check_meterless(do_chat: bool) -> None:
 # --- report ---------------------------------------------------------------
 
 
+def save_results(path: Path) -> None:
+    """Write the run to .state/preflight.json (gitignored).
+
+    Deliberately NOT written into any shared doc: a preflight result is a fact
+    about one machine at one moment, and shared docs that absorb it silently
+    start lying to everyone else. See docs/ENVIRONMENTS.md.
+    """
+    payload = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "host": platform.node(),
+        "platform": platform.platform(),
+        "python": platform.python_version(),
+        "summary": {
+            "pass": sum(1 for r in rows if r[2] == "PASS"),
+            "fail": sum(1 for r in rows if r[2] == "FAIL"),
+            "warn": sum(1 for r in rows if r[2] == "WARN"),
+        },
+        "checks": [
+            {"group": g, "check": c, "status": s, "detail": d} for g, c, s, d in rows
+        ],
+    }
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    except OSError as e:
+        print(f"\n  (could not write {path}: {e})")
+        return
+    print(f"  saved to {path}")
+    print("  This is a fact about THIS machine right now. Do not copy it into a")
+    print("  shared doc -- put a one-line summary in your section of docs/ENVIRONMENTS.md.")
+
+
 def report() -> int:
     width_check = max(len(r[1]) for r in rows)
     current = ""
@@ -402,13 +436,20 @@ def report() -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--no-chat", action="store_true", help="skip the live chat completion")
+    parser.add_argument("--no-save", action="store_true",
+                        help="do not write .state/preflight.json")
     args = parser.parse_args()
 
     check_tools()
     check_env()
     check_zetaris()
     check_meterless(do_chat=not args.no_chat)
-    return report()
+    exit_code = report()
+    if not args.no_save:
+        save_results(Path(os.environ.get("STATE_DIR", ".state")) / "preflight.json"
+                     if os.path.isabs(os.environ.get("STATE_DIR", ".state"))
+                     else ROOT / os.environ.get("STATE_DIR", ".state") / "preflight.json")
+    return exit_code
 
 
 if __name__ == "__main__":
