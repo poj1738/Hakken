@@ -23,7 +23,8 @@ put the date on it.
 | **Zetaris** | **Local** — sponsor's `zetaris-platform` Docker bundle. REST `localhost:8888/api/v1.0`, org `1`. Carries the install's pre-existing `NY_TAXI` + `TPCDS_DB` sample data. |
 | **Nightshift** | **Own**, at `127.0.0.1:8088/v1`, build `m1-m4`. NVIDIA key in Setup → Providers. Lanes: `deep-reasoner`, `fast-tools`, `deep-verifier` — all cloud Nemotron, 0 local. |
 | **Last preflight** | **2026-10-23 — 22 pass / 0 fail.** Both services were up; `meterless/auto` answered by `nvidia/nemotron-3.5-super-vl-120b-a12b`. |
-| **Caveat** | Docker and Nightshift were **shut down after that run**, so the result is stale until re-run. `gh` is not installed on this machine. Python is 3.12 while CI pins 3.11. |
+| **Tooling** | `gh` 2.103.0, authenticated as `poj1738` (24 Oct) — so PRs and CI checks can be driven from the terminal here. |
+| **Caveat** | Python is 3.12 while CI pins 3.11 — if something passes locally and fails in CI, suspect that first. |
 
 ## Anshuman
 
