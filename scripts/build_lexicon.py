@@ -329,8 +329,36 @@ def build() -> int:
     log(f"  synthetic codes:     {len(records) - real_codes}/{len(records)}")
     log(f"  with real dos_weight: {with_volume}/{len(records)}")
     if atc_conflicts:
+        # Written to a file as well as logged, because APINCHS classification is
+        # by ATC prefix: a disagreement can move a medicine in or out of a
+        # high-risk class, and that is a clinical decision, not a build detail.
+        apinchs_prefixes = [r["atc_prefix"] for r in apinchs]
+
+        def apinchs_for(code: str) -> str:
+            for prefix in apinchs_prefixes:  # already longest-first
+                if code.startswith(prefix):
+                    return next(r["apinchs_class"] for r in apinchs if r["atc_prefix"] == prefix)
+            return ""
+
+        review = OUT / "atc_crosscheck.csv"
+        with review.open("w", newline="", encoding="utf-8") as fh:
+            w = csv.writer(fh)
+            w.writerow(["generic", "brand", "spec_atc", "spec_apinchs",
+                        "pbs_atc", "pbs_apinchs", "changes_high_risk"])
+            for generic, brand, spec_atc, pbs_atc in atc_conflicts:
+                a, b = apinchs_for(spec_atc), apinchs_for(pbs_atc)
+                w.writerow([generic, brand, spec_atc, a, pbs_atc, b, "YES" if a != b else ""])
+        moved = [(g, b, s, p2) for g, b, s, p2 in atc_conflicts
+                 if apinchs_for(s) != apinchs_for(p2)]
         log(f"\n  ATC cross-check: {len(atc_conflicts)} disagreement(s) between DATA_SPEC "
-            f"and PBS. DATA_SPEC wins; these are for a human to resolve:")
+            f"and PBS -> {review}")
+        if moved:
+            log(f"  *** {len(moved)} of them CHANGE the APINCHS class, which changes whether a")
+            log(f"      medicine is high-risk. DATA_SPEC wins, but these need a human:")
+            for generic, brand, spec_atc, pbs_atc in moved:
+                log(f"        {generic:34} spec={spec_atc:9} ({apinchs_for(spec_atc) or '-'})"
+                    f"  pbs={pbs_atc:9} ({apinchs_for(pbs_atc) or '-'})")
+        log("  full list:")
         for generic, brand, spec_atc, pbs_atc in atc_conflicts[:25]:
             log(f"    {generic:44} {brand:22} spec={spec_atc:10} pbs={pbs_atc}")
         if len(atc_conflicts) > 25:

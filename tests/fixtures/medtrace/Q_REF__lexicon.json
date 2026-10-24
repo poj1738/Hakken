@@ -18,7 +18,7 @@
  ],
  "data": [
   [
-   "SYN-PBS-0001",
+   "13494F",
    "Coversyl",
    "perindopril",
    "SYN-AMT-MP-0067",
@@ -28,14 +28,14 @@
    "5 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "perindopril",
    "0.000000"
   ],
   [
-   "SYN-PBS-0002",
+   "13555K",
    "Coversyl",
    "perindopril",
    "SYN-AMT-MP-0067",
@@ -45,14 +45,14 @@
    "10 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "perindopril",
    "0.000000"
   ],
   [
-   "SYN-PBS-0003",
+   "13371R",
    "Coversyl",
    "perindopril",
    "SYN-AMT-MP-0067",
@@ -62,14 +62,14 @@
    "4 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "perindopril",
    "0.000000"
   ],
   [
-   "SYN-PBS-0004",
+   "13372T",
    "Coversyl",
    "perindopril",
    "SYN-AMT-MP-0067",
@@ -79,14 +79,14 @@
    "8 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "perindopril",
    "0.000000"
   ],
   [
-   "SYN-PBS-0005",
+   "13532F",
    "Norvasc",
    "amlodipine",
    "SYN-AMT-MP-0004",
@@ -103,7 +103,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0006",
+   "13562T",
    "Norvasc",
    "amlodipine",
    "SYN-AMT-MP-0004",
@@ -120,7 +120,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0007",
+   "13436E",
    "Atacand",
    "candesartan",
    "SYN-AMT-MP-0014",
@@ -130,14 +130,14 @@
    "8 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "candesartan",
    "0.000000"
   ],
   [
-   "SYN-PBS-0008",
+   "13565Y",
    "Atacand",
    "candesartan",
    "SYN-AMT-MP-0014",
@@ -147,14 +147,14 @@
    "16 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "candesartan",
    "0.000000"
   ],
   [
-   "SYN-PBS-0009",
+   "13438G",
    "Atacand",
    "candesartan",
    "SYN-AMT-MP-0014",
@@ -164,14 +164,14 @@
    "32 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "candesartan",
    "0.000000"
   ],
   [
-   "SYN-PBS-0010",
+   "13437F",
    "Micardis",
    "telmisartan",
    "SYN-AMT-MP-0088",
@@ -181,14 +181,14 @@
    "40 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "false",
    "telmisartan",
    "0.000000"
   ],
   [
-   "SYN-PBS-0011",
+   "13593K",
    "Micardis",
    "telmisartan",
    "SYN-AMT-MP-0088",
@@ -198,14 +198,14 @@
    "80 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "false",
    "telmisartan",
    "0.000000"
   ],
   [
-   "SYN-PBS-0012",
+   "13380F",
    "Avapro",
    "irbesartan",
    "SYN-AMT-MP-0049",
@@ -215,14 +215,14 @@
    "150 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "irbesartan",
    "0.000000"
   ],
   [
-   "SYN-PBS-0013",
+   "13564X",
    "Avapro",
    "irbesartan",
    "SYN-AMT-MP-0049",
@@ -232,14 +232,14 @@
    "300 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "irbesartan",
    "0.000000"
   ],
   [
-   "SYN-PBS-0014",
+   "13405M",
    "Tritace",
    "ramipril",
    "SYN-AMT-MP-0073",
@@ -249,14 +249,14 @@
    "5 mg",
    "capsule",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "ramipril",
    "0.000000"
   ],
   [
-   "SYN-PBS-0015",
+   "1316G",
    "Tritace",
    "ramipril",
    "SYN-AMT-MP-0073",
@@ -270,10 +270,10 @@
    "5",
    "false",
    "ramipril",
-   "0.000000"
+   "0.029466"
   ],
   [
-   "SYN-PBS-0016",
+   "13494F",
    "Coversyl Plus",
    "perindopril/indapamide",
    "SYN-AMT-MP-0069",
@@ -283,14 +283,14 @@
    "5/1.25 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "perindopril;indapamide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0017",
+   "13380F",
    "Avapro HCT",
    "irbesartan/hydrochlorothiazide",
    "SYN-AMT-MP-0050",
@@ -300,14 +300,14 @@
    "150/12.5 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "irbesartan;hydrochlorothiazide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0018",
+   "13564X",
    "Avapro HCT",
    "irbesartan/hydrochlorothiazide",
    "SYN-AMT-MP-0050",
@@ -317,14 +317,14 @@
    "300/12.5 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "irbesartan;hydrochlorothiazide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0019",
+   "13380F",
    "Karvezide",
    "irbesartan/hydrochlorothiazide",
    "SYN-AMT-MP-0050",
@@ -334,14 +334,14 @@
    "150/12.5 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "irbesartan;hydrochlorothiazide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0020",
+   "13564X",
    "Karvezide",
    "irbesartan/hydrochlorothiazide",
    "SYN-AMT-MP-0050",
@@ -351,14 +351,14 @@
    "300/12.5 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "irbesartan;hydrochlorothiazide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0021",
+   "13565Y",
    "Atacand Plus",
    "candesartan/hydrochlorothiazide",
    "SYN-AMT-MP-0015",
@@ -368,14 +368,14 @@
    "16/12.5 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "candesartan;hydrochlorothiazide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0022",
+   "13437F",
    "Twynsta",
    "telmisartan/amlodipine",
    "SYN-AMT-MP-0089",
@@ -385,14 +385,14 @@
    "40/5 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "true",
    "telmisartan;amlodipine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0023",
+   "13593K",
    "Twynsta",
    "telmisartan/amlodipine",
    "SYN-AMT-MP-0089",
@@ -402,14 +402,14 @@
    "80/5 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "true",
    "telmisartan;amlodipine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0024",
+   "13494F",
    "Coveram",
    "perindopril/amlodipine",
    "SYN-AMT-MP-0068",
@@ -419,14 +419,14 @@
    "5/5 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "perindopril;amlodipine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0025",
+   "13555K",
    "Coveram",
    "perindopril/amlodipine",
    "SYN-AMT-MP-0068",
@@ -436,14 +436,14 @@
    "10/5 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "perindopril;amlodipine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0026",
+   "13532F",
    "Norvasc",
    "amlodipine",
    "SYN-AMT-MP-0004",
@@ -453,14 +453,14 @@
    "5 mg",
    "tablet",
    "IR",
-   "5",
+   "60",
    "5",
    "false",
    "amlodipine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0027",
+   "13406N",
    "Crestor",
    "rosuvastatin",
    "SYN-AMT-MP-0076",
@@ -470,14 +470,14 @@
    "5 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "rosuvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0028",
+   "13586C",
    "Crestor",
    "rosuvastatin",
    "SYN-AMT-MP-0076",
@@ -487,14 +487,14 @@
    "10 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "rosuvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0029",
+   "13588E",
    "Crestor",
    "rosuvastatin",
    "SYN-AMT-MP-0076",
@@ -504,14 +504,14 @@
    "20 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "rosuvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0030",
+   "13589F",
    "Crestor",
    "rosuvastatin",
    "SYN-AMT-MP-0076",
@@ -521,14 +521,14 @@
    "40 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "rosuvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0031",
+   "13495G",
    "Lipitor",
    "atorvastatin",
    "SYN-AMT-MP-0009",
@@ -538,14 +538,14 @@
    "10 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "atorvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0032",
+   "13529C",
    "Lipitor",
    "atorvastatin",
    "SYN-AMT-MP-0009",
@@ -555,14 +555,14 @@
    "20 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "atorvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0033",
+   "13468W",
    "Lipitor",
    "atorvastatin",
    "SYN-AMT-MP-0009",
@@ -572,14 +572,14 @@
    "40 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "atorvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0034",
+   "13374X",
    "Lipitor",
    "atorvastatin",
    "SYN-AMT-MP-0009",
@@ -589,14 +589,14 @@
    "80 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "atorvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0035",
+   "13373W",
    "Zocor",
    "simvastatin",
    "SYN-AMT-MP-0081",
@@ -606,14 +606,14 @@
    "20 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "simvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0036",
+   "13471B",
    "Zocor",
    "simvastatin",
    "SYN-AMT-MP-0081",
@@ -623,14 +623,14 @@
    "40 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "simvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0037",
+   "13532F",
    "Caduet",
    "amlodipine/atorvastatin",
    "SYN-AMT-MP-0005",
@@ -640,14 +640,14 @@
    "5/10 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "amlodipine;atorvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0038",
+   "13562T",
    "Caduet",
    "amlodipine/atorvastatin",
    "SYN-AMT-MP-0005",
@@ -657,14 +657,14 @@
    "10/80 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "amlodipine;atorvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0039",
+   "13440J",
    "Rosuzet",
    "ezetimibe/rosuvastatin",
    "SYN-AMT-MP-0035",
@@ -674,14 +674,14 @@
    "10/10 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "ezetimibe;rosuvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0040",
+   "13440J",
    "Rosuzet",
    "ezetimibe/rosuvastatin",
    "SYN-AMT-MP-0035",
@@ -691,14 +691,14 @@
    "10/40 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "ezetimibe;rosuvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0041",
+   "13440J",
    "Ezetrol",
    "ezetimibe",
    "SYN-AMT-MP-0033",
@@ -708,14 +708,14 @@
    "10 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "ezetimibe",
    "0.000000"
   ],
   [
-   "SYN-PBS-0042",
+   "14501F",
    "Somac",
    "pantoprazole",
    "SYN-AMT-MP-0064",
@@ -725,14 +725,14 @@
    "20 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "pantoprazole",
    "0.000000"
   ],
   [
-   "SYN-PBS-0043",
+   "11678P",
    "Somac",
    "pantoprazole",
    "SYN-AMT-MP-0064",
@@ -749,7 +749,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0044",
+   "11692J",
    "Nexium",
    "esomeprazole",
    "SYN-AMT-MP-0032",
@@ -766,7 +766,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0045",
+   "12283L",
    "Nexium",
    "esomeprazole",
    "SYN-AMT-MP-0032",
@@ -776,14 +776,14 @@
    "40 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "esomeprazole",
    "0.000000"
   ],
   [
-   "SYN-PBS-0046",
+   "14502G",
    "Pariet",
    "rabeprazole",
    "SYN-AMT-MP-0072",
@@ -793,14 +793,14 @@
    "10 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "false",
    "rabeprazole",
    "0.000000"
   ],
   [
-   "SYN-PBS-0047",
+   "11670F",
    "Pariet",
    "rabeprazole",
    "SYN-AMT-MP-0072",
@@ -817,7 +817,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0048",
+   "15047Y",
    "Pepcidine",
    "famotidine",
    "SYN-AMT-MP-0036",
@@ -827,14 +827,14 @@
    "20 mg",
    "tablet",
    "IR",
-   "60",
+   "120",
    "5",
    "false",
    "famotidine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0049",
+   "10598T",
    "Panadol Osteo",
    "paracetamol",
    "SYN-AMT-MP-0065",
@@ -844,14 +844,14 @@
    "665 mg",
    "modified release tablet",
    "MR",
-   "60",
+   "192",
    "5",
    "false",
    "paracetamol",
-   "0.000000"
+   "0.003618"
   ],
   [
-   "SYN-PBS-0050",
+   "12518W",
    "OxyContin",
    "oxycodone",
    "SYN-AMT-MP-0062",
@@ -861,14 +861,14 @@
    "10 mg",
    "modified release tablet",
    "MR",
-   "60",
-   "2",
+   "56",
+   "0",
    "false",
    "oxycodone",
    "0.000000"
   ],
   [
-   "SYN-PBS-0051",
+   "12510K",
    "OxyContin",
    "oxycodone",
    "SYN-AMT-MP-0062",
@@ -878,14 +878,14 @@
    "20 mg",
    "modified release tablet",
    "MR",
-   "60",
-   "2",
+   "56",
+   "0",
    "false",
    "oxycodone",
    "0.000000"
   ],
   [
-   "SYN-PBS-0052",
+   "12031F",
    "Targin",
    "oxycodone/naloxone",
    "SYN-AMT-MP-0063",
@@ -895,14 +895,14 @@
    "10/5 mg",
    "modified release tablet",
    "MR",
-   "60",
-   "2",
+   "10",
+   "0",
    "true",
    "oxycodone;naloxone",
    "0.000000"
   ],
   [
-   "SYN-PBS-0053",
+   "12510K",
    "Targin",
    "oxycodone/naloxone",
    "SYN-AMT-MP-0063",
@@ -912,14 +912,14 @@
    "20/10 mg",
    "modified release tablet",
    "MR",
-   "60",
-   "2",
+   "56",
+   "0",
    "true",
    "oxycodone;naloxone",
    "0.000000"
   ],
   [
-   "SYN-PBS-0054",
+   "10756D",
    "Norspan",
    "buprenorphine",
    "SYN-AMT-MP-0012",
@@ -929,14 +929,14 @@
    "5 microgram/h",
    "patch",
    "MR",
-   "4",
    "2",
+   "0",
    "false",
    "buprenorphine",
-   "0.000000"
+   "0.000383"
   ],
   [
-   "SYN-PBS-0055",
+   "10948F",
    "Norspan",
    "buprenorphine",
    "SYN-AMT-MP-0012",
@@ -947,13 +947,13 @@
    "patch",
    "MR",
    "4",
-   "2",
+   "0",
    "false",
    "buprenorphine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0056",
+   "10970J",
    "Norspan",
    "buprenorphine",
    "SYN-AMT-MP-0012",
@@ -964,13 +964,13 @@
    "patch",
    "MR",
    "4",
-   "2",
+   "0",
    "false",
    "buprenorphine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0057",
+   "10092E",
    "Palexia SR",
    "tapentadol",
    "SYN-AMT-MP-0087",
@@ -980,14 +980,14 @@
    "50 mg",
    "modified release tablet",
    "MR",
-   "60",
-   "2",
+   "28",
+   "0",
    "false",
    "tapentadol",
-   "0.000000"
+   "0.002165"
   ],
   [
-   "SYN-PBS-0058",
+   "10094G",
    "Palexia SR",
    "tapentadol",
    "SYN-AMT-MP-0087",
@@ -997,14 +997,14 @@
    "100 mg",
    "modified release tablet",
    "MR",
-   "60",
-   "2",
+   "28",
+   "0",
    "false",
    "tapentadol",
-   "0.000000"
+   "0.009726"
   ],
   [
-   "SYN-PBS-0059",
+   "2335X",
    "Lyrica",
    "pregabalin",
    "SYN-AMT-MP-0071",
@@ -1014,14 +1014,14 @@
    "75 mg",
    "capsule",
    "IR",
-   "60",
+   "56",
    "5",
    "false",
    "pregabalin",
-   "0.000000"
+   "0.156126"
   ],
   [
-   "SYN-PBS-0060",
+   "8439E",
    "Celebrex",
    "celecoxib",
    "SYN-AMT-MP-0017",
@@ -1031,14 +1031,14 @@
    "100 mg",
    "capsule",
    "IR",
-   "30",
-   "5",
+   "60",
+   "3",
    "false",
    "celecoxib",
-   "0.000000"
+   "0.022843"
   ],
   [
-   "SYN-PBS-0061",
+   "8440F",
    "Celebrex",
    "celecoxib",
    "SYN-AMT-MP-0017",
@@ -1049,13 +1049,13 @@
    "capsule",
    "IR",
    "30",
-   "5",
+   "3",
    "false",
    "celecoxib",
-   "0.000000"
+   "0.084780"
   ],
   [
-   "SYN-PBS-0062",
+   "13233L",
    "Endone",
    "oxycodone",
    "SYN-AMT-MP-0062",
@@ -1065,14 +1065,14 @@
    "5 mg",
    "tablet",
    "IR",
-   "30",
+   "10",
    "0",
    "false",
    "oxycodone",
    "0.000000"
   ],
   [
-   "SYN-PBS-0063",
+   "13976N",
    "Diabex",
    "metformin",
    "SYN-AMT-MP-0057",
@@ -1082,14 +1082,14 @@
    "500 mg",
    "tablet",
    "IR",
-   "60",
+   "200",
    "5",
    "false",
    "metformin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0064",
+   "13976N",
    "Diabex",
    "metformin",
    "SYN-AMT-MP-0057",
@@ -1099,14 +1099,14 @@
    "1000 mg",
    "tablet",
    "IR",
-   "60",
+   "200",
    "5",
    "false",
    "metformin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0065",
+   "13976N",
    "Diaformin",
    "metformin",
    "SYN-AMT-MP-0057",
@@ -1116,14 +1116,14 @@
    "500 mg",
    "tablet",
    "IR",
-   "60",
+   "200",
    "5",
    "false",
    "metformin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0066",
+   "13976N",
    "Diaformin",
    "metformin",
    "SYN-AMT-MP-0057",
@@ -1133,14 +1133,14 @@
    "1000 mg",
    "tablet",
    "IR",
-   "60",
+   "200",
    "5",
    "false",
    "metformin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0067",
+   "13847T",
    "Diabex XR",
    "metformin",
    "SYN-AMT-MP-0057",
@@ -1150,14 +1150,14 @@
    "1000 mg",
    "modified release tablet",
    "MR",
-   "30",
+   "120",
    "5",
    "false",
    "metformin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0068",
+   "14740T",
    "Diamicron MR",
    "gliclazide",
    "SYN-AMT-MP-0043",
@@ -1167,14 +1167,14 @@
    "30 mg",
    "modified release tablet",
    "MR",
-   "30",
+   "200",
    "5",
    "false",
    "gliclazide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0069",
+   "13922R",
    "Diamicron MR",
    "gliclazide",
    "SYN-AMT-MP-0043",
@@ -1184,14 +1184,14 @@
    "60 mg",
    "modified release tablet",
    "MR",
-   "30",
+   "120",
    "5",
    "false",
    "gliclazide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0070",
+   "10206E",
    "Jardiance",
    "empagliflozin",
    "SYN-AMT-MP-0028",
@@ -1205,10 +1205,10 @@
    "5",
    "false",
    "empagliflozin",
-   "0.000000"
+   "0.005489"
   ],
   [
-   "SYN-PBS-0071",
+   "10202Y",
    "Jardiance",
    "empagliflozin",
    "SYN-AMT-MP-0028",
@@ -1222,10 +1222,10 @@
    "5",
    "false",
    "empagliflozin",
-   "0.000000"
+   "0.004338"
   ],
   [
-   "SYN-PBS-0072",
+   "10011X",
    "Forxiga",
    "dapagliflozin",
    "SYN-AMT-MP-0021",
@@ -1235,14 +1235,14 @@
    "10 mg",
    "tablet",
    "IR",
-   "30",
+   "28",
    "5",
    "false",
    "dapagliflozin",
-   "0.000000"
+   "0.051513"
   ],
   [
-   "SYN-PBS-0073",
+   "14058X",
    "Janumet",
    "sitagliptin/metformin",
    "SYN-AMT-MP-0082",
@@ -1252,14 +1252,14 @@
    "50/1000 mg",
    "tablet",
    "IR",
-   "60",
+   "56",
    "5",
    "true",
    "sitagliptin;metformin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0074",
+   "10202Y",
    "Jardiamet",
    "empagliflozin/metformin",
    "SYN-AMT-MP-0029",
@@ -1269,14 +1269,14 @@
    "12.5/1000 mg",
    "tablet",
    "IR",
-   "60",
+   "30",
    "5",
    "true",
    "empagliflozin;metformin",
-   "0.000000"
+   "0.004338"
   ],
   [
-   "SYN-PBS-0075",
+   "9039R",
    "Optisulin",
    "insulin glargine",
    "SYN-AMT-MP-0048",
@@ -1286,14 +1286,14 @@
    "100 units/mL",
    "injection",
    "MR",
-   "1",
    "5",
+   "1",
    "false",
    "insulin glargine",
-   "0.000000"
+   "0.037330"
   ],
   [
-   "SYN-PBS-0076",
+   "11302W",
    "Optisulin",
    "insulin glargine",
    "SYN-AMT-MP-0048",
@@ -1303,14 +1303,14 @@
    "300 units/mL",
    "injection",
    "MR",
-   "1",
    "5",
+   "1",
    "false",
    "insulin glargine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0077",
+   "11815W",
    "Toujeo",
    "insulin glargine",
    "SYN-AMT-MP-0048",
@@ -1320,14 +1320,14 @@
    "100 units/mL",
    "injection",
    "MR",
-   "1",
    "5",
+   "1",
    "false",
    "insulin glargine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0078",
+   "11302W",
    "Toujeo",
    "insulin glargine",
    "SYN-AMT-MP-0048",
@@ -1337,14 +1337,14 @@
    "300 units/mL",
    "injection",
    "MR",
-   "1",
    "5",
+   "1",
    "false",
    "insulin glargine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0079",
+   "12075M",
    "Ozempic",
    "semaglutide",
    "SYN-AMT-MP-0079",
@@ -1361,7 +1361,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0080",
+   "12075M",
    "Ozempic",
    "semaglutide",
    "SYN-AMT-MP-0079",
@@ -1378,7 +1378,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0081",
+   "13922R",
    "Diamicron MR",
    "gliclazide",
    "SYN-AMT-MP-0043",
@@ -1388,14 +1388,14 @@
    "60 mg",
    "modified release tablet",
    "MR",
-   "30",
+   "120",
    "5",
    "false",
    "gliclazide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0082",
+   "8571D",
    "NovoRapid",
    "insulin aspart",
    "SYN-AMT-MP-0047",
@@ -1405,14 +1405,14 @@
    "100 units/mL",
    "injection",
    "IR",
-   "1",
    "5",
+   "2",
    "false",
    "insulin aspart",
-   "0.000000"
+   "0.001369"
   ],
   [
-   "SYN-PBS-0083",
+   "14349F",
    "Lexapro",
    "escitalopram",
    "SYN-AMT-MP-0031",
@@ -1422,14 +1422,14 @@
    "10 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "56",
+   "2",
    "false",
    "escitalopram",
    "0.000000"
   ],
   [
-   "SYN-PBS-0084",
+   "10181W",
    "Lexapro",
    "escitalopram",
    "SYN-AMT-MP-0031",
@@ -1439,14 +1439,14 @@
    "20 mg",
    "tablet",
    "IR",
-   "30",
+   "1",
    "5",
    "false",
    "escitalopram",
-   "0.000000"
+   "0.000804"
   ],
   [
-   "SYN-PBS-0085",
+   "14400X",
    "Zoloft",
    "sertraline",
    "SYN-AMT-MP-0080",
@@ -1456,14 +1456,14 @@
    "50 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "60",
+   "2",
    "false",
    "sertraline",
    "0.000000"
   ],
   [
-   "SYN-PBS-0086",
+   "14404D",
    "Zoloft",
    "sertraline",
    "SYN-AMT-MP-0080",
@@ -1473,14 +1473,14 @@
    "100 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "60",
+   "2",
    "false",
    "sertraline",
    "0.000000"
   ],
   [
-   "SYN-PBS-0087",
+   "14400X",
    "Zoloft",
    "sertraline",
    "SYN-AMT-MP-0080",
@@ -1490,14 +1490,14 @@
    "200 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "60",
+   "2",
    "false",
    "sertraline",
    "0.000000"
   ],
   [
-   "SYN-PBS-0088",
+   "14369G",
    "Avanza",
    "mirtazapine",
    "SYN-AMT-MP-0061",
@@ -1507,14 +1507,14 @@
    "15 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "60",
+   "2",
    "false",
    "mirtazapine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0089",
+   "14473R",
    "Avanza",
    "mirtazapine",
    "SYN-AMT-MP-0061",
@@ -1524,14 +1524,14 @@
    "30 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "60",
+   "2",
    "false",
    "mirtazapine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0090",
+   "14475W",
    "Avanza",
    "mirtazapine",
    "SYN-AMT-MP-0061",
@@ -1541,14 +1541,14 @@
    "45 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "60",
+   "2",
    "false",
    "mirtazapine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0091",
+   "14472Q",
    "Efexor-XR",
    "venlafaxine",
    "SYN-AMT-MP-0095",
@@ -1558,14 +1558,14 @@
    "75 mg",
    "modified release capsule",
    "MR",
-   "30",
-   "5",
+   "56",
+   "2",
    "false",
    "venlafaxine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0092",
+   "14402B",
    "Efexor-XR",
    "venlafaxine",
    "SYN-AMT-MP-0095",
@@ -1575,14 +1575,14 @@
    "150 mg",
    "modified release capsule",
    "MR",
-   "30",
-   "5",
+   "56",
+   "2",
    "false",
    "venlafaxine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0093",
+   "14402B",
    "Efexor-XR",
    "venlafaxine",
    "SYN-AMT-MP-0095",
@@ -1592,14 +1592,14 @@
    "225 mg",
    "modified release capsule",
    "MR",
-   "30",
-   "5",
+   "56",
+   "2",
    "false",
    "venlafaxine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0094",
+   "9155W",
    "Cymbalta",
    "duloxetine",
    "SYN-AMT-MP-0026",
@@ -1609,14 +1609,14 @@
    "30 mg",
    "capsule",
    "MR",
-   "30",
-   "5",
+   "28",
+   "0",
    "false",
    "duloxetine",
-   "0.000000"
+   "0.022723"
   ],
   [
-   "SYN-PBS-0095",
+   "14712H",
    "Cymbalta",
    "duloxetine",
    "SYN-AMT-MP-0026",
@@ -1626,14 +1626,14 @@
    "60 mg",
    "capsule",
    "MR",
-   "30",
-   "5",
+   "56",
+   "2",
    "false",
    "duloxetine",
    "0.000000"
   ],
   [
-   "SYN-PBS-0096",
+   "2088X",
    "Normison",
    "temazepam",
    "SYN-AMT-MP-0090",
@@ -1643,14 +1643,14 @@
    "10 mg",
    "tablet",
    "IR",
-   "30",
-   "0",
+   "50",
+   "5",
    "false",
    "temazepam",
-   "0.000000"
+   "0.002719"
   ],
   [
-   "SYN-PBS-0097",
+   "4077N",
    "Cartia",
    "aspirin",
    "SYN-AMT-MP-0007",
@@ -1660,14 +1660,14 @@
    "100 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "84",
+   "1",
    "false",
    "aspirin",
-   "0.000000"
+   "0.004421"
   ],
   [
-   "SYN-PBS-0098",
+   "4078P",
    "Astrix",
    "aspirin",
    "SYN-AMT-MP-0007",
@@ -1677,14 +1677,14 @@
    "100 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "84",
+   "1",
    "false",
    "aspirin",
-   "0.000000"
+   "0.000538"
   ],
   [
-   "SYN-PBS-0099",
+   "13365K",
    "Plavix",
    "clopidogrel",
    "SYN-AMT-MP-0018",
@@ -1694,14 +1694,14 @@
    "75 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "false",
    "clopidogrel",
    "0.000000"
   ],
   [
-   "SYN-PBS-0100",
+   "13399F",
    "Iscover",
    "clopidogrel",
    "SYN-AMT-MP-0018",
@@ -1711,14 +1711,14 @@
    "75 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "false",
    "clopidogrel",
    "0.000000"
   ],
   [
-   "SYN-PBS-0101",
+   "13524T",
    "Brilinta",
    "ticagrelor",
    "SYN-AMT-MP-0091",
@@ -1728,14 +1728,14 @@
    "90 mg",
    "tablet",
    "IR",
-   "60",
+   "112",
    "5",
    "false",
    "ticagrelor",
    "0.000000"
   ],
   [
-   "SYN-PBS-0102",
+   "10590J",
    "CoPlavix",
    "aspirin/clopidogrel",
    "SYN-AMT-MP-0008",
@@ -1745,14 +1745,14 @@
    "100/75 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "112",
+   "1",
    "true",
    "aspirin;clopidogrel",
-   "0.000000"
+   "0.001132"
   ],
   [
-   "SYN-PBS-0103",
+   "10590J",
    "DuoCover",
    "aspirin/clopidogrel",
    "SYN-AMT-MP-0008",
@@ -1762,14 +1762,14 @@
    "100/75 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "112",
+   "1",
    "true",
    "aspirin;clopidogrel",
-   "0.000000"
+   "0.001132"
   ],
   [
-   "SYN-PBS-0104",
+   "13461L",
    "Imdur",
    "isosorbide mononitrate",
    "SYN-AMT-MP-0051",
@@ -1779,14 +1779,14 @@
    "60 mg",
    "modified release tablet",
    "MR",
-   "30",
+   "60",
    "5",
    "false",
    "isosorbide mononitrate",
    "0.000000"
   ],
   [
-   "SYN-PBS-0105",
+   "13461L",
    "Duride",
    "isosorbide mononitrate",
    "SYN-AMT-MP-0051",
@@ -1796,14 +1796,14 @@
    "60 mg",
    "modified release tablet",
    "MR",
-   "30",
+   "60",
    "5",
    "false",
    "isosorbide mononitrate",
    "0.000000"
   ],
   [
-   "SYN-PBS-0106",
+   "13549D",
    "Nitrolingual Pumpspray",
    "glyceryl trinitrate",
    "SYN-AMT-MP-0045",
@@ -1813,7 +1813,7 @@
    "400 microgram/dose",
    "spray",
    "IR",
-   "1",
+   "2",
    "5",
    "false",
    "glyceryl trinitrate",
@@ -1888,7 +1888,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0111",
+   "13464P",
    "Eliquis",
    "apixaban",
    "SYN-AMT-MP-0006",
@@ -1905,7 +1905,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0112",
+   "13464P",
    "Eliquis",
    "apixaban",
    "SYN-AMT-MP-0006",
@@ -1922,7 +1922,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0113",
+   "13463N",
    "Xarelto",
    "rivaroxaban",
    "SYN-AMT-MP-0075",
@@ -1932,14 +1932,14 @@
    "15 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "false",
    "rivaroxaban",
    "0.000000"
   ],
   [
-   "SYN-PBS-0114",
+   "13462M",
    "Xarelto",
    "rivaroxaban",
    "SYN-AMT-MP-0075",
@@ -1949,14 +1949,14 @@
    "20 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "false",
    "rivaroxaban",
    "0.000000"
   ],
   [
-   "SYN-PBS-0115",
+   "2843P",
    "Marevan",
    "warfarin",
    "SYN-AMT-MP-0096",
@@ -1966,14 +1966,14 @@
    "1 mg",
    "tablet",
    "IR",
-   "30",
-   "1",
+   "50",
+   "2",
    "false",
    "warfarin",
-   "0.000000"
+   "0.071751"
   ],
   [
-   "SYN-PBS-0116",
+   "2209G",
    "Marevan",
    "warfarin",
    "SYN-AMT-MP-0096",
@@ -1983,14 +1983,14 @@
    "2 mg",
    "tablet",
    "IR",
-   "30",
-   "1",
+   "50",
+   "2",
    "false",
    "warfarin",
-   "0.000000"
+   "0.062793"
   ],
   [
-   "SYN-PBS-0117",
+   "2844Q",
    "Marevan",
    "warfarin",
    "SYN-AMT-MP-0096",
@@ -2000,14 +2000,14 @@
    "3 mg",
    "tablet",
    "IR",
-   "30",
-   "1",
+   "50",
+   "2",
    "false",
    "warfarin",
-   "0.000000"
+   "0.020580"
   ],
   [
-   "SYN-PBS-0118",
+   "2211J",
    "Marevan",
    "warfarin",
    "SYN-AMT-MP-0096",
@@ -2017,14 +2017,14 @@
    "5 mg",
    "tablet",
    "IR",
-   "30",
-   "1",
+   "50",
+   "2",
    "false",
    "warfarin",
-   "0.000000"
+   "0.038733"
   ],
   [
-   "SYN-PBS-0119",
+   "2843P",
    "Coumadin",
    "warfarin",
    "SYN-AMT-MP-0096",
@@ -2034,14 +2034,14 @@
    "1 mg",
    "tablet",
    "IR",
-   "30",
-   "1",
+   "50",
+   "2",
    "false",
    "warfarin",
-   "0.000000"
+   "0.071751"
   ],
   [
-   "SYN-PBS-0120",
+   "2209G",
    "Coumadin",
    "warfarin",
    "SYN-AMT-MP-0096",
@@ -2051,14 +2051,14 @@
    "2 mg",
    "tablet",
    "IR",
-   "30",
-   "1",
+   "50",
+   "2",
    "false",
    "warfarin",
-   "0.000000"
+   "0.062793"
   ],
   [
-   "SYN-PBS-0121",
+   "2844Q",
    "Coumadin",
    "warfarin",
    "SYN-AMT-MP-0096",
@@ -2068,14 +2068,14 @@
    "3 mg",
    "tablet",
    "IR",
-   "30",
-   "1",
+   "50",
+   "2",
    "false",
    "warfarin",
-   "0.000000"
+   "0.020580"
   ],
   [
-   "SYN-PBS-0122",
+   "2211J",
    "Coumadin",
    "warfarin",
    "SYN-AMT-MP-0096",
@@ -2085,14 +2085,14 @@
    "5 mg",
    "tablet",
    "IR",
-   "30",
-   "1",
+   "50",
+   "2",
    "false",
    "warfarin",
-   "0.000000"
+   "0.038733"
   ],
   [
-   "SYN-PBS-0123",
+   "13523R",
    "Pradaxa",
    "dabigatran",
    "SYN-AMT-MP-0020",
@@ -2102,14 +2102,14 @@
    "110 mg",
    "capsule",
    "IR",
-   "60",
+   "120",
    "5",
    "false",
    "dabigatran",
    "0.000000"
   ],
   [
-   "SYN-PBS-0124",
+   "13489Y",
    "Pradaxa",
    "dabigatran",
    "SYN-AMT-MP-0020",
@@ -2119,14 +2119,14 @@
    "150 mg",
    "capsule",
    "IR",
-   "60",
+   "120",
    "5",
    "false",
    "dabigatran",
    "0.000000"
   ],
   [
-   "SYN-PBS-0125",
+   "2605D",
    "Lanoxin",
    "digoxin",
    "SYN-AMT-MP-0023",
@@ -2136,14 +2136,14 @@
    "62.5 microgram",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "200",
+   "1",
    "false",
    "digoxin",
-   "0.000000"
+   "0.024422"
   ],
   [
-   "SYN-PBS-0126",
+   "1322N",
    "Lanoxin",
    "digoxin",
    "SYN-AMT-MP-0023",
@@ -2153,14 +2153,14 @@
    "125 microgram",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "100",
+   "1",
    "false",
    "digoxin",
-   "0.000000"
+   "0.006679"
   ],
   [
-   "SYN-PBS-0127",
+   "2605D",
    "Lanoxin PG",
    "digoxin",
    "SYN-AMT-MP-0023",
@@ -2170,14 +2170,14 @@
    "62.5 microgram",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "200",
+   "1",
    "false",
    "digoxin",
-   "0.000000"
+   "0.024422"
   ],
   [
-   "SYN-PBS-0128",
+   "1322N",
    "Lanoxin PG",
    "digoxin",
    "SYN-AMT-MP-0023",
@@ -2187,14 +2187,14 @@
    "125 microgram",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "100",
+   "1",
    "false",
    "digoxin",
-   "0.000000"
+   "0.006679"
   ],
   [
-   "SYN-PBS-0129",
+   "8398B",
    "Sotacor",
    "sotalol",
    "SYN-AMT-MP-0084",
@@ -2208,10 +2208,10 @@
    "5",
    "false",
    "sotalol",
-   "0.000000"
+   "0.038128"
   ],
   [
-   "SYN-PBS-0130",
+   "1312C",
    "Cardizem CD",
    "diltiazem",
    "SYN-AMT-MP-0024",
@@ -2225,10 +2225,10 @@
    "5",
    "false",
    "diltiazem",
-   "0.000000"
+   "0.037078"
   ],
   [
-   "SYN-PBS-0131",
+   "1313D",
    "Cardizem CD",
    "diltiazem",
    "SYN-AMT-MP-0024",
@@ -2242,10 +2242,10 @@
    "5",
    "false",
    "diltiazem",
-   "0.000000"
+   "0.030424"
   ],
   [
-   "SYN-PBS-0132",
+   "5457F",
    "Prolia",
    "denosumab",
    "SYN-AMT-MP-0022",
@@ -2256,13 +2256,13 @@
    "injection",
    "IR",
    "1",
-   "1",
+   "0",
    "false",
    "denosumab",
-   "0.000000"
+   "0.041685"
   ],
   [
-   "SYN-PBS-0133",
+   "13499L",
    "Fosamax",
    "alendronate",
    "SYN-AMT-MP-0001",
@@ -2272,14 +2272,14 @@
    "70 mg",
    "tablet",
    "IR",
-   "4",
+   "8",
    "5",
    "false",
    "alendronate",
    "0.000000"
   ],
   [
-   "SYN-PBS-0134",
+   "13499L",
    "Fosamax Plus",
    "alendronate/colecalciferol",
    "SYN-AMT-MP-0002",
@@ -2289,14 +2289,14 @@
    "70 mg/140 microgram",
    "tablet",
    "IR",
-   "4",
+   "8",
    "5",
    "true",
    "alendronate;colecalciferol",
    "0.000000"
   ],
   [
-   "SYN-PBS-0135",
+   "13364J",
    "Actonel",
    "risedronate",
    "SYN-AMT-MP-0074",
@@ -2306,14 +2306,14 @@
    "35 mg",
    "tablet",
    "IR",
-   "4",
+   "8",
    "5",
    "false",
    "risedronate",
    "0.000000"
   ],
   [
-   "SYN-PBS-0136",
+   "13488X",
    "Actonel",
    "risedronate",
    "SYN-AMT-MP-0074",
@@ -2323,14 +2323,14 @@
    "150 mg",
    "tablet",
    "IR",
-   "4",
+   "2",
    "5",
    "false",
    "risedronate",
    "0.000000"
   ],
   [
-   "SYN-PBS-0137",
+   "9288W",
    "Aclasta",
    "zoledronic acid",
    "SYN-AMT-MP-0097",
@@ -2344,7 +2344,7 @@
    "0",
    "false",
    "zoledronic acid",
-   "0.000000"
+   "0.001633"
   ],
   [
    "SYN-PBS-0138",
@@ -2364,7 +2364,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0139",
+   "14200J",
    "Flomax",
    "tamsulosin",
    "SYN-AMT-MP-0086",
@@ -2374,14 +2374,14 @@
    "400 microgram",
    "modified release tablet",
    "MR",
-   "30",
+   "60",
    "5",
    "false",
    "tamsulosin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0140",
+   "10095H",
    "Duodart",
    "dutasteride/tamsulosin",
    "SYN-AMT-MP-0027",
@@ -2395,7 +2395,7 @@
    "5",
    "true",
    "dutasteride;tamsulosin",
-   "0.000000"
+   "0.000087"
   ],
   [
    "SYN-PBS-0141",
@@ -2432,7 +2432,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0143",
+   "14361W",
    "Spiriva",
    "tiotropium",
    "SYN-AMT-MP-0092",
@@ -2442,14 +2442,14 @@
    "18 microgram",
    "inhaler",
    "IR",
-   "1",
+   "60",
    "5",
    "false",
    "tiotropium",
    "0.000000"
   ],
   [
-   "SYN-PBS-0144",
+   "14331G",
    "Symbicort",
    "budesonide/formoterol",
    "SYN-AMT-MP-0011",
@@ -2459,7 +2459,7 @@
    "200/6 microgram",
    "inhaler",
    "IR",
-   "1",
+   "2",
    "5",
    "true",
    "budesonide;formoterol",
@@ -2483,7 +2483,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0146",
+   "11719T",
    "Trelegy Ellipta",
    "fluticasone furoate/umeclidinium/vilanterol",
    "SYN-AMT-MP-0039",
@@ -2500,7 +2500,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0147",
+   "10187E",
    "Anoro Ellipta",
    "umeclidinium/vilanterol",
    "SYN-AMT-MP-0094",
@@ -2514,10 +2514,10 @@
    "5",
    "true",
    "umeclidinium;vilanterol",
-   "0.000000"
+   "0.005782"
   ],
   [
-   "SYN-PBS-0148",
+   "12108G",
    "Ventolin",
    "salbutamol",
    "SYN-AMT-MP-0078",
@@ -2528,13 +2528,13 @@
    "inhaler",
    "IR",
    "1",
-   "5",
+   "0",
    "false",
    "salbutamol",
    "0.000000"
   ],
   [
-   "SYN-PBS-0149",
+   "12108G",
    "Asmol",
    "salbutamol",
    "SYN-AMT-MP-0078",
@@ -2545,13 +2545,13 @@
    "inhaler",
    "IR",
    "1",
-   "5",
+   "0",
    "false",
    "salbutamol",
    "0.000000"
   ],
   [
-   "SYN-PBS-0150",
+   "2413B",
    "Lasix",
    "furosemide",
    "SYN-AMT-MP-0042",
@@ -2561,14 +2561,14 @@
    "20 mg",
    "tablet",
    "IR",
-   "30",
    "5",
+   "0",
    "false",
    "furosemide",
-   "0.000000"
+   "0.000901"
   ],
   [
-   "SYN-PBS-0151",
+   "13472C",
    "Lasix",
    "furosemide",
    "SYN-AMT-MP-0042",
@@ -2578,14 +2578,14 @@
    "40 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "200",
+   "1",
    "false",
    "furosemide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0152",
+   "13504R",
    "Lasix",
    "furosemide",
    "SYN-AMT-MP-0042",
@@ -2595,14 +2595,14 @@
    "80 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "2",
+   "3",
    "false",
    "furosemide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0153",
+   "12222G",
    "Urex",
    "furosemide",
    "SYN-AMT-MP-0042",
@@ -2612,14 +2612,14 @@
    "20 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "50",
+   "0",
    "false",
    "furosemide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0154",
+   "13472C",
    "Urex",
    "furosemide",
    "SYN-AMT-MP-0042",
@@ -2629,14 +2629,14 @@
    "40 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "200",
+   "1",
    "false",
    "furosemide",
    "0.000000"
   ],
   [
-   "SYN-PBS-0155",
+   "12222G",
    "Urex",
    "furosemide",
    "SYN-AMT-MP-0042",
@@ -2646,8 +2646,8 @@
    "80 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "50",
+   "0",
    "false",
    "furosemide",
    "0.000000"
@@ -2704,7 +2704,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0159",
+   "13419G",
    "Bicor",
    "bisoprolol",
    "SYN-AMT-MP-0010",
@@ -2714,14 +2714,14 @@
    "1.25 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "false",
    "bisoprolol",
    "0.000000"
   ],
   [
-   "SYN-PBS-0160",
+   "13419G",
    "Bicor",
    "bisoprolol",
    "SYN-AMT-MP-0010",
@@ -2731,14 +2731,14 @@
    "2.5 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "false",
    "bisoprolol",
    "0.000000"
   ],
   [
-   "SYN-PBS-0161",
+   "13419G",
    "Bicor",
    "bisoprolol",
    "SYN-AMT-MP-0010",
@@ -2748,14 +2748,14 @@
    "5 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "false",
    "bisoprolol",
    "0.000000"
   ],
   [
-   "SYN-PBS-0162",
+   "13444N",
    "Bicor",
    "bisoprolol",
    "SYN-AMT-MP-0010",
@@ -2765,14 +2765,14 @@
    "10 mg",
    "tablet",
    "IR",
-   "30",
+   "56",
    "5",
    "false",
    "bisoprolol",
    "0.000000"
   ],
   [
-   "SYN-PBS-0163",
+   "13417E",
    "Dilatrend",
    "carvedilol",
    "SYN-AMT-MP-0016",
@@ -2782,14 +2782,14 @@
    "6.25 mg",
    "tablet",
    "IR",
-   "60",
+   "120",
    "5",
    "false",
    "carvedilol",
    "0.000000"
   ],
   [
-   "SYN-PBS-0164",
+   "13418F",
    "Dilatrend",
    "carvedilol",
    "SYN-AMT-MP-0016",
@@ -2799,14 +2799,14 @@
    "12.5 mg",
    "tablet",
    "IR",
-   "60",
+   "120",
    "5",
    "false",
    "carvedilol",
    "0.000000"
   ],
   [
-   "SYN-PBS-0165",
+   "13387N",
    "Dilatrend",
    "carvedilol",
    "SYN-AMT-MP-0016",
@@ -2816,14 +2816,14 @@
    "25 mg",
    "tablet",
    "IR",
-   "60",
+   "120",
    "5",
    "false",
    "carvedilol",
    "0.000000"
   ],
   [
-   "SYN-PBS-0166",
+   "13590G",
    "Inspra",
    "eplerenone",
    "SYN-AMT-MP-0030",
@@ -2833,14 +2833,14 @@
    "25 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "false",
    "eplerenone",
    "0.000000"
   ],
   [
-   "SYN-PBS-0167",
+   "13503Q",
    "Aldactone",
    "spironolactone",
    "SYN-AMT-MP-0085",
@@ -2850,14 +2850,14 @@
    "25 mg",
    "tablet",
    "IR",
-   "30",
+   "200",
    "5",
    "false",
    "spironolactone",
    "0.000000"
   ],
   [
-   "SYN-PBS-0168",
+   "10011X",
    "Forxiga",
    "dapagliflozin",
    "SYN-AMT-MP-0021",
@@ -2867,14 +2867,14 @@
    "10 mg",
    "tablet",
    "IR",
-   "30",
+   "28",
    "5",
    "false",
    "dapagliflozin",
-   "0.000000"
+   "0.051513"
   ],
   [
-   "SYN-PBS-0169",
+   "2174K",
    "Eutroxsig",
    "levothyroxine",
    "SYN-AMT-MP-0055",
@@ -2884,14 +2884,14 @@
    "50 microgram",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "200",
+   "1",
    "false",
    "levothyroxine",
-   "0.000000"
+   "0.039938"
   ],
   [
-   "SYN-PBS-0170",
+   "2175L",
    "Eutroxsig",
    "levothyroxine",
    "SYN-AMT-MP-0055",
@@ -2901,14 +2901,14 @@
    "100 microgram",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "200",
+   "1",
    "false",
    "levothyroxine",
-   "0.000000"
+   "0.038644"
   ],
   [
-   "SYN-PBS-0171",
+   "2173J",
    "Eutroxsig",
    "levothyroxine",
    "SYN-AMT-MP-0055",
@@ -2918,14 +2918,14 @@
    "150 microgram",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "200",
+   "1",
    "false",
    "levothyroxine",
-   "0.000000"
+   "0.002788"
   ],
   [
-   "SYN-PBS-0172",
+   "2174K",
    "Oroxine",
    "levothyroxine",
    "SYN-AMT-MP-0055",
@@ -2935,14 +2935,14 @@
    "50 microgram",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "200",
+   "1",
    "false",
    "levothyroxine",
-   "0.000000"
+   "0.039938"
   ],
   [
-   "SYN-PBS-0173",
+   "2175L",
    "Oroxine",
    "levothyroxine",
    "SYN-AMT-MP-0055",
@@ -2952,14 +2952,14 @@
    "100 microgram",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "200",
+   "1",
    "false",
    "levothyroxine",
-   "0.000000"
+   "0.038644"
   ],
   [
-   "SYN-PBS-0174",
+   "2173J",
    "Oroxine",
    "levothyroxine",
    "SYN-AMT-MP-0055",
@@ -2969,14 +2969,14 @@
    "150 microgram",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "200",
+   "1",
    "false",
    "levothyroxine",
-   "0.000000"
+   "0.002788"
   ],
   [
-   "SYN-PBS-0175",
+   "13358C",
    "Zyloprim",
    "allopurinol",
    "SYN-AMT-MP-0003",
@@ -2986,14 +2986,14 @@
    "100 mg",
    "tablet",
    "IR",
-   "120",
+   "400",
    "2",
    "false",
    "allopurinol",
    "0.000000"
   ],
   [
-   "SYN-PBS-0176",
+   "13575L",
    "Zyloprim",
    "allopurinol",
    "SYN-AMT-MP-0003",
@@ -3010,7 +3010,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0177",
+   "13358C",
    "Progout",
    "allopurinol",
    "SYN-AMT-MP-0003",
@@ -3020,14 +3020,14 @@
    "100 mg",
    "tablet",
    "IR",
-   "120",
+   "400",
    "2",
    "false",
    "allopurinol",
    "0.000000"
   ],
   [
-   "SYN-PBS-0178",
+   "13575L",
    "Progout",
    "allopurinol",
    "SYN-AMT-MP-0003",
@@ -3044,7 +3044,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0179",
+   "10445R",
    "Adenuric",
    "febuxostat",
    "SYN-AMT-MP-0037",
@@ -3054,14 +3054,14 @@
    "80 mg",
    "tablet",
    "IR",
-   "30",
+   "28",
    "5",
    "false",
    "febuxostat",
-   "0.000000"
+   "0.001118"
   ],
   [
-   "SYN-PBS-0180",
+   "13457G",
    "Rocaltrol",
    "calcitriol",
    "SYN-AMT-MP-0013",
@@ -3071,8 +3071,8 @@
    "0.25 microgram",
    "capsule",
    "IR",
-   "30",
-   "5",
+   "200",
+   "3",
    "false",
    "calcitriol",
    "0.000000"
@@ -3129,7 +3129,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0184",
+   "14034P",
    "Keppra",
    "levetiracetam",
    "SYN-AMT-MP-0052",
@@ -3139,7 +3139,7 @@
    "500 mg",
    "tablet",
    "IR",
-   "60",
+   "120",
    "5",
    "false",
    "levetiracetam",
@@ -3163,7 +3163,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0186",
+   "2532G",
    "Aricept",
    "donepezil",
    "SYN-AMT-MP-0025",
@@ -3173,14 +3173,14 @@
    "5 mg",
    "tablet",
    "IR",
-   "30",
+   "28",
    "5",
    "false",
    "donepezil",
-   "0.000000"
+   "0.006964"
   ],
   [
-   "SYN-PBS-0187",
+   "2479L",
    "Aricept",
    "donepezil",
    "SYN-AMT-MP-0025",
@@ -3190,14 +3190,14 @@
    "10 mg",
    "tablet",
    "IR",
-   "30",
+   "28",
    "5",
    "false",
    "donepezil",
-   "0.000000"
+   "0.019536"
   ],
   [
-   "SYN-PBS-0188",
+   "1622J",
    "Methoblastin",
    "methotrexate",
    "SYN-AMT-MP-0058",
@@ -3207,14 +3207,14 @@
    "2.5 mg",
    "tablet",
    "IR",
-   "4",
-   "2",
+   "30",
+   "5",
    "false",
    "methotrexate",
-   "0.000000"
+   "0.003285"
   ],
   [
-   "SYN-PBS-0189",
+   "14643Q",
    "Methoblastin",
    "methotrexate",
    "SYN-AMT-MP-0058",
@@ -3224,14 +3224,14 @@
    "10 mg",
    "tablet",
    "IR",
-   "4",
-   "2",
+   "10",
+   "5",
    "false",
    "methotrexate",
    "0.000000"
   ],
   [
-   "SYN-PBS-0190",
+   "13888Y",
    "Panafcortelone",
    "prednisolone",
    "SYN-AMT-MP-0070",
@@ -3241,14 +3241,14 @@
    "1 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "200",
+   "4",
    "false",
    "prednisolone",
    "0.000000"
   ],
   [
-   "SYN-PBS-0191",
+   "14045F",
    "Panafcortelone",
    "prednisolone",
    "SYN-AMT-MP-0070",
@@ -3258,14 +3258,14 @@
    "5 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "120",
+   "4",
    "false",
    "prednisolone",
    "0.000000"
   ],
   [
-   "SYN-PBS-0192",
+   "1916W",
    "Panafcortelone",
    "prednisolone",
    "SYN-AMT-MP-0070",
@@ -3276,13 +3276,13 @@
    "tablet",
    "IR",
    "30",
-   "5",
+   "4",
    "false",
    "prednisolone",
-   "0.000000"
+   "0.048813"
   ],
   [
-   "SYN-PBS-0193",
+   "13888Y",
    "Solone",
    "prednisolone",
    "SYN-AMT-MP-0070",
@@ -3292,14 +3292,14 @@
    "1 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "200",
+   "4",
    "false",
    "prednisolone",
    "0.000000"
   ],
   [
-   "SYN-PBS-0194",
+   "14045F",
    "Solone",
    "prednisolone",
    "SYN-AMT-MP-0070",
@@ -3309,14 +3309,14 @@
    "5 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "120",
+   "4",
    "false",
    "prednisolone",
    "0.000000"
   ],
   [
-   "SYN-PBS-0195",
+   "1916W",
    "Solone",
    "prednisolone",
    "SYN-AMT-MP-0070",
@@ -3327,13 +3327,13 @@
    "tablet",
    "IR",
    "30",
-   "5",
+   "4",
    "false",
    "prednisolone",
-   "0.000000"
+   "0.048813"
   ],
   [
-   "SYN-PBS-0196",
+   "1512N",
    "Plaquenil",
    "hydroxychloroquine",
    "SYN-AMT-MP-0046",
@@ -3343,14 +3343,14 @@
    "200 mg",
    "tablet",
    "IR",
-   "60",
-   "5",
+   "100",
+   "3",
    "false",
    "hydroxychloroquine",
-   "0.000000"
+   "0.015851"
   ],
   [
-   "SYN-PBS-0197",
+   "10573L",
    "Megafol",
    "folic acid",
    "SYN-AMT-MP-0041",
@@ -3360,14 +3360,14 @@
    "5 mg",
    "tablet",
    "IR",
-   "4",
-   "5",
+   "200",
+   "1",
    "false",
    "folic acid",
-   "0.000000"
+   "0.000130"
   ],
   [
-   "SYN-PBS-0198",
+   "13440J",
    "Atozet",
    "ezetimibe/atorvastatin",
    "SYN-AMT-MP-0034",
@@ -3377,14 +3377,14 @@
    "10/10 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "ezetimibe;atorvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0199",
+   "13440J",
    "Atozet",
    "ezetimibe/atorvastatin",
    "SYN-AMT-MP-0034",
@@ -3394,14 +3394,14 @@
    "10/40 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "ezetimibe;atorvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0200",
+   "13440J",
    "Atozet",
    "ezetimibe/atorvastatin",
    "SYN-AMT-MP-0034",
@@ -3411,14 +3411,14 @@
    "10/80 mg",
    "tablet",
    "IR",
-   "30",
+   "60",
    "5",
    "true",
    "ezetimibe;atorvastatin",
    "0.000000"
   ],
   [
-   "SYN-PBS-0201",
+   "10582Y",
    "Panadeine Forte",
    "paracetamol/codeine",
    "SYN-AMT-MP-0066",
@@ -3428,11 +3428,11 @@
    "500/30 mg",
    "tablet",
    "IR",
-   "60",
-   "2",
+   "100",
+   "1",
    "true",
    "paracetamol;codeine",
-   "0.000000"
+   "0.000774"
   ],
   [
    "SYN-PBS-0202",
@@ -3503,7 +3503,7 @@
    "0.000000"
   ],
   [
-   "SYN-PBS-0206",
+   "15372C",
    "Blackmores Magnesium",
    "magnesium",
    "SYN-AMT-MP-0056",
@@ -3513,14 +3513,14 @@
    "300 mg",
    "tablet",
    "IR",
-   "30",
-   "5",
+   "120",
+   "0",
    "false",
    "magnesium",
    "0.000000"
   ],
   [
-   "SYN-PBS-0207",
+   "12210P",
    "Panadol",
    "paracetamol",
    "SYN-AMT-MP-0065",
@@ -3530,8 +3530,8 @@
    "500 mg",
    "tablet",
    "IR",
-   "60",
-   "5",
+   "100",
+   "3",
    "false",
    "paracetamol",
    "0.000000"
