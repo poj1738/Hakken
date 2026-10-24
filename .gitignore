@@ -35,3 +35,6 @@ web/dist/
 
 # ── Generated reference data (regenerate with `make data`; see docs/DATA_LICENCES.md)
 data/reference/
+
+# Generated silos (2MB, regenerate with `make synth`); ground truth + fixtures ARE committed
+data/synthetic/silos/

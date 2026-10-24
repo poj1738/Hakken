@@ -38,6 +38,9 @@ data: ## Rebuild the reference data (PBS fetch, then lexicon)
 lexicon: ## Rebuild only the lexicon, from the committed hand-built sources
 	$(VENV_PY) scripts/build_lexicon.py
 
+synth: ## Regenerate the synthetic silos, ground truth and fixtures
+	$(VENV_PY) scripts/generate_synthetic.py
+
 register: ## Register the synthetic silos in Zetaris (dry-run first)
 	$(VENV_PY) scripts/register_sources.py --dry-run
 
@@ -47,4 +50,4 @@ examples: ## Regenerate output_examples/ from real runs
 validate: ## Reproduce the disqualification checklist end to end
 	bash scripts/validate_submission.sh
 
-.PHONY: help setup preflight test conformance scan data lexicon run serve register examples validate
+.PHONY: help setup preflight test conformance scan data lexicon synth run serve register examples validate
