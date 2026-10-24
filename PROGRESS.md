@@ -3,7 +3,9 @@
 One file, current state only. Overwrite it as things change — the history lives in
 `docs/HANDOFF.md` and in git. Read this first at session start.
 
-**Last updated:** 2026-10-25 09:35 AEDT by Arpon
+**Last updated:** 2026-10-25 10:40 AEDT by Arpon
+
+> **Unmerged work on `arpon/population`:** population raised to 200, held-out F1 0.92, high-risk 25/26 — but 2 sample-sensitive tests fail and Zetaris is stale. See the latest HANDOFF entry before merging.
 
 ## Status
 

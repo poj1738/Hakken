@@ -115,12 +115,19 @@ def detect_discrepancies(
       what separates a real duplicate (Caduet and Lipitor on the same GP list)
       from the same therapy written two ways in two places, which brief 8
       section 4 says is never a finding.
-    - `dose_unconfirmable` -- every current medicine whose dose changes without
-      a new script (`safety.DOSE_CHANGES_WITHOUT_A_SCRIPT`). Agreement between
-      sources that cannot see a phone instruction is not confirmation, so it is
-      raised whether or not they visibly disagree, and severity is high either
-      way (DATA_SPEC 9.5: "never auto-resolved to one source"). These medicines
-      never also get a plain `dose` finding.
+    - `dose_unconfirmable` -- a current medicine whose dose changes without a
+      new script (`safety.DOSE_CHANGES_WITHOUT_A_SCRIPT`), **when the sources
+      show it**: their daily doses disagree, or the GP or patient gives
+      directions that name no dose ("as directed per INR", "not sure how much
+      now") -- DATA_SPEC 9.5's visible trace of a phone change -- or no patient
+      statement of a regular dose exists, since the patient is the one source a
+      phone change reaches. Never resolved
+      to one source; severity high. Where the sources agree, the standing
+      "confirm the dose" duty is `safety.forced_confirm`, a task the
+      orchestrator emits for every current one -- not a finding. (This
+      replaced an earlier rule that fired for every current one: at 200
+      patients that rule was 21 of 32 false positives.) A chart that halves a
+      dose the sources agree on still gets a plain `dose` finding as well.
 
     **Not emitted yet, deliberately:**
 
@@ -195,20 +202,38 @@ def detect_discrepancies(
         noted = next((c.note_text for c in charted if c.note_text), None)
         intent = "documented_intentional" if noted else "likely_unintentional"
 
-        # -- dose_unconfirmable: the dose cannot be confirmed, by construction
+        # -- dose_unconfirmable: a phone-changed dose, visible in the sources
         if g in DOSE_CHANGES_WITHOUT_A_SCRIPT and (present_now or (on_chart and present_now is not False)):
             sources = [s for s in ("gp", "pharmacy", "patient", "emr") if rows_of(s, g)]
-            doses = sorted({str(s.daily_dose_mg) for src in sources
+            doses = sorted({round(s.daily_dose_mg, 4) for src in sources
                             for s in by_source.get((src, g), []) if s.daily_dose_mg})
-            emit(DiscrepancyType.DOSE_UNCONFIRMABLE, med, sources,
-                 [r for src in sources for r in rows_of(src, g)],
-                 {"mechanism": "dose changes without a new script",
-                  "doses_seen": doses, "sources_disagree": len(doses) > 1},
-                 "possibly_intentional")
+            vague = [s.row_id for src in ("gp", "patient") for s in by_source.get((src, g), [])
+                     if _unstated_dose(s)]
+            disagree = len(doses) > 1 and _differ(doses[0], doses[-1])
+            # Confirmed only when the patient -- the one source a phone change
+            # reaches -- states a regular dose. With no such statement (no
+            # interview, or the patient never mentioned it) the dose is
+            # unconfirmable in the literal sense: nothing we can see could show
+            # a change. A GP list alone repeating the usual dose is not
+            # confirmation.
+            patient_states_it = any(
+                s.frequency and not _unstated_dose(s) and s.status != "ceased"
+                for s in by_source.get(("patient", g), []))
+            if disagree or vague or not patient_states_it:
+                emit(DiscrepancyType.DOSE_UNCONFIRMABLE, med, sources,
+                     [r for src in sources for r in rows_of(src, g)],
+                     {"mechanism": "dose changes without a new script",
+                      "doses_seen": [str(x) for x in doses], "sources_disagree": disagree,
+                      "directions_without_a_dose": vague},
+                     "possibly_intentional")
 
-        # -- omission
-        if (not on_chart and med.per_source.get("emr") is EvidenceState.ABSENT_IN_SCOPE
-                and present_now and existence is not None):
+        # -- omission. A chart combination containing this medicine does not
+        # cover it when the combination is ALSO a separate current medicine:
+        # one chart line cannot account for two (Rosuzet charted, a separate
+        # rosuvastatin omitted).
+        absent_from_chart = med.per_source.get("emr") is EvidenceState.ABSENT_IN_SCOPE or (
+            on_chart and not charted and _covered_only_by_listed_combos(g, fused, chart_rows))
+        if (absent_from_chart and present_now and existence is not None):
             # Not on a GP listing alone: GP summaries keep about 30% of stopped
             # medicines as active (Elliott 2023; DATA_SPEC 8), so a listing with
             # nothing behind it -- no current supply, no patient saying yes -- is
@@ -235,8 +260,10 @@ def detect_discrepancies(
                  {"reason": "on the admission chart, but not current before admission",
                   "contradicted_by": against})
 
-        # -- dose / frequency / formulation / route: chart against the BPMH
-        if charted and present_now is not False and g not in DOSE_CHANGES_WITHOUT_A_SCRIPT:
+        # -- dose / frequency / formulation / route: chart against the BPMH. Also
+        # for phone-dose medicines: a chart that halves a dose the GP and the
+        # pharmacy agree on is a chart error, whatever else is uncertain.
+        if charted and present_now is not False:
             _compare_chart(med, charted[0], by_source, emit, intent, rows_of)
 
         # -- stale_listing
@@ -270,6 +297,34 @@ def _asserts_stopped(source: str, generic: str, by_source, stmts, as_of: date) -
         return bool(own) and not _irregular_anywhere(generic, stmts) and \
             supply_status(own, as_of) == "POSSIBLY_CEASED"
     return any(s.status == "ceased" for s in own)
+
+
+def _unstated_dose(stmt: MedStatement) -> bool:
+    """Directions that name no dose: "as directed per INR", "not sure how much
+    now", "up 2 units every three days". DATA_SPEC 9.5's visible trace of a
+    dose changed by phone. PRN is a stated regimen, not a missing one."""
+    text = (stmt.frequency or "").strip()
+    if not text or stmt.prn:
+        return False
+    per_day, prn = parse_frequency(text)
+    return per_day is None and not prn
+
+
+def _covered_only_by_listed_combos(generic, fused, chart_rows) -> bool:
+    """Is this medicine on the chart only inside combinations that are
+    themselves separate current medicines in the BPMH?"""
+    combos = []
+    for med in fused:
+        if med.generic == generic or "/" not in med.generic:
+            continue
+        if generic in med.generic.split("/") and chart_rows(med.generic):
+            combos.append(med)
+    if not combos:
+        return False
+    def current(med):
+        ex = med.attributes.get("existence")
+        return ex is not None and not ex.abstained and ex.value == "present"
+    return all(current(c) for c in combos)
 
 
 def _per_day(stmt: MedStatement) -> float | None:

@@ -91,9 +91,9 @@ def fuse(
       opinion, not fourteen.
     - **Existence** comes from `evidence` -- `ABSENT_IN_SCOPE` votes absent,
       `UNKNOWN` abstains. The pharmacy vote is `supply_status` instead: a supply
-      that ran out months ago is evidence the medicine stopped, even though the
-      pharmacy did dispense it once. Supply status already accounts for time,
-      so that vote is not decayed again.
+      that ran out months ago is evidence the medicine stopped (not decayed --
+      it is evidence as of today), while a supply still running is evidence it
+      continues, decayed by the age of the last fill.
     - **Only sources voting "present" vote on dose, frequency, release and
       route.** A GP line marked ceased has no say over the current dose.
     - **Margin** is the winner's share of the two-way contest,
@@ -213,8 +213,16 @@ def _existence_votes(
             if fills:
                 status = supply_status(fills, as_of)
                 latest = max(fills, key=lambda s: s.doc_date or date.min)
-                votes[source] = (ABSENT if status == "POSSIBLY_CEASED" else PRESENT,
-                                 1.0, latest.row_id)
+                if status == "POSSIBLY_CEASED":
+                    # A lapse is evidence as of today, so it is not decayed.
+                    votes[source] = (ABSENT, 1.0, latest.row_id)
+                else:
+                    # A supply that has not formally lapsed is weaker evidence of
+                    # current use the longer ago it was dispensed. At full weight
+                    # it outvoted a GP list dated two months AFTER the last fill
+                    # that said the medicine had been ceased.
+                    votes[source] = (PRESENT, _recency(source, latest.doc_date, as_of),
+                                     latest.row_id)
                 continue
         stmt = voters.get(source)
         if source == "emr":
