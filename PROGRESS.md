@@ -19,7 +19,7 @@ frozen; nothing downstream of it is built yet.
 | Preflight (`make preflight`) | — | working — **22 pass / 0 fail on Arpon's machine, 23 Oct** (his services only; re-run it on yours) |
 | Config layer (`app/config.py`) | — | working — validated, secrets as `SecretStr`, `ZETARIS_TIMEOUT_S` 180 |
 | Secret scan + pre-commit hook | — | working, verified to block a commit |
-| Tests | — | **456 green** on any machine — no services, isolated from any local `.env` |
+| Tests | — | **456 green** on any machine — no services, isolated from any local `.env`. Verified on a fresh clone under Python 3.11 (CI's version), and the suite now changes **0 tracked files**: it used to regenerate `data/synthetic/` and the committed fixtures in place |
 | Team workflow, CI, onboarding | — | working |
 | **MedTrace contract** (`app/domain/packs/medtrace/types.py`) | Arpon | **frozen, on `main`.** Shared file — changes need sign-off, a HANDOFF entry and a PR line |
 | **SQL templates** (`queries.py`) | Arpon | **written and run live** — the real Q1 executed verbatim against a union view on 24 Oct. Q4 (TGA) deliberately unwritten |
@@ -100,6 +100,17 @@ spike (`docs/DECISIONS.md`):
 
 What remains unproven is only the real data: the generator, the actual `medtrace.*`
 views and their counts (steps 4–6).
+
+## `make test` no longer regenerates your data
+
+The determinism test used to run the generator **in place**, so the suite quietly
+rewrote `data/synthetic/` and the committed fixtures. On a fresh clone that meant CI
+regenerated the silos *without* the gitignored real PBS codes and then asserted
+against data nobody had committed — the same commit scored 0.846 locally and 0.820 on
+CI. It now writes under a temp directory.
+
+So: **if `data/synthetic/silos/` is missing, the generator tests skip.** Run
+`make synth` yourself; nothing will create it for you any more.
 
 ## If you regenerate the data, re-cache Zetaris
 

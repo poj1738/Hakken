@@ -129,6 +129,39 @@ non-functional, then re-caches and re-verifies. I stopped rather than run it bec
 nicknames only affects fuzzy given-name matching in identity, and `identity.py`'s own
 nickname map is built in `parse.py`, not from this view.
 
+**5. CI failed on a number that passed locally, and the cause is worth everyone's
+attention: the test suite was rewriting the data it tests.**
+
+`test_the_generator_is_deterministic` ran the generator twice **in place**, so running
+`make test` silently overwrote `data/synthetic/` and the committed fixtures. On your
+own machine that only hides staleness. On a fresh clone it is much worse:
+`data/reference/lexicon.json` is **gitignored**, so CI regenerated the silos *without*
+the real PBS codes, replaced the committed fixtures with those, and every later test
+then asserted against data nobody had committed. That is how the same commit gave
+0.846 locally and 0.820 on CI.
+
+I only found it by cloning the repo into a temp directory and running the suite in a
+`python:3.11-slim` container — the clone's fixtures came out byte-different from the
+ones at the same SHA. Worth remembering as a technique: **if CI and local disagree on
+identical commits, reproduce on a clean clone before suspecting the code.** My first
+three hypotheses (Python 3.11 vs 3.12, hash randomisation, `SAMPLE_MODE`) were all
+wrong, and each was easy to "confirm" by reasoning rather than testing.
+
+Fixes: the generator takes `--out-root` and the test writes under `tmp_path`; the
+module's `skipif` now checks the **silos** (gitignored) rather than `ground_truth.json`
+(committed), which is what its reason string always claimed. Pack sizes moved to the
+committed `medicines.csv` via `scripts/backfill_packs.py`, so the generator no longer
+needs anything gitignored.
+
+**Verified:** a fresh clone on Python 3.11 is fully green and the suite now changes
+**0 tracked files**.
+
+**Two things this leaves for the team:**
+- **`make test` no longer regenerates your silos.** If `data/synthetic/silos/` is
+  missing, the generator tests *skip* instead of quietly creating it. Run `make synth`.
+- Our fixtures are only as good as the last person to commit them. The suite can no
+  longer paper over a stale fixture by regenerating it.
+
 **Next:** Sunday's modules — `fuse`, `detect`, `triage`, `scripts/eval.py`. `detect`
 and `triage` now have brief 8 to build against. Q4/TGA registration stays optional.
 
