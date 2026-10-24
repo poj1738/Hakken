@@ -59,7 +59,7 @@ def _digest(paths: list[pathlib.Path]) -> str:
 
 
 @pytest.mark.slow
-def test_the_generator_is_deterministic() -> None:
+def test_the_generator_is_deterministic(tmp_path: pathlib.Path) -> None:
     """Same seed, byte-identical output. Without this, `output_examples/` and the
     eval numbers cannot be reproduced by a judge, and every rate in DATA_SPEC
     becomes unverifiable.
@@ -69,12 +69,23 @@ def test_the_generator_is_deterministic() -> None:
     tests staleness, not determinism: regenerating the lexicon with real PBS
     codes legitimately changes the output, and that must not read as a
     non-determinism failure.
+
+    Writes under `tmp_path`, never into the repo. It used to regenerate in
+    place, which meant **running the test suite silently rewrote
+    `data/synthetic/` and the committed fixtures**. On a developer's machine
+    that merely hid staleness; on a fresh clone it was worse, because
+    `data/reference/lexicon.json` is gitignored -- CI regenerated the silos
+    without the real PBS codes, replaced the committed fixtures with those, and
+    every later test then asserted against data nobody had committed. A test
+    must not edit the artefacts another test is reading.
     """
     def regenerate() -> str:
-        result = subprocess.run([sys.executable, "scripts/generate_synthetic.py"],
-                                capture_output=True, text=True, timeout=300)
+        result = subprocess.run(
+            [sys.executable, "scripts/generate_synthetic.py", "--out-root", str(tmp_path)],
+            capture_output=True, text=True, timeout=300)
         assert result.returncode == 0, result.stderr[-2000:]
-        return _digest(sorted(SILOS.glob("*.json")) + [OUT / "ground_truth.json"])
+        out = tmp_path / OUT
+        return _digest(sorted((out / "silos").glob("*.json")) + [out / "ground_truth.json"])
 
     assert regenerate() == regenerate(), "two runs of the same seed differed"
 

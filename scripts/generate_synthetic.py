@@ -59,6 +59,15 @@ SRC = pathlib.Path("data/reference_src")
 OUT = pathlib.Path("data/synthetic")
 FIXTURES = pathlib.Path("tests/fixtures/medtrace")
 
+#: Prefixed to both of the above by `--out-root`. The determinism test runs the
+#: generator twice and compares the runs; without somewhere else to write, it
+#: overwrote `data/synthetic/` and the committed fixtures every time the suite
+#: ran. On a fresh clone that is worse than untidy: `data/reference/lexicon.json`
+#: is gitignored, so CI regenerated the silos *without* the real codes, replaced
+#: the committed fixtures with them, and then asserted against data nobody had
+#: committed. Tests must read the artefacts we ship, not ones they just made.
+OUT_ROOT = pathlib.Path(".")
+
 SOURCES = ("emr", "gp", "pharmacy", "patient")
 
 # DATA_SPEC 3: age bands and sex
@@ -1164,7 +1173,15 @@ def main() -> int:
     ap.add_argument("--fixtures", type=int, default=10,
                     help="how many tune patients get Q1/Q2/Q3 fixtures")
     ap.add_argument("--seed", type=int, default=SEED)
+    ap.add_argument("--out-root", type=pathlib.Path, default=None,
+                    help="write the silos and fixtures under this directory "
+                         "instead of the repo (used by the determinism test, so "
+                         "running the suite cannot overwrite committed data)")
     args = ap.parse_args()
+
+    global OUT_ROOT
+    if args.out_root is not None:
+        OUT_ROOT = args.out_root
 
     products = [Product(r) for r in read_csv(SRC / "medicines.csv")]
     bundles: dict[str, list[Product]] = collections.defaultdict(list)
@@ -1237,20 +1254,21 @@ def main() -> int:
         })
 
     # -- write silos --------------------------------------------------------
-    (OUT / "silos").mkdir(parents=True, exist_ok=True)
+    out, fixtures_dir = OUT_ROOT / OUT, OUT_ROOT / FIXTURES
+    (out / "silos").mkdir(parents=True, exist_ok=True)
     for source in SOURCES:
         payload = {"records": rows.data[source]}
-        (OUT / "silos" / f"{source}.json").write_text(json.dumps(payload, indent=1), encoding="utf-8")
+        (out / "silos" / f"{source}.json").write_text(json.dumps(payload, indent=1), encoding="utf-8")
         log(f"  silo {source:9} {len(rows.data[source]):5} rows")
 
     ground_truth = {
         "seed": args.seed, "generator_version": GENERATOR_VERSION, "as_of": iso(AS_OF),
         "hidden_error_rates": HIDDEN_ERROR_RATES, "split": split, "patients": gt_patients,
     }
-    (OUT / "ground_truth.json").write_text(json.dumps(ground_truth, indent=1), encoding="utf-8")
+    (out / "ground_truth.json").write_text(json.dumps(ground_truth, indent=1), encoding="utf-8")
 
     # -- fixtures ----------------------------------------------------------
-    FIXTURES.mkdir(parents=True, exist_ok=True)
+    fixtures_dir.mkdir(parents=True, exist_ok=True)
     harmonised: list[dict[str, str]] = []
     for source in SOURCES:
         harmonised.extend(harmonise(source, r) for r in rows.data[source])
@@ -1270,7 +1288,7 @@ def main() -> int:
         for name, cols, data in (("Q1", IDENTITY_COLUMNS, q1),
                                  ("Q2", HARMONISED_COLUMNS, q2),
                                  ("Q3", HARMONISED_COLUMNS, q3)):
-            (FIXTURES / f"{name}__{p.key}.json").write_text(
+            (fixtures_dir / f"{name}__{p.key}.json").write_text(
                 json.dumps(envelope(cols, data), indent=1), encoding="utf-8")
             written += 1
     log(f"  fixtures: {written} envelopes for {min(args.fixtures, len(patients))} patients")
