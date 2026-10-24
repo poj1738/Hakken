@@ -31,6 +31,13 @@ run: ## One run against the first example input
 serve: ## Start the API server
 	$(VENV_PY) run.py serve
 
+data: ## Rebuild the reference data (PBS fetch, then lexicon)
+	$(VENV_PY) scripts/fetch_reference.py
+	$(VENV_PY) scripts/build_lexicon.py
+
+lexicon: ## Rebuild only the lexicon, from the committed hand-built sources
+	$(VENV_PY) scripts/build_lexicon.py
+
 register: ## Register the synthetic silos in Zetaris (dry-run first)
 	$(VENV_PY) scripts/register_sources.py --dry-run
 
@@ -40,4 +47,4 @@ examples: ## Regenerate output_examples/ from real runs
 validate: ## Reproduce the disqualification checklist end to end
 	bash scripts/validate_submission.sh
 
-.PHONY: help setup preflight test conformance scan run serve register examples validate
+.PHONY: help setup preflight test conformance scan data lexicon run serve register examples validate

@@ -44,11 +44,24 @@ def build_lexicon(
 ) -> Lexicon:
     """Build the in-process `Lexicon` from the three Q_REF results.
 
-    Called once at app startup, never per run -- a reference query costs the same
-    4-91 s as any other (`docs/DECISIONS.md`, 24 Oct). Builds the casefolded
-    brand and generic indexes, sorts the APINCHS prefixes longest-first so the
-    most specific ATC prefix wins, and makes the nickname map **symmetric and
-    transitively closed within a cluster**, so Peggy -> Margaret -> Maggie all
-    resolve to each other.
+    Called once at app startup, never per run (`docs/DECISIONS.md`, 24 Oct).
+    Builds the casefolded brand and generic indexes, and sorts the APINCHS
+    prefixes longest-first so the most specific ATC prefix wins: `A10AB`
+    (fast-acting insulin) must beat `A10` before it.
+
+    The nickname map is **symmetric, and closed only within one canonical
+    name** -- deliberately *not* transitively closed across a shared variant.
+    Peggy, Peg, Maggie and Marg all resolve to each other because they are all
+    Margaret. But `Chris` is a variant of both Christine and Christopher, and
+    closing through it would make **Christine equivalent to Christopher**. With
+    a shared surname and date of birth that is a false merge across two people
+    of different sexes, and false-merge rate has a target of zero. Nine variants
+    in `data/reference_src/nicknames.csv` are ambiguous this way (`Chris`,
+    `Pat`, `Jan`, `Harry`, `Terry`, `Kath`, `Kathy`, `Gerry`, `Ronnie`), so this
+    is the common case, not a corner.
+
+    A match made *through* an ambiguous variant is therefore weaker evidence
+    than one through an unambiguous one, and `identity.score_pair` weights it
+    accordingly.
     """
     raise NotImplementedError("Arpon: parse.py")

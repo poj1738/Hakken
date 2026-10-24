@@ -1,0 +1,41 @@
+row_no,apinchs_class,label,atc_prefixes,examples,source
+1,A,aminoglycosides,J01GB,"gentamicin, tobramycin, amikacin",ACSQHC
+2,A,glycopeptides,J01XA,vancomycin,ACSQHC
+3,A,amphotericin,J02AA01,amphotericin B,ACSQHC
+4,A,other antibacterials (flag only),J01,all,Extension
+5,P,potassium,A12BA,potassium chloride,ACSQHC
+6,P,IV electrolyte concentrates,B05XA,"KCl, hypertonic NaCl",ACSQHC
+7,P,magnesium,A12CC,magnesium sulfate,ACSQHC
+8,P,calcium,A12AA,calcium gluconate,ACSQHC
+9,I,fast-acting,A10AB,"aspart, lispro",ACSQHC
+10,I,intermediate,A10AC,isophane,ACSQHC
+11,I,premixed,A10AD,aspart/protamine,ACSQHC
+12,I,long-acting,A10AE,"glargine, degludec",ACSQHC
+13,N,opium alkaloids,N02AA,"morphine, oxycodone, hydromorphone",ACSQHC
+14,N,phenylpiperidines,N02AB,fentanyl,ACSQHC
+15,N,oripavines,N02AE,buprenorphine,ACSQHC
+16,N,opioid combinations,N02AJ,paracetamol/codeine,ACSQHC
+17,N,other opioids,N02AX,"tramadol, tapentadol",ACSQHC
+18,N,methadone,N07BC02,methadone,ACSQHC
+19,N,benzodiazepine anxiolytics,N05BA,"diazepam, oxazepam",ACSQHC
+20,N,benzodiazepine hypnotics,N05CD,"temazepam, midazolam",ACSQHC
+21,N,Z-drugs,N05CF,"zolpidem, zopiclone",Extension
+22,N,anaesthetics,N01AX10;N01AF,"propofol, thiopental",ACSQHC
+23,C,antineoplastics,L01,all,ACSQHC
+24,C,vinca alkaloids,L01CA,vincristine,ACSQHC
+25,C,etoposide,L01CB,etoposide,ACSQHC
+26,C,methotrexate (oncology),L01BA01,methotrexate,ACSQHC
+27,C,methotrexate (oral weekly),L04AX03,methotrexate,ACSQHC + extension
+28,C,azathioprine,L04AX01,azathioprine,ACSQHC
+29,H,vitamin K antagonists,B01AA,warfarin,ACSQHC
+30,H,heparins,B01AB,"heparin, enoxaparin",ACSQHC
+31,H,direct thrombin inhibitors,B01AE,dabigatran,ACSQHC
+32,H,factor Xa inhibitors,B01AF,"apixaban, rivaroxaban",ACSQHC
+33,H,thrombolytics,B01AD,"alteplase, tenecteplase",ACSQHC
+34,Ext,digoxin,C01AA05,digoxin,Extension
+35,Ext,antiarrhythmics III,C01BD,amiodarone,WA APINCHS
+36,Ext,sulfonylureas,A10BB,"gliclazide, glimepiride",Extension
+37,Ext,SU combinations,A10BD02,metformin/glibenclamide,Extension
+38,Ext,clozapine,N05AH02,clozapine,SA APINCHEN
+39,Ext,lithium,N05AN01,lithium,SA APINCHEN
+40,Ext,neuromuscular blockers,M03AC;M03AB,"rocuronium, suxamethonium",SA APINCHEN

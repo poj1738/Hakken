@@ -107,6 +107,9 @@ class NoticeType(str, Enum):
 
     A notice says something about *our evidence*; a discrepancy says something
     about the patient's medicines.
+
+    `known_shortage` is the one member with no implementation behind it yet; see
+    its comment for why it is declared early.
     """
 
     COVERAGE_GAP = "coverage_gap"
@@ -115,6 +118,12 @@ class NoticeType(str, Enum):
     PATIENT_ONLY_ITEM = "patient_only_item"
     CONFLICT_ABSTAINED = "conflict_abstained"
     STALE_DOCUMENT = "stale_document"
+    #: TGA shortage overlay (Q4, Monday, optional -- PLAN 3 and 11). Declared now,
+    #: while this file is being frozen, precisely so Monday's optional work cannot
+    #: require editing a shared file that Arnav has already imported. The TGA
+    #: shortage database is known to be incomplete, so this is never ground truth
+    #: and must always be rendered as "known shortage", never "unavailable".
+    KNOWN_SHORTAGE = "known_shortage"
 
 
 Severity = Literal["high", "medium", "low"]
