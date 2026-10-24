@@ -266,6 +266,29 @@ class Product(dict):
     def is_addon(self) -> bool:
         return self["is_addon"] == "1"
 
+    def override_for(self, column: str, strength: str) -> int:
+        """A per-strength override from `column`, or 0 if none.
+
+        The column is either one value for every strength, or a ";"-separated
+        list aligned with `strengths` -- the same convention as brands and
+        strengths. One value per product gave every prednisolone strength the
+        200-tablet pack that is right only for 5 mg, which made a finished
+        25 mg course look like 200 days of supply.
+        """
+        raw = (self.get(column) or "").strip()
+        if not raw:
+            return 0
+        values = raw.split(";")
+        if len(values) > 1:
+            try:
+                raw = values[self.strengths.index(strength)]
+            except (ValueError, IndexError):
+                return 0
+        try:
+            return int(raw or 0)
+        except ValueError:
+            return 0
+
 
 def doses_per_day(regimen: str) -> float:
     """Doses per day from a regimen string. Weekly agents divide by 7."""
@@ -424,12 +447,10 @@ class Med:
         # only applies to items with no PBS listing (OTC, and the few
         # private-script products).
         real_qty, real_repeats = PACKS.get((self.generic, self.brand, self.strength), (0, 0))
-        self.pbs_repeats = real_repeats
-        try:
-            self.pack_qty = (int(product["pack_qty_override"] or 0) or real_qty
-                             or (60 if per_day >= 2 else 30))
-        except ValueError:
-            self.pack_qty = real_qty or 30
+        override_repeats = product.override_for("repeats_override", self.strength)
+        self.pbs_repeats = override_repeats or real_repeats
+        self.pack_qty = (product.override_for("pack_qty_override", self.strength) or real_qty
+                         or (60 if per_day >= 2 else 30))
         # A device pack is ONE unit that lasts about a month, so dividing it by
         # doses-per-day collapsed days_supply to the 7-day floor and let an
         # inhaler or insulin pen be dispensed 50+ times a year. Pack size says
@@ -786,7 +807,16 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
     if p.prior_discharge:
         d_date = AS_OF - dt.timedelta(days=rng.randint(14, 180))
         for med in rng.sample(p.meds, min(len(p.meds), rng.randint(2, 4))):
-            action = pick(rng, (("start", 0.58), ("cease", 0.27), ("change", 0.15)))
+            # The action has to agree with what actually happened. These were
+            # drawn at random, so a discharge summary would "cease" a medicine
+            # the patient carried on taking -- incoherent history that made a
+            # current salbutamol inhaler and a current statin look like
+            # commissions. A stopped medicine is ceased; a current one was
+            # started or changed.
+            if not med.current:
+                action = "cease"
+            else:
+                action = pick(rng, (("start", 0.79), ("change", 0.21)))
             reason = "" if rng.random() > 0.81 else rng.choice(
                 ["dose reduced: eGFR 28", "ceased: dizziness", "started: new AF"])
             rows.add("emr", dict(emr_base, record_kind="prior_discharge", record_date=iso(d_date),
@@ -823,7 +853,13 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
                                          amt_code=code_for(med, "amt_mpp"),
                                          strength=med.strength, directions=directions,
                                          status=status))
-            if status == "active" and not med.current and med.possibly_ceased():
+            # Only plantable when there is a pharmacy record to show the lapse.
+            # possibly_ceased() reads the generator's own dispensing history,
+            # which exists even for a patient with no pharmacy silo -- so a stale
+            # listing was planted on evidence no silo contained, and no detector
+            # could ever find it.
+            if (status == "active" and not med.current and p.present["pharmacy"]
+                    and med.possibly_ceased()):
                 plant("stale_listing", med, ["gp", "pharmacy"], [row_id],
                       {"last_dispensed": iso(med.dispensings[-1]) if med.dispensings else None},
                       "likely_unintentional")
