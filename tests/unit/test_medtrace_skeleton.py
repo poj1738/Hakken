@@ -97,6 +97,7 @@ IMPLEMENTED: set[tuple[str, str]] = {
     ("supply", "supply_status"),
     ("supply", "pdc"),
     ("fuse", "fuse"),
+    ("detect", "detect_discrepancies"),
 }
 
 #: `(module, function) -> the exact signature`, with the quotes that

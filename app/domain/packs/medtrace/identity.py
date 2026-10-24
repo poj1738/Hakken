@@ -369,19 +369,23 @@ def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) 
             conflicting = ihis - {anchor_ihi}
             if not conflicting:
                 continue
-            if anchor_ihi in ihis:
-                # The cluster holds BOTH the patient's IHI and someone else's.
-                # A lookalike makes this unavoidable: the records are identical
-                # on name and date of birth, so a member carrying no IHI is
-                # equally consistent with either person. We cannot tell, and
-                # pretending otherwise is how a false merge happens -- so the
-                # un-identified members go to a human. This is the demo's
-                # "a lookalike refused auto-link, one review click".
-                ambiguous.update(m for m in members if not (records[m].ihi_syn or "").strip())
-            else:
-                # No member carries the patient's IHI and at least one carries
-                # someone else's: the whole cluster is a different person.
-                rejected.update(members)
+            # The cluster holds someone else's IHI. Members carrying it are that
+            # person. Members carrying NO IHI are not known to be: a lookalike
+            # is identical on name and date of birth, so an un-identified record
+            # is equally consistent with either person. We cannot tell, and
+            # pretending otherwise either way is wrong -- so they go to a human.
+            # This is the demo's "a lookalike refused auto-link, one review
+            # click".
+            #
+            # That used to apply only when the patient's own IHI also appeared
+            # in the cluster. When it did not -- P0008, whose GP, pharmacy and
+            # interview records all lack an IHI while the lookalike's carry
+            # one -- the whole cluster was rejected, the patient's own records
+            # with it, and every finding resting on them was lost. Review never
+            # merges anything, so this cannot raise the false-merge rate.
+            ambiguous.update(m for m in members if not (records[m].ihi_syn or "").strip())
+            if anchor_ihi not in ihis:
+                rejected.update(m for m in members if (records[m].ihi_syn or "").strip())
 
         for link in links:
             if link.tier == "ihi_conflict":

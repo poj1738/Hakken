@@ -206,7 +206,13 @@ def test_an_ihi_conflict_elsewhere_in_a_cluster_demotes_a_record_with_no_ihi(lex
     links = {l.candidate_id: l for l in link_identity(anchor, [decoy_with_ihi, decoy_without], lex)}
     assert links["gp:GP9"].band == "new"            # tier 1 rejects it outright
     assert links["patient:INT9"].band != "auto-merge"
-    assert "ihi_conflict_in_cluster" in links["patient:INT9"].guards
+    # Review, not rejection. Here INT9 happens to be the decoy, but nothing in
+    # the record says so -- same name, same DOB, no IHI -- so it is equally
+    # consistent with the patient. Rejecting such records outright threw away
+    # P0008's own GP, pharmacy and interview records (25 Oct). Review never
+    # merges, so the false-merge guarantee this test exists for is unchanged.
+    assert links["patient:INT9"].band == "review"
+    assert "ihi_ambiguous_in_cluster" in links["patient:INT9"].guards
 
 
 def test_a_record_equally_consistent_with_two_people_goes_to_a_human(lex) -> None:

@@ -18,7 +18,7 @@ import math
 from datetime import date
 
 from app.domain.packs.medtrace.normalise import parse_frequency
-from app.domain.packs.medtrace.supply import supply_status
+from app.domain.packs.medtrace.supply import _is_irregular, supply_status
 from app.domain.packs.medtrace.trust import DEFAULT_TRUST
 from app.domain.packs.medtrace.types import (
     FUSED_ATTRIBUTES,
@@ -36,6 +36,15 @@ TAU_DAYS: dict[str, float] = {"emr": 3650.0, "gp": 730.0, "pharmacy": 180.0, "pa
 
 PRESENT = "present"
 ABSENT = "absent"
+
+#: Weight of a source that is in scope but simply never mentions a medicine,
+#: relative to one that says it was stopped. Not mentioning is weaker evidence
+#: than denying: patients forget about 15% of their medicines (DATA_SPEC 8),
+#: PRN ones especially, and a GP summary or a single pharmacy's record can be
+#: incomplete. Counting silence at full weight produced false commissions --
+#: a current GTN spray charted at admission, outvoted by a patient and a
+#: pharmacy that had simply never mentioned it.
+SILENCE_WEIGHT = 0.5
 
 
 def fuse(
@@ -144,6 +153,11 @@ def fuse(
     return fused
 
 
+def _irregular_anywhere(generic: str, stmts: list[MedStatement]) -> bool:
+    """Does any source describe this medicine as PRN or long-interval?"""
+    return any(s.generic == generic and _is_irregular(s) for s in stmts)
+
+
 def _latest_date(stmts: list[MedStatement]) -> date | None:
     dated = [s.doc_date for s in stmts if s.doc_date is not None]
     return max(dated) if dated else None
@@ -187,6 +201,14 @@ def _existence_votes(
         if state is EvidenceState.UNKNOWN:
             continue
         if source == "pharmacy":
+            if _irregular_anywhere(generic, stmts):
+                # For a PRN or long-interval medicine, dispensing says nothing
+                # about existence either way: a year-old GTN fill does not prove
+                # current use, and no fill does not prove stopping. supply_status
+                # exempts these regimens too, but it reads only the dispensing
+                # rows, which carry no directions -- so the PRN signal has to
+                # come from the chart, GP or patient.
+                continue
             fills = [s for s in stmts if s.source == "pharmacy" and s.generic == generic]
             if fills:
                 status = supply_status(fills, as_of)
@@ -212,6 +234,8 @@ def _existence_votes(
         value = PRESENT if state is EvidenceState.PRESENT else ABSENT
         row_id = stmt.row_id if stmt is not None else ""
         recency = _recency(source, stmt.doc_date, as_of) if stmt is not None else 1.0
+        if stmt is None and value == ABSENT:
+            recency *= SILENCE_WEIGHT
         votes[source] = (value, recency, row_id)
     return votes
 
