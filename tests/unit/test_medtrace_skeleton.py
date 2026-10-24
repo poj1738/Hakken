@@ -88,6 +88,12 @@ IMPLEMENTED: set[tuple[str, str]] = {
     ("identity", "score_pair"),
     ("identity", "link_identity"),
     ("identity", "detect_overlay"),
+    ("normalise", "normalise_med"),
+    ("normalise", "llm_candidates"),
+    ("normalise", "strip_salt"),
+    ("normalise", "parse_strength_mg"),
+    ("normalise", "parse_frequency"),
+    ("normalise", "parse_release"),
 }
 
 #: `(module, function) -> the exact signature`, with the quotes that
@@ -124,6 +130,10 @@ EXPECTED_SIGNATURES: dict[tuple[str, str], str] = {
     ),
     ("identity", "detect_overlay"): "(rows_for_one_record: list[SourceRow]) -> list[str]",
     # -- normalise.py ---------------------------------------------------------
+    ("normalise", "strip_salt"): "(name: str) -> str",
+    ("normalise", "parse_strength_mg"): "(text: str | None) -> float | None",
+    ("normalise", "parse_frequency"): "(text: str | None) -> tuple[float | None, bool]",
+    ("normalise", "parse_release"): "(*texts: str | None) -> str",
     ("normalise", "normalise_med"): "(row: SourceRow, lex: Lexicon) -> MedStatement",
     ("normalise", "llm_candidates"): "(text: str, lex: Lexicon, k: int = 5) -> dict",
     # -- coverage.py ----------------------------------------------------------
@@ -252,6 +262,10 @@ STUB_CALLS: tuple[tuple[str, str, tuple[Any, ...]], ...] = (
     ("identity", "score_pair", (_row(), _row(), Lexicon())),
     ("identity", "link_identity", (_row(), [], Lexicon())),
     ("identity", "detect_overlay", ([],)),
+    ("normalise", "strip_salt", ("atorvastatin calcium",)),
+    ("normalise", "parse_strength_mg", ("40 mg",)),
+    ("normalise", "parse_frequency", ("1 tab bd",)),
+    ("normalise", "parse_release", ("modified release tablet",)),
     ("normalise", "normalise_med", (_row(), Lexicon())),
     ("normalise", "llm_candidates", ("my blood thinner", Lexicon())),
     ("coverage", "coverage", ([_LINK], [])),
