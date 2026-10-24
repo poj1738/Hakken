@@ -1,0 +1,94 @@
+{
+  "patients": [
+    {
+      "patient_id": "MRN0000001",
+      "record_key": "emr:MRN0000001",
+      "name_given": "Marjorie",
+      "name_family": "Lee",
+      "dob": "1951-02-24",
+      "sex": "F",
+      "admission_date": "2026-10-24"
+    },
+    {
+      "patient_id": "MRN0000002",
+      "record_key": "emr:MRN0000002",
+      "name_given": "Thomas",
+      "name_family": "Papadopoulos",
+      "dob": "1942-03-08",
+      "sex": "M",
+      "admission_date": "2026-10-24"
+    },
+    {
+      "patient_id": "MRN0000003",
+      "record_key": "emr:MRN0000003",
+      "name_given": "Christine",
+      "name_family": "O'Brien",
+      "dob": "1955-01-25",
+      "sex": "F",
+      "admission_date": "2026-10-24"
+    },
+    {
+      "patient_id": "MRN0000004",
+      "record_key": "emr:MRN0000004",
+      "name_given": "Veronica",
+      "name_family": "Chen",
+      "dob": "1942-04-29",
+      "sex": "F",
+      "admission_date": "2026-10-24"
+    },
+    {
+      "patient_id": "MRN0000005",
+      "record_key": "emr:MRN0000005",
+      "name_given": "Clifford",
+      "name_family": "Singh",
+      "dob": "1948-05-16",
+      "sex": "M",
+      "admission_date": "2026-10-24"
+    },
+    {
+      "patient_id": "MRN0000006",
+      "record_key": "emr:MRN0000006",
+      "name_given": "Thomas",
+      "name_family": "Papadopoulos",
+      "dob": "1942-03-08",
+      "sex": "M",
+      "admission_date": "2026-10-24"
+    },
+    {
+      "patient_id": "MRN0000007",
+      "record_key": "emr:MRN0000007",
+      "name_given": "Benjamin",
+      "name_family": "O'Brien",
+      "dob": "1936-12-30",
+      "sex": "M",
+      "admission_date": "2026-10-24"
+    },
+    {
+      "patient_id": "MRN0000008",
+      "record_key": "emr:MRN0000008",
+      "name_given": "Clifford",
+      "name_family": "Singh",
+      "dob": "1948-05-16",
+      "sex": "M",
+      "admission_date": "2026-10-24"
+    },
+    {
+      "patient_id": "MRN0000009",
+      "record_key": "emr:MRN0000009",
+      "name_given": "Joseph",
+      "name_family": "Young",
+      "dob": "1956-12-13",
+      "sex": "M",
+      "admission_date": "2026-10-24"
+    },
+    {
+      "patient_id": "MRN0000010",
+      "record_key": "emr:MRN0000010",
+      "name_given": "Janet",
+      "name_family": "Harris",
+      "dob": "1945-02-19",
+      "sex": "F",
+      "admission_date": "2026-10-24"
+    }
+  ]
+}

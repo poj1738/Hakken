@@ -1,0 +1,581 @@
+{
+  "run_id": "run-ex-p0002",
+  "status": "needs_review",
+  "output": {
+    "summary": "Waiting for identity review before reconciling.",
+    "recommendations": [],
+    "evidence": [],
+    "caveats": [
+      "Hand-written example for UI development (PLAN 5.8); not the output of a real run. Regenerated from real runs once the pipeline works.",
+      "Synthetic data. Not medical advice. A pharmacist must confirm every item."
+    ],
+    "artifacts": []
+  },
+  "agents": [
+    {
+      "name": "Planner",
+      "role": "plan the investigation",
+      "iterations": 1,
+      "models_used": [
+        "nvidia/nemotron-3.5-lightning-30b-a3b"
+      ],
+      "routes_requested": [
+        "meterless/fast"
+      ],
+      "status": "ok"
+    },
+    {
+      "name": "Executor",
+      "role": "fetch, link, normalise",
+      "iterations": 1,
+      "models_used": [
+        "nvidia/nemotron-3.5-lightning-30b-a3b"
+      ],
+      "routes_requested": [
+        "meterless/fast"
+      ],
+      "status": "ok"
+    }
+  ],
+  "trace_id": "run-ex-p0002",
+  "log_file": "logs/trace-run-ex-p0002.jsonl",
+  "execution_time_seconds": 6.1,
+  "error": null,
+  "memory_used": [],
+  "sample_mode": true,
+  "provider_state": "online",
+  "patient_id": "MRN0000002",
+  "coverage": {
+    "emr": {
+      "source": "emr",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "emr:MRN0000002",
+      "doc_date": "2026-10-24"
+    },
+    "pharmacy": {
+      "source": "pharmacy",
+      "state": "found",
+      "scope_notes": [
+        "linked on synthetic IHI"
+      ],
+      "record_key": "pharmacy:C000002",
+      "doc_date": null
+    },
+    "gp": {
+      "source": "gp",
+      "state": "near_miss_pending",
+      "scope_notes": [
+        "waiting for identity review"
+      ],
+      "record_key": null,
+      "doc_date": null
+    },
+    "patient": {
+      "source": "patient",
+      "state": "near_miss_pending",
+      "scope_notes": [
+        "waiting for identity review"
+      ],
+      "record_key": null,
+      "doc_date": null
+    }
+  },
+  "bpmh_confirmable": false,
+  "banner": "Identity review needed: two people share this name and date of birth.",
+  "grid": [],
+  "findings": [],
+  "notices": [],
+  "tasks": [],
+  "identity_review": {
+    "anchor": {
+      "source": "emr",
+      "row_id": "EMR-000009",
+      "source_patient_id": "MRN0000002",
+      "ihi_syn": "SYN-320504145476",
+      "name_given": "Thomas",
+      "name_family": "Papadopoulos",
+      "name_previous": null,
+      "dob": "1942-03-08",
+      "dob_raw": "1942-03-08",
+      "sex": "M",
+      "postcode": "2641",
+      "record_kind": "admission_chart",
+      "doc_date": "2026-10-24",
+      "med_text": null,
+      "med_code": null,
+      "code_system": null,
+      "strength_text": null,
+      "dose_text": null,
+      "route_text": null,
+      "freq_text": null,
+      "status_text": null,
+      "note_text": null,
+      "qty": null,
+      "days_supply": null,
+      "pharmacy_id": null,
+      "script_type": null
+    },
+    "candidates": [
+      {
+        "anchor_id": "emr:MRN0000002",
+        "candidate_id": "gp:GPP000002",
+        "match_weight": 29.99,
+        "probability": 0.84,
+        "band": "review",
+        "tier": "probabilistic",
+        "field_evidence": {
+          "given": "given name matches exactly",
+          "surname": "surname matches exactly",
+          "dob": "date of birth matches exactly",
+          "sex": "sex matches",
+          "postcode": "postcode matches",
+          "guard": "this record carries no IHI and is an equally good match for two different people with the same name and date of birth — confirm which"
+        },
+        "guards": [
+          "ihi_ambiguous_in_cluster"
+        ]
+      },
+      {
+        "anchor_id": "emr:MRN0000002",
+        "candidate_id": "patient:INT00002",
+        "match_weight": 16.4,
+        "probability": 0.84,
+        "band": "review",
+        "tier": "probabilistic",
+        "field_evidence": {
+          "given": "given name matches exactly (within a combined name field)",
+          "dob": "date of birth matches exactly",
+          "guard": "this record carries no IHI and is an equally good match for two different people with the same name and date of birth — confirm which"
+        },
+        "guards": [
+          "ihi_ambiguous_in_cluster"
+        ]
+      },
+      {
+        "anchor_id": "emr:MRN0000002",
+        "candidate_id": "pharmacy:C000006",
+        "match_weight": 20.69,
+        "probability": 0.84,
+        "band": "review",
+        "tier": "probabilistic",
+        "field_evidence": {
+          "given": "given name matches exactly (within a combined name field)",
+          "surname": "surname matches a previous surname",
+          "dob": "date of birth matches exactly",
+          "postcode": "postcode differs (a move?)",
+          "guard": "2 records in pharmacy score as this patient; a distinguishing field or a human decision is needed before merging either"
+        },
+        "guards": [
+          "ihi_ambiguous_in_cluster",
+          "lookalike_cluster"
+        ]
+      }
+    ],
+    "records": {
+      "pharmacy:C000002": {
+        "source": "pharmacy",
+        "row_id": "PHM-000079",
+        "source_patient_id": "C000002",
+        "ihi_syn": "SYN-320504145476",
+        "name_given": "PAPADOPOULOS, Thomas",
+        "name_family": null,
+        "name_previous": null,
+        "dob": "1942-03-08",
+        "dob_raw": "1942-03-08",
+        "sex": null,
+        "postcode": "3546",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "gp:GPP000002": {
+        "source": "gp",
+        "row_id": "GP-000011",
+        "source_patient_id": "GPP000002",
+        "ihi_syn": null,
+        "name_given": "Thomas",
+        "name_family": "Papadopoulos",
+        "name_previous": null,
+        "dob": "1942-03-08",
+        "dob_raw": "08/03/1942",
+        "sex": "Male",
+        "postcode": "2641",
+        "record_kind": "gp_list",
+        "doc_date": "2026-08-29",
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "patient:INT00002": {
+        "source": "patient",
+        "row_id": "PAT-000009",
+        "source_patient_id": "INT00002",
+        "ihi_syn": null,
+        "name_given": "Thomas Papadopoulos",
+        "name_family": null,
+        "name_previous": null,
+        "dob": "1942-03-08",
+        "dob_raw": "1942-03-08",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "pharmacy:C000006": {
+        "source": "pharmacy",
+        "row_id": "PHM-000309",
+        "source_patient_id": "C000006",
+        "ihi_syn": null,
+        "name_given": "PAPADOPOULOS, Thomas",
+        "name_family": null,
+        "name_previous": null,
+        "dob": "1942-03-08",
+        "dob_raw": "1942-03-08",
+        "sex": null,
+        "postcode": "2777",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "emr:MRN0000006": {
+        "source": "emr",
+        "row_id": "EMR-000049",
+        "source_patient_id": "MRN0000006",
+        "ihi_syn": "SYN-932392202599",
+        "name_given": "Thomas",
+        "name_family": "Papadopoulos",
+        "name_previous": null,
+        "dob": "1942-03-08",
+        "dob_raw": "1942-03-08",
+        "sex": "M",
+        "postcode": "2777",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "patient:INT00006": {
+        "source": "patient",
+        "row_id": "PAT-000049",
+        "source_patient_id": "INT00006",
+        "ihi_syn": "SYN-932392202599",
+        "name_given": "Thomas Papadopoulos",
+        "name_family": null,
+        "name_previous": null,
+        "dob": "1942-03-08",
+        "dob_raw": "1942-03-08",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    }
+  },
+  "evidence_index": {},
+  "trust": [
+    {
+      "source": "emr",
+      "attribute": "actually_taking",
+      "value": 0.4,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-emr-actually_taking"
+    },
+    {
+      "source": "emr",
+      "attribute": "daily_dose",
+      "value": 0.7,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-emr-daily_dose"
+    },
+    {
+      "source": "emr",
+      "attribute": "existence",
+      "value": 0.65,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-emr-existence"
+    },
+    {
+      "source": "emr",
+      "attribute": "intended_dose",
+      "value": 0.7,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-emr-intended_dose"
+    },
+    {
+      "source": "emr",
+      "attribute": "strength",
+      "value": 0.75,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-emr-strength"
+    },
+    {
+      "source": "gp",
+      "attribute": "actually_taking",
+      "value": 0.45,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-gp-actually_taking"
+    },
+    {
+      "source": "gp",
+      "attribute": "daily_dose",
+      "value": 0.7,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-gp-daily_dose"
+    },
+    {
+      "source": "gp",
+      "attribute": "existence",
+      "value": 0.6,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-gp-existence"
+    },
+    {
+      "source": "gp",
+      "attribute": "intended_dose",
+      "value": 0.75,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-gp-intended_dose"
+    },
+    {
+      "source": "gp",
+      "attribute": "strength",
+      "value": 0.75,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-gp-strength"
+    },
+    {
+      "source": "patient",
+      "attribute": "actually_taking",
+      "value": 0.8,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-patient-actually_taking"
+    },
+    {
+      "source": "patient",
+      "attribute": "daily_dose",
+      "value": 0.4,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-patient-daily_dose"
+    },
+    {
+      "source": "patient",
+      "attribute": "existence",
+      "value": 0.65,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-patient-existence"
+    },
+    {
+      "source": "patient",
+      "attribute": "intended_dose",
+      "value": 0.35,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-patient-intended_dose"
+    },
+    {
+      "source": "patient",
+      "attribute": "strength",
+      "value": 0.3,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-patient-strength"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "actually_taking",
+      "value": 0.7,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-pharmacy-actually_taking"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "daily_dose",
+      "value": 0.55,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-pharmacy-daily_dose"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "existence",
+      "value": 0.85,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-pharmacy-existence"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "intended_dose",
+      "value": 0.5,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-pharmacy-intended_dose"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "strength",
+      "value": 0.9,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-pharmacy-strength"
+    }
+  ],
+  "trace": [
+    {
+      "timestamp": "2026-10-24T22:10:00+00:00",
+      "run_id": "run-ex-p0002",
+      "agent_name": "Planner",
+      "action": "plan",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PLAN",
+      "message": "Plan: find Thomas Papadopoulos in the other sources.",
+      "route": "meterless/fast",
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:10:05+00:00",
+      "run_id": "run-ex-p0002",
+      "agent_name": "Executor",
+      "action": "find_identities",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "Found two different people named Thomas Papadopoulos born 8 Mar 1942. 3 records match both equally well: needs your confirmation.",
+      "route": null,
+      "latency_ms": 2400,
+      "tokens": null,
+      "sql": null,
+      "row_count": 189,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:10:06+00:00",
+      "run_id": "run-ex-p0002",
+      "agent_name": "Executor",
+      "action": "needs_review",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "waiting",
+      "step": "NEEDS_REVIEW",
+      "message": "Paused for identity review.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    }
+  ],
+  "query_count": 1,
+  "zetaris_ms": 2400,
+  "model_calls": [
+    {
+      "role": "Planner",
+      "requested_route": "meterless/fast",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "request_id": "req-ex-0001",
+      "tokens": {
+        "prompt_tokens": 1450,
+        "completion_tokens": 410
+      },
+      "truncated": false
+    }
+  ]
+}

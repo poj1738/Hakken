@@ -1,0 +1,25 @@
+{
+  "run_id": "run-ex-p0001",
+  "target_id": "F-006",
+  "verdict": "reject",
+  "reason": "source_outdated",
+  "trust_updates": [
+    {
+      "source": "gp",
+      "attribute": "intended_dose",
+      "hmem_record_id": "hm-gp-intended_dose",
+      "kind": "wrong",
+      "before": 0.75,
+      "after": 0.55,
+      "delta": -0.2
+    }
+  ],
+  "acceptance_updates": [
+    {
+      "type": "frequency",
+      "atc_class": "A10BA",
+      "before": 0.5,
+      "after": 0.55
+    }
+  ]
+}

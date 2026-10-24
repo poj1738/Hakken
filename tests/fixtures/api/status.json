@@ -1,0 +1,28 @@
+{
+  "status": "ok",
+  "sample_mode": true,
+  "domain_pack": "medtrace",
+  "zetaris": "connected",
+  "meterless": "online",
+  "meterless_routes": [
+    "meterless/auto",
+    "meterless/cheap",
+    "meterless/cluster",
+    "meterless/code",
+    "meterless/deep",
+    "meterless/embed",
+    "meterless/fast",
+    "meterless/fusion",
+    "meterless/image",
+    "meterless/judge",
+    "meterless/local",
+    "meterless/music",
+    "meterless/perception",
+    "meterless/speech",
+    "meterless/text",
+    "meterless/transcribe",
+    "meterless/video",
+    "meterless/vision"
+  ],
+  "last_routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b"
+}
