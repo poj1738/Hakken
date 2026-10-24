@@ -32,3 +32,6 @@ web/dist/
 
 # ── OS
 .DS_Store
+
+# ── Generated reference data (regenerate with `make data`; see docs/DATA_LICENCES.md)
+data/reference/

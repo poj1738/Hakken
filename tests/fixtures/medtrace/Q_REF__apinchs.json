@@ -1,0 +1,220 @@
+{
+ "headers": [
+  "atc_prefix",
+  "apinchs_class",
+  "label"
+ ],
+ "data": [
+  [
+   "A10BD02",
+   "Ext",
+   "SU combinations"
+  ],
+  [
+   "C01AA05",
+   "Ext",
+   "digoxin"
+  ],
+  [
+   "J02AA01",
+   "A",
+   "amphotericin"
+  ],
+  [
+   "L01BA01",
+   "C",
+   "methotrexate (oncology)"
+  ],
+  [
+   "L04AX01",
+   "C",
+   "azathioprine"
+  ],
+  [
+   "L04AX03",
+   "C",
+   "methotrexate (oral weekly)"
+  ],
+  [
+   "N01AX10",
+   "N",
+   "anaesthetics"
+  ],
+  [
+   "N05AH02",
+   "Ext",
+   "clozapine"
+  ],
+  [
+   "N05AN01",
+   "Ext",
+   "lithium"
+  ],
+  [
+   "N07BC02",
+   "N",
+   "methadone"
+  ],
+  [
+   "A10AB",
+   "I",
+   "fast-acting"
+  ],
+  [
+   "A10AC",
+   "I",
+   "intermediate"
+  ],
+  [
+   "A10AD",
+   "I",
+   "premixed"
+  ],
+  [
+   "A10AE",
+   "I",
+   "long-acting"
+  ],
+  [
+   "A10BB",
+   "Ext",
+   "sulfonylureas"
+  ],
+  [
+   "A12AA",
+   "P",
+   "calcium"
+  ],
+  [
+   "A12BA",
+   "P",
+   "potassium"
+  ],
+  [
+   "A12CC",
+   "P",
+   "magnesium"
+  ],
+  [
+   "B01AA",
+   "H",
+   "vitamin K antagonists"
+  ],
+  [
+   "B01AB",
+   "H",
+   "heparins"
+  ],
+  [
+   "B01AD",
+   "H",
+   "thrombolytics"
+  ],
+  [
+   "B01AE",
+   "H",
+   "direct thrombin inhibitors"
+  ],
+  [
+   "B01AF",
+   "H",
+   "factor Xa inhibitors"
+  ],
+  [
+   "B05XA",
+   "P",
+   "IV electrolyte concentrates"
+  ],
+  [
+   "C01BD",
+   "Ext",
+   "antiarrhythmics III"
+  ],
+  [
+   "J01GB",
+   "A",
+   "aminoglycosides"
+  ],
+  [
+   "J01XA",
+   "A",
+   "glycopeptides"
+  ],
+  [
+   "L01CA",
+   "C",
+   "vinca alkaloids"
+  ],
+  [
+   "L01CB",
+   "C",
+   "etoposide"
+  ],
+  [
+   "M03AB",
+   "Ext",
+   "neuromuscular blockers"
+  ],
+  [
+   "M03AC",
+   "Ext",
+   "neuromuscular blockers"
+  ],
+  [
+   "N01AF",
+   "N",
+   "anaesthetics"
+  ],
+  [
+   "N02AA",
+   "N",
+   "opium alkaloids"
+  ],
+  [
+   "N02AB",
+   "N",
+   "phenylpiperidines"
+  ],
+  [
+   "N02AE",
+   "N",
+   "oripavines"
+  ],
+  [
+   "N02AJ",
+   "N",
+   "opioid combinations"
+  ],
+  [
+   "N02AX",
+   "N",
+   "other opioids"
+  ],
+  [
+   "N05BA",
+   "N",
+   "benzodiazepine anxiolytics"
+  ],
+  [
+   "N05CD",
+   "N",
+   "benzodiazepine hypnotics"
+  ],
+  [
+   "N05CF",
+   "N",
+   "Z-drugs"
+  ],
+  [
+   "J01",
+   "A",
+   "other antibacterials (flag only)"
+  ],
+  [
+   "L01",
+   "C",
+   "antineoplastics"
+  ]
+ ],
+ "total": 42
+}

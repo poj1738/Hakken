@@ -25,6 +25,7 @@ PLACEHOLDER_SECRETS = {
     "rt-local",
     "your-nightshift-runtime-token",
     "your-zetaris-api-key",
+    "your-pbs-public-subscription-key",
 }
 
 
@@ -77,6 +78,17 @@ class Settings(BaseSettings):
     meterless_model_deep: str = "nvidia/nemotron-3-super-120b-a12b"
     # The contract is explicit: 180 s, because a cold model load can take minutes.
     meterless_timeout_s: float = 180.0
+
+    # -- PBS public API (reference data, build-time only) --------------------
+    # Used ONLY by scripts/fetch_reference.py, never at run time: agents read the
+    # lexicon from Zetaris, and a run never touches this API. One request per
+    # 20 s, shared across every user of the public key.
+    pbs_api_base: str = "https://data-api.health.gov.au/pbs/api/v3"
+    # The published *unregistered* key. Not a credential -- the API is free and
+    # needs no login -- but a bare hex string in the repo would trip the secret
+    # scan and could read to a judge as a committed secret, so it lives in .env
+    # like everything else and is referred to by name.
+    pbs_subscription_key: SecretStr = SecretStr("")
 
     # -- Runtime behaviour ---------------------------------------------------
     sample_mode: bool = False
@@ -158,6 +170,12 @@ class Settings(BaseSettings):
         """False for an unset key and for the contract-rejected `rt-local`."""
         return self._usable(self.meterless_runtime_token)
 
+    @property
+    def has_pbs_key(self) -> bool:
+        """Whether a PBS public API key is configured. Build-time only."""
+        value = self.pbs_subscription_key.get_secret_value().strip()
+        return bool(value) and value not in PLACEHOLDER_SECRETS
+
     def require_meterless_token(self) -> str:
         if not self.has_meterless_token:
             raise ValueError(
@@ -201,6 +219,10 @@ class Settings(BaseSettings):
             "meterless_model_fast": self.meterless_model_fast,
             "meterless_model_deep": self.meterless_model_deep,
             "meterless_timeout_s": self.meterless_timeout_s,
+            "pbs_api_base": self.pbs_api_base,
+            # Presence only, for symmetry with the real secrets -- this one is a
+            # published public key, but no secret-shaped value is ever dumped.
+            "pbs_subscription_key": "set" if self.has_pbs_key else "MISSING",
             "sample_mode": self.sample_mode,
             "domain_pack": self.domain_pack,
             "max_agent_iterations": self.max_agent_iterations,

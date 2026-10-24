@@ -58,6 +58,10 @@ SOURCE_VIEWS: dict[str, str] = {
 
 ALL_SOURCES_VIEW = "medtrace.all_sources"
 
+#: Q4's view (PLAN 2.1). Declared now so Monday's optional TGA work adds a body,
+#: not a name. Not registered yet -- `q_shortages` raises.
+TGA_VIEW = "medtrace.tga_shortages"
+
 #: Q_REF name -> its reference view.
 REFERENCE_VIEWS: dict[str, str] = {
     "lexicon": "medtrace.med_lexicon",
@@ -503,4 +507,4 @@ def q_shortages(generics: list[str]) -> str:
     shortages" wherever it is shown. Writing SQL against a view whose columns
     nobody has seen would be inventing an endpoint, which `CLAUDE.md` forbids.
     """
-    raise NotImplementedError("Arpon: queries.py Q4 -- medtrace.tga_shortages is not registered yet (PLAN 3, Monday)")
+    raise NotImplementedError("Arpon: queries.py Q4, Monday")

@@ -527,6 +527,9 @@ def test_the_taxonomy_matches_the_plan() -> None:
     assert {n.value for n in NoticeType} == {
         "coverage_gap", "bpmh_not_confirmable", "possible_second_pharmacy",
         "patient_only_item", "conflict_abstained", "stale_document",
+        # Declared while types.py was being frozen so Monday's optional TGA
+        # overlay cannot force an edit to a shared file Arnav already imports.
+        "known_shortage",
     }
 
 

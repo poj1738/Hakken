@@ -11,6 +11,64 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-24 — PBS reference data: PLAN §3's backbone is not publicly obtainable; the hand-built lexicon becomes the primary **[live, 24 Oct]**
+
+PLAN §3 names "the PBS monthly *PBS API CSV files* ZIP (October 2026 bundle, about 5 MB)"
+as the backbone, with the join spine
+`PBS item code → AMT MP/MPP/TPP via amt-items → primary ATC via item-atc-relationships → APINCHS`.
+**None of that is reachable without credentials.** Checked, in order:
+
+| Source | Result |
+|---|---|
+| `data.pbs.gov.au` | 200, but states **"The legacy outputs have been discontinued. The PBS embargo API is now the only source of embargo data available."** The CSV bundle PLAN §3 relies on is gone. |
+| `data-api.health.gov.au/pbs/api/v3/schedules` | **401** — `"Access denied due to missing subscription key"`, header `Subscription-Key`. Requires registration. |
+| "Developer Downloads" on `data.pbs.gov.au` | "Available to all authorised users who have a **login** to the embargo downloads area." |
+| `data.gov.au` — PBS **Item Report** (CC BY 3.0 AU) | Downloaded, 27 MB. Columns: `Year, Item_number, State, Scheme, Month, Patient_Category, Services, Benefits ($)`. **No drug names, no ATC codes, no strengths.** |
+| `data.gov.au` — PBS **ATC Report** (CC BY 3.0 AU) | Downloaded, 207 KB. Columns: `Year, Month, State, ATC_Classification, Scheme, Services, Benefits ($)`, where `ATC_Classification` is an **ATC level-1 name** ("Alimentary Tract and Metabolism"). **No ATC codes, no item codes.** |
+| `data.gov.au` — any PBS dataset with drug names or a Date of Supply file | Only three PBS datasets exist there (Item, ATC, Patient Category), all utilisation statistics. No Date of Supply. |
+
+So the two open mirrors are **dispensing statistics**, not the schedule. Neither carries
+`item_number → drug_name → ATC code`, which is the join the whole lexicon depends on.
+That mapping exists only in the current schedule, behind the subscription key or the
+embargo login.
+
+**Decided: PLAN 11's named fallback becomes the primary** — *"the hand-built ~150-row
+lexicon, marked as our own, using codes from the sample."* With one amendment: there is
+no PBS sample to take codes from, so the ATC codes are written from general
+pharmacological knowledge for a small set of common medicines. That is a defensible
+position and it is **not** a redistribution of the WHO ATC/DDD index (which PLAN §3
+forbids committing): it is roughly 80 individual, widely-published classification facts,
+hand-entered, for drugs we chose. It is stated plainly in `docs/DATA_LICENCES.md` and the
+README rather than implied to be PBS-derived.
+
+**Consequences.**
+- **No credential is introduced.** Pursuing the API would have added a
+  `Subscription-Key` secret to manage, against the grain of "no credentials anywhere
+  shared" (PLAN §9).
+- **The licence question dissolves.** PLAN §3 and PLAN 11 both flagged the PBS licence as
+  *unconfirmed* and made committing PBS-derived rows conditional on reading a `_meta`
+  copyright block. Hand-built reference data is our own work under the repo's licence, so
+  there is nothing to confirm and nothing to gitignore for licence reasons. The two
+  CC BY 3.0 AU mirrors are declared in `docs/PREEXISTING.md` as *consulted and not used*.
+- **`dos_weight` loses its real basis.** It was to come from PBS Date of Supply volumes.
+  The Item Report has real volumes but no drug identity, so they cannot be attached to a
+  named medicine. Weights are therefore hand-assigned on clinical plausibility and
+  **labelled as such** — they only bias sampling toward common medicines, and no result
+  depends on them being accurate.
+- **Reduced from ~150 products to ~80.** The generator is now 40 patients at 5–12 meds
+  (decided 24 Oct), so ~80 products covering the PLAN 4.4 condition bundles and every
+  APINCHS class is ample. Padding to 150 would add hand-written content that nothing
+  samples.
+- `scripts/fetch_reference.py` is kept, and **documents this investigation and fails
+  loudly with the reason** rather than being deleted. If someone obtains a subscription
+  key later, the regeneration path is already written down.
+
+**Honesty note for the README.** We should say that our medicines reference data is
+hand-built and why, rather than claiming an open-data pipeline we do not have. The
+synthetic *patients* were always synthetic; this makes the *medicines* our own work too.
+
+---
+
 ## 2026-10-24 (later) — **Correction: Zetaris latency tracks bytes scanned, not a fixed per-query floor** **[live — Arpon's machine, 24 Oct]**
 
 **This supersedes the central claim of the "Zetaris latency is the binding constraint"
