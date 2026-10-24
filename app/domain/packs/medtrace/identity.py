@@ -144,6 +144,15 @@ def _is_ambiguous(name: str, lex: Lexicon) -> bool:
                for member in family for other in family)
 
 
+def _current_surname(row: SourceRow) -> str:
+    """`name_family`, or the surname inside a combined "SURNAME, Given" field."""
+    if row.name_family:
+        return normalise_text(row.name_family)
+    if row.name_given and "," in row.name_given:
+        return normalise_text(row.name_given.split(",", 1)[0])
+    return ""
+
+
 def _compare_surname(a: SourceRow, b: SourceRow) -> tuple[float, str | None]:
     """Surnames, against both the current and any recorded previous surname."""
     lefts = {normalise_text(a.name_family), normalise_text(a.name_previous)} - {""}
@@ -156,7 +165,12 @@ def _compare_surname(a: SourceRow, b: SourceRow) -> tuple[float, str | None]:
     if not lefts or not rights:
         return 0.0, None
 
-    current = {normalise_text(a.name_family)} & {normalise_text(b.name_family)} - {""}
+    # The current surname includes the one parsed from a combined name field.
+    # Comparing only `name_family` here meant a pharmacy record -- whose surname
+    # exists only inside "PAPADOPOULOS, Thomas" -- could never match exactly, so
+    # an exact match fell through to the previous-surname branch below and was
+    # labelled AND weighted as a maiden-name match (spotted by Arnav on P0002).
+    current = {_current_surname(a)} & {_current_surname(b)} - {""}
     if current:
         return WEIGHTS["surname"][0], "surname matches exactly"
     if lefts & rights:

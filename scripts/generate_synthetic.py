@@ -1390,6 +1390,17 @@ def main() -> int:
             written += 1
     log(f"  fixtures: {written} envelopes for {min(args.fixtures, len(patients))} patients")
 
+    # Q0: the admissions list, which is how a run finds its anchor. One envelope
+    # for the whole population, exactly as queries.q_admissions() returns it --
+    # one row per admission-chart LINE, so a caller dedupes on
+    # source_patient_id. Without it, SAMPLE_MODE has nothing to replay for the
+    # first query a run makes.
+    q0 = [h for h in harmonised if h["source"] == "emr" and h["record_kind"] == "admission_chart"]
+    (fixtures_dir / "Q0__admissions.json").write_text(
+        json.dumps(envelope(IDENTITY_COLUMNS, q0), indent=1), encoding="utf-8")
+    log(f"  fixtures: Q0__admissions.json, {len(q0)} rows, "
+        f"{len({h['source_patient_id'] for h in q0})} admissions")
+
     # -- report ------------------------------------------------------------
     counts: collections.Counter = collections.Counter()
     notice_counts: collections.Counter = collections.Counter()
