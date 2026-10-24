@@ -24,6 +24,10 @@ put the date on it.
 | **Nightshift** | **Own**, at `127.0.0.1:8088/v1`, build `m1-m4`. NVIDIA key in Setup → Providers. Lanes: `deep-reasoner`, `fast-tools`, `deep-verifier` — all cloud Nemotron, 0 local. |
 | **Last preflight** | **2026-10-23 — 22 pass / 0 fail.** Both services were up; `meterless/auto` answered by `nvidia/nemotron-3.5-super-vl-120b-a12b`. |
 | **Tooling** | `gh` 2.103.0, authenticated as `poj1738` (24 Oct) — so PRs and CI checks can be driven from the terminal here. |
+| **MedTrace registered** | **Yes, 2026-10-24.** All 8 views live and verified: `medtrace.{emr,gp,pharmacy,patient_report,med_lexicon,apinchs,nicknames,all_sources}`. `SELECT COUNT(*) FROM medtrace.all_sources` = **4,825**, matching `datasvc` exactly. Re-check with `python3 scripts/register_sources.py --verify-only`. |
+| **datasvc reachability** | **Proven 2026-10-24.** `host.docker.internal:8100` returns HTTP 200 in ~20 ms from both `zetaris-api-1` and `zetaris-driver-1`, and a real REST table at that URL fetches our data. The MinIO/Parquet and Postgres-over-JDBC fallbacks are retired. **`datasvc` must be running for a cache refresh or a re-register** — `.venv/bin/python -m uvicorn datasvc.main:app --host 0.0.0.0 --port 8100`. |
+| **Query timings** | Q_REF 0.17–0.64 s · Q0 0.33 s · **Q1 1.84 s** · Q2 1.86 s · Q3 1.72 s. A whole run costs ~6 s of Zetaris. |
+| **Leftover** | `medtrace_spike` is an empty SchemaStore container from the morning's spike. There is no SQL path to drop a container, so it needs the Data Explorer. Cosmetic. |
 | **Caveat** | Python is 3.12 while CI pins 3.11 — if something passes locally and fails in CI, suspect that first. |
 
 ## Anshuman

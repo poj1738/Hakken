@@ -1,109 +1,109 @@
 bundle_id,bundle,weight_f,weight_m,generic,brands,strengths,form,release,route,regimen,share,is_addon,sex_restrict,ingredients,atc,high_risk,pack_qty_override,repeats_override
-1,Hypertension,0.70,0.70,perindopril,Coversyl,5 mg;10 mg;4 mg;8 mg,tablet,IR,PO,1 mane,0.22,0,,perindopril,C09AA04,,,
+1,Hypertension,0.70,0.70,perindopril,Coversyl,5 mg;10 mg;4 mg;8 mg,tablet,IR,PO,1 mane,0.22,0,,perindopril,C09AA04,,60,5
 1,Hypertension,0.70,0.70,amlodipine,Norvasc,5 mg;10 mg,tablet,IR,PO,1 daily,0.20,0,,amlodipine,C08CA01,,60,5
-1,Hypertension,0.70,0.70,candesartan,Atacand,8 mg;16 mg;32 mg,tablet,IR,PO,1 daily,0.12,0,,candesartan,C09CA06,,,
-1,Hypertension,0.70,0.70,telmisartan,Micardis,40 mg;80 mg,tablet,IR,PO,1 daily,0.10,0,,telmisartan,C09CA07,,,
-1,Hypertension,0.70,0.70,irbesartan,Avapro,150 mg;300 mg,tablet,IR,PO,1 daily,0.08,0,,irbesartan,C09CA04,,,
-1,Hypertension,0.70,0.70,ramipril,Tritace,5 mg;10 mg,capsule,IR,PO,1 daily,0.06,0,,ramipril,C09AA05,,,
-1,Hypertension,0.70,0.70,perindopril/indapamide,Coversyl Plus,5/1.25 mg,tablet,IR,PO,1 mane,0.06,0,,perindopril;indapamide,C09BA04,,,
-1,Hypertension,0.70,0.70,irbesartan/hydrochlorothiazide,Avapro HCT;Karvezide,150/12.5 mg;300/12.5 mg,tablet,IR,PO,1 daily,0.06,0,,irbesartan;hydrochlorothiazide,C09DA04,,,
-1,Hypertension,0.70,0.70,candesartan/hydrochlorothiazide,Atacand Plus,16/12.5 mg,tablet,IR,PO,1 daily,0.04,0,,candesartan;hydrochlorothiazide,C09DA06,,,
-1,Hypertension,0.70,0.70,telmisartan/amlodipine,Twynsta,40/5 mg;80/5 mg,tablet,IR,PO,1 daily,0.03,0,,telmisartan;amlodipine,C09DB04,,,
-1,Hypertension,0.70,0.70,perindopril/amlodipine,Coveram,5/5 mg;10/5 mg,tablet,IR,PO,1 daily,0.03,0,,perindopril;amlodipine,C09BB04,,,
+1,Hypertension,0.70,0.70,candesartan,Atacand,8 mg;16 mg;32 mg,tablet,IR,PO,1 daily,0.12,0,,candesartan,C09CA06,,60,5
+1,Hypertension,0.70,0.70,telmisartan,Micardis,40 mg;80 mg,tablet,IR,PO,1 daily,0.10,0,,telmisartan,C09CA07,,56,5
+1,Hypertension,0.70,0.70,irbesartan,Avapro,150 mg;300 mg,tablet,IR,PO,1 daily,0.08,0,,irbesartan,C09CA04,,60,5
+1,Hypertension,0.70,0.70,ramipril,Tritace,5 mg;10 mg,capsule,IR,PO,1 daily,0.06,0,,ramipril,C09AA05,,60,5
+1,Hypertension,0.70,0.70,perindopril/indapamide,Coversyl Plus,5/1.25 mg,tablet,IR,PO,1 mane,0.06,0,,perindopril;indapamide,C09BA04,,60,5
+1,Hypertension,0.70,0.70,irbesartan/hydrochlorothiazide,Avapro HCT;Karvezide,150/12.5 mg;300/12.5 mg,tablet,IR,PO,1 daily,0.06,0,,irbesartan;hydrochlorothiazide,C09DA04,,60,5
+1,Hypertension,0.70,0.70,candesartan/hydrochlorothiazide,Atacand Plus,16/12.5 mg,tablet,IR,PO,1 daily,0.04,0,,candesartan;hydrochlorothiazide,C09DA06,,60,5
+1,Hypertension,0.70,0.70,telmisartan/amlodipine,Twynsta,40/5 mg;80/5 mg,tablet,IR,PO,1 daily,0.03,0,,telmisartan;amlodipine,C09DB04,,56,5
+1,Hypertension,0.70,0.70,perindopril/amlodipine,Coveram,5/5 mg;10/5 mg,tablet,IR,PO,1 daily,0.03,0,,perindopril;amlodipine,C09BB04,,60,5
 1,Hypertension,0.70,0.70,amlodipine,Norvasc,5 mg,tablet,IR,PO,1 daily,0.30,1,,amlodipine,C08CA01,,60,5
-2,Dyslipidaemia,0.65,0.65,rosuvastatin,Crestor,5 mg;10 mg;20 mg;40 mg,tablet,IR,PO,1 daily,0.52,0,,rosuvastatin,C10AA07,,,
-2,Dyslipidaemia,0.65,0.65,atorvastatin,Lipitor,10 mg;20 mg;40 mg;80 mg,tablet,IR,PO,1 daily,0.36,0,,atorvastatin,C10AA05,,,
-2,Dyslipidaemia,0.65,0.65,simvastatin,Zocor,20 mg;40 mg,tablet,IR,PO,1 nocte,0.04,0,,simvastatin,C10AA01,,,
-2,Dyslipidaemia,0.65,0.65,amlodipine/atorvastatin,Caduet,5/10 mg;10/80 mg,tablet,IR,PO,1 daily,0.04,0,,amlodipine;atorvastatin,C10BX03,,,
-2,Dyslipidaemia,0.65,0.65,ezetimibe/rosuvastatin,Rosuzet,10/10 mg;10/40 mg,tablet,IR,PO,1 daily,0.04,0,,ezetimibe;rosuvastatin,C10BA06,,,
-2,Dyslipidaemia,0.65,0.65,ezetimibe,Ezetrol,10 mg,tablet,IR,PO,1 daily,0.15,1,,ezetimibe,C10AX09,,,
-3,GORD,0.40,0.40,pantoprazole,Somac,20 mg;40 mg,tablet,IR,PO,1 daily,0.50,0,,pantoprazole,A02BC02,,,
-3,GORD,0.40,0.40,esomeprazole,Nexium,20 mg;40 mg,tablet,IR,PO,1 daily,0.38,0,,esomeprazole,A02BC05,,,
-3,GORD,0.40,0.40,rabeprazole,Pariet,10 mg;20 mg,tablet,IR,PO,1 daily,0.07,0,,rabeprazole,A02BC04,,,
-3,GORD,0.40,0.40,famotidine,Pepcidine,20 mg,tablet,IR,PO,1 bd,0.05,0,,famotidine,A02BA03,,,
-4,Pain / osteoarthritis,0.30,0.30,paracetamol,Panadol Osteo,665 mg,modified release tablet,MR,PO,2 tds,0.55,0,,paracetamol,N02BE01,,,
-4,Pain / osteoarthritis,0.30,0.30,oxycodone,OxyContin,10 mg;20 mg,modified release tablet,MR,PO,1 bd,0.10,0,,oxycodone,N02AA05,Y,,2
-4,Pain / osteoarthritis,0.30,0.30,oxycodone/naloxone,Targin,10/5 mg;20/10 mg,modified release tablet,MR,PO,1 bd,0.08,0,,oxycodone;naloxone,N02AA55,Y,,2
+2,Dyslipidaemia,0.65,0.65,rosuvastatin,Crestor,5 mg;10 mg;20 mg;40 mg,tablet,IR,PO,1 daily,0.52,0,,rosuvastatin,C10AA07,,60,5
+2,Dyslipidaemia,0.65,0.65,atorvastatin,Lipitor,10 mg;20 mg;40 mg;80 mg,tablet,IR,PO,1 daily,0.36,0,,atorvastatin,C10AA05,,60,5
+2,Dyslipidaemia,0.65,0.65,simvastatin,Zocor,20 mg;40 mg,tablet,IR,PO,1 nocte,0.04,0,,simvastatin,C10AA01,,60,5
+2,Dyslipidaemia,0.65,0.65,amlodipine/atorvastatin,Caduet,5/10 mg;10/80 mg,tablet,IR,PO,1 daily,0.04,0,,amlodipine;atorvastatin,C10BX03,,60,5
+2,Dyslipidaemia,0.65,0.65,ezetimibe/rosuvastatin,Rosuzet,10/10 mg;10/40 mg,tablet,IR,PO,1 daily,0.04,0,,ezetimibe;rosuvastatin,C10BA06,,1,5
+2,Dyslipidaemia,0.65,0.65,ezetimibe,Ezetrol,10 mg,tablet,IR,PO,1 daily,0.15,1,,ezetimibe,C10AX09,,60,5
+3,GORD,0.40,0.40,pantoprazole,Somac,20 mg;40 mg,tablet,IR,PO,1 daily,0.50,0,,pantoprazole,A02BC02,,60,5
+3,GORD,0.40,0.40,esomeprazole,Nexium,20 mg;40 mg,tablet,IR,PO,1 daily,0.38,0,,esomeprazole,A02BC05,,60,5
+3,GORD,0.40,0.40,rabeprazole,Pariet,10 mg;20 mg,tablet,IR,PO,1 daily,0.07,0,,rabeprazole,A02BC04,,56,5
+3,GORD,0.40,0.40,famotidine,Pepcidine,20 mg,tablet,IR,PO,1 bd,0.05,0,,famotidine,A02BA03,,120,5
+4,Pain / osteoarthritis,0.30,0.30,paracetamol,Panadol Osteo,665 mg,modified release tablet,MR,PO,2 tds,0.55,0,,paracetamol,N02BE01,,192,5
+4,Pain / osteoarthritis,0.30,0.30,oxycodone,OxyContin,10 mg;20 mg,modified release tablet,MR,PO,1 bd,0.10,0,,oxycodone,N02AA05,Y,56,0
+4,Pain / osteoarthritis,0.30,0.30,oxycodone/naloxone,Targin,10/5 mg;20/10 mg,modified release tablet,MR,PO,1 bd,0.08,0,,oxycodone;naloxone,N02AA55,Y,56,0
 4,Pain / osteoarthritis,0.30,0.30,buprenorphine,Norspan,5 microgram/h;10 microgram/h;20 microgram/h,patch,MR,TD,weekly,0.08,0,,buprenorphine,N02AE01,Y,4,2
-4,Pain / osteoarthritis,0.30,0.30,tapentadol,Palexia SR,50 mg;100 mg,modified release tablet,MR,PO,1 bd,0.06,0,,tapentadol,N02AX06,Y,,2
-4,Pain / osteoarthritis,0.30,0.30,pregabalin,Lyrica,75 mg,capsule,IR,PO,1 bd,0.08,0,,pregabalin,N03AX16,,,
-4,Pain / osteoarthritis,0.30,0.30,celecoxib,Celebrex,100 mg;200 mg,capsule,IR,PO,1 daily,0.05,0,,celecoxib,M01AH01,,,
-4,Pain / osteoarthritis,0.30,0.30,oxycodone,Endone,5 mg,tablet,IR,PO,prn,0.10,1,,oxycodone,N02AA05,Y,,0
-5,T2DM,0.28,0.28,metformin,Diabex;Diaformin,500 mg;1000 mg,tablet,IR,PO,1 bd,0.24,0,,metformin,A10BA02,,,
-5,T2DM,0.28,0.28,metformin,Diabex XR,1000 mg,modified release tablet,MR,PO,1 to 2 nocte,0.20,0,,metformin,A10BA02,,,
-5,T2DM,0.28,0.28,gliclazide,Diamicron MR,30 mg;60 mg,modified release tablet,MR,PO,1 to 2 mane,0.10,0,,gliclazide,A10BB09,ext,,
-5,T2DM,0.28,0.28,empagliflozin,Jardiance,10 mg;25 mg,tablet,IR,PO,1 daily,0.12,0,,empagliflozin,A10BK03,,,
-5,T2DM,0.28,0.28,dapagliflozin,Forxiga,10 mg,tablet,IR,PO,1 daily,0.08,0,,dapagliflozin,A10BK01,,,
-5,T2DM,0.28,0.28,sitagliptin/metformin,Janumet,50/1000 mg,tablet,IR,PO,1 bd,0.06,0,,sitagliptin;metformin,A10BD07,,,
-5,T2DM,0.28,0.28,empagliflozin/metformin,Jardiamet,12.5/1000 mg,tablet,IR,PO,1 bd,0.04,0,,empagliflozin;metformin,A10BD20,,,
+4,Pain / osteoarthritis,0.30,0.30,tapentadol,Palexia SR,50 mg;100 mg,modified release tablet,MR,PO,1 bd,0.06,0,,tapentadol,N02AX06,Y,28,0
+4,Pain / osteoarthritis,0.30,0.30,pregabalin,Lyrica,75 mg,capsule,IR,PO,1 bd,0.08,0,,pregabalin,N03AX16,,56,5
+4,Pain / osteoarthritis,0.30,0.30,celecoxib,Celebrex,100 mg;200 mg,capsule,IR,PO,1 daily,0.05,0,,celecoxib,M01AH01,,60,3
+4,Pain / osteoarthritis,0.30,0.30,oxycodone,Endone,5 mg,tablet,IR,PO,prn,0.10,1,,oxycodone,N02AA05,Y,10,0
+5,T2DM,0.28,0.28,metformin,Diabex;Diaformin,500 mg;1000 mg,tablet,IR,PO,1 bd,0.24,0,,metformin,A10BA02,,200,5
+5,T2DM,0.28,0.28,metformin,Diabex XR,1000 mg,modified release tablet,MR,PO,1 to 2 nocte,0.20,0,,metformin,A10BA02,,120,5
+5,T2DM,0.28,0.28,gliclazide,Diamicron MR,30 mg;60 mg,modified release tablet,MR,PO,1 to 2 mane,0.10,0,,gliclazide,A10BB09,ext,200,5
+5,T2DM,0.28,0.28,empagliflozin,Jardiance,10 mg;25 mg,tablet,IR,PO,1 daily,0.12,0,,empagliflozin,A10BK03,,30,5
+5,T2DM,0.28,0.28,dapagliflozin,Forxiga,10 mg,tablet,IR,PO,1 daily,0.08,0,,dapagliflozin,A10BK01,,28,5
+5,T2DM,0.28,0.28,sitagliptin/metformin,Janumet,50/1000 mg,tablet,IR,PO,1 bd,0.06,0,,sitagliptin;metformin,A10BD07,,112,5
+5,T2DM,0.28,0.28,empagliflozin/metformin,Jardiamet,12.5/1000 mg,tablet,IR,PO,1 bd,0.04,0,,empagliflozin;metformin,A10BD20,,60,5
 5,T2DM,0.28,0.28,insulin glargine,Optisulin;Toujeo,100 units/mL;300 units/mL,injection,MR,SC,10 to 40 units nocte,0.10,0,,insulin glargine,A10AE04,Y,1,5
 5,T2DM,0.28,0.28,semaglutide,Ozempic,0.5 mg;1 mg,injection,IR,SC,weekly,0.06,0,,semaglutide,A10BJ06,,1,5
-5,T2DM,0.28,0.28,gliclazide,Diamicron MR,60 mg,modified release tablet,MR,PO,1 mane,0.20,1,,gliclazide,A10BB09,ext,,
-5,T2DM,0.28,0.28,gliclazide,APX-Gliclazide;Nidem,80 mg,tablet,IR,PO,1 bd,0.10,1,,gliclazide,A10BB09,ext,,
+5,T2DM,0.28,0.28,gliclazide,Diamicron MR,60 mg,modified release tablet,MR,PO,1 mane,0.20,1,,gliclazide,A10BB09,ext,120,5
+5,T2DM,0.28,0.28,gliclazide,APX-Gliclazide;Nidem,80 mg,tablet,IR,PO,1 bd,0.10,1,,gliclazide,A10BB09,ext,200,5
 5,T2DM,0.28,0.28,insulin aspart,NovoRapid,100 units/mL,injection,IR,SC,tds with meals,0.30,1,,insulin aspart,A10AB05,Y,1,5
-6,Depression / anxiety,0.25,0.25,escitalopram,Lexapro,10 mg;20 mg,tablet,IR,PO,1 daily,0.264,0,,escitalopram,N06AB10,,,
-6,Depression / anxiety,0.25,0.25,sertraline,Zoloft,50 mg;100 mg;200 mg,tablet,IR,PO,1 daily,0.248,0,,sertraline,N06AB06,,,
-6,Depression / anxiety,0.25,0.25,mirtazapine,Avanza,15 mg;30 mg;45 mg,tablet,IR,PO,1 nocte,0.144,0,,mirtazapine,N06AX11,,,
-6,Depression / anxiety,0.25,0.25,venlafaxine,Efexor-XR,37.5 mg;75 mg;150 mg,modified release capsule,MR,PO,1 daily,0.147,0,,venlafaxine,N06AX16,,,
-6,Depression / anxiety,0.25,0.25,duloxetine,Cymbalta,30 mg;60 mg,capsule,MR,PO,1 daily,0.095,0,,duloxetine,N06AX21,,,
-6,Depression / anxiety,0.25,0.25,desvenlafaxine,Desfax;Pristiq,50 mg;100 mg,modified release tablet,MR,PO,1 daily,0.102,0,,desvenlafaxine,N06AX23,,,
-6,Depression / anxiety,0.25,0.25,temazepam,Normison,10 mg,tablet,IR,PO,nocte prn,0.12,1,,temazepam,N05CD07,Y,,0
-7,IHD,0.25,0.25,aspirin,Cartia;Astrix,100 mg,tablet,IR,PO,1 daily,0.55,0,,aspirin,B01AC06,,,
-7,IHD,0.25,0.25,clopidogrel,Plavix;Iscover,75 mg,tablet,IR,PO,1 daily,0.25,0,,clopidogrel,B01AC04,,,
-7,IHD,0.25,0.25,ticagrelor,Brilinta,90 mg,tablet,IR,PO,1 bd,0.05,0,,ticagrelor,B01AC24,,,
-7,IHD,0.25,0.25,aspirin/clopidogrel,CoPlavix;DuoCover,100/75 mg,tablet,IR,PO,1 daily,0.05,0,,aspirin;clopidogrel,B01AC30,,,
-7,IHD,0.25,0.25,isosorbide mononitrate,Imdur;Duride,60 mg,modified release tablet,MR,PO,1 mane,0.10,0,,isosorbide mononitrate,C01DA14,,,
+6,Depression / anxiety,0.25,0.25,escitalopram,Lexapro,10 mg;20 mg,tablet,IR,PO,1 daily,0.264,0,,escitalopram,N06AB10,,56,2
+6,Depression / anxiety,0.25,0.25,sertraline,Zoloft,50 mg;100 mg;200 mg,tablet,IR,PO,1 daily,0.248,0,,sertraline,N06AB06,,60,2
+6,Depression / anxiety,0.25,0.25,mirtazapine,Avanza,15 mg;30 mg;45 mg,tablet,IR,PO,1 nocte,0.144,0,,mirtazapine,N06AX11,,60,2
+6,Depression / anxiety,0.25,0.25,venlafaxine,Efexor-XR,37.5 mg;75 mg;150 mg,modified release capsule,MR,PO,1 daily,0.147,0,,venlafaxine,N06AX16,,56,2
+6,Depression / anxiety,0.25,0.25,duloxetine,Cymbalta,30 mg;60 mg,capsule,MR,PO,1 daily,0.095,0,,duloxetine,N06AX21,,56,2
+6,Depression / anxiety,0.25,0.25,desvenlafaxine,Desfax;Pristiq,50 mg;100 mg,modified release tablet,MR,PO,1 daily,0.102,0,,desvenlafaxine,N06AX23,,56,2
+6,Depression / anxiety,0.25,0.25,temazepam,Normison,10 mg,tablet,IR,PO,nocte prn,0.12,1,,temazepam,N05CD07,Y,50,5
+7,IHD,0.25,0.25,aspirin,Cartia;Astrix,100 mg,tablet,IR,PO,1 daily,0.55,0,,aspirin,B01AC06,,84,1
+7,IHD,0.25,0.25,clopidogrel,Plavix;Iscover,75 mg,tablet,IR,PO,1 daily,0.25,0,,clopidogrel,B01AC04,,56,5
+7,IHD,0.25,0.25,ticagrelor,Brilinta,90 mg,tablet,IR,PO,1 bd,0.05,0,,ticagrelor,B01AC24,,112,5
+7,IHD,0.25,0.25,aspirin/clopidogrel,CoPlavix;DuoCover,100/75 mg,tablet,IR,PO,1 daily,0.05,0,,aspirin;clopidogrel,B01AC30,,60,5
+7,IHD,0.25,0.25,isosorbide mononitrate,Imdur;Duride,60 mg,modified release tablet,MR,PO,1 mane,0.10,0,,isosorbide mononitrate,C01DA14,,60,5
 7,IHD,0.25,0.25,glyceryl trinitrate,Nitrolingual Pumpspray,400 microgram/dose,spray,IR,SL,prn,0.40,1,,glyceryl trinitrate,C01DA02,,1,5
-7,IHD,0.25,0.25,metoprolol,Betaloc;Minax,25 mg;50 mg,tablet,IR,PO,1 bd,0.45,1,,metoprolol,C07AB02,,,
-7,IHD,0.25,0.25,metoprolol,Toprol-XL;Metrol-XL;Minax XL,47.5 mg;95 mg;190 mg,modified release tablet,MR,PO,1 daily,0.20,1,,metoprolol,C07AB02,,,
+7,IHD,0.25,0.25,metoprolol,Betaloc;Minax,25 mg;50 mg,tablet,IR,PO,1 bd,0.45,1,,metoprolol,C07AB02,,60,5
+7,IHD,0.25,0.25,metoprolol,Toprol-XL;Metrol-XL;Minax XL,47.5 mg;95 mg;190 mg,modified release tablet,MR,PO,1 daily,0.20,1,,metoprolol,C07AB02,,30,5
 8,Atrial fibrillation,0.18,0.18,apixaban,Eliquis,2.5 mg;5 mg,tablet,IR,PO,1 bd,0.50,0,,apixaban,B01AF02,Y,120,5
-8,Atrial fibrillation,0.18,0.18,rivaroxaban,Xarelto,15 mg;20 mg,tablet,IR,PO,1 daily,0.28,0,,rivaroxaban,B01AF01,Y,,
-8,Atrial fibrillation,0.18,0.18,warfarin,Marevan;Coumadin,1 mg;2 mg;3 mg;5 mg,tablet,IR,PO,variable per INR,0.17,0,,warfarin,B01AA03,Y,,1
-8,Atrial fibrillation,0.18,0.18,dabigatran,Pradaxa,110 mg;150 mg,capsule,IR,PO,1 bd,0.05,0,,dabigatran,B01AE07,Y,,
-8,Atrial fibrillation,0.18,0.18,digoxin,Lanoxin;Lanoxin PG,62.5 microgram;125 microgram,tablet,IR,PO,1 daily,0.12,1,,digoxin,C01AA05,ext,,
-8,Atrial fibrillation,0.18,0.18,sotalol,Sotacor,80 mg,tablet,IR,PO,1 bd,0.08,1,,sotalol,C07AA07,,,
-8,Atrial fibrillation,0.18,0.18,diltiazem,Cardizem CD,180 mg;240 mg,modified release capsule,MR,PO,1 daily,0.10,1,,diltiazem,C08DB01,,,
-8,Atrial fibrillation,0.18,0.18,diltiazem,Cardizem;Vasocardol,60 mg,tablet,IR,PO,1 tds,0.06,1,,diltiazem,C08DB01,,,
+8,Atrial fibrillation,0.18,0.18,rivaroxaban,Xarelto,15 mg;20 mg,tablet,IR,PO,1 daily,0.28,0,,rivaroxaban,B01AF01,Y,56,5
+8,Atrial fibrillation,0.18,0.18,warfarin,Marevan;Coumadin,1 mg;2 mg;3 mg;5 mg,tablet,IR,PO,variable per INR,0.17,0,,warfarin,B01AA03,Y,50,2
+8,Atrial fibrillation,0.18,0.18,dabigatran,Pradaxa,110 mg;150 mg,capsule,IR,PO,1 bd,0.05,0,,dabigatran,B01AE07,Y,120,5
+8,Atrial fibrillation,0.18,0.18,digoxin,Lanoxin;Lanoxin PG,62.5 microgram;125 microgram,tablet,IR,PO,1 daily,0.12,1,,digoxin,C01AA05,ext,200,1
+8,Atrial fibrillation,0.18,0.18,sotalol,Sotacor,80 mg,tablet,IR,PO,1 bd,0.08,1,,sotalol,C07AA07,,60,5
+8,Atrial fibrillation,0.18,0.18,diltiazem,Cardizem CD,180 mg;240 mg,modified release capsule,MR,PO,1 daily,0.10,1,,diltiazem,C08DB01,,30,5
+8,Atrial fibrillation,0.18,0.18,diltiazem,Cardizem;Vasocardol,60 mg,tablet,IR,PO,1 tds,0.06,1,,diltiazem,C08DB01,,90,5
 9,Osteoporosis,0.25,0.05,denosumab,Prolia,60 mg,injection,IR,SC,6-monthly,0.40,0,,denosumab,M05BX04,,1,1
 9,Osteoporosis,0.25,0.05,alendronate,Fosamax,70 mg,tablet,IR,PO,weekly,0.20,0,,alendronate,M05BA04,,4,5
 9,Osteoporosis,0.25,0.05,alendronate/colecalciferol,Fosamax Plus,70 mg/140 microgram,tablet,IR,PO,weekly,0.15,0,,alendronate;colecalciferol,M05BB03,,4,5
 9,Osteoporosis,0.25,0.05,risedronate,Actonel,35 mg;150 mg,tablet,IR,PO,weekly or monthly,0.15,0,,risedronate,M05BA07,,4,5
 9,Osteoporosis,0.25,0.05,zoledronic acid,Aclasta,5 mg,injection,IR,IV,yearly,0.10,0,,zoledronic acid,M05BA08,,1,0
-9,Osteoporosis,0.25,0.05,colecalciferol,Ostelin,1000 IU,capsule,IR,PO,1 daily,0.50,1,,colecalciferol,A11CC05,,,
-10,BPH / bladder,0.06,0.20,tamsulosin,Flomaxtra,400 microgram,modified release tablet,MR,PO,1 daily,0.55,0,M,tamsulosin,G04CA02,,,
-10,BPH / bladder,0.06,0.20,dutasteride/tamsulosin,Duodart,0.5/0.4 mg,capsule,MR,PO,1 daily,0.30,0,M,dutasteride;tamsulosin,G04CA52,,,
-10,BPH / bladder,0.06,0.20,mirabegron,Betmiga,25 mg;50 mg,modified release tablet,MR,PO,1 daily,0.15,0,,mirabegron,G04BD12,,,
+9,Osteoporosis,0.25,0.05,colecalciferol,Ostelin,1000 IU,capsule,IR,PO,1 daily,0.50,1,,colecalciferol,A11CC05,,30,5
+10,BPH / bladder,0.06,0.20,tamsulosin,Flomaxtra,400 microgram,modified release tablet,MR,PO,1 daily,0.55,0,M,tamsulosin,G04CA02,,60,5
+10,BPH / bladder,0.06,0.20,dutasteride/tamsulosin,Duodart,0.5/0.4 mg,capsule,MR,PO,1 daily,0.30,0,M,dutasteride;tamsulosin,G04CA52,,30,5
+10,BPH / bladder,0.06,0.20,mirabegron,Betmiga,25 mg;50 mg,modified release tablet,MR,PO,1 daily,0.15,0,,mirabegron,G04BD12,,30,5
 11,COPD / asthma,0.15,0.15,tiotropium,Spiriva,18 microgram,inhaler,IR,INH,1 daily,0.25,0,,tiotropium,R03BB04,,1,5
 11,COPD / asthma,0.15,0.15,budesonide/formoterol,Symbicort,200/6 microgram,inhaler,IR,INH,2 puffs bd,0.20,0,,budesonide;formoterol,R03AK07,,1,5
 11,COPD / asthma,0.15,0.15,fluticasone/salmeterol,Seretide,250/25 microgram,inhaler,IR,INH,2 puffs bd,0.15,0,,fluticasone;salmeterol,R03AK06,,1,5
 11,COPD / asthma,0.15,0.15,fluticasone furoate/umeclidinium/vilanterol,Trelegy Ellipta,100/62.5/25 microgram,inhaler,IR,INH,1 daily,0.25,0,,fluticasone furoate;umeclidinium;vilanterol,R03AL08,,1,5
 11,COPD / asthma,0.15,0.15,umeclidinium/vilanterol,Anoro Ellipta,62.5/25 microgram,inhaler,IR,INH,1 daily,0.15,0,,umeclidinium;vilanterol,R03AL03,,1,5
 11,COPD / asthma,0.15,0.15,salbutamol,Ventolin;Asmol,100 microgram/dose,inhaler,IR,INH,2 puffs prn,0.80,1,,salbutamol,R03AC02,,1,5
-12,Heart failure,0.12,0.12,furosemide,Lasix;Urex,20 mg;40 mg;80 mg,tablet,IR,PO,1 mane,0.45,0,,furosemide,C03CA01,,,
-12,Heart failure,0.12,0.12,sacubitril/valsartan,Entresto,24/26 mg;49/51 mg;97/103 mg,tablet,IR,PO,1 bd,0.20,0,,sacubitril;valsartan,C09DX04,,,
-12,Heart failure,0.12,0.12,bisoprolol,Bicor,1.25 mg;2.5 mg;5 mg;10 mg,tablet,IR,PO,1 daily,0.20,0,,bisoprolol,C07AB07,,,
-12,Heart failure,0.12,0.12,carvedilol,Dilatrend,6.25 mg;12.5 mg;25 mg,tablet,IR,PO,1 bd,0.10,0,,carvedilol,C07AG02,,,
-12,Heart failure,0.12,0.12,eplerenone,Inspra,25 mg,tablet,IR,PO,1 daily,0.05,0,,eplerenone,C03DA04,,,
-12,Heart failure,0.12,0.12,spironolactone,Aldactone,25 mg,tablet,IR,PO,1 daily,0.40,1,,spironolactone,C03DA01,,,
-12,Heart failure,0.12,0.12,dapagliflozin,Forxiga,10 mg,tablet,IR,PO,1 daily,0.35,1,,dapagliflozin,A10BK01,,,
-13,Hypothyroidism,0.15,0.05,levothyroxine,Eutroxsig;Oroxine,50 microgram;100 microgram;150 microgram,tablet,IR,PO,1 mane,1.00,0,,levothyroxine,H03AA01,,,
+12,Heart failure,0.12,0.12,furosemide,Lasix;Urex,20 mg;40 mg;80 mg,tablet,IR,PO,1 mane,0.45,0,,furosemide,C03CA01,,200,1
+12,Heart failure,0.12,0.12,sacubitril/valsartan,Entresto,24/26 mg;49/51 mg;97/103 mg,tablet,IR,PO,1 bd,0.20,0,,sacubitril;valsartan,C09DX04,,56,5
+12,Heart failure,0.12,0.12,bisoprolol,Bicor,1.25 mg;2.5 mg;5 mg;10 mg,tablet,IR,PO,1 daily,0.20,0,,bisoprolol,C07AB07,,56,5
+12,Heart failure,0.12,0.12,carvedilol,Dilatrend,6.25 mg;12.5 mg;25 mg,tablet,IR,PO,1 bd,0.10,0,,carvedilol,C07AG02,,120,5
+12,Heart failure,0.12,0.12,eplerenone,Inspra,25 mg,tablet,IR,PO,1 daily,0.05,0,,eplerenone,C03DA04,,60,5
+12,Heart failure,0.12,0.12,spironolactone,Aldactone,25 mg,tablet,IR,PO,1 daily,0.40,1,,spironolactone,C03DA01,,200,5
+12,Heart failure,0.12,0.12,dapagliflozin,Forxiga,10 mg,tablet,IR,PO,1 daily,0.35,1,,dapagliflozin,A10BK01,,28,5
+13,Hypothyroidism,0.15,0.05,levothyroxine,Eutroxsig;Oroxine,50 microgram;100 microgram;150 microgram,tablet,IR,PO,1 mane,1.00,0,,levothyroxine,H03AA01,,200,1
 14,Gout / CKD,0.10,0.10,allopurinol,Zyloprim;Progout,100 mg;300 mg,tablet,IR,PO,1 daily,0.75,0,,allopurinol,M04AA01,,120,2
-14,Gout / CKD,0.10,0.10,febuxostat,Adenuric,80 mg,tablet,IR,PO,1 daily,0.10,0,,febuxostat,M04AA03,,,
-14,Gout / CKD,0.10,0.10,calcitriol,Rocaltrol,0.25 microgram,capsule,IR,PO,1 daily,0.15,0,,calcitriol,A11CC04,,,
-15,Parkinson's / epilepsy / dementia,0.06,0.06,levodopa/carbidopa,Sinemet;Kinson,100/25 mg,tablet,IR,PO,1 tds,0.35,0,,levodopa;carbidopa,N04BA02,,,
-15,Parkinson's / epilepsy / dementia,0.06,0.06,levodopa/benserazide,Madopar,100/25 mg,capsule,IR,PO,1 tds,0.15,0,,levodopa;benserazide,N04BA02,,,
-15,Parkinson's / epilepsy / dementia,0.06,0.06,levetiracetam,Keppra,500 mg,tablet,IR,PO,1 bd,0.25,0,,levetiracetam,N03AX14,,,
-15,Parkinson's / epilepsy / dementia,0.06,0.06,sodium valproate,Epilim,500 mg,modified release tablet,MR,PO,1 bd,0.10,0,,sodium valproate,N03AG01,,,
-15,Parkinson's / epilepsy / dementia,0.06,0.06,donepezil,Aricept,5 mg;10 mg,tablet,IR,PO,1 nocte,0.15,0,,donepezil,N06DA02,,,
+14,Gout / CKD,0.10,0.10,febuxostat,Adenuric,80 mg,tablet,IR,PO,1 daily,0.10,0,,febuxostat,M04AA03,,28,5
+14,Gout / CKD,0.10,0.10,calcitriol,Rocaltrol,0.25 microgram,capsule,IR,PO,1 daily,0.15,0,,calcitriol,A11CC04,,200,3
+15,Parkinson's / epilepsy / dementia,0.06,0.06,levodopa/carbidopa,Sinemet;Kinson,100/25 mg,tablet,IR,PO,1 tds,0.35,0,,levodopa;carbidopa,N04BA02,,100,5
+15,Parkinson's / epilepsy / dementia,0.06,0.06,levodopa/benserazide,Madopar,100/25 mg,capsule,IR,PO,1 tds,0.15,0,,levodopa;benserazide,N04BA02,,200,5
+15,Parkinson's / epilepsy / dementia,0.06,0.06,levetiracetam,Keppra,500 mg,tablet,IR,PO,1 bd,0.25,0,,levetiracetam,N03AX14,,120,5
+15,Parkinson's / epilepsy / dementia,0.06,0.06,sodium valproate,Epilim,500 mg,modified release tablet,MR,PO,1 bd,0.10,0,,sodium valproate,N03AG01,,60,5
+15,Parkinson's / epilepsy / dementia,0.06,0.06,donepezil,Aricept,5 mg;10 mg,tablet,IR,PO,1 nocte,0.15,0,,donepezil,N06DA02,,28,5
 16,RA / PMR,0.05,0.05,methotrexate,Methoblastin,2.5 mg;10 mg,tablet,IR,PO,10 to 20 mg once weekly,0.45,0,,methotrexate,L04AX03,Y,4,2
-16,RA / PMR,0.05,0.05,prednisolone,Panafcortelone;Solone,1 mg;5 mg;25 mg,tablet,IR,PO,daily or taper,0.45,0,,prednisolone,H02AB06,ext,,
-16,RA / PMR,0.05,0.05,hydroxychloroquine,Plaquenil,200 mg,tablet,IR,PO,1 bd,0.10,0,,hydroxychloroquine,P01BA02,,,
-16,RA / PMR,0.05,0.05,folic acid,Megafol,5 mg,tablet,IR,PO,weekly,0.95,1,,folic acid,B03BB01,,,
-17,Combination traps (4.3),0.00,0.00,ezetimibe/atorvastatin,Atozet,10/10 mg;10/40 mg;10/80 mg,tablet,IR,PO,1 daily,0.00,0,,ezetimibe;atorvastatin,C10BA05,,,
-17,Combination traps (4.3),0.00,0.00,paracetamol/codeine,Panadeine Forte,500/30 mg,tablet,IR,PO,1 to 2 qid prn,0.00,0,,paracetamol;codeine,N02AJ06,Y,,2
-18,OTC / complementary,0.00,0.00,fish oil,Blackmores Fish Oil,1000 mg,capsule,IR,PO,1 to 2 daily,0.00,0,,fish oil,,,,
-18,OTC / complementary,0.00,0.00,glucosamine,Blackmores Glucosamine,1500 mg,tablet,IR,PO,1 daily,0.00,0,,glucosamine,,,,
-18,OTC / complementary,0.00,0.00,turmeric,Blackmores Turmeric,500 mg,tablet,IR,PO,1 daily,0.00,0,,turmeric,,,,
-18,OTC / complementary,0.00,0.00,colecalciferol,Ostelin,1000 IU,capsule,IR,PO,1 daily,0.00,0,,colecalciferol,A11CC05,,,
-18,OTC / complementary,0.00,0.00,magnesium,Blackmores Magnesium,300 mg,tablet,IR,PO,1 daily,0.00,0,,magnesium,A12CC,,,
-18,OTC / complementary,0.00,0.00,paracetamol,Panadol,500 mg,tablet,IR,PO,1 to 2 qid prn,0.00,0,,paracetamol,N02BE01,,,
+16,RA / PMR,0.05,0.05,prednisolone,Panafcortelone;Solone,1 mg;5 mg;25 mg,tablet,IR,PO,daily or taper,0.45,0,,prednisolone,H02AB06,ext,200,4
+16,RA / PMR,0.05,0.05,hydroxychloroquine,Plaquenil,200 mg,tablet,IR,PO,1 bd,0.10,0,,hydroxychloroquine,P01BA02,,100,3
+16,RA / PMR,0.05,0.05,folic acid,Megafol,5 mg,tablet,IR,PO,weekly,0.95,1,,folic acid,B03BB01,,200,1
+17,Combination traps (4.3),0.00,0.00,ezetimibe/atorvastatin,Atozet,10/10 mg;10/40 mg;10/80 mg,tablet,IR,PO,1 daily,0.00,0,,ezetimibe;atorvastatin,C10BA05,,30,5
+17,Combination traps (4.3),0.00,0.00,paracetamol/codeine,Panadeine Forte,500/30 mg,tablet,IR,PO,1 to 2 qid prn,0.00,0,,paracetamol;codeine,N02AJ06,Y,10,0
+18,OTC / complementary,0.00,0.00,fish oil,Blackmores Fish Oil,1000 mg,capsule,IR,PO,1 to 2 daily,0.00,0,,fish oil,,,30,5
+18,OTC / complementary,0.00,0.00,glucosamine,Blackmores Glucosamine,1500 mg,tablet,IR,PO,1 daily,0.00,0,,glucosamine,,,30,5
+18,OTC / complementary,0.00,0.00,turmeric,Blackmores Turmeric,500 mg,tablet,IR,PO,1 daily,0.00,0,,turmeric,,,30,5
+18,OTC / complementary,0.00,0.00,colecalciferol,Ostelin,1000 IU,capsule,IR,PO,1 daily,0.00,0,,colecalciferol,A11CC05,,30,5
+18,OTC / complementary,0.00,0.00,magnesium,Blackmores Magnesium,300 mg,tablet,IR,PO,1 daily,0.00,0,,magnesium,A12CC,,120,0
+18,OTC / complementary,0.00,0.00,paracetamol,Panadol,500 mg,tablet,IR,PO,1 to 2 qid prn,0.00,0,,paracetamol,N02BE01,,100,3

@@ -91,7 +91,59 @@ which is how CI runs too, with no `.env` and no network at all. So you can write
 test the adapters, engines and schemas without Zetaris or Nightshift; you just cannot
 verify a live call.
 
-## 5. Your first change
+## 5. Build the data (you will need this)
+
+Two directories are **gitignored and nothing creates them for you**:
+`data/reference/` and `data/synthetic/silos/`. A fresh clone has neither.
+
+```bash
+make lexicon    # reference tables from the committed sources, no network
+make synth      # the four synthetic silos, ground truth and fixtures
+```
+
+Use `make data` instead of `make lexicon` only if you want the real PBS codes — it
+fetches from the PBS public API at one request per 21 s, so it takes about 8 minutes.
+Without it the lexicon still builds complete and working; the codes are just synthetic.
+
+**`make test` does not build these, and it used to.** Until 25 Oct the determinism
+test ran the generator *in place*, so running the suite quietly rewrote
+`data/synthetic/` and the committed fixtures. That hid staleness locally, and on CI it
+was worse: the silos were regenerated without the gitignored PBS codes, the committed
+fixtures were replaced with those, and every later test asserted against data nobody
+had committed. The test now writes to a temp directory, so:
+
+- if `data/synthetic/silos/` is missing, the generator tests **skip** — that is
+  correct, not a failure. Run `make synth`.
+- nothing regenerates your data behind your back any more.
+
+### If you have Zetaris registered
+
+The silos are `CACHE`d inside Zetaris, and `CACHE TABLE` on an already-cached table is
+a **no-op**. So regenerating the files is not enough — re-running the registration
+would leave Zetaris serving the previous generation while every committed fixture
+disagreed with it:
+
+```bash
+make synth
+make refresh    # uncache and re-cache; creates and drops nothing
+make verify     # 8 views, the real Q_REF/Q0-Q3 templates, and the fixture diffs
+```
+
+`make verify` exits non-zero if anything is wrong. If you have **added a column** to a
+generated file, you need one more step — a REST table infers its schema once at
+creation and a view pins its SELECT list the same way, and `REFRESH TABLE` re-infers
+neither:
+
+```bash
+python3 scripts/register_sources.py --recreate-drifted
+```
+
+That drops and re-creates only what actually drifted. **It drops Zetaris objects, so
+ask first** (see `CLAUDE.md`). Note that `COUNT(*)` cannot detect this class of bug,
+because counting rows never names a column — which is exactly how it went unnoticed
+for a day.
+
+## 6. Your first change
 
 ```bash
 git pull origin main

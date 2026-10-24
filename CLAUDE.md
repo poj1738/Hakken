@@ -56,6 +56,11 @@ vertical slice, then improve.
   weaken a check to make it pass.
 - Every external call has a timeout and a fallback. Every loop is bounded.
 - Smallest working slice first: run it, read the logs, test, then refine.
+- **`data/reference/` and `data/synthetic/silos/` are gitignored and nothing builds
+  them for you** — `make lexicon` and `make synth`. Tests that need them *skip*; a
+  skip there is a missing build, not a pass. No test may write into the repo: one
+  that regenerates the fixtures another test reads makes CI assert against data
+  nobody committed.
 - Commit often with clear messages, on a feature branch per phase. The pre-commit
   secret scan must pass (`make scan`).
 - Keep `docs/DECISIONS.md` (decision, why, date) and `TODO.md` ordered by judging impact.
@@ -153,6 +158,13 @@ before relying on it, and re-verify on your own machine.
   `SHOW LIGHTNING DATABASES` and `SHOW TABLES IN <db>`.
 - `CREATE SCHEMASTORE CONTAINER` has no `IF NOT EXISTS`; a re-run fails on a duplicate.
 - A REST table may re-call its source on every query — `CACHE TABLE` after registering.
+- **A REST table infers its schema once, at creation, and a view pins its SELECT list
+  the same way. `REFRESH TABLE` re-infers neither** (it returns ok and changes
+  nothing). So adding a column to a source file silently breaks both, and `COUNT(*)`
+  cannot detect it, because counting rows never names a column. Run
+  `scripts/register_sources.py --recreate-drifted`, which rebuilds only what drifted.
+- **`CACHE TABLE` on an already-cached table is a no-op.** After regenerating data,
+  `make refresh` — re-applying the registration leaves Zetaris a generation behind.
 
 **Meterless Nightshift**
 - Normalise any pasted URL to `<host>/v1`; **never produce `/v1/v1`**.

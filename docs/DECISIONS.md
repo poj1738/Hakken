@@ -832,3 +832,8 @@ not read `.env.local` anywhere in `app/`.
 is *their* convention. Keeping ours separate means running a reference script never
 pulls our config, and our app never depends on a file the hackathon doesn't define.
 If we ever run `.refs/zetaris/scripts/*` directly it needs its own `.env.local`.
+
+- **Pitch claims are vetted and the wording is fixed** (24 Oct). Three of our four
+  headline claims were loose or wrong — "Actions 4.5/4.6 require two independent
+  sources" is not what those Actions say. Approved wording and citations are in
+  `docs/PITCH_CLAIMS.md`; the README, slides and video must use it verbatim.

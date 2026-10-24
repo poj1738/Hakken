@@ -27,6 +27,166 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 01:20 AEDT · Arpon · arpon/research-fixes
+
+**Did:** Applied the consultant's round-two findings (briefs 6–10) and fixed three
+things that surfaced while verifying them. 456 tests green, secret scan clean.
+
+**1. The dispensing layer was the least believable part of the data. It is fixed,
+and the fix came from real PBS numbers rather than better guesses.** `Med` was
+inventing a pack of 60 or 30. The lexicon already carried each item's real PBS
+maximum quantity and repeat count — we had the number and were not reading it.
+Paracetamol 665 mg MR is a pack of **192**, not 60.
+
+Two traps on the way, both worth knowing:
+
+- An inhaler's pack is **1**, so `pack_qty / doses_per_day` collapsed to the 7-day
+  floor and NovoRapid came out with **54 fills a year**. Pack size says nothing
+  about duration for a device — the same reason `normalise.py` refuses to infer a
+  daily dose from one. Devices are now a flat month.
+- PBS records `pack_size` as **1** for some oral items too — the quantity unit there
+  is a pack, not a tablet. Rosuzet is listed as 1, so it looked like a 7-day supply
+  and one patient got **53 fills**. The honest signal is the **repeat count**, from
+  the same real PBS row: an item with repeats is ongoing therapy and gets a
+  one-month floor; an item with none is a one-off course.
+
+Max fills for one medicine in 12 months: **29 → 14**, median 5, every `days_supply`
+now ≥ 28. `repeats_left` is bounded by the item's real repeats instead of a random
+0–5. Unlabelled shared ingredients on a chart: **3 → 0** (the three that remain are
+the planted duplications, and they are labelled in ground truth).
+
+**2. The TGA loader reported success on 1,010 rows while two columns were empty for
+every one of them.** It looked for "Medicine name" and "resolution"; the real columns
+are **`ARTG name`** and **`Supply impact end date`**. Also added
+`Shortage impact rating` (Critical 90 / Medium 178 / Low 742) — Critical and Low are
+not the same notice. A column that is empty for *every* row now warns loudly. This is
+the second time this week a row count has passed while the shape was wrong; **a row
+count is not a shape check**.
+
+**3. Two silent-staleness bugs, and the second one matters to everybody.**
+
+`datasvc` cached on path alone, on the reasoning that the files are immutable between
+runs of `make synth`. They are not immutable *across* one. I regenerated the silos
+while the process stayed up, so it kept serving the previous generation, **and
+Zetaris cached that**. Every committed fixture then disagreed with the live views.
+Now keyed on mtime and size. **If you regenerate data, you no longer need to restart
+`datasvc` — but you do need `--refresh` (below).**
+
+The worse one: `time_templates()` returned `None`, so a template query that *errored*
+was printed in the timing list and then ignored, and the script **still exited 0**.
+`Q_REF(nicknames)` had been failing for a day that way. `COUNT(*)` in `verify()`
+cannot catch a missing column because it never names one — only running the real
+query does, which is the entire reason those timings exist. It now returns a failure
+count and `--verify-only` exits 1.
+
+**New flags on `register_sources.py`:**
+- `--refresh` — uncache and re-cache every raw table. **Run this after `make synth`.**
+  `CACHE TABLE` on an already-cached table is a no-op, so a plain re-`--apply` leaves
+  Zetaris serving the old generation. Creates and drops nothing.
+- `--recreate-drifted` — finds REST tables whose *inferred* schema no longer matches
+  the files and rebuilds them. **Drops objects, so it needs Arpon.**
+
+**4. Research findings recorded where the code will actually see them.** Brief 8's
+never-flag / always-flag rules are now data in `triage.py`, with provenance per rule.
+`SUPPRESS` itself is untouched — a contract test pins it. Where the consultant could
+not retrieve a dose-equivalence source (metoprolol tartrate↔succinate, gliclazide
+IR↔MR, Optisulin↔Toujeo), **no conversion factor is asserted**; those go to a human
+instead. An unverified factor silently applied to a high-risk medicine is worse than
+no factor at all.
+
+`docs/PITCH_CLAIMS.md` has the four headline claims with approved wording. One was
+**wrong as we had it**: Actions 4.05 and 4.06 do not say "two independent sources" —
+that is ACSQHC *implementation guidance*, and the numbering is 4.05/4.06. Also: we
+must stop saying MedTrace produces a BPMH. A BPMH requires a clinician; ours is "a
+pre-populated medication history for clinician verification". That is the same claim
+the human-review gate makes in the product, so the pitch and the code now agree.
+
+**Changed shared files:** **`CLAUDE.md` and the `Makefile`** — both on the
+say-it-twice list.
+
+- `CLAUDE.md`: two facts under Zetaris (a REST table infers its schema once at
+  creation and a view pins its SELECT list the same way, `REFRESH TABLE` re-inferring
+  neither; and `CACHE TABLE` on a cached table being a no-op), plus a working-agreement
+  line that the gitignored data directories are yours to build and that **no test may
+  write into the repo**.
+- `Makefile`: `make register` was **broken** — it passed `--dry-run`, which is not a
+  flag, so it exited 2 every time. The script is dry-run by default. Added
+  `make refresh` and `make verify`, and `make synth` now prints the follow-up step.
+- `docs/ONBOARDING.md` gained a "Build the data" section; there wasn't one, which is
+  why this keeps catching people.
+
+Also `datasvc/main.py`,
+`scripts/register_sources.py` and `scripts/generate_synthetic.py` all changed
+behaviour — see the two flags above if you touch Zetaris.
+
+**Broken:** nothing. (`medtrace.nicknames` was broken for most of this session;
+**resolved 25 Oct** — see below.)
+
+**RESOLVED — `medtrace.nicknames`.** It failed every query in Zetaris. The REST
+table inferred `struct<canonical, variant>` before `sex` was added by the name/sex
+fix, and a Lightning REST table infers its schema **once, at creation** — `REFRESH
+TABLE` returns ok and changes nothing. So the view reads rows wider than its schema
+and Spark throws `ArrayIndexOutOfBoundsException`; `Q_REF(nicknames)` fails with
+`UNRESOLVED_COLUMN ... 'sex'`.
+
+To be clear about cause: **this was already broken before I touched it.** A stale
+cached copy was masking it, and the only check that would have caught it was being
+discarded (see 3). Everything else is green — all 8 other views match `datasvc`
+exactly, Q0–Q3 run, and **all 6 live-vs-fixture diffs match**.
+
+Arpon ran `--recreate-drifted` and it took **two passes**, which is the part worth
+remembering. The first rebuilt `MT_REF.nicknames_raw` and reported every view `ok` —
+but `Q_REF(nicknames)` still failed. **A SchemaStore view pins its SELECT list at
+creation exactly as a REST table pins its inferred schema**, so the view went on
+exposing two columns over a three-column table. `COUNT(*)` passed the whole time,
+because counting rows never names a column — the same blind spot that hid the
+original breakage. The tool now checks and rebuilds views too, rebuilds
+`all_sources` when a silo view underneath it is replaced, and runs the real
+templates at the end instead of stopping at `COUNT(*)`.
+
+Now green: `Q_REF(nicknames)` returns 167 rows with `sex` populated (77 F / 90 M),
+and `--verify-only` exits 0.
+
+**Needs from teammates:** nothing.
+
+**5. CI failed on a number that passed locally, and the cause is worth everyone's
+attention: the test suite was rewriting the data it tests.**
+
+`test_the_generator_is_deterministic` ran the generator twice **in place**, so running
+`make test` silently overwrote `data/synthetic/` and the committed fixtures. On your
+own machine that only hides staleness. On a fresh clone it is much worse:
+`data/reference/lexicon.json` is **gitignored**, so CI regenerated the silos *without*
+the real PBS codes, replaced the committed fixtures with those, and every later test
+then asserted against data nobody had committed. That is how the same commit gave
+0.846 locally and 0.820 on CI.
+
+I only found it by cloning the repo into a temp directory and running the suite in a
+`python:3.11-slim` container — the clone's fixtures came out byte-different from the
+ones at the same SHA. Worth remembering as a technique: **if CI and local disagree on
+identical commits, reproduce on a clean clone before suspecting the code.** My first
+three hypotheses (Python 3.11 vs 3.12, hash randomisation, `SAMPLE_MODE`) were all
+wrong, and each was easy to "confirm" by reasoning rather than testing.
+
+Fixes: the generator takes `--out-root` and the test writes under `tmp_path`; the
+module's `skipif` now checks the **silos** (gitignored) rather than `ground_truth.json`
+(committed), which is what its reason string always claimed. Pack sizes moved to the
+committed `medicines.csv` via `scripts/backfill_packs.py`, so the generator no longer
+needs anything gitignored.
+
+**Verified:** a fresh clone on Python 3.11 is fully green and the suite now changes
+**0 tracked files**.
+
+**Two things this leaves for the team:**
+- **`make test` no longer regenerates your silos.** If `data/synthetic/silos/` is
+  missing, the generator tests *skip* instead of quietly creating it. Run `make synth`.
+- Our fixtures are only as good as the last person to commit them. The suite can no
+  longer paper over a stale fixture by regenerating it.
+
+**Next:** Sunday's modules — `fuse`, `detect`, `triage`, `scripts/eval.py`. `detect`
+and `triage` now have brief 8 to build against. Q4/TGA registration stays optional.
+
+---
+
 ### 2026-10-24 20:55 AEDT · Arpon · arpon/domain-logic (stacked on arpon/generator)
 
 **Did:** Applied the Zetaris registration (step 6) and started step 7.
