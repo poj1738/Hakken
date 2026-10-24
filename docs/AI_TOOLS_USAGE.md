@@ -28,5 +28,6 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-24 | Arpon | Claude Code | Opus 5 | Team workflow: handoff log, session-start hook, CI, onboarding docs |
 | 2026-10-24 | Arpon | Claude Code | Opus 5 | MedTrace domain-pack skeleton: frozen `types.py`, SQL templates, trust priors, contract tests |
 | 2026-10-24 | Arpon | Claude Code | Opus 5 | Live SQL dialect testing (found the `''` escaping bug), step-1 reachability spike, latency correction |
+| 2026-10-24 | Arpon | Claude Code | Opus 5 | Steps 2/4/5/6: PBS fetch + hand-built lexicon, synthetic generator, datasvc, Zetaris registration (dry run) |
 
 The README's **AI and model usage** section summarises this for judges.

@@ -27,6 +27,96 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-24 18:40 AEDT · Arpon · arpon/generator (stacked on arpon/reference-data)
+
+**Did:** Steps 2, 4, 5 and 6. `docs/DATA_SPEC.md` is **merged to main** (#5) and so is the
+**domain-pack skeleton** (#4), so Arnav has both his dependencies.
+
+**1. The PBS public API works — I was wrong to call it a wall.** The 401 body said to
+send the key and I read it as "registration required". The published unregistered key
+works, free, no login. What is genuinely gone is narrower: the monthly CSV bundle is in
+the embargo area behind an HPP login, and the legacy XML/text files were discontinued
+1 May 2026. **188 of 207 lexicon rows now carry a real `pbs_code`**, with real
+`pack_size` and `number_of_repeats`, from schedule 4751.
+
+**The licence needs a decision from you.** The `_meta` copyright block PLAN §3 required
+reading is **more restrictive than the CC BY 3.0 AU** reported elsewhere: *"Permission is
+granted to use and redistribute this content, as long as all copyright statements are
+retained. **Permission is not granted to modify this content.**"* I honoured the
+statement attached to the bytes over the general label, so no PBS value is altered,
+`data/reference/` stays gitignored as the plan directed, and only a ≤200-row attributed
+sample is committed. Full reasoning in `docs/DATA_LICENCES.md` §1.
+
+**2. The ATC cross-check earned its keep, and two items need a clinician.** 35
+disagreements between DATA_SPEC and PBS, in `data/reference/atc_crosscheck.csv`. Only
+**two change the APINCHS class**, which is the only kind that matters, and the build
+reports exactly those:
+
+| Medicine | DATA_SPEC | PBS | Effect |
+|---|---|---|---|
+| **sotalol** | `C07AA07` → not APINCHS | `C01BD` → **Ext** | PBS makes it high-risk |
+| **paracetamol/codeine** | `N02AJ06` → **N** | `N02BE01` → not APINCHS | PBS loses the codeine |
+
+Sotalol genuinely is a class III antiarrhythmic, so the spec may be under-classifying
+it. For Panadeine Forte the spec is right and PBS is wrong. **DATA_SPEC wins in the
+build — nothing was applied silently.** The other 33 are PBS systematically giving a
+combination the ATC of one component, which doesn't move the class.
+
+**3. The generator runs.** 40 patients, 355 medicines, 73 planted findings, ~4,800 silo
+rows, **30 Zetaris envelopes in `tests/fixtures/medtrace/`**. Three defects found while
+building it, each of which would have been invisible later:
+
+- `choose_medicines` never topped up when short, so the population sat at **4.3
+  medicines per patient** against the spec's 5–12 (mean 8.4) — and every *per-medicine*
+  planting rate was then applied to too small a denominator. Now 5–12, mean 8.9.
+- **Planted findings had empty `row_ids`**, because findings are planted while rendering
+  the EMR, before the GP/pharmacy/patient rows exist. DATA_SPEC §11.2 scores a true
+  positive by row_id **overlap**, so every one would have been unmatchable — recall
+  capped at zero per type, for reasons nothing to do with the detector.
+- **`duplication` had an uncontrolled rate** — only planted when sampling happened to
+  draw a combination beside its own component. It produced 3 instances and *all 3 landed
+  in held-out*, so the type had nothing to tune against. Now induced at §5.2's 0.18.
+
+**4. `datasvc` serves all 7 endpoints.** `register_sources.py` builds all 28 statements
+and is **dry-run by default — nothing has been applied to Zetaris**, per PLAN step 6's
+"wait for my go-ahead". The view `SELECT` lists derive from the generator's
+`HARMONISED_MAP`, so the live view and the replayed fixtures cannot drift apart.
+
+**Changed shared files:** `app/config.py` and `.env.example` (`PBS_API_BASE`,
+`PBS_SUBSCRIPTION_KEY`), `Makefile` (`data`, `lexicon`, `synth`), `pytest.ini` (a `slow`
+marker; the anyio deprecation ignored **by message only** so our own still fail the
+build), and `app/domain/packs/medtrace/{types,queries,parse}.py` — see the `known_shortage`
+note in the previous entry.
+
+**Broken:** Nothing. **241 tests green, secret scan clean on 143 files.** Caveats worth
+knowing: no SQL has been applied to Zetaris yet (dry run only); `amt-items` was not
+fetched, so **AMT codes are synthetic** and clearly marked; `dos_weight` is real for only
+57 of 207 rows because the Item Report is 2016 data against the 2026 schedule.
+
+**Needs from teammates:**
+- **Arnav** — everything you need is on `main`: `docs/DATA_SPEC.md` and the whole
+  `app/domain/packs/medtrace/` skeleton. Fixtures for 10 patients (Q1/Q2/Q3) and Q_REF
+  are in `tests/fixtures/medtrace/` on **this branch**, so merge #6 then #7 (or pull the
+  branch) for `SAMPLE_MODE`. Two hard rules: **never build a SQL literal by hand** (use
+  `queries.sql_literal()` — the doubled quote fails silently), and **keep `None` as
+  `None`**, never `str()` it.
+- **Anshu** — unaffected.
+
+**Needs from Arpon (you), in order:**
+1. **Go-ahead to `--apply` the registration.** 28 statements, dry run reviewed. This is
+   the last step before a live `SELECT COUNT(*) FROM medtrace.all_sources`.
+2. **Sotalol and paracetamol/codeine** — the two ATC/APINCHS calls above.
+3. **DATA_SPEC §4.2 bundle 6** sums to 0.95, not 1.00. Missing share, or a wrong one?
+4. **Four formulation-trap drugs have only one form in §4.2** (metoprolol, gliclazide,
+   venlafaxine, tamsulosin), so no IR/MR pair can be planted for them. Needs a brand and
+   strength each, from you — I won't invent them.
+5. **Population size.** At 20 tune patients, §5.2's "≥15 tune instances per type" is
+   unreachable for the low-rate types. Raise `--patients` before the final eval run.
+
+**Next:** DATA_SPEC §7's lookalike, twin and overlay traps — `identity_traps` is empty
+and **Q1 currently returns no decoys**, which matters because false-merge rate is a
+headline metric and identity is the demo's opening scene. Then `--apply` once you say so.
+
 ### 2026-10-24 16:05 AEDT · Arpon · arpon/skeleton
 
 **Did:** Two things: ran the templates against live Zetaris instead of trusting the
