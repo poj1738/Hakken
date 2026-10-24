@@ -27,6 +27,64 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 03:48 AEDT · Arnav · arnav/schemas
+
+**Did:** First session. Machine set up (Windows 11 + WSL2 Ubuntu; local Zetaris, own
+Nightshift, preflight 20/2/1 — see my section of `docs/ENVIRONMENTS.md`, PR #11).
+**Claiming PLAN 5.1 (schemas), 5.8 (example API JSON), then 5.2–5.7** in that order;
+5.9 (engines) runs in a second session on `arnav/engines`.
+
+PLAN 2.8 landed in `app/schemas.py`: `Finding`, `Evidence`, `IdentityReview`,
+`ModelCall`, the new `FeedbackRequest`, and the MedTrace fields on `RunResponse`
+(`coverage`, `bpmh_confirmable`, `banner`, `grid`, `notices`, `tasks`, `query_count`,
+`zetaris_ms`, `model_calls`). The domain types (`Coverage`, `FusedMed`, `IdentityLink`,
+`EvidenceState`, `Notice`, `SourceRow`, `DiscrepancyType`) are **imported from
+`types.py`, never redefined**. Every new field has a default, so a response with only
+the official fields still validates. 24 tests in `tests/unit/test_schemas.py`.
+
+Beyond 2.8, added because PLAN 6 (UI) and 5.8 (the fixture list) need them — **Arpon,
+these are the parts to review**:
+- `RunStatus` gains `running` (mid-run poll) and `needs_review` (PLAN 6.4 expects
+  `status: needs_review`). A finished run still reports only success/partial/error.
+- `RunResponse.findings`, `.identity_review`, `.trace` (timeline polling), `.trust`
+  (trust panel), `.evidence_index` (row_id → `Evidence`, for the grid's hover), `.patient_id`.
+- `Finding.id`, `.explanation` (Writer's 1–2 sentences), `.intent_reason`.
+- `IdentityReview.records` (record_key → `SourceRow`) so the UI can lay rows side by side.
+- New: `IdentityDecisionRequest`, `PatientSummary`/`PatientsResponse` (Q0),
+  `TrustEntry`, `FeedbackResponse` with `TrustUpdate` and `AcceptanceUpdate`.
+- `TraceEvent.step` and `.message` (the plain-English timeline line).
+- `HealthResponse.last_routed_model` (status pill). `RunRequest.patient_id`; `question`
+  now has a default.
+
+**Plan vs repo — followed the repo:**
+1. PLAN 2.8 says `Finding` "gains" fields; there was no `Finding` in `schemas.py`. Created it.
+2. PLAN 2.8 types `Evidence.fields` as `dict[str, str]`; it is `dict[str, str | None]`,
+   because a SQL NULL arrives as JSON null and must stay `None` (Arpon, 24 Oct handoff).
+3. Patients are identified by EMR `source_patient_id` (`MRN0000001`), not `P0001`:
+   P-keys are ground truth, which the app must not see. The fixture filenames use
+   P-keys; mapping them is a SAMPLE_MODE replay detail.
+4. Arpon's generated envelopes for P0001–P0010 are already on `main`, so I will **not**
+   hand-make P0001 fixtures as my own brief said. There is no Q0 (`q_admissions`)
+   fixture yet.
+5. The old `FeedbackRequest` (`memory_id`, `kind`) is replaced per 2.8; nothing imported it.
+
+**Changed shared files:** **`app/schemas.py`** (additive except `FeedbackRequest`, which
+is replaced per PLAN 2.8). **Anshu:** copy these into `web/src/types.ts`; example JSON
+for every endpoint follows next in `tests/fixtures/api/`.
+
+**Broken:** Nothing. 444 passed / 36 skipped, secret scan clean. Merging without
+Arpon's sign-off, by agreement — review afterwards and changes come back as a PR.
+
+**Needs from teammates:**
+- **Arpon** — review the "beyond 2.8" list above. Also: should I register the MedTrace
+  silos on my own Zetaris, or stay on fixtures until you say? And a Q0 fixture would
+  let `GET /patients` replay in SAMPLE_MODE.
+- **Anshu** — nothing to do yet; the example JSON lands next.
+
+**Next:** PLAN 5.8, the example API JSON in `tests/fixtures/api/`.
+
+---
+
 ### 2026-10-25 01:20 AEDT · Arpon · arpon/research-fixes
 
 **Did:** Applied the consultant's round-two findings (briefs 6–10) and fixed three
