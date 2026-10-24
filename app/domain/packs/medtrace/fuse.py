@@ -46,6 +46,13 @@ ABSENT = "absent"
 #: pharmacy that had simply never mentioned it.
 SILENCE_WEIGHT = 0.5
 
+#: Supply evidence is asymmetric (consultant brief 13.2). A recent dispensing is
+#: good evidence a medicine is in use; a lapse is weaker evidence it stopped --
+#: another pharmacy, hospital or specialist supply, samples, a stockpile. So a
+#: lapse votes at this fraction of the pharmacy's existence weight: 0.85 x 0.75
+#: is about 0.64, inside the consultant's 0.6-0.7.
+SUPPLY_LAPSE_WEIGHT = 0.75
+
 
 def fuse(
     stmts: list[MedStatement],
@@ -214,8 +221,9 @@ def _existence_votes(
                 status = supply_status(fills, as_of)
                 latest = max(fills, key=lambda s: s.doc_date or date.min)
                 if status == "POSSIBLY_CEASED":
-                    # A lapse is evidence as of today, so it is not decayed.
-                    votes[source] = (ABSENT, 1.0, latest.row_id)
+                    # Evidence as of today, so not decayed -- but weaker than
+                    # a supply that is running (SUPPLY_LAPSE_WEIGHT).
+                    votes[source] = (ABSENT, SUPPLY_LAPSE_WEIGHT, latest.row_id)
                 else:
                     # A supply that has not formally lapsed is weaker evidence of
                     # current use the longer ago it was dispensed. At full weight

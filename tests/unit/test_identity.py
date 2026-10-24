@@ -341,3 +341,17 @@ def test_a_combined_name_field_surname_is_an_exact_match_not_a_previous_one(lex)
                    dob=date(1945, 3, 2), dob_raw="1945-03-02")
     link = score_pair(emr, pharmacy, lex)
     assert link.field_evidence["surname"] == "surname matches exactly"
+
+
+def test_a_typo_inside_a_combined_given_family_field_is_still_a_close_given_name(lex) -> None:
+    """The interview silo writes "Given Family" in one field. A one-letter typo
+    used to be fuzzy-matched against the whole string -- "Marjorie" vs "Marorie
+    Kaur" -- so it scored as a different given name, the surname was never
+    compared, and P0076's interview record was lost."""
+    emr = row(name_given="Marjorie", name_family="Kaur", dob=date(1950, 4, 9),
+              dob_raw="1950-04-09")
+    interview = row("patient", "INT1", name_given="Marorie Kaur", dob=date(1950, 4, 9),
+                    dob_raw="1950-04-09")
+    link = score_pair(emr, interview, lex)
+    assert "slightly" in link.field_evidence["given"]
+    assert link.field_evidence["surname"] == "surname matches exactly"

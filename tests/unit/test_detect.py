@@ -264,3 +264,57 @@ def test_output_is_deterministic_and_ordered(busy) -> None:
     assert found == run(list(reversed(busy)))
     order = [(f.generic, f.type.value) for f in found]
     assert order == sorted(order)
+
+
+def test_a_lapse_alone_is_a_confirm_item_not_an_asserted_commission() -> None:
+    """Consultant brief 13.3: a supply lapse alone is "conflict: confirm" --
+    never a confident commission, but never silence either."""
+    found = run([chart("spironolactone", 25.0), fill("spironolactone", 25.0, days_ago=300)],
+                found=("emr", "pharmacy"))
+    item = next(f for f in found if f.type is D.COMMISSION)
+    assert item.detail["conflict"] == "confirm"
+    assert item.severity == "low"
+    assert any("Ask the patient or GP" in t for t in item.tasks)
+
+
+def test_a_patient_saying_they_stopped_outranks_an_active_gp_listing() -> None:
+    """Consultant brief 13.2: the BPMH is what the patient actually took."""
+    found = run([chart("spironolactone", 25.0), gp("spironolactone", 25.0),
+                 patient("spironolactone", status="ceased"),
+                 fill("spironolactone", 25.0, days_ago=300)])
+    item = next(f for f in found if f.type is D.COMMISSION)
+    assert "conflict" not in item.detail
+
+
+def test_two_tablets_instead_of_one_is_a_dose_not_a_frequency_error() -> None:
+    """Consultant brief 11.2: the dose per administration changed."""
+    found = run([chart("amlodipine", 10.0, freq="2 daily"), gp("amlodipine", 5.0, freq="1 daily"),
+                 fill("amlodipine", 5.0)])
+    assert (D.DOSE, "amlodipine") in kinds(found)
+
+
+def test_a_split_sensitive_medicine_is_flagged_when_only_the_split_changes() -> None:
+    """Consultant brief 11.3: same daily dose, different split -- suppressed,
+    except for medicines like levodopa where the split itself matters."""
+    found = run([chart("levodopa/carbidopa", 400.0, freq="2 bd"),
+                 gp("levodopa/carbidopa", 400.0, freq="1 qid"), fill("levodopa/carbidopa", 400.0)])
+    item = next(f for f in found if f.type is D.FREQUENCY)
+    assert item.detail["subtype"] == "regimen_split_differs"
+    assert item.severity == "low"
+    plain = run([chart("metformin", 1000.0, freq="2 daily"), gp("metformin", 1000.0, freq="1 bd"),
+                 fill("metformin", 1000.0)])
+    assert not [f for f in plain if f.type in (D.DOSE, D.FREQUENCY)]
+
+
+def test_a_finding_resting_on_one_source_is_marked_unverified() -> None:
+    """Consultant brief 14.4: a finding, not a conflict -- with a second-source task."""
+    found = run([chart("amlodipine", 2.5), gp("amlodipine", 5.0)], found=("emr", "gp"))
+    item = next(f for f in found if f.type is D.DOSE)
+    assert item.detail["bpmh_single_source"] == "gp"
+    assert any("second source" in t for t in item.tasks)
+
+
+def test_a_doubled_high_risk_dose_outranks_a_small_ordinary_one() -> None:
+    """Consultant brief 11.4: severity follows the daily-dose ratio and drug risk."""
+    small = run([chart("amlodipine", 6.0), gp("amlodipine", 5.0), fill("amlodipine", 5.0)])
+    assert next(f for f in small if f.type is D.DOSE).severity == "low"

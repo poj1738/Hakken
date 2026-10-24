@@ -126,7 +126,9 @@ LAY_TERMS = {
 }
 #: DATA_SPEC 9.5: regimens whose dose changes by phone, with no new script, so
 #: the dispensing record cannot reconstruct it.
-PHONE_DOSE_GENERICS = ("warfarin", "insulin glargine", "prednisolone")
+#: All insulins, not one (consultant brief 12.3: APINCH covers "all insulins",
+#: and bolus doses are titrated without new scripts just as basal ones are).
+PHONE_DOSE_GENERICS = ("warfarin", "insulin glargine", "insulin aspart", "prednisolone")
 
 
 def phone_dose_gp_directions(med: "Med", rng: random.Random, usual: str) -> str:
@@ -138,7 +140,7 @@ def phone_dose_gp_directions(med: "Med", rng: random.Random, usual: str) -> str:
     """
     if med.generic == "warfarin":
         return "as directed per INR" if rng.random() < 0.5 else usual
-    if med.generic == "insulin glargine":
+    if med.generic.startswith("insulin"):
         return "as directed" if rng.random() < 0.6 else usual
     return usual
 
@@ -155,7 +157,7 @@ def phone_dose_patient_words(med: "Med", rng: random.Random) -> str:
         if rng.random() < 0.6 and mg > 1:
             return f"{mg - 1:g} mg Mon Wed Fri, {mg:g} mg the other days"
         return "not sure how much now, the clinic changes it"
-    if med.generic == "insulin glargine":
+    if med.generic.startswith("insulin"):
         return rng.choice(["up 2 units every three days", "they told me to go up a bit",
                            "changes with my sugars"])
     return rng.choice(["down to the next step this week", "cutting down each week",
@@ -436,6 +438,10 @@ class Med:
         self.start = AS_OF - dt.timedelta(days=rng.randint(60, 3650))
         self.stop: dt.date | None = None
         self.changed_by_phone = False
+        # Whether the phone change shows in any rendered row, and the intent
+        # drawn for it. A dose_unconfirmable is planted only if it shows.
+        self.phone_visible = False
+        self.phone_intent = "possibly_intentional"
         self.private = rng.random() < PRIVATE_SCRIPT_RATE
         self.hidden_at_second_pharmacy = False
         self.dispensings: list[dt.date] = []
@@ -724,9 +730,8 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
         if med.generic in PHONE_DOSE_GENERICS and med.current:
             if rng.random() < 0.85:
                 med.changed_by_phone = True
-                plant("dose_unconfirmable", med, ["gp", "pharmacy", "patient"], [],
-                      {"mechanism": "dose changed without a new script"},
-                      "possibly_intentional" if rng.random() < 0.6 else "likely_unintentional")
+                med.phone_intent = ("possibly_intentional" if rng.random() < 0.6
+                                    else "likely_unintentional")
 
     # -- EMR ----------------------------------------------------------------
     given, family, dob_text = render_name_for("emr", p, rng, corruptions)
@@ -856,7 +861,9 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
                          else f"{med.generic} {med.strength}")
             directions = FREQ_WORDS.get(med.regimen, med.regimen)
             if med.changed_by_phone:
+                usual = directions
                 directions = phone_dose_gp_directions(med, rng, directions)
+                med.phone_visible = med.phone_visible or directions != usual
             status = "active" if med.gp_listing == "active" else "ceased"
             row_id = rows.add("gp", dict(gp_base, drug_text=drug_text,
                                          amt_code=code_for(med, "amt_mpp"),
@@ -943,6 +950,7 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
             how_often = FREQ_WORDS.get(med.regimen, med.regimen)
             if med.changed_by_phone:
                 how_often = phone_dose_patient_words(med, rng)
+                med.phone_visible = True
             rows.add("patient", dict(pat_base, med_described=described,
                                      how_often=how_often, still_taking=still))
         for med in p.otc:
@@ -959,6 +967,16 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
     if found < 2:
         notices.append({"type": "bpmh_not_confirmable", "detail":
                         f"only {found + 1} of 4 sources found"})
+
+    # -- dose_unconfirmable, planted only where it SHOWS ---------------------
+    # Consultant brief 12.2: the routine "confirm this dose" is a task, not a
+    # finding; a finding is a visible conflict. So a phone change that every
+    # rendered source hides -- the GP repeating the old dose, no interview --
+    # is a task for the pharmacist, not a planted finding for the detector.
+    for med in p.meds:
+        if med.changed_by_phone and med.phone_visible:
+            plant("dose_unconfirmable", med, ["gp", "pharmacy", "patient"], [],
+                  {"mechanism": "dose changed without a new script"}, med.phone_intent)
 
     # -- duplication (DATA_SPEC 4.3) ----------------------------------------
     for med in p.meds:

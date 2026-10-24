@@ -325,33 +325,6 @@
    null
   ],
   [
-   "emr",
-   "EMR-000060",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Deborah",
-   "Nguyen",
-   null,
-   "1948-05-20",
-   "F",
-   "2777",
-   "admission_chart",
-   "2026-10-24",
-   "digoxin",
-   "SYN-AMT-MP-0024",
-   "amt",
-   "125 microgram",
-   "0.125",
-   "PO",
-   "1 daily",
-   "",
-   "withheld: nil by mouth",
-   null,
-   null,
-   null,
-   null
-  ],
-  [
    "pharmacy",
    "PHM-000327",
    "C000006",
@@ -2647,5 +2620,5 @@
    null
   ]
  ],
- "total": 97
+ "total": 96
 }
