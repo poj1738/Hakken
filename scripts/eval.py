@@ -49,6 +49,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 from app.domain.packs.medtrace import coverage as cov_mod
 from app.domain.packs.medtrace.detect import detect_discrepancies
 from app.domain.packs.medtrace.fuse import fuse
+from app.domain.packs.medtrace.triage import MUST_REVIEW_FLOOR, prioritise
 from app.domain.packs.medtrace.parse import build_lexicon, dicts_from_sql, rows_from_sql
 from app.domain.packs.medtrace.identity import link_identity
 from app.domain.packs.medtrace.normalise import normalise_med
@@ -178,7 +179,7 @@ def reconcile(world: World, patient: dict, review: str = "oracle") -> Reconcilia
                 for g in generics}
 
     fused = fuse(stmts, evidence, dict(SOURCE_TRUST_PRIORS), world.as_of)
-    findings = detect_discrepancies(fused, stmts, cov, world.as_of, world.lex)
+    findings = prioritise(detect_discrepancies(fused, stmts, cov, world.as_of, world.lex), {})
     return Reconciliation(patient_key=patient["patient_key"], links=links, linked_keys=linked,
                           cov=cov, stmts=stmts, evidence=evidence, fused=fused,
                           findings=findings, needed_review=len(needed_review))
@@ -320,9 +321,11 @@ def show(world: World, key: str, review: str) -> int:
                          for s in SOURCES)
         attrs = [f"{n}={'CONFLICT' if v.abstained else v.value}" for n, v in med.attributes.items()]
         log(f"  {med.generic:26} {cells}   {'  '.join(attrs)}")
-    log("\nFINDINGS")
+    log("\nFINDINGS (ranked)")
     for f in rec.findings:
-        log(f"  {f.type.value:20} {f.generic:24} {f.severity:6} {f.row_ids[:5]}")
+        tier = "MUST REVIEW" if f.priority >= MUST_REVIEW_FLOOR else ""
+        log(f"  {f.priority:5.2f} {tier:11} {f.type.value:20} {f.generic:24} {f.severity:6} "
+            f"{f.row_ids[:4]}")
     log("\nPLANTED")
     for f in patient["planted"]:
         log(f"  {f['type']:20} {f['generic']:24} {f['row_ids']}")

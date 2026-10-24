@@ -35,6 +35,18 @@ from app.domain.packs.medtrace.types import (
     MedStatement,
 )
 
+#: Characters of the ATC code that define the "class" learned acceptance is
+#: keyed on: the pharmacological subgroup, e.g. C09A (ACE inhibitors). Written
+#: into every candidate's `detail["atc_class"]` so `triage.prioritise` and the
+#: feedback endpoint (`schemas.AcceptanceUpdate.atc_class`) read one value
+#: rather than each computing their own.
+ATC_CLASS_LENGTH = 4
+
+
+def _atc_class(atc: str | None) -> str:
+    return (atc or "")[:ATC_CLASS_LENGTH]
+
+
 #: Two daily doses closer than this, relatively, are the same dose. "2.5 mg"
 #: written two ways must never become a dose discrepancy.
 DOSE_TOLERANCE = 0.01
@@ -158,6 +170,7 @@ def detect_discrepancies(
         forced = forced_confirm(med.generic, med.atc)
         if forced and forced not in tasks:
             tasks.append(forced)
+        detail = {**detail, "atc": med.atc, "atc_class": _atc_class(med.atc)}
         found.append(DiscrepancyCandidate(
             id=f"{kind.value}:{med.generic}", type=kind, generic=med.generic,
             sources_involved=sorted(dict.fromkeys(sources)), row_ids=rows, detail=detail,
@@ -373,7 +386,8 @@ def _duplications(fused, by_source, chart_rows, as_of, lex, emit_into) -> list[D
                         sources_involved=[source],
                         row_ids=[s.row_id for s in both_g] + [s.row_id for s in both_h],
                         detail={"overlaps_with": h, "shared": sorted(mine & ingredients[h]),
-                                "listed_together_in": source},
+                                "listed_together_in": source, "atc": med.atc,
+                                "atc_class": _atc_class(med.atc)},
                         high_risk_class=high_risk_class(med.atc, lex),
                         severity="high" if high_risk_class(med.atc, lex) else "medium",
                         tasks=[TASKS[DiscrepancyType.DUPLICATION].format(g=g)],
