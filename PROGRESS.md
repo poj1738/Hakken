@@ -131,10 +131,17 @@ python3 scripts/register_sources.py --refresh      # creates and drops nothing
 ## Waiting on Arpon (blocks nothing else, but these are decisions only he can make)
 
 1. ~~Go-ahead to apply the registration.~~ **Done 24 Oct — live and verified.**
-2. **Two ATC/APINCHS calls** (`data/reference/atc_crosscheck.csv`): **sotalol** —
-   DATA_SPEC `C07AA07` (not APINCHS) vs PBS `C01BD` (**Ext**, i.e. high-risk); and
-   **paracetamol/codeine** — DATA_SPEC `N02AJ06` (**N**) vs PBS `N02BE01` (loses the
-   codeine). DATA_SPEC wins in the build; nothing was applied silently.
+2. **One ATC/APINCHS call** (`data/reference/atc_crosscheck.csv`, now 6 rows):
+   **sotalol** — DATA_SPEC `C07AA07` (not APINCHS) vs PBS `C01BD` (**Ext**, i.e.
+   high-risk). DATA_SPEC wins in the build; nothing was applied silently. The
+   extended class III row in `apinchs_atc.csv` is labelled `Ext` and carries its
+   provenance (WA APINCHS 2015 poster only; absent from core ACSQHC), so core and
+   extended can be reported separately.
+
+   ~~paracetamol/codeine — PBS `N02BE01` loses the codeine~~ — **withdrawn, that was
+   my bug, not a PBS disagreement.** Combination products were matching a plain
+   component's real code (fixed in `a997f03`); the crosscheck fell from 35
+   disagreements to 6 and this one disappeared with it.
 3. **DATA_SPEC §4.2 bundle 6** anchor shares sum to **0.95**, not 1.00.
 4. **Four formulation-trap drugs have only one form in §4.2** (metoprolol, gliclazide,
    venlafaxine, tamsulosin), so no IR/MR pair can be planted for them.
