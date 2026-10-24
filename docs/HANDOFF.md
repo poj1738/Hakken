@@ -27,6 +27,52 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 12:30 AEDT · Arpon · arpon/population (green — supersedes the entry below)
+
+**Did:** The entry below is resolved. Then applied the consultant's review of the
+detector (briefs 11–14), restored the population to 200, refreshed Zetaris and
+reviewed Arnav's schema. Every test green, secret scan clean.
+
+**Held-out (200 patients): precision 0.95, recall 0.95, F1 0.95, high-risk 35/37.**
+The full table and what changed per brief are in `docs/DECISIONS.md` (25 Oct,
+"Consultant rulings…"). Three things matter most:
+- `dose_unconfirmable` is now a finding only on visible conflict. Routine dose
+  confirmation is the `safety.forced_confirm` task lane.
+- A lapse alone is a `conflict: confirm` item, never an asserted commission.
+- **DATA_SPEC's 100% high-risk recall is not met on held-out.** The two missed
+  commissions are recorded, not tuned against.
+
+**The two red tests** were sample-sensitive, not regressions. Each now tests its
+real property exactly, with no floor lowered:
+- 82 of 82 resolvable patient descriptions resolved.
+- The blank-IHI format check now looks across all fixtures.
+- The population-level free-text figure (0.847) moved to the scorecard.
+
+**Zetaris is current at 200 patients and no slower**: Q1–Q3 run in 2–3 s,
+`all_sources` holds 13,856 rows, the fixture diffs match, and Q0 is identical
+(1,326 rows).
+
+**Schema review for Arnav:** posted on #12. **Two additions are needed**:
+- `Finding` needs `detail` / `atc_class` — without it `POST /feedback` cannot key
+  learned acceptance, and the UI cannot show `conflict: confirm` or an
+  unverified-BPMH flag.
+- `FeedbackRequest` needs `source` + `attribute` so `source_outdated` can lower
+  the right trust record.
+
+**Changed shared files:** none. `safety.DOSE_CHANGES_WITHOUT_A_SCRIPT` and the
+`trust` priors changed value, not shape.
+
+**Broken:** nothing.
+
+**Needs from teammates:** **Arnav** — the two schema additions; emit
+`forced_confirm` tasks for every current warfarin, insulin, prednisolone and
+methotrexate (the consultant's separate lane); the fixtures changed again at 200
+patients.
+
+**Next:** merge this; then back to whatever helps the agent layer most.
+
+---
+
 ### 2026-10-25 10:40 AEDT · Arpon · arpon/population (NOT merged — 2 tests red)
 
 **Did:** PR #14 merged (domain pack complete). Then raised the population to
