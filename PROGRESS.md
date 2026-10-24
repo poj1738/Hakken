@@ -3,13 +3,18 @@
 One file, current state only. Overwrite it as things change — the history lives in
 `docs/HANDOFF.md` and in git. Read this first at session start.
 
-**Last updated:** 2026-10-25 01:20 AEDT by Arpon
+**Last updated:** 2026-10-25 02:10 AEDT by Arpon
 
 ## Status
 
 **The track is decided: MedTrace**, medication reconciliation across four siloed
 systems. Roles, contracts and today's hour-by-hour plan are in
 `docs/PLAN_2026-10-24.md` — read it before starting work.
+
+**Everything below is on `main` as of 25 Oct.** PRs #6 → #7 → #8 → #9 merged in
+order, CI green on `main`, **no open PRs**. `git pull origin main` before you start:
+Arpon's four-branch stack landed in one go, so a branch cut before 25 Oct is well
+behind.
 
 Phase 1 is complete. Of the MedTrace build, the domain-pack contract exists and is
 frozen; nothing downstream of it is built yet.
