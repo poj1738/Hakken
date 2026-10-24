@@ -268,7 +268,7 @@ ROUTE_CODES = {"po": "PO", "oral": "PO", "by mouth": "PO", "sl": "SL",
 FORM_ROUTES = (("inhaler", "INH"), ("patch", "TD"), ("tablet", "PO"), ("capsule", "PO"))
 
 
-def canonical_route(text: str | None) -> str | None:
+def _canonical_route(text: str | None) -> str | None:
     """A route code (`PO`, `SL`, `INH` ...), or `None` when the text does not say.
 
     The pharmacy silo has no route column: what arrives in `route_text` is the
@@ -433,7 +433,7 @@ def normalise_med(row: SourceRow, lex: Lexicon) -> MedStatement:
         ingredients=ingredients,
         atc=atc,
         release=release,  # type: ignore[arg-type]
-        route=canonical_route(row.route_text),
+        route=_canonical_route(row.route_text),
         daily_dose_mg=daily,
         frequency=(row.freq_text or None),
         prn=prn,

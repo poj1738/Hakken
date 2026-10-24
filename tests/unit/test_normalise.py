@@ -14,7 +14,7 @@ from datetime import date
 import pytest
 
 from app.domain.packs.medtrace.normalise import (
-    canonical_route,
+    _canonical_route,
     llm_candidates,
     normalise_med,
     parse_frequency,
@@ -378,7 +378,7 @@ def test_a_product_level_code_does_pin_the_release(lex) -> None:
 def test_canonical_route(text, expected) -> None:
     """The pharmacy silo has no route column; `route_text` is the dosage form.
     Raw, it disagreed with the EMR's "PO" on nearly every medicine."""
-    assert canonical_route(text) == expected
+    assert _canonical_route(text) == expected
 
 
 def test_a_named_mr_product_outranks_a_plain_form_word(lex) -> None:
