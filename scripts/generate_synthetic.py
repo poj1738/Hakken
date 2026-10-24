@@ -423,6 +423,7 @@ class Patient:
         assert isinstance(target, int)
         self.meds: list[Med] = [Med(p, rng) for p in choose_medicines(rng, bundles, self.sex, target)]
         self.otc: list[Med] = []
+        self.overlay_from: Patient | None = None
 
     def induce_duplication(self, rng: random.Random, products: list[Product]) -> None:
         """Deliberately create an ingredient overlap, at DATA_SPEC 5.2's rate.
@@ -668,6 +669,18 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
                     repeats_left=str(rng.randint(0, 5)),
                     script_type="private" if med.private else "PBS",
                     prescriber=f"Dr {rng.choice('ABCDEFGH')}. {rng.choice(SURNAMES)}-SYN"))
+        # Overlay (DATA_SPEC 7): another person's dispensings under this customer
+        # number. Linking this record correctly STILL yields a wrong medication
+        # list, which is the whole point of surfacing it rather than resolving it.
+        if p.overlay_from is not None:
+            for med in p.overlay_from.meds[:3]:
+                day = med.dispensings[-1] if med.dispensings else AS_OF
+                rows.add("pharmacy", dict(
+                    ph_base, dispensed_on=iso(day),
+                    pbs_code=code_for(med, "pbs_code"), brand=med.brand or med.generic,
+                    strength=med.strength, form=med.form, qty=str(med.pack_qty),
+                    days_supply=str(med.days_supply), repeats_left="0", script_type="PBS",
+                    prescriber=f"Dr {rng.choice('ABCDEFGH')}. {rng.choice(SURNAMES)}-SYN"))
         if p.second_pharmacy:
             notices.append({"type": "possible_second_pharmacy", "source": "pharmacy",
                             "detail": "dispensing split across two pharmacies, one exposed"})
@@ -732,6 +745,74 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
                        "shared": sorted(set(overlap[0].ingredients) & set(med.ingredients))},
                       "likely_unintentional")
     return planted, notices, corruptions
+
+
+def apply_identity_traps(patients: list[Patient], split: dict[str, list[str]],
+                         rng: random.Random) -> dict[str, list[dict[str, object]]]:
+    """DATA_SPEC 7's deliberate linkage traps. Applied after building, before rendering.
+
+    These exist to make the **false-merge rate** measurable, and a false merge is
+    the worst thing this system can do: two patients' medicines blended into one
+    list. Without decoys, Q1 returns only the patient's own records, every link
+    is trivially correct, and a reported false-merge rate of zero means nothing.
+
+    Trap families stay **inside one split**, so a pair cannot leak tuning
+    information into held-out.
+
+      lookalike_pair  3 per split. Same given name, surname and DOB; different
+                      person, different IHI. The arithmetic cannot separate
+                      them -- only a distinguishing field, or a human, can.
+      twins           1 per split. Same surname, DOB and postcode, different
+                      given names. Harder in one way: the names genuinely
+                      differ, so a nickname match must not bridge them.
+      overlay         1 per split. One pharmacy customer number holds some of
+                      another person's dispensings, so linking the record
+                      correctly still yields a wrong medication list.
+
+    Returns `{patient_key: [trap, ...]}` for the ground truth. Every trap is
+    `should_link: False`; any merge across one counts toward false-merge rate.
+    """
+    by_key = {p.key: p for p in patients}
+    traps: dict[str, list[dict[str, object]]] = collections.defaultdict(list)
+
+    def pair(kind: str, a: Patient, b: Patient, split_name: str, detail: str = "") -> None:
+        for key, other in ((a.key, b), (b.key, a)):
+            entry: dict[str, object] = {"kind": kind, "other_patient_key": other.key,
+                                        "should_link": False, "split": split_name}
+            if detail:
+                entry["detail"] = detail
+            traps[key].append(entry)
+
+    for split_name, keys in split.items():
+        pool = [by_key[k] for k in keys]
+        if len(pool) < 10:
+            continue
+        chosen = rng.sample(pool, 10)
+
+        for i in range(3):
+            a, b = chosen[2 * i], chosen[2 * i + 1]
+            b.given_name, b.family_name = a.given_name, a.family_name
+            b.previous_surname = ""
+            b.dob = a.dob
+            b.nicknames = list(a.nicknames)
+            pair("lookalike_pair", a, b, split_name)
+
+        a, b = chosen[6], chosen[7]
+        b.family_name = a.family_name
+        b.dob = a.dob
+        b.postcode = a.postcode
+        b.old_postcode = ""
+        if b.given_name == a.given_name:
+            b.given_name = "Edith" if a.given_name != "Edith" else "Edna"
+            b.nicknames = []
+        pair("twins", a, b, split_name)
+
+        host, donor = chosen[8], chosen[9]
+        if host.present["pharmacy"] and donor.meds:
+            host.overlay_from = donor
+            pair("overlay", host, donor, split_name,
+                 "one pharmacy customer number mixes two people")
+    return dict(traps)
 
 
 def resolve_row_ids(patient: Patient, rows: Rows, planted: list[dict[str, object]]) -> None:
@@ -922,10 +1003,10 @@ def main() -> int:
     patients: list[Patient] = []
     gt_patients: list[dict[str, object]] = []
 
+    # Phase 1: build every patient. One stream per patient, derived from the
+    # master seed, so adding a patient cannot change an earlier one's draws --
+    # that is what keeps the tune/held-out split stable as the population grows.
     for index in range(1, args.patients + 1):
-        # One stream per patient, derived from the master seed. Adding a patient
-        # cannot change an earlier patient's draws, which is what makes the
-        # tune/held-out split stable as the population grows.
         rng = random.Random(args.seed * 100003 + index)
         p = Patient(index, rng, bundles, nicknames)
         p.induce_duplication(rng, products)
@@ -935,6 +1016,19 @@ def main() -> int:
         if otc_products and rng.random() < PATIENT_ONLY_RATE:
             for product in rng.sample(otc_products, min(len(otc_products), 1 + int(rng.random() * 2))):
                 p.otc.append(Med(product, rng))
+        patients.append(p)
+
+    half = args.patients // 2
+    split = {"tune": [p.key for p in patients[:half]],
+             "heldout": [p.key for p in patients[half:]]}
+
+    # Phase 2: identity traps. These pair patients together, so they cannot be
+    # applied while building them one at a time.
+    traps = apply_identity_traps(patients, split, random.Random(args.seed + 7919))
+
+    # Phase 3: render every patient into the four silos.
+    for p in patients:
+        rng = p.rng
         planted, notices, corruptions = render(p, rows, codes, rng)
         resolve_row_ids(p, rows, planted)
         # A planted finding with no citable row cannot be matched by DATA_SPEC
@@ -944,7 +1038,6 @@ def main() -> int:
         uncitable = [f for f in planted if not f["row_ids"]]
         dropped.extend(f"{p.key}:{f['type']}:{f['generic']}" for f in uncitable)
         planted = [f for f in planted if f["row_ids"]]
-        patients.append(p)
         gt_patients.append({
             "patient_key": p.key,
             "true_links": {s: [p.ids[s]] for s in SOURCES if p.present[s]},
@@ -956,17 +1049,13 @@ def main() -> int:
                 "prior_discharge": p.prior_discharge,
             },
             "corruptions": corruptions,
-            "identity_traps": [],
+            "identity_traps": traps.get(p.key, []),
             "timeline": [{"generic": m.generic, "start": iso(m.start), "stop": iso(m.stop) or None,
                           "true_daily_dose_mg": m.true_daily_dose_mg,
                           "changed_by_phone": m.changed_by_phone} for m in p.meds],
             "planted": planted,
             "notices": notices,
         })
-
-    half = args.patients // 2
-    split = {"tune": [p.key for p in patients[:half]],
-             "heldout": [p.key for p in patients[half:]]}
 
     # -- write silos --------------------------------------------------------
     (OUT / "silos").mkdir(parents=True, exist_ok=True)

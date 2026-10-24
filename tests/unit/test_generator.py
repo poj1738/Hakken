@@ -264,3 +264,105 @@ def test_q1_returns_at_least_the_patients_own_emr_rows(ground_truth: dict) -> No
         returned = {row[idx] for row in doc["data"]}
         for source, ids in patient["true_links"].items():
             assert set(ids) <= returned, f"{key}: Q1 missed the {source} record"
+
+
+# --------------------------------------------------------------------------- #
+# Identity traps (DATA_SPEC 7)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.fixture(scope="module")
+def traps(ground_truth: dict) -> list[tuple[str, dict]]:
+    return [(p["patient_key"], t) for p in ground_truth["patients"] for t in p["identity_traps"]]
+
+
+def test_all_three_trap_kinds_are_planted(traps) -> None:
+    """Without decoys, Q1 returns only the patient's own records, every link is
+    trivially correct, and a reported false-merge rate of zero means nothing."""
+    kinds = collections.Counter(t["kind"] for _k, t in traps)
+    assert kinds["lookalike_pair"] == 12, "3 pairs x 2 splits x 2 entries"
+    assert kinds["twins"] == 4, "1 pair x 2 splits x 2 entries"
+    assert kinds["overlay"] >= 2
+
+
+def test_no_trap_crosses_the_split(ground_truth: dict, traps) -> None:
+    """A trap family spanning tune and held-out would leak tuning information."""
+    side = {p["patient_key"]: ("tune" if p["patient_key"] in ground_truth["split"]["tune"]
+                               else "heldout") for p in ground_truth["patients"]}
+    for key, trap in traps:
+        assert side[key] == side[trap["other_patient_key"]], (key, trap)
+
+
+def test_every_trap_is_marked_should_not_link(traps) -> None:
+    """Any merge across a trap counts toward false-merge rate, whose target is 0."""
+    assert traps
+    for _key, trap in traps:
+        assert trap["should_link"] is False
+
+
+def test_traps_are_symmetric(traps) -> None:
+    """Both halves of a pair must record it, or scoring depends on which patient
+    the run happened to start from."""
+    pairs = {(k, t["other_patient_key"], t["kind"]) for k, t in traps}
+    for key, other, kind in pairs:
+        assert (other, key, kind) in pairs, (key, other, kind)
+
+
+def test_a_lookalike_decoy_actually_reaches_q1(ground_truth: dict) -> None:
+    """The point of the trap: the decoy must come back from the blocking query.
+
+    A decoy Q1 never returns is not a trap -- the linker is never asked to
+    reject it, and the false-merge rate it produces is meaningless.
+    """
+    by_key = {p["patient_key"]: p for p in ground_truth["patients"]}
+    checked = 0
+    for path in sorted(FIXTURES.glob("Q1__*.json")):
+        patient = by_key[path.stem.split("__")[1]]
+        lookalikes = [t for t in patient["identity_traps"] if t["kind"] == "lookalike_pair"]
+        if not lookalikes:
+            continue
+        doc = json.loads(path.read_text())
+        idx = doc["headers"].index("source_patient_id")
+        returned = {row[idx] for row in doc["data"]}
+        decoys = {v for t in lookalikes
+                  for ids in by_key[t["other_patient_key"]]["true_links"].values()
+                  for v in ids}
+        assert returned & decoys, f"{patient['patient_key']}: Q1 returned no decoy"
+        checked += 1
+    assert checked, "no fixture patient carries a lookalike trap"
+
+
+def test_lookalike_pairs_really_do_look_alike(ground_truth: dict, silo_rows) -> None:
+    """Same name and DOB in the EMR, different people, different IHI. If the
+    demographics differ, the linker separates them for free."""
+    by_key = {p["patient_key"]: p for p in ground_truth["patients"]}
+    emr_by_mrn = {r["mrn"]: r for r in silo_rows["emr"]}
+    for patient in ground_truth["patients"]:
+        for trap in patient["identity_traps"]:
+            if trap["kind"] != "lookalike_pair":
+                continue
+            mine = patient["true_links"].get("emr", [])
+            theirs = by_key[trap["other_patient_key"]]["true_links"].get("emr", [])
+            if not (mine and theirs):
+                continue
+            a, b = emr_by_mrn.get(mine[0]), emr_by_mrn.get(theirs[0])
+            if not (a and b):
+                continue
+            assert (a["given_name"], a["family_name"], a["dob"]) == \
+                   (b["given_name"], b["family_name"], b["dob"])
+            assert a["mrn"] != b["mrn"]
+            if a["ihi_syn"] and b["ihi_syn"]:
+                assert a["ihi_syn"] != b["ihi_syn"], "two people must not share an IHI"
+
+
+def test_an_overlay_puts_another_persons_dispensing_under_one_customer(
+        ground_truth: dict, silo_rows) -> None:
+    """Linking an overlaid record correctly still yields a wrong medication list,
+    which is why it is surfaced rather than resolved."""
+    hosts = [p for p in ground_truth["patients"]
+             if any(t["kind"] == "overlay" for t in p["identity_traps"])]
+    assert hosts
+    counts = collections.Counter(r["cust_no"] for r in silo_rows["pharmacy"])
+    for patient in hosts:
+        for cust in patient["true_links"].get("pharmacy", []):
+            assert counts[cust] > 0

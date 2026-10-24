@@ -108,7 +108,15 @@
     "prior_discharge": false
    },
    "corruptions": [],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "overlay",
+     "other_patient_key": "P0003",
+     "should_link": false,
+     "split": "tune",
+     "detail": "one pharmacy customer number mixes two people"
+    }
+   ],
    "timeline": [
     {
      "generic": "perindopril/indapamide",
@@ -233,7 +241,7 @@
      "type": "patient_only_item",
      "generic": "fish oil",
      "row_ids": [
-      "PAT-000008"
+      "PAT-000010"
      ],
      "detail": "OTC or complementary"
     },
@@ -241,7 +249,7 @@
      "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000009"
+      "PAT-000011"
      ],
      "detail": "OTC or complementary"
     }
@@ -274,7 +282,14 @@
     "prior_discharge": false
    },
    "corruptions": [],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "lookalike_pair",
+     "other_patient_key": "P0006",
+     "should_link": false,
+     "split": "tune"
+    }
+   ],
    "timeline": [
     {
      "generic": "amlodipine",
@@ -403,7 +418,7 @@
      ],
      "row_ids": [
       "GP-000019",
-      "PHM-000223"
+      "PHM-000226"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -480,7 +495,15 @@
      "after": "Chis"
     }
    ],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "overlay",
+     "other_patient_key": "P0001",
+     "should_link": false,
+     "split": "tune",
+     "detail": "one pharmacy customer number mixes two people"
+    }
+   ],
    "timeline": [
     {
      "generic": "candesartan",
@@ -584,7 +607,7 @@
      "type": "patient_only_item",
      "generic": "paracetamol",
      "row_ids": [
-      "PAT-000026"
+      "PAT-000028"
      ],
      "detail": "OTC or complementary"
     },
@@ -592,7 +615,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000027"
+      "PAT-000029"
      ],
      "detail": "OTC or complementary"
     }
@@ -627,11 +650,18 @@
      "operator": "nickname",
      "source": "gp",
      "field": "given",
-     "before": "Winifred",
-     "after": "Win"
+     "before": "Richard",
+     "after": "Dick"
     }
    ],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "lookalike_pair",
+     "other_patient_key": "P0020",
+     "should_link": false,
+     "split": "tune"
+    }
+   ],
    "timeline": [
     {
      "generic": "levothyroxine",
@@ -715,7 +745,7 @@
      ],
      "row_ids": [
       "GP-000030",
-      "PHM-000387"
+      "PHM-000390"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -733,7 +763,7 @@
      ],
      "row_ids": [
       "GP-000034",
-      "PHM-000428"
+      "PHM-000431"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -751,7 +781,7 @@
      ],
      "row_ids": [
       "GP-000036",
-      "PHM-000462"
+      "PHM-000465"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -769,7 +799,7 @@
      ],
      "row_ids": [
       "GP-000039",
-      "PHM-000493"
+      "PHM-000496"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -861,11 +891,18 @@
      "operator": "nickname",
      "source": "patient",
      "field": "given",
-     "before": "Matthew",
-     "after": "Matt"
+     "before": "Barbara",
+     "after": "Barb"
     }
    ],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "lookalike_pair",
+     "other_patient_key": "P0008",
+     "should_link": false,
+     "split": "tune"
+    }
+   ],
    "timeline": [
     {
      "generic": "irbesartan",
@@ -933,7 +970,7 @@
      "type": "patient_only_item",
      "generic": "magnesium",
      "row_ids": [
-      "PAT-000042"
+      "PAT-000044"
      ],
      "detail": "OTC or complementary"
     },
@@ -941,7 +978,7 @@
      "type": "patient_only_item",
      "generic": "turmeric",
      "row_ids": [
-      "PAT-000043"
+      "PAT-000045"
      ],
      "detail": "OTC or complementary"
     }
@@ -969,7 +1006,14 @@
     "prior_discharge": false
    },
    "corruptions": [],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "lookalike_pair",
+     "other_patient_key": "P0002",
+     "should_link": false,
+     "split": "tune"
+    }
+   ],
    "timeline": [
     {
      "generic": "insulin aspart",
@@ -1199,7 +1243,14 @@
     "prior_discharge": false
    },
    "corruptions": [],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "lookalike_pair",
+     "other_patient_key": "P0005",
+     "should_link": false,
+     "split": "tune"
+    }
+   ],
    "timeline": [
     {
      "generic": "sacubitril/valsartan",
@@ -1297,7 +1348,7 @@
      ],
      "row_ids": [
       "GP-000054",
-      "PHM-000838"
+      "PHM-000841"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -1315,7 +1366,7 @@
      ],
      "row_ids": [
       "GP-000058",
-      "PHM-000877"
+      "PHM-000880"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -1329,7 +1380,7 @@
      "type": "patient_only_item",
      "generic": "fish oil",
      "row_ids": [
-      "PAT-000071"
+      "PAT-000073"
      ],
      "detail": "OTC or complementary"
     }
@@ -1409,7 +1460,7 @@
      ],
      "row_ids": [
       "GP-000066",
-      "PHM-000953"
+      "PHM-000956"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -1541,7 +1592,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000083"
+      "PAT-000085"
      ],
      "detail": "OTC or complementary"
     },
@@ -1549,7 +1600,7 @@
      "type": "patient_only_item",
      "generic": "fish oil",
      "row_ids": [
-      "PAT-000084"
+      "PAT-000086"
      ],
      "detail": "OTC or complementary"
     }
@@ -1580,7 +1631,14 @@
     "prior_discharge": false
    },
    "corruptions": [],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "twins",
+     "other_patient_key": "P0016",
+     "should_link": false,
+     "split": "tune"
+    }
+   ],
    "timeline": [
     {
      "generic": "levothyroxine",
@@ -1855,7 +1913,7 @@
      "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000107"
+      "PAT-000109"
      ],
      "detail": "OTC or complementary"
     },
@@ -1973,7 +2031,7 @@
      "type": "patient_only_item",
      "generic": "paracetamol",
      "row_ids": [
-      "PAT-000113"
+      "PAT-000115"
      ],
      "detail": "OTC or complementary"
     },
@@ -1981,7 +2039,7 @@
      "type": "patient_only_item",
      "generic": "magnesium",
      "row_ids": [
-      "PAT-000114"
+      "PAT-000116"
      ],
      "detail": "OTC or complementary"
     }
@@ -2103,7 +2161,7 @@
      ],
      "row_ids": [
       "GP-000093",
-      "PHM-001398"
+      "PHM-001401"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -2167,7 +2225,14 @@
      "after": "Vincennt"
     }
    ],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "twins",
+     "other_patient_key": "P0011",
+     "should_link": false,
+     "split": "tune"
+    }
+   ],
    "timeline": [
     {
      "generic": "aspirin",
@@ -2514,7 +2579,7 @@
      "type": "patient_only_item",
      "generic": "magnesium",
      "row_ids": [
-      "PAT-000134"
+      "PAT-000136"
      ],
      "detail": "OTC or complementary"
     },
@@ -2522,7 +2587,7 @@
      "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000135"
+      "PAT-000137"
      ],
      "detail": "OTC or complementary"
     }
@@ -2647,7 +2712,7 @@
      "type": "patient_only_item",
      "generic": "fish oil",
      "row_ids": [
-      "PAT-000144"
+      "PAT-000146"
      ],
      "detail": "OTC or complementary"
     }
@@ -2683,7 +2748,14 @@
      "after": "Richie"
     }
    ],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "lookalike_pair",
+     "other_patient_key": "P0004",
+     "should_link": false,
+     "split": "tune"
+    }
+   ],
    "timeline": [
     {
      "generic": "insulin glargine",
@@ -2804,7 +2876,7 @@
      ],
      "row_ids": [
       "GP-000134",
-      "PAT-000145"
+      "PAT-000147"
      ],
      "detail": {
       "mechanism": "dose changed without a new script"
@@ -2823,7 +2895,7 @@
      "type": "patient_only_item",
      "generic": "fish oil",
      "row_ids": [
-      "PAT-000154"
+      "PAT-000156"
      ],
      "detail": "OTC or complementary"
     }
@@ -2862,7 +2934,14 @@
      "after": "Richie"
     }
    ],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "twins",
+     "other_patient_key": "P0039",
+     "should_link": false,
+     "split": "heldout"
+    }
+   ],
    "timeline": [
     {
      "generic": "irbesartan",
@@ -2920,7 +2999,7 @@
      "type": "patient_only_item",
      "generic": "paracetamol",
      "row_ids": [
-      "PAT-000162"
+      "PAT-000164"
      ],
      "detail": "OTC or complementary"
     }
@@ -3034,7 +3113,7 @@
      "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000170"
+      "PAT-000172"
      ],
      "detail": "OTC or complementary"
     },
@@ -3042,7 +3121,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000171"
+      "PAT-000173"
      ],
      "detail": "OTC or complementary"
     }
@@ -3076,7 +3155,14 @@
     "prior_discharge": false
    },
    "corruptions": [],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "lookalike_pair",
+     "other_patient_key": "P0034",
+     "should_link": false,
+     "split": "heldout"
+    }
+   ],
    "timeline": [
     {
      "generic": "perindopril",
@@ -3194,7 +3280,7 @@
      ],
      "row_ids": [
       "GP-000165",
-      "PHM-001962"
+      "PHM-001965"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -3227,7 +3313,7 @@
      "type": "patient_only_item",
      "generic": "paracetamol",
      "row_ids": [
-      "PAT-000181"
+      "PAT-000183"
      ],
      "detail": "OTC or complementary"
     },
@@ -3235,7 +3321,7 @@
      "type": "patient_only_item",
      "generic": "fish oil",
      "row_ids": [
-      "PAT-000182"
+      "PAT-000184"
      ],
      "detail": "OTC or complementary"
     }
@@ -3360,7 +3446,7 @@
      "type": "patient_only_item",
      "generic": "paracetamol",
      "row_ids": [
-      "PAT-000190"
+      "PAT-000192"
      ],
      "detail": "OTC or complementary"
     }
@@ -3519,8 +3605,8 @@
      ],
      "row_ids": [
       "GP-000171",
-      "PHM-002151",
-      "PAT-000192"
+      "PHM-002154",
+      "PAT-000194"
      ],
      "detail": {
       "mechanism": "dose changed without a new script"
@@ -3534,7 +3620,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000200"
+      "PAT-000202"
      ],
      "detail": "OTC or complementary"
     }
@@ -3670,7 +3756,7 @@
      ],
      "row_ids": [
       "GP-000186",
-      "PHM-002336"
+      "PHM-002339"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -3684,7 +3770,7 @@
      "type": "patient_only_item",
      "generic": "magnesium",
      "row_ids": [
-      "PAT-000210"
+      "PAT-000212"
      ],
      "detail": "OTC or complementary"
     },
@@ -3692,7 +3778,7 @@
      "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000211"
+      "PAT-000213"
      ],
      "detail": "OTC or complementary"
     }
@@ -3737,7 +3823,14 @@
      "after": "Ctherine"
     }
    ],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "lookalike_pair",
+     "other_patient_key": "P0035",
+     "should_link": false,
+     "split": "heldout"
+    }
+   ],
    "timeline": [
     {
      "generic": "insulin aspart",
@@ -4032,7 +4125,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000228"
+      "PAT-000230"
      ],
      "detail": "OTC or complementary"
     }
@@ -4063,7 +4156,14 @@
     "prior_discharge": true
    },
    "corruptions": [],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "lookalike_pair",
+     "other_patient_key": "P0032",
+     "should_link": false,
+     "split": "heldout"
+    }
+   ],
    "timeline": [
     {
      "generic": "insulin aspart",
@@ -4128,7 +4228,7 @@
      "type": "patient_only_item",
      "generic": "magnesium",
      "row_ids": [
-      "PAT-000237"
+      "PAT-000239"
      ],
      "detail": "OTC or complementary"
     },
@@ -4136,7 +4236,7 @@
      "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000238"
+      "PAT-000240"
      ],
      "detail": "OTC or complementary"
     }
@@ -4166,8 +4266,24 @@
     "private_script_items": [],
     "prior_discharge": false
    },
-   "corruptions": [],
-   "identity_traps": [],
+   "corruptions": [
+    {
+     "operator": "single_char_typo",
+     "source": "patient",
+     "field": "given",
+     "before": "Lorraine",
+     "after": "Lorrane"
+    }
+   ],
+   "identity_traps": [
+    {
+     "kind": "overlay",
+     "other_patient_key": "P0033",
+     "should_link": false,
+     "split": "heldout",
+     "detail": "one pharmacy customer number mixes two people"
+    }
+   ],
    "timeline": [
     {
      "generic": "ezetimibe/rosuvastatin",
@@ -4396,7 +4512,7 @@
      "type": "patient_only_item",
      "generic": "paracetamol",
      "row_ids": [
-      "PAT-000255"
+      "PAT-000256"
      ],
      "detail": "OTC or complementary"
     }
@@ -4430,11 +4546,18 @@
      "operator": "nickname",
      "source": "patient",
      "field": "given",
-     "before": "Angela",
-     "after": "Angie"
+     "before": "Joan",
+     "after": "Joanie"
     }
    ],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "lookalike_pair",
+     "other_patient_key": "P0029",
+     "should_link": false,
+     "split": "heldout"
+    }
+   ],
    "timeline": [
     {
      "generic": "insulin aspart",
@@ -4497,7 +4620,7 @@
      "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000263"
+      "PAT-000264"
      ],
      "detail": "OTC or complementary"
     }
@@ -4535,7 +4658,15 @@
      "after": "Gordy"
     }
    ],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "overlay",
+     "other_patient_key": "P0030",
+     "should_link": false,
+     "split": "heldout",
+     "detail": "one pharmacy customer number mixes two people"
+    }
+   ],
    "timeline": [
     {
      "generic": "aspirin",
@@ -4721,7 +4852,14 @@
     "prior_discharge": false
    },
    "corruptions": [],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "lookalike_pair",
+     "other_patient_key": "P0023",
+     "should_link": false,
+     "split": "heldout"
+    }
+   ],
    "timeline": [
     {
      "generic": "rosuvastatin",
@@ -4827,7 +4965,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000269"
+      "PAT-000270"
      ],
      "detail": "OTC or complementary"
     }
@@ -4862,11 +5000,18 @@
      "operator": "nickname",
      "source": "gp",
      "field": "given",
-     "before": "Josephine",
-     "after": "Jo"
+     "before": "Catherine",
+     "after": "Cathy"
     }
    ],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "lookalike_pair",
+     "other_patient_key": "P0027",
+     "should_link": false,
+     "split": "heldout"
+    }
+   ],
    "timeline": [
     {
      "generic": "rosuvastatin",
@@ -5087,7 +5232,7 @@
      "type": "patient_only_item",
      "generic": "magnesium",
      "row_ids": [
-      "PAT-000286"
+      "PAT-000287"
      ],
      "detail": "OTC or complementary"
     }
@@ -5388,7 +5533,7 @@
      "type": "patient_only_item",
      "generic": "turmeric",
      "row_ids": [
-      "PAT-000306"
+      "PAT-000307"
      ],
      "detail": "OTC or complementary"
     }
@@ -5419,7 +5564,14 @@
     "prior_discharge": false
    },
    "corruptions": [],
-   "identity_traps": [],
+   "identity_traps": [
+    {
+     "kind": "twins",
+     "other_patient_key": "P0021",
+     "should_link": false,
+     "split": "heldout"
+    }
+   ],
    "timeline": [
     {
      "generic": "rosuvastatin",
@@ -5588,8 +5740,8 @@
      ],
      "row_ids": [
       "GP-000299",
-      "PHM-003750",
-      "PAT-000315"
+      "PHM-003756",
+      "PAT-000316"
      ],
      "detail": {
       "mechanism": "dose changed without a new script"
@@ -5720,7 +5872,7 @@
      "type": "patient_only_item",
      "generic": "magnesium",
      "row_ids": [
-      "PAT-000323"
+      "PAT-000324"
      ],
      "detail": "OTC or complementary"
     }
