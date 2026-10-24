@@ -101,7 +101,21 @@ must stop saying MedTrace produces a BPMH. A BPMH requires a clinician; ours is 
 pre-populated medication history for clinician verification". That is the same claim
 the human-review gate makes in the product, so the pitch and the code now agree.
 
-**Changed shared files:** none of the listed ones. But `datasvc/main.py`,
+**Changed shared files:** **`CLAUDE.md` and the `Makefile`** — both on the
+say-it-twice list.
+
+- `CLAUDE.md`: two facts under Zetaris (a REST table infers its schema once at
+  creation and a view pins its SELECT list the same way, `REFRESH TABLE` re-inferring
+  neither; and `CACHE TABLE` on a cached table being a no-op), plus a working-agreement
+  line that the gitignored data directories are yours to build and that **no test may
+  write into the repo**.
+- `Makefile`: `make register` was **broken** — it passed `--dry-run`, which is not a
+  flag, so it exited 2 every time. The script is dry-run by default. Added
+  `make refresh` and `make verify`, and `make synth` now prints the follow-up step.
+- `docs/ONBOARDING.md` gained a "Build the data" section; there wasn't one, which is
+  why this keeps catching people.
+
+Also `datasvc/main.py`,
 `scripts/register_sources.py` and `scripts/generate_synthetic.py` all changed
 behaviour — see the two flags above if you touch Zetaris.
 

@@ -40,9 +40,18 @@ lexicon: ## Rebuild only the lexicon, from the committed hand-built sources
 
 synth: ## Regenerate the synthetic silos, ground truth and fixtures
 	$(VENV_PY) scripts/generate_synthetic.py
+	@echo
+	@echo "data/synthetic/silos/ is gitignored and NOTHING ELSE creates it."
+	@echo "If Zetaris is registered, follow this with:  make refresh"
 
-register: ## Register the synthetic silos in Zetaris (dry-run first)
-	$(VENV_PY) scripts/register_sources.py --dry-run
+register: ## Show the Zetaris registration statements (dry run, sends nothing)
+	$(VENV_PY) scripts/register_sources.py
+
+refresh: ## Re-cache the Zetaris tables after `make synth` (creates/drops nothing)
+	$(VENV_PY) scripts/register_sources.py --refresh
+
+verify: ## Check the live Zetaris views against the files and the committed fixtures
+	$(VENV_PY) scripts/register_sources.py --verify-only
 
 examples: ## Regenerate output_examples/ from real runs
 	$(VENV_PY) scripts/generate_examples.py
@@ -50,4 +59,4 @@ examples: ## Regenerate output_examples/ from real runs
 validate: ## Reproduce the disqualification checklist end to end
 	bash scripts/validate_submission.sh
 
-.PHONY: help setup preflight test conformance scan data lexicon synth run serve register examples validate
+.PHONY: help setup preflight test conformance scan data lexicon synth run serve register refresh verify examples validate
