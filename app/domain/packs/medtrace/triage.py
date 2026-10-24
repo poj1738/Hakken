@@ -14,6 +14,30 @@ from __future__ import annotations
 
 from app.domain.packs.medtrace.types import DiscrepancyCandidate
 
+#: APINCHS classes from the ACSQHC core list (A, P, I, N, C, H, and S where a
+#: lexicon carries it). These carry the absolute floor.
+CORE_APINCHS = frozenset({"A", "P", "I", "N", "C", "H", "S"})
+
+#: How much more a finding matters because of what the medicine is.
+CLASS_RISK: dict[str, float] = {"core": 3.0, "Ext": 2.0, "steroid_taper_ext": 1.5}
+
+#: How much more it matters because of what kind of finding it is.
+SEVERITY_WEIGHT = {"high": 3.0, "medium": 2.0, "low": 1.0}
+
+#: The "must review" line. Anything at or above it is shown expanded, first.
+#: The highest a non-high-risk finding can score is 1 x 3 x 1 x 1 = 3, so a
+#: floor of 4 puts every core APINCHS item above every other finding,
+#: whatever the learned acceptance says.
+MUST_REVIEW_FLOOR = 4.0
+
+#: A documented reason ("withheld: AKI") halves the priority: collapsed in the
+#: UI with its reason, never hidden -- the reason can still be the mistake.
+DOCUMENTED_INTENT_FACTOR = 0.5
+
+#: Learned acceptance is clamped here, so no type can be learned into
+#: invisibility -- a rate of zero would multiply a finding off the list.
+MIN_ACCEPTANCE = 0.05
+
 #: Differences that are **never** findings (PLAN 2.6).
 #:
 #: - `brand_only` -- Lipitor and atorvastatin are the same medicine. Flagging it
@@ -132,5 +156,43 @@ def prioritise(
     Sets `priority` in place and returns the sorted list. Items whose type is in
     `SUPPRESS` are dropped here if anything upstream produced them, so the
     suppression rule holds even if a detector regresses.
+
+    Concretely:
+
+    - `class_risk` -- 3 for core APINCHS, 2 for an extension (`Ext`), 1.5 for
+      the prednisolone taper, 1 otherwise.
+    - `type_severity` -- high 3, medium 2, low 1.
+    - `evidence_strength` -- 0.6 plus 0.2 per independent pre-admission source
+      behind it, capped at 1. A finding the GP, the pharmacy and the patient all
+      point at outranks one resting on a single source.
+    - `acceptance` -- looked up as `(type, detail["atc_class"])`, then `(type,
+      "")`, default 1, clamped to at least `MIN_ACCEPTANCE`.
+    - `documented_intentional` halves it.
+    - **Core APINCHS is floored at `MUST_REVIEW_FLOOR`**, after everything
+      else, so no amount of learned dismissal ranks a warfarin finding below a
+      non-high-risk one.
+
+    Ties break on generic then type, so the order is deterministic.
     """
-    raise NotImplementedError("Arpon: triage.py")
+    kept: list[DiscrepancyCandidate] = []
+    for cand in cands:
+        if cand.type.value in SUPPRESS or cand.detail.get("suppressed_as") in SUPPRESS:
+            continue
+        risk_class = cand.high_risk_class
+        core = risk_class in CORE_APINCHS
+        class_risk = CLASS_RISK["core"] if core else CLASS_RISK.get(risk_class or "", 1.0)
+        severity = SEVERITY_WEIGHT.get(cand.severity, 1.0)
+        independent = {s for s in cand.sources_involved if s != "emr"}
+        evidence = min(1.0, 0.6 + 0.2 * len(independent))
+        key = cand.type.value
+        rate = acceptance.get((key, str(cand.detail.get("atc_class") or "")),
+                              acceptance.get((key, ""), 1.0))
+        rate = min(1.0, max(MIN_ACCEPTANCE, rate))
+        priority = class_risk * severity * evidence * rate
+        if cand.intent_status == "documented_intentional":
+            priority *= DOCUMENTED_INTENT_FACTOR
+        if core:
+            priority = max(priority, MUST_REVIEW_FLOOR)
+        cand.priority = round(priority, 4)
+        kept.append(cand)
+    return sorted(kept, key=lambda c: (-c.priority, c.generic, c.type.value))

@@ -96,6 +96,9 @@ IMPLEMENTED: set[tuple[str, str]] = {
     ("normalise", "parse_release"),
     ("supply", "supply_status"),
     ("supply", "pdc"),
+    ("fuse", "fuse"),
+    ("detect", "detect_discrepancies"),
+    ("triage", "prioritise"),
 }
 
 #: `(module, function) -> the exact signature`, with the quotes that

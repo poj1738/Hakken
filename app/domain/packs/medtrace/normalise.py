@@ -37,10 +37,18 @@ SALTS = (
     "benzoate", "dihydrate", "monohydrate", "anhydrous", "hcl",
 )
 
-#: Markers that mean modified release, in the words our silos actually use.
+#: Phrases that mean modified release. Matched as substrings: they are long
+#: enough that a substring hit is never a coincidence.
 MR_MARKERS = ("modified release", "controlled release", "controlled delivery",
-              "sustained release", "extended release", " mr", " cr", " sr", " xr",
-              " xl", " cd", "-xl", "-xr", " la")
+              "sustained release", "extended release")
+
+#: Short suffixes that mean modified release ("Efexor-XR", "Diamicron MR",
+#: "Cardizem CD", "Inderal LA"). Matched as **whole words only**. As bare
+#: substrings they matched the start of ordinary names: " cr" made **Crestor**
+#: modified release, and " la" would have done the same to lansoprazole, Lasix,
+#: lamotrigine and lactulose -- so rosuvastatin, which has no MR form in
+#: Australia, was being reported as MR and set up a false formulation finding.
+MR_SUFFIXES = re.compile(r"\b(mr|cr|sr|xr|xl|cd|la)\b")
 
 #: `pattern -> doses per day`. Covers the enum forms (DATA_SPEC 2.1) and the
 #: free text the GP and patient silos emit. Longest patterns first, so "twice a
@@ -186,11 +194,99 @@ def parse_release(*texts: str | None) -> str:
     stripping safe for metoprolol -- see `SALTS`.
     """
     blob = " " + " ".join(normalise_text(t) for t in texts if t) + " "
-    if any(marker in blob for marker in MR_MARKERS):
+    if any(marker in blob for marker in MR_MARKERS) or MR_SUFFIXES.search(blob):
         return "MR"
     if any(word in blob for word in ("tablet", "capsule", "immediate release")):
         return "IR"
     return "unknown"
+
+
+#: id(lex) -> (lex, generic -> the releases its products come in). Holding the
+#: Lexicon itself means the id cannot be reused by a different object.
+_RELEASES: dict[int, tuple[Lexicon, dict[str, frozenset[str]]]] = {}
+
+
+def _releases_for(generic: str | None, lex: Lexicon) -> frozenset[str]:
+    cached = _RELEASES.get(id(lex))
+    if cached is None or cached[0] is not lex:
+        table: dict[str, set[str]] = {}
+        for entry in lex.entries:
+            if entry.generic and entry.release in ("IR", "MR"):
+                table.setdefault(entry.generic, set()).add(entry.release)
+        cached = (lex, {g: frozenset(r) for g, r in table.items()})
+        _RELEASES[id(lex)] = cached
+    return cached[1].get(generic or "", frozenset())
+
+
+def _pins_product(row: SourceRow, entry: object) -> bool:
+    """Did this row identify one specific product, rather than just a medicine?
+
+    A PBS item code or an AMT MPP/TPP code names one product; so does its brand
+    written in the text. An AMT **MP** code or a bare generic name does not --
+    the MP code is shared by every product of that medicine.
+    """
+    code = (row.med_code or "").strip()
+    if code and code in {getattr(entry, k, None) for k in ("pbs_code", "amt_mpp", "amt_tpp")}:
+        return True
+    brand = normalise_text(getattr(entry, "brand", None))
+    generic = normalise_text(getattr(entry, "generic", None))
+    return bool(brand) and brand != generic and brand in normalise_text(row.med_text)
+
+
+def _release_from_lexicon(row: SourceRow, entry: object, lex: Lexicon) -> str:
+    """The lexicon's release, but only when it actually knows.
+
+    `by_amt_code` is filled with `setdefault`, so an AMT MP code -- shared by
+    every product of a medicine -- resolves to whichever product was loaded
+    first. Taking *that* product's release invented a formulation: the EMR's
+    plain "metformin" came out IR while the GP and pharmacy, which name Diabex
+    XR, said MR, which is a formulation discrepancy that does not exist.
+
+    So the lexicon may supply release only if the row pinned one product, or if
+    every product of that medicine has the same release (rosuvastatin is IR
+    whatever brand). Six medicines in the lexicon come in both, and for those an
+    unspecified release stays `unknown`.
+    """
+    if _pins_product(row, entry):
+        own = getattr(entry, "release", "unknown")
+        if own in ("IR", "MR"):
+            return own
+        return parse_release(getattr(entry, "form", None))
+    releases = _releases_for(getattr(entry, "generic", None), lex)
+    return next(iter(releases)) if len(releases) == 1 else "unknown"
+
+
+#: Route codes the EMR writes, and their spoken forms.
+ROUTE_CODES = {"po": "PO", "oral": "PO", "by mouth": "PO", "sl": "SL",
+               "sublingual": "SL", "iv": "IV", "intravenous": "IV", "sc": "SC",
+               "subcut": "SC", "subcutaneous": "SC", "im": "IM", "intramuscular": "IM",
+               "inh": "INH", "inhaled": "INH", "neb": "INH", "top": "TOP",
+               "topical": "TOP", "td": "TD", "transdermal": "TD", "pr": "PR"}
+
+#: Dose forms that imply exactly one route. Anything else -- "injection" could be
+#: SC, IM or IV; "spray" could be sublingual or nasal -- implies nothing.
+FORM_ROUTES = (("inhaler", "INH"), ("patch", "TD"), ("tablet", "PO"), ("capsule", "PO"))
+
+
+def _canonical_route(text: str | None) -> str | None:
+    """A route code (`PO`, `SL`, `INH` ...), or `None` when the text does not say.
+
+    The pharmacy silo has no route column: what arrives in `route_text` is the
+    dosage form ("tablet", "modified release tablet", "spray"). Passed through
+    raw it disagreed with the EMR's "PO" on nearly every medicine, so fusion saw
+    a route conflict that does not exist. A form that implies one route is
+    mapped to it; an ambiguous one is `None`, which counts as no evidence
+    rather than as a contradiction.
+    """
+    value = normalise_text(text)
+    if not value:
+        return None
+    if value in ROUTE_CODES:
+        return ROUTE_CODES[value]
+    for form, route in FORM_ROUTES:
+        if form in value:
+            return route
+    return None
 
 
 #: Dose forms whose pack size does not imply a daily dose.
@@ -301,11 +397,18 @@ def normalise_med(row: SourceRow, lex: Lexicon) -> MedStatement:
         ingredients = list(entry.ingredients)
         atc = entry.atc_primary
 
-    release = parse_release(row.route_text, row.med_text,
-                            entry.form if entry is not None else None,
-                            entry.release if entry is not None else None)
-    if release == "unknown" and entry is not None and entry.release in ("IR", "MR"):
-        release = entry.release
+    # What this source itself wrote, first. The lexicon only fills a gap, and
+    # only when it can genuinely say -- see _release_from_lexicon.
+    release = parse_release(row.route_text, row.med_text)
+    if (release == "IR" and entry is not None and entry.release == "MR"
+            and _pins_product(row, entry)):
+        # A bare "capsule" or "tablet" is a weak signal; a named product is a
+        # strong one. Cymbalta is a delayed-release capsule, and the pharmacy
+        # silo's form column just says "capsule" -- read alone that made it IR
+        # and contradicted the GP and the EMR.
+        release = "MR"
+    elif release == "unknown" and entry is not None:
+        release = _release_from_lexicon(row, entry, lex)
 
     strength = parse_strength_mg(row.strength_text or row.dose_text)
     per_day, prn = parse_frequency(row.freq_text)
@@ -330,7 +433,7 @@ def normalise_med(row: SourceRow, lex: Lexicon) -> MedStatement:
         ingredients=ingredients,
         atc=atc,
         release=release,  # type: ignore[arg-type]
-        route=(row.route_text or None),
+        route=_canonical_route(row.route_text),
         daily_dose_mg=daily,
         frequency=(row.freq_text or None),
         prn=prn,

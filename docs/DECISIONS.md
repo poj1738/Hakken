@@ -11,6 +11,75 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-25 — How the detector decides what is a finding **[built and scored against ground truth, 25 Oct]**
+
+Six decisions made while implementing `fuse`, `detect` and `triage`. Each was
+forced by a specific failure on real synthetic patients, and four are out with the
+consultant as briefs 11–14 (`docs/RESEARCH_QUESTIONS.md`) — overturn any of them
+there, not by editing the code quietly.
+
+**1. The current admission chart does not vote in the BPMH.** The BPMH is the
+pre-admission history; the chart is what gets reconciled against it (ACSQHC Action
+4.06). With the chart voting, P0002's planted error (chart 2.5 mg, pharmacy 5 mg)
+resolved to 2.5 mg — the chart outweighed a six-week-old dispensing — and the error
+disappeared. The chart stays visible in the grid; older EMR documents (prior
+discharge summaries) are history and do vote. *(Brief 14.)*
+
+**2. Silence counts half, and a commission needs someone to say it stopped.** A
+source that is in scope but never mentions a medicine gets `SILENCE_WEIGHT = 0.5`
+of the weight of one that says it was stopped, and `commission` requires a positive
+assertion — a ceased listing, a patient's "no", a discharge "cease" or a lapsed
+regular supply. Counting silence fully made a current GTN spray a commission:
+outvoted by a patient and pharmacy that had simply never mentioned it. *(Brief 13.)*
+
+**3. PRN medicines: the pharmacy has no say on existence.** A year-old GTN fill does
+not prove current use and no fill does not prove stopping. The PRN signal has to
+come from the chart, GP or patient, because dispensing rows carry no directions.
+
+**4. Frequency vs dose is classified by what changed.** Same strength per unit at a
+different number of doses a day is `frequency` (clopidogrel charted bd instead of
+daily, which doubles the daily dose); anything else is `dose`; an equal total daily
+dose is never a finding (brief 8 §2). This matches the generator and overturns the
+skeleton docstring, which had said "frequency = same daily dose, different split".
+*(Brief 11.)*
+
+**5. `dose_unconfirmable` for every current warfarin, insulin and prednisolone.**
+Agreement between sources that cannot see a phone instruction is not confirmation
+(DATA_SPEC 9.5). Uses `safety.DOSE_CHANGES_WITHOUT_A_SCRIPT` as the single list,
+which includes insulin aspart; the generator plants only glargine, so aspart
+currently scores as a false positive (6 of the 12 across both splits). *(Brief 12.)*
+
+**6. Learned acceptance is keyed `(type, atc_class)`**, where `atc_class` is the
+first 4 characters of the ATC code (e.g. `C09A`), written by `detect` into every
+candidate's `detail["atc_class"]`. Matches `schemas.AcceptanceUpdate`, so the
+ranking and the feedback endpoint read one value. Core APINCHS is floored at
+`triage.MUST_REVIEW_FLOOR`, above anything a non-high-risk finding can score.
+
+**Also decided:**
+- **Identity sends a lookalike's un-identified records to review, not rejection**,
+  even when the patient's own IHI is absent from the cluster. Review never merges,
+  so false merges stay 0; P0008 had lost three findings to rejection.
+- **`eval.py` reports two review modes.** `oracle` simulates a pharmacist confirming
+  exactly the true review-band links (the designed workflow); `none` is the system
+  alone. Both are reported; neither is presented as the other.
+- **Not emitted yet:** `unpropagated_discharge_change` (not planted; the generator
+  only now makes discharge actions coherent) and `identity_uncertain` (review-band
+  rows are not read until confirmed, so nothing can rest on one).
+
+**Scores** (40 patients, `scripts/eval.py`, simulated review):
+
+| split | precision | recall | F1 | high-risk recall |
+|---|---|---|---|---|
+| tune | 0.83 | 1.00 | 0.91 | 8/8 |
+| **held-out** | **0.83** | **0.94** | **0.88** | 2/2 |
+| held-out, no human review | 0.80 | 0.77 | 0.79 | 2/2 |
+
+Held-out is within 0.03 F1 of tune and no change was made by looking at it. The
+Wilson intervals are wide — several types have 1–4 instances per split — which is
+the population-size decision still open (raise `--patients`).
+
+---
+
 ## 2026-10-24 — Research briefs answered, and one of my own bugs manufactured most of a finding **[consultant research + live verification, 24 Oct]**
 
 A consultant worked the five briefs in `docs/RESEARCH_QUESTIONS.md`. Two closed from

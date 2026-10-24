@@ -22,9 +22,16 @@ A row covers several brands and strengths, which can differ in pack size, so
 the modal value across its lexicon entries is used and any row whose entries
 disagree is reported rather than silently flattened.
 
+Values are written **per strength**: a ";"-separated list aligned with the
+row's `strengths`, because one value per product gave every prednisolone
+strength the 200-tablet pack that is right only for 5 mg.
+
 Usage:
     python3 scripts/backfill_packs.py            # report only
     python3 scripts/backfill_packs.py --write
+    python3 scripts/backfill_packs.py --write --hand-set original.csv
+        # recompute every row except those that had an override in
+        # original.csv -- for redoing an earlier backfill
 """
 
 from __future__ import annotations
@@ -43,6 +50,9 @@ LEXICON = pathlib.Path("data/reference/lexicon.json")
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--write", action="store_true", help="write the file (default: report)")
+    ap.add_argument("--hand-set", type=pathlib.Path,
+                    help="a medicines.csv from before any backfill; rows with an override "
+                         "there are kept, every other row is recomputed")
     args = ap.parse_args()
 
     if not LEXICON.exists():
@@ -57,31 +67,47 @@ def main() -> int:
 
     rows = list(csv.DictReader(SRC.open()))
     fields = list(rows[0])
+    hand_set: set[tuple[str, str]] | None = None
+    if args.hand_set:
+        hand_set = {(r["generic"], r["strengths"]) for r in csv.DictReader(args.hand_set.open())
+                    if r["pack_qty_override"]}
     filled = kept = unmatched = 0
     disagreed: list[str] = []
 
     for row in rows:
-        if row["pack_qty_override"]:
+        is_hand_set = ((row["generic"], row["strengths"]) in hand_set) if hand_set is not None \
+            else bool(row["pack_qty_override"])
+        if is_hand_set:
             kept += 1
             continue
-        found = [packs[(row["generic"], brand, strength)]
-                 for brand in row["brands"].split(";")
-                 for strength in row["strengths"].split(";")
-                 if (row["generic"], brand, strength) in packs]
-        if not found:
+        qtys: list[str] = []
+        reps: list[str] = []
+        for strength in row["strengths"].split(";"):
+            found = [packs[(row["generic"], brand, strength)]
+                     for brand in row["brands"].split(";")
+                     if (row["generic"], brand, strength) in packs]
+            if not found:
+                qtys.append("")
+                reps.append("")
+                continue
+            counted = collections.Counter(found)
+            # Most frequent wins; ties go to the LARGER pack. A tie broken by
+            # insertion order would be arbitrary, and the small side is usually
+            # an artefact rather than a real pack: PBS lists the quantity unit as
+            # a pack for some items (escitalopram drops come back as 1) and
+            # injections come back as single ampoules (furosemide as 2 and 5).
+            qty, repeats = max(counted, key=lambda v: (counted[v], int(v[0])))
+            if len(counted) > 1:
+                disagreed.append(f"  {row['generic']:22} {strength:10} chose {qty}/{repeats} "
+                                 f"from {dict(counted)}")
+            qtys.append(qty)
+            reps.append(repeats)
+        if not any(qtys):
             unmatched += 1
             continue
-        counted = collections.Counter(found)
-        # Most frequent wins; ties go to the LARGER pack. A tie broken by
-        # insertion order would be arbitrary, and the small side of these ties
-        # is usually an artefact rather than a real pack: PBS lists the
-        # quantity unit as a pack for some items (escitalopram drops come back
-        # as 1) and injections come back as single ampoules (furosemide as 2
-        # and 5). The oral maintenance pack is the one a reconciliation sees.
-        qty, repeats = max(counted, key=lambda v: (counted[v], int(v[0])))
-        if len(counted) > 1:
-            disagreed.append(f"  {row['generic']:22} chose {qty}/{repeats} from {dict(counted)}")
-        row["pack_qty_override"], row["repeats_override"] = qty, repeats
+        # One value when every strength agrees, so the common case stays readable.
+        row["pack_qty_override"] = qtys[0] if len(set(qtys)) == 1 else ";".join(qtys)
+        row["repeats_override"] = reps[0] if len(set(reps)) == 1 else ";".join(reps)
         filled += 1
 
     print(f"{filled} row(s) filled, {kept} hand-set kept, {unmatched} with no PBS entry")

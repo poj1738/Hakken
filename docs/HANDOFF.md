@@ -27,6 +27,78 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 09:35 AEDT · Arpon · arpon/sunday-logic
+
+**Did:** Finished the clinical domain pack — `fuse`, `detect`, `triage` — and
+`scripts/eval.py`, which scores it end to end against the planted ground truth.
+584 tests green, secret scan clean, Zetaris refreshed and verified.
+
+**Held-out scorecard (the number we report): precision 0.83, recall 0.94, F1 0.88,
+high-risk recall 2/2**, with simulated review of near-miss identity links. With no
+human review at all: F1 0.79. Tune: 0.91. Held-out is within 0.03 of tune and **no
+change was made by looking at it.** Pinned by `tests/eval/test_scorecard.py` (F1
+floors, 100% high-risk recall, ≤4 findings per patient, zero false merges).
+
+**Building against real patients rather than in the abstract found eleven defects
+before they could reach a demo.** In the order they were found:
+
+- **Ground truth:** 9 of 20 planted omissions cited *another patient's* rows, which
+  capped omission recall near 55% for any detector. The `dose_unconfirmable` phone
+  change left no trace in any silo, so the warfarin finding had no visible reason —
+  now rendered per DATA_SPEC 9.5 ("as directed per INR" vs "4 mg Mon Wed Fri").
+  Discharge actions contradicted what happened; stale listings were planted for
+  patients with no pharmacy record; one pack size per product made a finished
+  prednisolone 25 mg course look like 200 days of supply.
+- **normalise:** `" cr"` matched "Crestor", so rosuvastatin was modified-release;
+  a generic-level AMT code borrowed an arbitrary product's release; pharmacy dosage
+  forms were read as routes. Release and route conflicts across 108 medicines: 0.
+- **coverage:** a GP line marked *ceased* counted as support. Now evidence against.
+- **identity:** a lookalike's un-identified records were rejected outright when the
+  patient's own IHI was absent from the cluster — P0008 lost three findings. Now
+  review. And Arnav's P0002 label was a **scoring** bug: pharmacy surnames, which
+  live inside "SURNAME, Given", were weighted as maiden-name matches.
+
+**The design decisions are in `docs/DECISIONS.md` (25 Oct)** — chart excluded from
+the BPMH, silence counts half, commission needs an assertion, frequency-vs-dose by
+what changed, `dose_unconfirmable` for every current phone-dose medicine, acceptance
+keyed `(type, atc_class)`. Four are out with the consultant as **briefs 11–14**.
+
+**Changed shared files:** none of the listed ones. `types.py` is unchanged.
+
+**For Arnav — things you will hit:**
+- **`tests/fixtures/medtrace/Q0__admissions.json`** is new — your first `SAMPLE_MODE`
+  replay. Identical to live. It is one row per admission-chart **line** (290 rows,
+  40 admissions), so dedupe on `source_patient_id`.
+- **The fixtures were regenerated today.** Your `tests/fixtures/api/*.json` still
+  validate (no dangling row ids), but their demographics and row text now drift from
+  `Q1/Q2`, and `run_P0002_needs_review.json` carries the old surname label. PLAN
+  says regenerate them from real runs today anyway.
+- **Acceptance is keyed `(type, detail["atc_class"])`**, the 4-character ATC
+  subgroup, matching your `AcceptanceUpdate.atc_class`. Read it off the candidate
+  rather than computing your own.
+- **`fuse` leaves `FusedMed.high_risk_class` as `None`** (it is not given the
+  lexicon). Fill it with `safety.high_risk_class(med.atc, lex)`.
+- **The orchestrator composition is in `scripts/eval.py:reconcile()`** — Q1 →
+  `link_identity` → Q2 on the auto-merge set only → `normalise_med` → `coverage` →
+  `evidence_state` → `fuse` → `detect_discrepancies` → `prioritise`. Copy it rather
+  than rediscovering the order.
+
+**Broken:** nothing. Known and recorded rather than fixed: `coverage()` uses
+`date.today()` for the stale-GP check, so it reads the wall clock instead of the
+admission date — harmless today, wrong in a replay.
+
+**Needs from teammates:**
+- **Arnav** — the agent layer is where every unmet disqualification rule sits;
+  World Model is 17 hours overdue. Tell me what you have and have not started, and I
+  will take something off you (World Model is my preference — no coupling to your
+  orchestrator).
+- **Anshu** — nothing from you is in the repo yet. Everything you need has been on
+  `main` since 4am: `tests/fixtures/api/`, `app/schemas.py`, `types.py`.
+
+**Next:** review Arnav's schema additions (#12); then whatever he hands over.
+
+---
+
 ### 2026-10-25 04:05 AEDT · Arnav · arnav/api-fixtures
 
 **Did:** PLAN 5.8 — example API responses for the UI in `tests/fixtures/api/`, one per

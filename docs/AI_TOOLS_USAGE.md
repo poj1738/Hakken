@@ -32,5 +32,6 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-24 | Arpon | Claude Code | Opus 5 | Zetaris registration applied live + verified; step 7 began: `parse.py` and `safety.py` |
 | 2026-10-24 | Arpon | Claude Code | Opus 5 | Step 7: `identity.py` (0 false merges) and `normalise.py`; research briefs for an outside consultant |
 | 2026-10-25 | Arpon | Claude Code | Opus 5 | Applied consultant briefs 6-10: real PBS pack sizes in the generator, TGA field mapping, brief 8 suppression rules, vetted pitch claims; fixed two silent-staleness bugs in `datasvc` and the registration verifier |
+| 2026-10-25 | Arpon | Claude Code | Opus 5.5 | `fuse`, `detect`, `triage` and `scripts/eval.py` (detector scorecard against ground truth); 11 defects fixed across the generator, `normalise`, `coverage` and `identity`; consultant briefs 11-14 |
 
 The README's **AI and model usage** section summarises this for judges.

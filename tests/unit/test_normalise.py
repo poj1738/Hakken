@@ -14,6 +14,7 @@ from datetime import date
 import pytest
 
 from app.domain.packs.medtrace.normalise import (
+    _canonical_route,
     llm_candidates,
     normalise_med,
     parse_frequency,
@@ -314,3 +315,78 @@ def test_normalisation_accuracy_against_ground_truth(lex) -> None:
     assert free_text >= 0.84, f"patient free-text top-1 {free_text:.3f}"
     assert dose_total > 500
     assert dose_ok / dose_total >= 0.99, f"daily dose {dose_ok}/{dose_total}"
+
+
+# --------------------------------------------------------------------------- #
+# Release and route: false formulation and route conflicts (25 Oct)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.parametrize(("texts", "expected"), [
+    # Bare-substring MR markers matched the start of ordinary names.
+    (("Crestor",), "unknown"),
+    (("Crestor 5 mg",), "unknown"),
+    (("Lasix",), "unknown"),
+    (("lansoprazole",), "unknown"),
+    (("lamotrigine",), "unknown"),
+    # ...while the real suffixes still count, as whole words.
+    (("Inderal LA",), "MR"),
+    (("Cardizem CD",), "MR"),
+    (("Diamicron MR",), "MR"),
+    (("Toprol-XL",), "MR"),
+])
+def test_mr_suffixes_match_whole_words_only(texts, expected) -> None:
+    assert parse_release(*texts) == expected
+
+
+def test_rosuvastatin_is_never_modified_release(lex) -> None:
+    """"Crestor" contains " cr", which used to make rosuvastatin MR. There is no
+    MR rosuvastatin in Australia, so every Crestor line set up a false
+    formulation finding against an EMR that correctly said nothing."""
+    statement = normalise_med(row("gp", med_text="Crestor 5 mg", strength_text="5 mg"), lex)
+    assert statement.generic == "rosuvastatin"
+    assert statement.release == "IR"
+
+
+def test_a_generic_level_code_does_not_invent_a_release(lex) -> None:
+    """An AMT MP code is shared by every product of a medicine, and
+    `by_amt_code` keeps whichever was loaded first. Metformin comes in IR and
+    MR, so the EMR's plain "metformin" must stay `unknown` -- not borrow the
+    release of an arbitrary product and contradict a GP who named Diabex XR."""
+    mp_code = next(e.amt_mp for e in lex.entries if e.generic == "metformin")
+    statement = normalise_med(row("emr", row_id="EMR-000001", med_text="metformin",
+                                  med_code=mp_code, code_system="AMT_MP",
+                                  strength_text="1000 mg", route_text="PO"), lex)
+    assert statement.generic == "metformin"
+    assert statement.release == "unknown"
+
+
+def test_a_product_level_code_does_pin_the_release(lex) -> None:
+    entry = next(e for e in lex.entries if e.generic == "metformin" and e.release == "MR")
+    statement = normalise_med(row("gp", med_text="metformin 1000 mg", med_code=entry.amt_mpp,
+                                  code_system="AMT_MPP", strength_text="1000 mg"), lex)
+    assert statement.release == "MR"
+
+
+@pytest.mark.parametrize(("text", "expected"), [
+    ("PO", "PO"), ("SL", "SL"), ("INH", "INH"), ("SC", "SC"),
+    ("tablet", "PO"), ("capsule", "PO"), ("modified release tablet", "PO"),
+    ("inhaler", "INH"), ("patch", "TD"),
+    # Ambiguous forms say nothing about route -- None, never a guess.
+    ("spray", None), ("injection", None), (None, None), ("", None),
+])
+def test_canonical_route(text, expected) -> None:
+    """The pharmacy silo has no route column; `route_text` is the dosage form.
+    Raw, it disagreed with the EMR's "PO" on nearly every medicine."""
+    assert _canonical_route(text) == expected
+
+
+def test_a_named_mr_product_outranks_a_plain_form_word(lex) -> None:
+    """The pharmacy form column says just "capsule" for Cymbalta, a
+    delayed-release capsule. Read alone, "capsule" made it IR and contradicted
+    the GP and EMR. A pinned product is a stronger signal than a form word."""
+    entry = next(e for e in lex.entries if e.generic == "duloxetine" and e.release == "MR")
+    statement = normalise_med(row("pharmacy", row_id="PHM-000001", med_text=entry.brand,
+                                  med_code=entry.pbs_code, code_system="PBS",
+                                  route_text="capsule", strength_text=entry.strength), lex)
+    assert statement.release == "MR"

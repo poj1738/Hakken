@@ -124,6 +124,44 @@ LAY_TERMS = {
     "glyceryl trinitrate": "spray under the tongue", "temazepam": "sleeping tablet",
     "paracetamol": "arthritis Panadol", "tamsulosin": "prostate tablet",
 }
+#: DATA_SPEC 9.5: regimens whose dose changes by phone, with no new script, so
+#: the dispensing record cannot reconstruct it.
+PHONE_DOSE_GENERICS = ("warfarin", "insulin glargine", "prednisolone")
+
+
+def phone_dose_gp_directions(med: "Med", rng: random.Random, usual: str) -> str:
+    """What the GP list says once the dose has moved by phone (DATA_SPEC 9.5).
+
+    Warfarin: half "as directed per INR", half the stale fixed dose. Insulin: "as
+    directed" 60% of the time. Prednisolone: the stale dose -- the GP list is
+    where the original prescription lives, not the taper step.
+    """
+    if med.generic == "warfarin":
+        return "as directed per INR" if rng.random() < 0.5 else usual
+    if med.generic == "insulin glargine":
+        return "as directed" if rng.random() < 0.6 else usual
+    return usual
+
+
+def phone_dose_patient_words(med: "Med", rng: random.Random) -> str:
+    """What the patient says about a dose that moved by phone (DATA_SPEC 9.5).
+
+    Warfarin: 60% describe the current alternating regimen, 40% are unsure.
+    Insulin titration and the current prednisolone step exist **only** here,
+    which is exactly why no structured source can confirm them.
+    """
+    mg = strength_mg(med.strength) or 0.0
+    if med.generic == "warfarin":
+        if rng.random() < 0.6 and mg > 1:
+            return f"{mg - 1:g} mg Mon Wed Fri, {mg:g} mg the other days"
+        return "not sure how much now, the clinic changes it"
+    if med.generic == "insulin glargine":
+        return rng.choice(["up 2 units every three days", "they told me to go up a bit",
+                           "changes with my sugars"])
+    return rng.choice(["down to the next step this week", "cutting down each week",
+                       "on the lower dose now"])
+
+
 FREQ_WORDS = {"1 mane": "one in the morning", "1 nocte": "one at night",
               "1 daily": "one a day", "1 bd": "morning and night", "2 tds": "two three times a day",
               "1 tds": "one three times a day", "prn": "only when I need it"}
@@ -227,6 +265,29 @@ class Product(dict):
     @property
     def is_addon(self) -> bool:
         return self["is_addon"] == "1"
+
+    def override_for(self, column: str, strength: str) -> int:
+        """A per-strength override from `column`, or 0 if none.
+
+        The column is either one value for every strength, or a ";"-separated
+        list aligned with `strengths` -- the same convention as brands and
+        strengths. One value per product gave every prednisolone strength the
+        200-tablet pack that is right only for 5 mg, which made a finished
+        25 mg course look like 200 days of supply.
+        """
+        raw = (self.get(column) or "").strip()
+        if not raw:
+            return 0
+        values = raw.split(";")
+        if len(values) > 1:
+            try:
+                raw = values[self.strengths.index(strength)]
+            except (ValueError, IndexError):
+                return 0
+        try:
+            return int(raw or 0)
+        except ValueError:
+            return 0
 
 
 def doses_per_day(regimen: str) -> float:
@@ -386,12 +447,10 @@ class Med:
         # only applies to items with no PBS listing (OTC, and the few
         # private-script products).
         real_qty, real_repeats = PACKS.get((self.generic, self.brand, self.strength), (0, 0))
-        self.pbs_repeats = real_repeats
-        try:
-            self.pack_qty = (int(product["pack_qty_override"] or 0) or real_qty
-                             or (60 if per_day >= 2 else 30))
-        except ValueError:
-            self.pack_qty = real_qty or 30
+        override_repeats = product.override_for("repeats_override", self.strength)
+        self.pbs_repeats = override_repeats or real_repeats
+        self.pack_qty = (product.override_for("pack_qty_override", self.strength) or real_qty
+                         or (60 if per_day >= 2 else 30))
         # A device pack is ONE unit that lasts about a month, so dividing it by
         # doses-per-day collapsed days_supply to the 7-day floor and let an
         # inhaler or insulin pen be dispensed 50+ times a year. Pack size says
@@ -656,6 +715,19 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
             "high_risk_class": med.high_risk or None, "intent": intent,
         })
 
+    # -- dose_unconfirmable (DATA_SPEC 9.5) ---------------------------------
+    # Decided BEFORE any silo is written, because the mechanism has to show up
+    # in the GP and patient rows. It used to be decided after rendering and
+    # changed nothing, so the ground truth said "dose changed by phone" while
+    # every source agreed on the old dose: a finding with no visible reason.
+    for med in p.meds:
+        if med.generic in PHONE_DOSE_GENERICS and med.current:
+            if rng.random() < 0.85:
+                med.changed_by_phone = True
+                plant("dose_unconfirmable", med, ["gp", "pharmacy", "patient"], [],
+                      {"mechanism": "dose changed without a new script"},
+                      "possibly_intentional" if rng.random() < 0.6 else "likely_unintentional")
+
     # -- EMR ----------------------------------------------------------------
     given, family, dob_text = render_name_for("emr", p, rng, corruptions)
     emr_base = {"mrn": p.ids["emr"], "ihi_syn": ihi_for("emr", p, rng), "given_name": given,
@@ -667,9 +739,14 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
             continue
         # omission (DATA_SPEC 5.2): supported pre-admission, absent from the chart
         if rng.random() < HIDDEN_ERROR_RATES["emr"]["existence_omission"] * 1.5:
-            evidence = [r["row_id"] for r in rows.data["gp"] + rows.data["pharmacy"]
-                        if r.get("drug_text", "").startswith(med.brand)]
-            plant("omission", med, ["gp", "pharmacy"], evidence,
+            # Row ids left empty on purpose: resolve_row_ids fills them once this
+            # patient's GP and pharmacy rows exist. This used to scan
+            # rows.data["gp"] here -- but the EMR is rendered first, so at this
+            # point that list held only EARLIER patients' rows. Any brand match
+            # was another person's record, and because resolve_row_ids skips a
+            # finding that already has ids, 9 of 20 omissions ended up citing
+            # someone else's rows and could never be matched by row overlap.
+            plant("omission", med, ["gp", "pharmacy"], [],
                   {"reason": "not charted at admission"},
                   "documented_intentional" if rng.random() < 0.30 else "likely_unintentional")
             continue
@@ -730,7 +807,16 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
     if p.prior_discharge:
         d_date = AS_OF - dt.timedelta(days=rng.randint(14, 180))
         for med in rng.sample(p.meds, min(len(p.meds), rng.randint(2, 4))):
-            action = pick(rng, (("start", 0.58), ("cease", 0.27), ("change", 0.15)))
+            # The action has to agree with what actually happened. These were
+            # drawn at random, so a discharge summary would "cease" a medicine
+            # the patient carried on taking -- incoherent history that made a
+            # current salbutamol inhaler and a current statin look like
+            # commissions. A stopped medicine is ceased; a current one was
+            # started or changed.
+            if not med.current:
+                action = "cease"
+            else:
+                action = pick(rng, (("start", 0.79), ("change", 0.21)))
             reason = "" if rng.random() > 0.81 else rng.choice(
                 ["dose reduced: eGFR 28", "ceased: dizziness", "started: new AF"])
             rows.add("emr", dict(emr_base, record_kind="prior_discharge", record_date=iso(d_date),
@@ -760,12 +846,20 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
             drug_text = (f"{med.brand} {med.strength}" if rng.random() < 0.35
                          else f"{med.generic} {med.strength}")
             directions = FREQ_WORDS.get(med.regimen, med.regimen)
+            if med.changed_by_phone:
+                directions = phone_dose_gp_directions(med, rng, directions)
             status = "active" if med.gp_listing == "active" else "ceased"
             row_id = rows.add("gp", dict(gp_base, drug_text=drug_text,
                                          amt_code=code_for(med, "amt_mpp"),
                                          strength=med.strength, directions=directions,
                                          status=status))
-            if status == "active" and not med.current and med.possibly_ceased():
+            # Only plantable when there is a pharmacy record to show the lapse.
+            # possibly_ceased() reads the generator's own dispensing history,
+            # which exists even for a patient with no pharmacy silo -- so a stale
+            # listing was planted on evidence no silo contained, and no detector
+            # could ever find it.
+            if (status == "active" and not med.current and p.present["pharmacy"]
+                    and med.possibly_ceased()):
                 plant("stale_listing", med, ["gp", "pharmacy"], [row_id],
                       {"last_dispensed": iso(med.dispensings[-1]) if med.dispensings else None},
                       "likely_unintentional")
@@ -837,9 +931,11 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
                 described = "a little white one"
             still = ("yes" if med.current else
                      ("no" if rng.random() < 0.6 else "unsure"))
+            how_often = FREQ_WORDS.get(med.regimen, med.regimen)
+            if med.changed_by_phone:
+                how_often = phone_dose_patient_words(med, rng)
             rows.add("patient", dict(pat_base, med_described=described,
-                                     how_often=FREQ_WORDS.get(med.regimen, med.regimen),
-                                     still_taking=still))
+                                     how_often=how_often, still_taking=still))
         for med in p.otc:
             row_id = rows.add("patient", dict(pat_base, med_described=med.generic,
                                               how_often="one a day", still_taking="yes"))
@@ -854,15 +950,6 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
     if found < 2:
         notices.append({"type": "bpmh_not_confirmable", "detail":
                         f"only {found + 1} of 4 sources found"})
-
-    # -- dose_unconfirmable (DATA_SPEC 9.5) ---------------------------------
-    for med in p.meds:
-        if med.generic in ("warfarin", "insulin glargine", "prednisolone") and med.current:
-            if rng.random() < 0.85:
-                med.changed_by_phone = True
-                plant("dose_unconfirmable", med, ["gp", "pharmacy", "patient"], [],
-                      {"mechanism": "dose changed without a new script"},
-                      "possibly_intentional" if rng.random() < 0.6 else "likely_unintentional")
 
     # -- duplication (DATA_SPEC 4.3) ----------------------------------------
     for med in p.meds:
@@ -984,13 +1071,23 @@ def resolve_row_ids(patient: Patient, rows: Rows, planted: list[dict[str, object
                         "patient": "intake_id"}[source]
             text_field = {"emr": "med_name", "gp": "drug_text", "pharmacy": "brand",
                           "patient": "med_described"}[source]
-            for row in rows.data[source]:
-                if row.get(id_field) != pid:
-                    continue
+            mine = [row for row in rows.data[source] if row.get(id_field) == pid]
+
+            def exact(row: dict[str, str]) -> bool:
+                # The term, then anything but "/": "amlodipine 5 mg" is the
+                # single agent, "amlodipine/atorvastatin" is a different product.
                 text = (row.get(text_field) or "").lower()
-                if any(text.startswith(w) or w in text for w in wanted):
-                    found.append(row["row_id"])
-                    break
+                return any(text.startswith(w) and text[len(w):len(w) + 1] != "/"
+                           for w in wanted)
+
+            def loose(row: dict[str, str]) -> bool:
+                text = (row.get(text_field) or "").lower()
+                return any(text.startswith(w) or w in text for w in wanted)
+
+            match = next((r for r in mine if exact(r)), None) or next(
+                (r for r in mine if loose(r)), None)
+            if match is not None:
+                found.append(match["row_id"])
         entry["row_ids"] = found
 
 
@@ -1292,6 +1389,17 @@ def main() -> int:
                 json.dumps(envelope(cols, data), indent=1), encoding="utf-8")
             written += 1
     log(f"  fixtures: {written} envelopes for {min(args.fixtures, len(patients))} patients")
+
+    # Q0: the admissions list, which is how a run finds its anchor. One envelope
+    # for the whole population, exactly as queries.q_admissions() returns it --
+    # one row per admission-chart LINE, so a caller dedupes on
+    # source_patient_id. Without it, SAMPLE_MODE has nothing to replay for the
+    # first query a run makes.
+    q0 = [h for h in harmonised if h["source"] == "emr" and h["record_kind"] == "admission_chart"]
+    (fixtures_dir / "Q0__admissions.json").write_text(
+        json.dumps(envelope(IDENTITY_COLUMNS, q0), indent=1), encoding="utf-8")
+    log(f"  fixtures: Q0__admissions.json, {len(q0)} rows, "
+        f"{len({h['source_patient_id'] for h in q0})} admissions")
 
     # -- report ------------------------------------------------------------
     counts: collections.Counter = collections.Counter()

@@ -136,6 +136,31 @@ def coverage(links: list[IdentityLink], rows: list[SourceRow]) -> dict[str, Cove
     return out
 
 
+def _key(name: str | None) -> str:
+    return " ".join((name or "").split()).casefold()
+
+
+def _asserts(stmt: MedStatement, wanted: str) -> bool:
+    """Does this statement mention `wanted`, as itself or as an ingredient?"""
+    if _key(stmt.generic) == wanted:
+        return True
+    return any(_key(name) == wanted for name, _mg in stmt.ingredients)
+
+
+def _current_episode(emr_stmts: list[MedStatement]) -> list[MedStatement]:
+    """The EMR statements on the latest document -- the current admission chart.
+
+    `MedStatement` carries no record kind, but the admission chart is dated the
+    admission day and every older EMR document (a prior discharge summary) is
+    dated earlier, so the latest date identifies the current episode.
+    """
+    dated = [s.doc_date for s in emr_stmts if s.doc_date is not None]
+    if not dated:
+        return emr_stmts
+    latest = max(dated)
+    return [s for s in emr_stmts if s.doc_date == latest]
+
+
 def evidence_state(
     generic: str,
     source: str,
@@ -154,16 +179,37 @@ def evidence_state(
 
     `stmts` may be the whole run's statements; this filters to `source` itself,
     so a caller cannot accidentally credit one source with another's evidence.
+
+    Three refinements, each of which stopped a source being shown as supporting
+    a medicine it was actually evidence against:
+
+    - **A source that asserts the medicine as stopped counts against it.** A GP
+      line with status `ceased`, a patient's "no", a discharge `cease` -- all of
+      these were `PRESENT`, because the medicine was mentioned. They are now
+      `ABSENT_IN_SCOPE`: the source was read, and it says not current.
+    - **The EMR column is the current admission chart.** EMR rows also include
+      older discharge summaries; only statements on the latest EMR document
+      count, so a medicine started at a discharge in June and missing from
+      today's chart reads as absent from the chart -- which is what an omission
+      is.
+    - **A combination is present where all its components are.** "Coversyl Plus"
+      on the GP list and perindopril + indapamide charted separately is the
+      same therapy (brief 8, section 4), not an omission of the combination.
     """
-    wanted = (generic or "").strip().casefold()
-    for stmt in stmts:
-        if stmt.source != source:
-            continue
-        if (stmt.generic or "").strip().casefold() == wanted:
-            return EvidenceState.PRESENT
-        # A combination asserts each of its ingredients.
-        if any((name or "").strip().casefold() == wanted for name, _mg in stmt.ingredients):
-            return EvidenceState.PRESENT
+    wanted = _key(generic)
+    own = [s for s in stmts if s.source == source]
+    if source == "emr":
+        own = _current_episode(own)
+
+    matched = [s for s in own if _asserts(s, wanted)]
+    if not matched and "/" in wanted:
+        parts = [p for p in wanted.split("/") if p]
+        if parts and all(any(_asserts(s, part) for s in own) for part in parts):
+            matched = [s for s in own if any(_asserts(s, part) for part in parts)]
+    if matched:
+        if all(s.status == "ceased" for s in matched):
+            return EvidenceState.ABSENT_IN_SCOPE
+        return EvidenceState.PRESENT
 
     if cov.state != "found":
         return EvidenceState.UNKNOWN

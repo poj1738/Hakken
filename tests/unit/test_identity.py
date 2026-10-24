@@ -206,7 +206,13 @@ def test_an_ihi_conflict_elsewhere_in_a_cluster_demotes_a_record_with_no_ihi(lex
     links = {l.candidate_id: l for l in link_identity(anchor, [decoy_with_ihi, decoy_without], lex)}
     assert links["gp:GP9"].band == "new"            # tier 1 rejects it outright
     assert links["patient:INT9"].band != "auto-merge"
-    assert "ihi_conflict_in_cluster" in links["patient:INT9"].guards
+    # Review, not rejection. Here INT9 happens to be the decoy, but nothing in
+    # the record says so -- same name, same DOB, no IHI -- so it is equally
+    # consistent with the patient. Rejecting such records outright threw away
+    # P0008's own GP, pharmacy and interview records (25 Oct). Review never
+    # merges, so the false-merge guarantee this test exists for is unchanged.
+    assert links["patient:INT9"].band == "review"
+    assert "ihi_ambiguous_in_cluster" in links["patient:INT9"].guards
 
 
 def test_a_record_equally_consistent_with_two_people_goes_to_a_human(lex) -> None:
@@ -323,3 +329,15 @@ def test_linkage_against_ground_truth(lex) -> None:
     f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
     assert precision >= 0.95, f"precision {precision:.3f}"
     assert f1 >= 0.95, f"F1 {f1:.3f} is below DATA_SPEC 11.2's target"
+
+
+def test_a_combined_name_field_surname_is_an_exact_match_not_a_previous_one(lex) -> None:
+    """The pharmacy silo writes one "SURNAME, Given" field. Its surname used to
+    fall through to the previous-surname branch, labelled and weighted as a
+    maiden-name match (spotted by Arnav on P0002)."""
+    emr = row(name_given="Thomas", name_family="Papadopoulos",
+              dob=date(1945, 3, 2), dob_raw="1945-03-02")
+    pharmacy = row("pharmacy", "C1", name_given="PAPADOPOULOS, Thomas",
+                   dob=date(1945, 3, 2), dob_raw="1945-03-02")
+    link = score_pair(emr, pharmacy, lex)
+    assert link.field_evidence["surname"] == "surname matches exactly"
