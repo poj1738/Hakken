@@ -3,7 +3,7 @@
 One file, current state only. Overwrite it as things change — the history lives in
 `docs/HANDOFF.md` and in git. Read this first at session start.
 
-**Last updated:** 2026-10-24 15:10 AEDT by Arpon
+**Last updated:** 2026-10-24 20:05 AEDT by Arpon
 
 ## Status
 
@@ -19,16 +19,17 @@ frozen; nothing downstream of it is built yet.
 | Preflight (`make preflight`) | — | working — **22 pass / 0 fail on Arpon's machine, 23 Oct** (his services only; re-run it on yours) |
 | Config layer (`app/config.py`) | — | working — validated, secrets as `SecretStr`, `ZETARIS_TIMEOUT_S` 180 |
 | Secret scan + pre-commit hook | — | working, verified to block a commit |
-| Tests | — | **160 green** on any machine — no services, isolated from any local `.env` |
+| Tests | — | **249 green** on any machine — no services, isolated from any local `.env` |
 | Team workflow, CI, onboarding | — | working |
-| **MedTrace contract** (`app/domain/packs/medtrace/types.py`) | Arpon | **frozen.** Shared file — changes need sign-off, a HANDOFF entry and a PR line |
-| **SQL templates** (`queries.py`) | Arpon | **written** — Q_REF, Q0–Q3 real Lightning SQL. **Never run against Zetaris.** Q4 (TGA) deliberately unwritten |
+| **MedTrace contract** (`app/domain/packs/medtrace/types.py`) | Arpon | **frozen, on `main`.** Shared file — changes need sign-off, a HANDOFF entry and a PR line |
+| **SQL templates** (`queries.py`) | Arpon | **written and run live** — the real Q1 executed verbatim against a union view on 24 Oct. Q4 (TGA) deliberately unwritten |
 | `identity.decide()`, `SOURCE_TRUST_PRIORS` | Arpon | **real and usable today** |
-| Clinical logic (identity, normalise, coverage, supply, fuse, detect, safety, triage) | Arpon | **skeleton** — exact signatures, every body raises `NotImplementedError("Arpon: <file>")` |
-| Reference data (PBS lexicon, APINCHS, nicknames) | Arpon | not started — PLAN step 2 |
-| `docs/DATA_SPEC.md` | Arpon | not started — Arpon is writing it by hand |
-| Synthetic generator, ground truth, fixtures | Arpon | not started — PLAN step 4 |
-| `datasvc/`, `scripts/register_sources.py` | Arpon | not started — PLAN steps 5–6 |
+| Clinical logic (identity, normalise, coverage, supply, fuse, detect, safety, triage) | Arpon | **skeleton on `main`** (#4) — exact signatures, every body raises `NotImplementedError("Arpon: <file>")`. PLAN step 7 fills them |
+| Reference data (PBS lexicon, APINCHS, nicknames) | Arpon | **done** — 207 lexicon rows, **188 with a real PBS code** (schedule 4751). Hand-built clinical content, real codes joined in |
+| `docs/DATA_SPEC.md` | Arpon | **on `main`** (#5), names aligned to the plan and the frozen types |
+| Synthetic generator, ground truth, fixtures | Arpon | **done** — 40 patients, 73 planted findings, identity traps, **30 Zetaris envelopes** for `SAMPLE_MODE` |
+| `datasvc/` | Arpon | **done** — 7 endpoints, whole-table `{"records": [...]}` |
+| `scripts/register_sources.py` | Arpon | **APPLIED AND VERIFIED live, 24 Oct.** All 8 views registered, counts match `datasvc` exactly, `all_sources` = 4 825 rows in 1.05 s |
 | Zetaris / Meterless adapters | Arnav | **stub** — both unblocked, contracts fully known |
 | Orchestrator, agents, API, trace | Arnav | not started |
 | H-MEM, World Model | Arnav | not started — World Model first, `identity.decide` waits on it |
@@ -77,6 +78,19 @@ spike (`docs/DECISIONS.md`):
 
 What remains unproven is only the real data: the generator, the actual `medtrace.*`
 views and their counts (steps 4–6).
+
+## Waiting on Arpon (blocks nothing else, but these are decisions only he can make)
+
+1. ~~Go-ahead to apply the registration.~~ **Done 24 Oct — live and verified.**
+2. **Two ATC/APINCHS calls** (`data/reference/atc_crosscheck.csv`): **sotalol** —
+   DATA_SPEC `C07AA07` (not APINCHS) vs PBS `C01BD` (**Ext**, i.e. high-risk); and
+   **paracetamol/codeine** — DATA_SPEC `N02AJ06` (**N**) vs PBS `N02BE01` (loses the
+   codeine). DATA_SPEC wins in the build; nothing was applied silently.
+3. **DATA_SPEC §4.2 bundle 6** anchor shares sum to **0.95**, not 1.00.
+4. **Four formulation-trap drugs have only one form in §4.2** (metoprolol, gliclazide,
+   venlafaxine, tamsulosin), so no IR/MR pair can be planted for them.
+5. **Population size** — at 20 tune patients, §5.2's "≥15 tune instances per type" is
+   unreachable for the low-rate types. Raise `--patients` before the final eval run.
 
 ## Next up
 

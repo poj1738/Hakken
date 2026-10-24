@@ -11,6 +11,84 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-24 — Registration is live, and Zetaris is **not** the time budget **[live — Arpon's machine, 24 Oct]**
+
+PLAN steps 5 and 6 applied with Arpon's go-ahead. All 28 statements succeeded, all
+8 views verified against the files `datasvc` serves, and
+`SELECT COUNT(*) FROM medtrace.all_sources` returns **4,825**.
+
+| View | Zetaris | datasvc | Time |
+|---|---|---|---|
+| `medtrace.emr` | 325 | 325 | 0.39 s |
+| `medtrace.gp` | 307 | 307 | 0.25 s |
+| `medtrace.pharmacy` | 3 869 | 3 869 | 0.94 s |
+| `medtrace.patient_report` | 324 | 324 | 0.19 s |
+| `medtrace.med_lexicon` | 207 | 207 | 0.20 s |
+| `medtrace.apinchs` | 42 | 42 | 0.22 s |
+| `medtrace.nicknames` | 167 | 167 | 0.16 s |
+| **`medtrace.all_sources`** | **4 825** | **4 825** | **1.05 s** |
+
+**Template timings, the number that matters:**
+
+| Template | Time | Rows |
+|---|---|---|
+| Q_REF ×3 (lexicon, apinchs, nicknames) | 0.17–0.64 s | 207 / 42 / 167 |
+| Q0 admissions | 0.33 s | — |
+| **Q1 identity (the federated query)** | **1.84 s** | 145 |
+| Q2 meds | 1.86 s | 9 |
+| Q3 verify | 1.72 s | 9 |
+
+**A complete run costs about 6 s of Zetaris**, against a 5–10 minute judging budget.
+This closes the question the 24 Oct correction opened: latency tracks bytes scanned, our
+silos are ~2 MB, and at that size the data layer is nowhere near the constraint. The
+4 queries + 6 model calls the plan budgets for will be dominated by the model, not the
+database.
+
+Every architectural rule still stands and is still worth keeping — no joins at agent
+time, harmonise in registered views, one batched verification query, a hard query budget
+— but they are now **prudent rather than forced**. The one that is genuinely load-bearing
+is "reference the union view only once", which is a hard engine limit, not a performance
+choice.
+
+### The bug this found: a NULL is not an empty string
+
+Diffing the **real** `q_identity_candidates()` output against the committed fixtures
+showed every row count matching — 145 vs 145, 387 vs 387, all ten patients — while
+**409 cells per envelope differed**. Nothing failed. Normalising nulls made the two sets
+byte-identical, which isolated the cause:
+
+| Case | Live Zetaris returns |
+|---|---|
+| a column the source **does not have** (view emits `CAST(NULL AS STRING)`) | **JSON `null`** |
+| a column it **has**, whose value is blank (a missing `ihi_syn`) | **`""`** |
+
+The fixture generator stringified both to `""`. So `name_family` was `""` where live
+gives `null` for every pharmacy and patient row. **`SAMPLE_MODE` would have replayed a
+shape the live view never produces**, and because row counts agreed, no count check,
+schema check or test would ever have caught it. `parse.py` treats both as absent, so the
+*behaviour* would have looked fine until the first live run disagreed with the recorded
+one.
+
+Fixed in `harmonise()` and `envelope()`: `None` is preserved as JSON null. All 10
+fixtures now match live exactly.
+
+**Kept as a command, not a one-off:** `register_sources.py --diff-fixtures` re-runs the
+live Q1 per patient and diffs. PLAN 2.9 asked for this ("any difference is a view bug"),
+and the fixtures and views can drift later — a `HARMONISED_MAP` edit, a regenerated silo,
+an edited template. `--verify-only` now runs it too.
+
+**Lesson worth keeping:** a row-count check is not a shape check. Counts matching is
+weak evidence; it was true here while every single row was wrong in one column.
+
+### Housekeeping
+
+`medtrace_spike` from the morning's reachability spike still exists as an empty
+SchemaStore container. There is no SQL path to drop a container
+(`REFERENCE_NOTES` 1.3), so it needs the Data Explorer. Cosmetic; it does not collide
+with `medtrace`.
+
+---
+
 ## 2026-10-24 — PBS reference data: PLAN §3's backbone is not publicly obtainable; the hand-built lexicon becomes the primary **[live, 24 Oct]**
 
 PLAN §3 names "the PBS monthly *PBS API CSV files* ZIP (October 2026 bundle, about 5 MB)"
