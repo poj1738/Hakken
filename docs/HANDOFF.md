@@ -27,6 +27,105 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-24 16:05 AEDT · Arpon · arpon/skeleton
+
+**Did:** Two things: ran the templates against live Zetaris instead of trusting the
+dialect, and did PLAN step 1 (the reachability spike). Both found things.
+
+**1. `''` is not an escaped quote in Lightning SQL — it silently deletes the
+apostrophe.** `SELECT 'O''Brien'` returns `OBrien`, length 6. `''` closes one literal
+and opens another, and adjacent literals concatenate; quotes stay balanced and nothing
+raises. On 789 real rows, `zone LIKE '%''%'` matched **789 of 789** (the pattern had
+collapsed to `%%`) where the backslash form matched the true 12, and `=` against a real
+apostrophe value returned **0 rows with no error**. For us that is a patient-safety bug:
+`O'Brien` would reach Zetaris as `OBrien`, match nothing, and the pharmacist would be
+told **"GP: no record found" for a record that exists** — a fabricated coverage gap from
+a query that succeeded, invisible in a trace. `sql_literal()` now escapes `\` → `\\`
+then `'` → `\'`, verified to round-trip every value we embed, with injection attempts
+returning as inert strings. **One of my 104 tests had asserted the wrong escaping as
+correct**, so the suite agreed with the bug — only sending it to the engine found it.
+
+**2. The step-1 spike passed completely, and closed three risks.** `datasvc` can live
+on the host:
+- `host.docker.internal:8100` → **HTTP 200 in ~20 ms** from both `zetaris-api-1` and
+  `zetaris-driver-1`.
+- A real `CREATE LIGHTNING REST TABLE` at that URL **fetched our data**.
+- `LATERAL VIEW explode(records)`, a harmonised `SCHEMASTORE VIEW`, and a
+  `UNION ALL` union view all work: **4 200 rows, 2.3 s**.
+- **The real `q_identity_candidates()` output ran verbatim** against that union view —
+  23 rows, 2.6 s, including `UPPER(name_family) LIKE 'O\'BR%'` against a real `O'Brien`.
+- A self-join on the union view failed with exactly the documented
+  `MISSING_ATTRIBUTES.RESOLVED_ATTRIBUTE_APPEAR_IN_OPERATION`. The error names
+  `records`, the pre-explode array — so **any** second reference breaks it, not just a
+  self-join. `queries.py`'s no-subquery/no-window rule is load-bearing.
+
+So the MinIO/Parquet, Postgres-over-JDBC and four-separate-views fallbacks are all
+**retired**. Everything was dropped afterwards; `SHOW LIGHTNING DATABASES` is back to
+`NY_TAXI` and `TPCDS_DB`.
+
+**3. I have to correct myself on yesterday's headline finding.** I recorded that Zetaris
+latency was "per-query engine overhead, not data volume — smaller synthetic silos will
+not make it meaningfully faster", and put it in `DECISIONS.md`, `TODO.md`, `PROGRESS.md`
+and the plan as *the* constraint shaping the architecture. **It is wrong.** It tracks
+**bytes scanned**, ~1 s + 2–3 s/MB:
+
+| Query | Rows | Bytes | Time |
+|---|---|---|---|
+| our union view `COUNT(*)` | 4 200 | ~1.1 MB | 2.3 s |
+| `taxi_zones COUNT(*)` | 789 | ~11 MB (14 KB/row, multipolygon geometry) | 17.0 s |
+| `taxi_trips COUNT(*)` | 500 000 | ~50 MB | 164.2 s |
+
+`taxi_zones` was the worst table to generalise from — smallest by row count, nearly
+largest by volume — which is exactly what produced the false reading. The fix was one
+extra query against a second table.
+
+**This is good news:** at ~1 MB per silo a query is 1–3 s and a whole run costs ~10 s of
+Zetaris, so the 5–10 minute budget is comfortable and Zetaris is **not** the dominant
+cost. Two consequences for the generator (step 4): **keep the silos small and narrow —
+that is now the main latency lever**, and do not rely on column pruning, because a
+narrow projection on an 11 MB table saved only 10% (15.3 s vs 17.0 s). The design rules
+(no joins at agent time, budget 8, harmonised views, one batched verification query) all
+still stand — prudent rather than forced. `ZETARIS_TIMEOUT_S=180` stays; 164 s on a
+50 MB table is what it is for.
+
+**4. A NULL is not a string.** `CAST(NULL AS STRING)` came back as JSON `null`, not
+`"null"` — so "every value arrives as a string" has one exception. `parse.py` must treat
+it as absent; stringifying it puts the literal text `"None"` into `name_previous`, `sex`
+and every source-specific null, which would read as a present, non-matching value in
+identity scoring and `evidence_state`. Corrected in `REFERENCE_NOTES` 1.1.
+
+**5. `CACHE TABLE` is not the latency lever we assumed.** 1.39/1.66/1.06 s before,
+2.01/1.07/1.33 s after, on the 4 200-row union — no measurable difference. The
+sponsor's 49.7 s → 1.2 s figure was a **rate-limited external API**; our `datasvc` is a
+local HTTP server where a 643 KB refetch is free. Keep it (it stops a demo hammering
+`datasvc`), but it is not what makes runs fast.
+
+**Changed shared files:** `CLAUDE.md` — added the backslash-escaping rule to the Zetaris
+behaviour list, so any free-SQL path inherits it. Also `docs/REFERENCE_NOTES.md` (1.1
+nulls, 1.2 escaping + `UPPER`/`LIKE` costs), `docs/DECISIONS.md` (two new entries;
+yesterday's latency entry marked **superseded in part** in place rather than edited),
+`PROGRESS.md`, and **one clearly-marked correction line in `docs/PLAN_2026-10-24.md`
+§0** — I did not touch the plan's prose, but three people read that section today and
+the wrong justification came from my measurement. Arpon: say if you would rather I
+revert that line and leave the plan as a dated snapshot.
+
+**Broken:** Nothing. 161 tests green, secret scan clean, PR #4 CI green. Caveat on all
+spike numbers: **one machine, one afternoon, 4 200 synthetic rows** — and the thing I am
+correcting today is precisely what over-generalising from one measurement did yesterday,
+so treat the ~2–3 s/MB model as a working estimate, not a law. Re-measure on the real
+generated data in step 6.
+
+**Needs from teammates:**
+- **Arnav** — two things now bind on you. (a) **Never build a SQL literal by hand**; use
+  `queries.sql_literal()`. The doubled quote fails silently, so a free-SQL path that
+  gets this wrong produces wrong answers rather than errors. (b) Your adapter must keep
+  `None` as `None`, not `str()` it. Otherwise unchanged: import from
+  `app.domain.packs.medtrace.*`, do not write your own stubs.
+- **Anshu** — nothing changes for you.
+
+**Next:** PLAN step 2, the reference build (PBS CSV bundle, lexicon, APINCHS, nicknames,
+`DATA_LICENCES.md`). Step 3 (`DATA_SPEC.md`) is Arpon's by hand.
+
 ### 2026-10-24 15:10 AEDT · Arpon · arpon/skeleton
 
 **Did:** PLAN step 3b, the MedTrace domain-pack skeleton, brought forward ahead of

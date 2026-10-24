@@ -11,9 +11,12 @@ silently delete the apostrophe rather than escape it.
 `JOIN`s and no subqueries.** Three separate findings forced that, and each one
 was a live measurement rather than a guess:
 
-- A 2-table `JOIN` with `GROUP BY` over ~8k rows **timed out once, then took
-  91.2 s** (`docs/DECISIONS.md`, 24 Oct). Per-query overhead, so smaller silos
-  do not help. Joins are pre-computed in the registered views instead.
+- A 2-table `JOIN` with `GROUP BY` over the sample tables **timed out once, then
+  took 91.2 s** (`docs/DECISIONS.md`, 24 Oct). Joins are pre-computed in the
+  registered views instead. (That join scanned ~11 MB of multipolygon geometry;
+  latency tracks **bytes scanned**, ~1 s + 2-3 s/MB, so at our data size a query
+  is 1-3 s. See the 24 Oct correction. The rule stands on point 2 below
+  regardless: the union view cannot be referenced twice at all.)
 - Referencing the same `UNION ALL`-of-`explode()` view twice in one query fails
   with `MISSING_ATTRIBUTES.RESOLVED_ATTRIBUTE_APPEAR_IN_OPERATION`
   (`REFERENCE_NOTES` 1.2). `medtrace.all_sources` is exactly that shape.
@@ -91,8 +94,11 @@ HARMONISED_COLUMNS: tuple[str, ...] = (
     "script_type",
 )
 
-#: The identity subset. Q0 and Q1 never need medication columns, and trimming
-#: columns is the first mitigation in PLAN 11's latency row.
+#: The identity subset. Q0 and Q1 never need medication columns.
+#: Measured caveat: a narrow projection on an 11 MB table took 15.3 s against
+#: 17.0 s for a full count, so trimming columns saves the **payload**, not the
+#: scan (`docs/DECISIONS.md`, 24 Oct correction). Generating less data is the
+#: lever; this is tidiness and transfer size.
 IDENTITY_COLUMNS: tuple[str, ...] = (
     "source",
     "row_id",

@@ -41,13 +41,16 @@ Nobody else has run the services yet (`docs/ENVIRONMENTS.md`). **Run `make prefl
 on your own machine** rather than trusting this. API behaviour that holds everywhere is
 in `CLAUDE.md`.
 
-- **Zetaris latency is the constraint that shapes the architecture** [24 Oct]:
-  `SELECT 1` ~1.1 s, `COUNT(*)` on 789 rows 20.7 s cold and ~4 s warm, a 2-table
-  `JOIN` with `GROUP BY` **timed out once, then took 91.2 s**. Per-query overhead, so
-  smaller silos do not help. Model calls take 0.4–1.2 s, so **Zetaris, not the model,
-  is the judging time budget.** Hence: no joins at agent time, 3–4 queries per run
-  (hard budget 8), harmonise in cached views at registration, one batched verification
-  query. See `docs/DECISIONS.md`.
+- **Zetaris latency tracks bytes scanned: ~1 s + 2–3 s per MB** [24 Oct, corrected].
+  `SELECT 1` ~1.0 s; our 4 200-row union view 2.3 s; `taxi_zones` (789 rows but
+  14 KB each, ~11 MB) 17.0 s; `taxi_trips` (500 k rows) 164.2 s. **An earlier
+  conclusion that this was a fixed per-query floor and that smaller silos would not
+  help was wrong** — it generalised from one fat table. At our data size (~1 MB per
+  silo) a query is 1–3 s and a run costs ~10 s of Zetaris, well inside the budget.
+  Keeping the silos small is the main lever; column pruning saves payload, not scan.
+  The design rules still hold (no joins at agent time, budget 8, harmonised views,
+  one batched verification query) — now prudent rather than forced. See
+  `docs/DECISIONS.md`.
 - **Zetaris** answering on `localhost:8888`, envelope `{headers, data, total, timeUsed}`,
   **every value a string**. Catalogue discovery needs `SHOW LIGHTNING DATABASES` +
   `SHOW TABLES IN <db>`; `SHOW DATASOURCES` returns 0 rows.
@@ -57,18 +60,23 @@ in `CLAUDE.md`.
 
 ## Blocked on
 
-Nothing is blocked on a decision. The open **risks**, in order of how much rests on
-them:
+Nothing is blocked. **The three largest risks were closed on 24 Oct** by the step-1
+spike (`docs/DECISIONS.md`):
 
-1. **Can the Zetaris containers reach `host.docker.internal:8100`?** Unproven. If not,
-   the fallbacks in order are: `datasvc` on the Zetaris network, then MinIO/Parquet,
-   then Postgres over JDBC (`docs/DECISIONS.md`, PLAN 11). This is the next thing Arpon
-   does.
-2. **Does the union view register, cache and query?** `medtrace.all_sources` is a
-   `UNION ALL` of `explode()` views, and a second reference to one of those in a single
-   query is known to fail. Fallback: four per-source views queried separately.
-3. **No SQL in `queries.py` has been run against Zetaris.** It is written to the
-   recorded envelope and the documented dialect rules, not measured.
+1. ~~Can the Zetaris containers reach `host.docker.internal:8100`?~~ **Yes** — HTTP 200
+   in ~20 ms from both `zetaris-api-1` and `zetaris-driver-1`, and a real REST table
+   pointed at that URL fetched our data. The MinIO/Parquet and Postgres-over-JDBC
+   fallbacks are retired.
+2. ~~Does the union view register, cache and query?~~ **Yes** — `UNION ALL` over two
+   `explode()` views: 4 200 rows, 2.3 s. The four-separate-views fallback is retired.
+   Confirmed on our own view shape that it **cannot be referenced twice** in one query.
+3. ~~No SQL in `queries.py` has been run against Zetaris.~~ **It has.** The real
+   `q_identity_candidates()` output ran verbatim against a live union view: 23 rows,
+   2.6 s. Doing so found a silent escaping bug (`''` deletes the apostrophe) that 104
+   passing tests had agreed with.
+
+What remains unproven is only the real data: the generator, the actual `medtrace.*`
+views and their counts (steps 4–6).
 
 ## Next up
 

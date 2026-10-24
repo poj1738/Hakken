@@ -11,6 +11,143 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-24 (later) — **Correction: Zetaris latency tracks bytes scanned, not a fixed per-query floor** **[live — Arpon's machine, 24 Oct]**
+
+**This supersedes the central claim of the "Zetaris latency is the binding constraint"
+entry below.** That entry says: *"This is per-query engine overhead, not data volume.
+A `COUNT` on 789 rows costs ~4 s warm. Smaller synthetic silos will not make it
+meaningfully faster — the floor stays."* **That is wrong, and it was wrong in the
+direction that matters.** It was inferred from one table without checking a second.
+
+Measured across four tables of very different size:
+
+| Query | Rows | Approx. bytes | Time |
+|---|---|---|---|
+| `SELECT 1` | — | — | ~1.0 s |
+| our union view, `COUNT(*)` | 4 200 | ~1.1 MB | **2.3 s** |
+| `NY_TAXI.taxi_zones`, `COUNT(*)` | 789 | ~11 MB (14.2 KB/row — multipolygon geometry) | **17.0 s** |
+| `NY_TAXI.taxi_trips`, `COUNT(*)` | 500 000 | ~50 MB | **164.2 s** |
+
+Roughly **~1 s fixed + 2–3 s per MB scanned**, consistent across all four. The 789-row
+table is slow because its rows are 14 KB each, not because 789 rows are expensive.
+`taxi_zones` was the worst possible table to generalise from: it is the smallest by row
+count and nearly the largest by volume, which is exactly what produced the false
+"volume doesn't matter" reading.
+
+**What this changes.**
+
+- **Keeping the silos small and narrow is the primary latency lever**, not a
+  nice-to-have. The previous entry said the opposite. A 200-patient dataset at ~1 MB
+  per silo queries in 1–3 s.
+- **A realistic run is ~4 queries × 2–3 s ≈ 10 s of Zetaris**, not minutes. The 5–10
+  minute judging budget is comfortable, and Zetaris is **not** the dominant cost at our
+  data size. Yesterday's "Zetaris, not the model, is the judging time budget" held only
+  for the sample tables.
+- **The `91.2 s` join from yesterday is explained**: it scanned `taxi_trips` against
+  `taxi_zones`'s 11 MB of geometry. It was not evidence of a join penalty in general.
+- **Column pruning does not avoid the scan.** A narrow two-column projection on
+  `taxi_zones` took 15.3 s against 17.0 s for a full `COUNT(*)` — a 10% saving, not the
+  order of magnitude a columnar format would give. So trimming Q1 to 12 columns helps
+  the response payload, not the scan. **Generate less data; do not rely on selecting
+  fewer columns from more.**
+
+**What does not change.** The design decisions the earlier entry drove are still the
+right ones, for reasons that survive the correction: no `JOIN`s at agent time (the
+union view cannot be referenced twice anyway — see the spike entry), harmonise in
+registered views, one batched verification query, a hard query budget. They are now
+*prudent* rather than *forced*, and `ZETARIS_TIMEOUT_S=180` stays — 164 s on a 50 MB
+table is exactly the kind of worst case it exists for.
+
+**Method lesson, recorded because it caused the error.** One table, one shape, one
+afternoon, generalised into an architectural constraint, written into `DECISIONS.md`,
+`TODO.md` and `PROGRESS.md`, and reported as the finding of the day. The fix was a
+single extra query against a second table. Before a measurement becomes a design
+constraint, vary the thing you are claiming is irrelevant.
+
+---
+
+## 2026-10-24 — The reachability spike passed, and the whole REST→explode→view→union chain works **[live — Arpon's machine, 24 Oct]**
+
+PLAN step 1. **No fallback is needed.** `datasvc` can sit on the host and Zetaris will
+read it, which keeps `docker-compose.yml` as it is and retires the MinIO/Parquet and
+Postgres-over-JDBC contingencies (PLAN 11).
+
+**The network path.** A throwaway `python3 -m http.server 8100 --bind 0.0.0.0`, then
+from inside the containers:
+
+| From | Result |
+|---|---|
+| `zetaris-api-1` → `http://host.docker.internal:8100/records.json` | **HTTP 200 in 0.023 s** |
+| `zetaris-driver-1` → same | **HTTP 200 in 0.020 s** |
+
+That only proves the containers' own network. The part that matters is whether
+Zetaris's **REST-table client** honours it, so the full chain was registered against
+two throwaway silos (2400 and 1800 records, 643 KB and 479 KB):
+
+| Step | Result |
+|---|---|
+| `CREATE LIGHTNING DATABASE MT_SPIKE` | ok, 0.52 s |
+| `CREATE LIGHTNING REST TABLE … endpoint "http://host.docker.internal:8100/…"` | ok, 0.51 s |
+| `SELECT * FROM MT_SPIKE.emr_raw` — **does Zetaris fetch our URL?** | **yes**, the records array came back |
+| `CREATE SCHEMASTORE CONTAINER medtrace_spike` | ok, 0.10 s |
+| `CREATE SCHEMASTORE VIEW … LATERAL VIEW explode(records) AS r` | ok, 0.34 s |
+| `SELECT COUNT(*)` through the explode view | **2400**, 1.42 s |
+| `CREATE SCHEMASTORE VIEW all_sources … UNION ALL …` | ok, 0.84 s |
+| `SELECT COUNT(*) FROM medtrace_spike.all_sources` | **4200**, 2.34 s |
+| **The real `q_identity_candidates()` output, run verbatim** | **23 rows, 2.63 s** |
+
+**Three things this settles.**
+
+1. **The union view registers, caches and queries.** PLAN 2.1 listed this as a spike
+   and the fallback was four separate per-source views on a budget of 14. Not needed.
+2. **`queries.py` generates SQL that Zetaris accepts.** The Q1 built by the real
+   function — `IN` list of DOB spellings, nested `UPPER`/`LIKE` on three name columns,
+   the anchor clause, 12-column projection — ran unmodified against a live union view
+   over explode views, including `UPPER(name_family) LIKE 'O\'BR%'` against a real
+   `O'Brien` row. That retires "no SQL here has touched Zetaris".
+3. **The "reference the union view only once" rule is confirmed on *our* view shape**,
+   not just the reference repo's. A self-join on `medtrace_spike.all_sources` failed
+   with exactly the documented error:
+   `MISSING_ATTRIBUTES.RESOLVED_ATTRIBUTE_APPEAR_IN_OPERATION … attribute(s) "records"
+   missing … in operator !Generate explode(records#13223)`. The error names `records`,
+   the pre-explode array column — so the failure is in the explode, and **any** second
+   reference breaks it, not just a self-join. `queries.py`'s no-subquery /
+   no-window-function rule is therefore load-bearing, and a test asserts the view
+   appears exactly once per template.
+
+**`CACHE TABLE` is not the latency lever we assumed.** Measured either side of it on
+the 4200-row union:
+
+| | run 1 | run 2 | run 3 |
+|---|---|---|---|
+| before `CACHE TABLE` | 1.39 s | 1.66 s | 1.06 s |
+| after `CACHE TABLE` | 2.01 s | 1.07 s | 1.33 s |
+
+No measurable difference. The sponsor's 49.7 s → 1.2 s figure
+(`REFERENCE_NOTES` 1.3) was a **rate-limited external API**; our `datasvc` is a local
+HTTP server on the same machine, where a refetch of 643 KB is free. Keep
+`CACHE TABLE` — it still stops a demo hammering `datasvc` on every query, and it is
+harmless — but it is **not** the thing that makes runs fast, and the earlier
+"`CACHE TABLE` mandatory" framing overstated it. The real lever was avoiding joins.
+
+**A NULL is not a string.** `CAST(NULL AS STRING)` in a view came back as JSON `null`
+(Python `None`), not `"null"` — see `REFERENCE_NOTES` 1.1. `parse.py` must treat it as
+absent rather than stringifying it, or `name_previous`, `sex` and every other
+source-specific null become the literal text `"None"` and read as present,
+non-matching values in identity scoring and `evidence_state`.
+
+**Cleanup.** `MT_SPIKE`, its two REST tables, `medtrace_spike` and its three views are
+throwaway and dropped. There is **no SQL path to drop a SchemaStore container**
+(`REFERENCE_NOTES` 1.3), so `medtrace_spike` may linger as an empty container; that is
+cosmetic and does not collide with the real `medtrace` container.
+
+**Method note for anyone repeating this:** my spike script's stdout was block-buffered
+because it was not attached to a tty, so a long run looked like a hang with an empty
+output file. Use `print(..., flush=True)` in anything whose progress you intend to
+watch.
+
+---
+
 ## 2026-10-24 — `''` is **not** an escaped quote in Lightning SQL; it silently deletes the apostrophe **[live — Arpon's machine, 24 Oct]**
 
 **Use `\'` (backslash). Never `''` (doubled quote).**
@@ -81,6 +218,13 @@ sources — depends on that.
 ---
 
 ## 2026-10-24 — Zetaris latency is the binding constraint on the whole design **[live — Arpon's machine, 24 Oct]**
+
+> **⚠️ Superseded in part by the correction entry above (24 Oct, later).** The
+> measurements here are accurate, but the conclusion drawn from them — *"per-query
+> engine overhead, not data volume … smaller synthetic silos will not make it
+> meaningfully faster"* — **is wrong.** Latency tracks bytes scanned (~1 s + 2–3 s/MB).
+> `taxi_zones` is 789 rows of 14 KB each, so it is a large table that looks small.
+> Read the correction before relying on anything below.
 
 **Measured**, against the install's own `NY_TAXI` sample data:
 
