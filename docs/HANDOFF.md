@@ -64,10 +64,7 @@ real property exactly, with no floor lowered:
 
 **Broken:** nothing.
 
-**Needs from teammates:** **Arnav** — the two schema additions; emit
-`forced_confirm` tasks for every current warfarin, insulin, prednisolone and
-methotrexate (the consultant's separate lane); the fixtures changed again at 200
-patients.
+**Needs from teammates:** **Arnav — read `docs/TODO_ARNAV.md` first.** It holds the two schema additions, the `forced_confirm` task lane and the pipeline order, in priority order.
 
 **Next:** merge this; then back to whatever helps the agent layer most.
 

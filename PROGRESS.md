@@ -55,6 +55,8 @@ feedback loop by Monday morning at the latest.
 
 ## Next up
 
+**Arnav's session: read `docs/TODO_ARNAV.md` first** — everything needed from Arpon's side, in order.
+
 1. **Arnav** — in disqualification-risk order: Meterless adapter; orchestrator wired
    to the domain pack with the Writer as the first real Nemotron call; API and
    `run.py`; World Model and its 8 checks (then swap Arpon's local `decide`); H-MEM
