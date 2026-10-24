@@ -32,8 +32,8 @@ row_no,apinchs_class,label,atc_prefixes,examples,source
 31,H,direct thrombin inhibitors,B01AE,dabigatran,ACSQHC
 32,H,factor Xa inhibitors,B01AF,"apixaban, rivaroxaban",ACSQHC
 33,H,thrombolytics,B01AD,"alteplase, tenecteplase",ACSQHC
-34,Ext,digoxin,C01AA05,digoxin,Extension
-35,Ext,antiarrhythmics III,C01BD,amiodarone,WA APINCHS
+34,Ext,digoxin,C01AA05,digoxin,"Extension (facility policy; not in core ACSQHC APINCHS)"
+35,Ext,antiarrhythmics III,C01BD,amiodarone,"WA APINCHS 2015 poster ONLY; absent from WA Country Health v6.05 (7 Oct 2026) and from core ACSQHC"
 36,Ext,sulfonylureas,A10BB,"gliclazide, glimepiride",Extension
 37,Ext,SU combinations,A10BD02,metformin/glibenclamide,Extension
 38,Ext,clozapine,N05AH02,clozapine,SA APINCHEN
