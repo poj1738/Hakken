@@ -322,9 +322,70 @@ def time_templates(client: Zetaris) -> None:
 # --------------------------------------------------------------------------- #
 
 
+def diff_fixtures(client: Zetaris, limit: int = 12) -> int:
+    """Run the real Q1 live and diff it against the committed fixture, per patient.
+
+    PLAN 2.9: "Once registration works, Arpon re-records them from live Zetaris
+    and diffs; **any difference is a view bug**." Kept as a command rather than a
+    one-off because the fixtures and the views can drift apart later -- a change
+    to `HARMONISED_MAP`, a regenerated silo, an edited template.
+
+    This is how the NULL-vs-empty-string bug was found: every row count matched,
+    so nothing failed, while 409 cells differed and `SAMPLE_MODE` was quietly
+    replaying the wrong shape.
+    """
+    from app.domain.packs.medtrace import queries as q
+    from app.domain.packs.medtrace.types import SourceRow
+
+    gt_path = pathlib.Path("data/synthetic/ground_truth.json")
+    emr_path = pathlib.Path("data/synthetic/silos/emr.json")
+    if not (gt_path.exists() and emr_path.exists()):
+        log("\nno generated data; run `make synth` first")
+        return 1
+    ground_truth = json.loads(gt_path.read_text())
+    emr = {r["mrn"]: r for r in json.loads(emr_path.read_text())["records"]}
+
+    log("\n--- live Q1 vs the committed fixtures ---")
+    checked = failures = 0
+    for patient in ground_truth["patients"][:limit]:
+        key = patient["patient_key"]
+        fixture = pathlib.Path(f"tests/fixtures/medtrace/Q1__{key}.json")
+        mrn = (patient["true_links"].get("emr") or [None])[0]
+        if not fixture.exists() or mrn not in emr:
+            continue
+        row = emr[mrn]
+        anchor = SourceRow(source="emr", row_id=row["row_id"], source_patient_id=mrn,
+                           ihi_syn=row["ihi_syn"] or None, name_given=row["given_name"],
+                           name_family=row["family_name"], dob_raw=row["dob"])
+        result, secs, error = client.run(q.q_identity_candidates(anchor), limit=5000)
+        checked += 1
+        if error:
+            log(f"  FAIL  {key}  {secs:5.2f}s  {error[:120]}")
+            failures += 1
+            continue
+        doc = json.loads(fixture.read_text())
+        same = (result["headers"] == doc["headers"]
+                and sorted(map(tuple, result["data"])) == sorted(map(tuple, doc["data"])))
+        failures += 0 if same else 1
+        log(f"  {'ok  ' if same else 'FAIL'}  {key}  {secs:5.2f}s  "
+            f"live={result['total']:4} fixture={doc['total']:4}"
+            f"{'' if same else '   <-- VIEW BUG or stale fixture'}")
+        if not same:
+            live = {tuple(r) for r in result["data"]}
+            fx = {tuple(r) for r in doc["data"]}
+            for cells in list(live - fx)[:2]:
+                log(f"          live only:    {cells[:7]}")
+            for cells in list(fx - live)[:2]:
+                log(f"          fixture only: {cells[:7]}")
+    log(f"  {checked} patient(s) checked, {failures} mismatch(es)")
+    return failures
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--apply", action="store_true", help="execute (default is dry run)")
+    ap.add_argument("--diff-fixtures", action="store_true",
+                    help="run the real Q1 live and diff against the committed fixtures")
     ap.add_argument("--skip-exists", action="store_true",
                     help="treat 'already exists' as success, for a re-run")
     ap.add_argument("--verify-only", action="store_true", help="only count and time")
@@ -338,10 +399,14 @@ def main() -> int:
     log(f"container   {CONTAINER}")
     log(f"statements  {len(statements)}")
 
+    if args.diff_fixtures:
+        return 1 if diff_fixtures(Zetaris()) else 0
+
     if args.verify_only:
         client = Zetaris()
         failures = verify(client)
         time_templates(client)
+        failures += diff_fixtures(client, limit=6)
         return 1 if failures else 0
 
     if not args.apply:

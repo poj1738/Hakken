@@ -34,7 +34,7 @@
    "SYN-958471148299",
    "Annette",
    "O'Brien",
-   "",
+   null,
    "1936-12-30",
    "M",
    "2660",
@@ -49,10 +49,10 @@
    "1 daily",
    "",
    "",
-   "",
-   "",
-   "",
-   ""
+   null,
+   null,
+   null,
+   null
   ],
   [
    "emr",
@@ -61,7 +61,7 @@
    "SYN-958471148299",
    "Annette",
    "O'Brien",
-   "",
+   null,
    "1936-12-30",
    "M",
    "2660",
@@ -76,10 +76,10 @@
    "1 bd",
    "",
    "withheld: contrast",
-   "",
-   "",
-   "",
-   ""
+   null,
+   null,
+   null,
+   null
   ],
   [
    "emr",
@@ -88,7 +88,7 @@
    "SYN-958471148299",
    "Annette",
    "O'Brien",
-   "",
+   null,
    "1936-12-30",
    "M",
    "2660",
@@ -103,10 +103,10 @@
    "1 bd",
    "",
    "",
-   "",
-   "",
-   "",
-   ""
+   null,
+   null,
+   null,
+   null
   ],
   [
    "emr",
@@ -115,7 +115,7 @@
    "SYN-958471148299",
    "Annette",
    "O'Brien",
-   "",
+   null,
    "1936-12-30",
    "M",
    "2660",
@@ -130,10 +130,10 @@
    "2 puffs bd",
    "",
    "",
-   "",
-   "",
-   "",
-   ""
+   null,
+   null,
+   null,
+   null
   ],
   [
    "gp",
@@ -152,15 +152,15 @@
    "SYN-AMT-MPP-0029",
    "amt",
    "20 mg",
-   "",
-   "",
+   null,
+   null,
    "one a day",
    "active",
-   "",
-   "",
-   "",
-   "",
-   ""
+   null,
+   null,
+   null,
+   null,
+   null
   ]
  ],
  "total": 5

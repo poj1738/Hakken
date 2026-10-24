@@ -34,7 +34,7 @@
    "SYN-932392202599",
    "Stanley",
    "Papadopoulos",
-   "",
+   null,
    "1942-03-08",
    "F",
    "2777",
@@ -49,10 +49,10 @@
    "1 daily",
    "",
    "withheld: contrast",
-   "",
-   "",
-   "",
-   ""
+   null,
+   null,
+   null,
+   null
   ]
  ],
  "total": 1

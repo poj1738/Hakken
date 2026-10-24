@@ -243,7 +243,10 @@ def test_fixture_envelopes_match_their_sql_template(template: str, columns: tupl
         assert doc["total"] == len(doc["data"]), path.name
         for row in doc["data"]:
             assert len(row) == len(columns), path.name
-            assert all(isinstance(v, str) for v in row), path.name
+            # A present value is a string; `None` stays JSON null, because that
+            # is what the live view returns for a column the source does not
+            # have. Verified against live on 24 Oct.
+            assert all(v is None or isinstance(v, str) for v in row), path.name
 
 
 def test_q_ref_fixtures_are_present_and_shaped() -> None:
@@ -366,3 +369,28 @@ def test_an_overlay_puts_another_persons_dispensing_under_one_customer(
     for patient in hosts:
         for cust in patient["true_links"].get("pharmacy", []):
             assert counts[cust] > 0
+
+
+def test_fixtures_distinguish_an_absent_column_from_a_blank_value() -> None:
+    """`None` and `""` mean different things, and the live view emits both.
+
+    A column the source does not have at all comes back as JSON null (the view
+    emits `CAST(NULL AS STRING)`); a column it has whose value is blank comes
+    back as `""`. Flattening both to `""` made every replayed envelope differ
+    from live in hundreds of cells **without changing a single row count**, so
+    nothing failed and `SAMPLE_MODE` silently replayed the wrong shape. Only a
+    live diff found it (`register_sources.py --diff-fixtures`).
+    """
+    doc = json.loads((FIXTURES / "Q2__P0001.json").read_text())
+    headers = doc["headers"]
+    family = headers.index("name_family")
+    source = headers.index("source")
+    ihi = headers.index("ihi_syn")
+
+    pharmacy = [r for r in doc["data"] if r[source] == "pharmacy"]
+    assert pharmacy, "no pharmacy rows to check"
+    # The pharmacy silo has no family-name column -- only a combined "name".
+    assert all(r[family] is None for r in pharmacy)
+    # A missing IHI is a blank value in a column that does exist.
+    assert all(r[ihi] is None or isinstance(r[ihi], str) for r in doc["data"])
+    assert any(r[ihi] == "" for r in doc["data"]), "expected at least one blank IHI"

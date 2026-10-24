@@ -34,7 +34,7 @@
    "SYN-166926809857",
    "Kenneth",
    "Lee",
-   "",
+   null,
    "1951-02-24",
    "F",
    "2319",
@@ -49,10 +49,10 @@
    "1 bd",
    "",
    "",
-   "",
-   "",
-   "",
-   ""
+   null,
+   null,
+   null,
+   null
   ],
   [
    "gp",
@@ -71,15 +71,15 @@
    "SYN-AMT-MPP-0105",
    "amt",
    "60 mg",
-   "",
-   "",
+   null,
+   null,
    "one in the morning",
    "active",
-   "",
-   "",
-   "",
-   "",
-   ""
+   null,
+   null,
+   null,
+   null,
+   null
   ],
   [
    "gp",
@@ -98,15 +98,15 @@
    "SYN-AMT-MPP-0037",
    "amt",
    "5/10 mg",
-   "",
-   "",
+   null,
+   null,
    "one a day",
    "active",
-   "",
-   "",
-   "",
-   "",
-   ""
+   null,
+   null,
+   null,
+   null,
+   null
   ]
  ],
  "total": 3

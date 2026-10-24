@@ -891,13 +891,28 @@ HARMONISED_MAP: dict[str, dict[str, object]] = {
 }
 
 
-def harmonise(source: str, row: dict[str, str]) -> dict[str, str]:
-    """One native silo row -> the harmonised shape, every value a string."""
-    out: dict[str, str] = {}
+def harmonise(source: str, row: dict[str, str]) -> dict[str, str | None]:
+    """One native silo row -> the harmonised shape, matching the live view exactly.
+
+    **`None` and `""` are different here, and the difference is load-bearing.**
+    Verified against the registered views on 24 Oct:
+
+      a column this source does NOT HAVE  -> the view emits CAST(NULL AS STRING)
+                                             -> Zetaris returns JSON null
+      a column it has, whose value is blank -> Zetaris returns ""
+
+    So `name_family` is `None` for a pharmacy row (the silo has no such column at
+    all, only a combined `name`), while `ihi_syn` is `""` for a patient whose IHI
+    is simply missing. Both mean "absent" to `parse.py`, but flattening them here
+    made every replayed envelope differ from the live view in 409 places -- the
+    counts matched, so nothing failed, and `SAMPLE_MODE` would have quietly
+    tested the wrong shape. Caught only by diffing against live.
+    """
+    out: dict[str, str | None] = {}
     for column in HARMONISED_COLUMNS:
         mapping = HARMONISED_MAP[column].get(source)
         if mapping is None:
-            out[column] = ""
+            out[column] = None          # the source has no such column
         elif isinstance(mapping, tuple):
             out[column] = str(mapping[1])
         else:
@@ -905,10 +920,20 @@ def harmonise(source: str, row: dict[str, str]) -> dict[str, str]:
     return out
 
 
-def envelope(columns: tuple[str, ...], rows: list[dict[str, str]]) -> dict[str, object]:
-    """A Zetaris response body. Every value a string (`REFERENCE_NOTES` 1.1)."""
+def envelope(columns: tuple[str, ...], rows: list[dict[str, str | None]]) -> dict[str, object]:
+    """A Zetaris response body.
+
+    Every *present* value is a string; a `None` stays JSON null, because that is
+    what the live view returns for a column the source does not have
+    (`REFERENCE_NOTES` 1.1). Stringifying it would make the replayed envelope
+    differ from live without changing any row count.
+    """
+    def cell(row: dict[str, str | None], column: str) -> str | None:
+        value = row.get(column)
+        return None if value is None else str(value)
+
     return {"headers": list(columns),
-            "data": [[str(r.get(c, "")) for c in columns] for r in rows],
+            "data": [[cell(r, c) for c in columns] for r in rows],
             "total": len(rows)}
 
 
@@ -928,7 +953,7 @@ def dob_variants(text: str) -> set[str]:
     return out
 
 
-def q1_matches(anchor: dict[str, str], row: dict[str, str]) -> bool:
+def q1_matches(anchor: dict[str, str | None], row: dict[str, str | None]) -> bool:
     """The Q1 blocking predicate, in Python.
 
     Must stay equivalent to `queries.q_identity_candidates`. Step 6 verifies
@@ -938,9 +963,9 @@ def q1_matches(anchor: dict[str, str], row: dict[str, str]) -> bool:
     """
     if anchor["ihi_syn"] and row["ihi_syn"] == anchor["ihi_syn"]:
         return True
-    if row["dob_text"] and row["dob_text"] in dob_variants(anchor["dob_text"]):
+    if row["dob_text"] and row["dob_text"] in dob_variants(anchor["dob_text"] or ""):
         return True
-    year = anchor["dob_text"][:4]
+    year = (anchor["dob_text"] or "")[:4]
     prefix = ""
     for char in (anchor["name_family"] or anchor["name_given"] or "").upper():
         if not (char.isalpha() or char in "'- "):
@@ -948,7 +973,7 @@ def q1_matches(anchor: dict[str, str], row: dict[str, str]) -> bool:
         prefix += char
         if len(prefix) == 4:
             break
-    if year and prefix and year in row["dob_text"]:
+    if year and prefix and year in (row["dob_text"] or ""):
         for field in ("name_family", "name_previous", "name_given"):
             if (row.get(field) or "").upper().startswith(prefix):
                 return True
