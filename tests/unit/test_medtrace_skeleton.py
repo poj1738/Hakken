@@ -333,25 +333,52 @@ def test_dob_match_literals_emits_the_swap_only_when_it_is_a_real_date() -> None
 def test_surname_prefix_survives_punctuation() -> None:
     """`O'Brien` must yield `O''BR%`, not `OBRI%`, or it never matches `O'BRIEN`."""
     sql = queries.q_identity_candidates(_row(name_family="O'Brien", dob_raw="1948-07-03"))
-    assert "UPPER(name_family) LIKE 'O''BR%'" in sql
+    assert r"UPPER(name_family) LIKE 'O\'BR%'" in sql
     assert "OBRI" not in sql
+    assert "'O''BR%'" not in sql   # the doubled form would collapse to 'OBR%'
 
 
-def test_sql_literal_escapes_quotes_and_refuses_the_rest() -> None:
-    assert queries.sql_literal("O'Brien") == "'O''Brien'"
+def test_sql_literal_uses_backslash_escaping_not_a_doubled_quote() -> None:
+    """The doubled quote is **wrong in this dialect and fails silently.**
+
+    Measured live on 24 Oct: `SELECT 'O''Brien'` returns `OBrien`, length 6.
+    `''` closes one literal and opens another, adjacent literals concatenate,
+    and the apostrophe is deleted with balanced quotes and no error. A
+    `WHERE zone LIKE '%''%'` matched 789 of 789 rows against the real 12.
+
+    So this assertion is not a style preference. With the doubled form,
+    `O'Brien` reaches Zetaris as `OBrien`, matches nothing, and the pharmacist
+    is told "GP: no record found" for a record that exists.
+    """
+    assert queries.sql_literal("O'Brien") == r"'O\'Brien'"
+    assert "''" not in queries.sql_literal("O'Brien")
+    assert queries.sql_literal("a\\b") == r"'a\\b'"       # backslash doubled, not refused
     assert queries.sql_literal(None) == "NULL"
     assert queries.sql_literal(5) == "5"
-    for hostile in ("a\\b", "x; DROP VIEW medtrace.emr", "a\nb", "a\x00b", "x" * 257):
+    for hostile in ("x; DROP VIEW medtrace.emr", "a\nb", "a\x00b", "x" * 257):
         with pytest.raises(queries.QueryBuildError):
             queries.sql_literal(hostile)
     with pytest.raises(queries.QueryBuildError):
         queries.sql_literal(True)
 
 
-def test_a_hostile_name_cannot_reach_a_template() -> None:
-    """Free text from the patient silo reaches Q1. It must fail, not sanitise."""
+def test_an_injection_attempt_stays_inside_the_literal() -> None:
+    """Verified live: these come back from Zetaris as inert strings."""
+    assert queries.sql_literal("x' OR 1=1 --") == r"'x\' OR 1=1 --'"
+    assert queries.sql_literal("x'") == r"'x\''"
+
+
+def test_a_hostile_name_cannot_change_the_shape_of_a_template() -> None:
+    """A quote in the data must stay inside the literal, not add a clause.
+
+    A semicolon is still refused outright, because no template embeds free text
+    and refusing keeps the statement-level guard sound.
+    """
     with pytest.raises(queries.QueryBuildError):
         queries.q_identity_candidates(_row(ihi_syn="SYN-1'; DROP VIEW medtrace.emr --"))
+    sql = queries.q_identity_candidates(_row(name_family="O'Brien OR 1=1", dob_raw="1948-07-03"))
+    assert sql.count("WHERE") == 1
+    assert "1=1" not in sql   # truncated at the space by the prefix scan
 
 
 def test_empty_in_lists_are_refused_not_silently_emptied() -> None:

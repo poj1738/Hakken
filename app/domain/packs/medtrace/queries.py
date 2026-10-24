@@ -2,8 +2,10 @@
 
 Agents **pick from these templates**; free SQL is a budgeted fallback
 (`PLAN` 0). Every function returns exactly one statement with no trailing
-semicolon and every value escaped, because that is what the REST endpoint
-accepts (`REFERENCE_NOTES` 1.2).
+semicolon, because that is what the REST endpoint accepts
+(`REFERENCE_NOTES` 1.2), and every value escaped **with a backslash, not a
+doubled quote** -- see `sql_literal`, where the doubled form was measured to
+silently delete the apostrophe rather than escape it.
 
 **The governing rule of this module: no `DISTINCT`, no window functions, no
 `JOIN`s and no subqueries.** Three separate findings forced that, and each one
@@ -140,18 +142,37 @@ def sql_literal(value: str | int | float | None) -> str:
     """Render one value as a Lightning SQL literal.
 
     `None` becomes `NULL`; numbers are rendered bare; strings are single-quoted
-    with `'` doubled, so `O'Brien` becomes `'O''Brien'` -- a real surname in this
-    data, not a hypothetical.
+    with **backslash escaping**: a backslash is doubled, then `'` becomes `\'`.
 
-    Backslashes are **rejected rather than escaped**. Spark-family dialects treat
-    `\\` as an escape character inside string literals, so a trailing backslash
-    can escape the closing quote and change the shape of the statement. We never
-    need one in this data, so refusing is strictly safer than guessing which
-    escaping mode the engine is in.
+    **The standard SQL doubled quote is wrong in this dialect, and it fails
+    silently.** Measured `[live -- Arpon's machine, 24 Oct]`:
+
+        SELECT 'O''Brien'      ->  OBrien       (length 6, not 7)
+        SELECT 'AB' 'CD'       ->  ABCD
+        SELECT 'O\'Brien'      ->  O'Brien      (correct)
+
+    `''` is not an escaped apostrophe here -- it closes one literal and opens
+    another, and **adjacent literals concatenate**, so the apostrophe is deleted.
+    Quotes stay balanced, nothing raises, and the value is quietly corrupted. On
+    this instance `WHERE zone LIKE '%''%'` matched **789 of 789** rows, because
+    the pattern had collapsed to `%%`; the backslash form matched the true 12.
+
+    For MedTrace that is a patient-safety bug rather than a cosmetic one.
+    `O'Brien` would reach Zetaris as `OBrien`, match nothing, and the pharmacist
+    would be told "GP: no record found" for a record that exists -- a fabricated
+    coverage gap, caused by a surname that is ordinary in Australia.
+
+    Backslash escaping was verified to round-trip every value these templates
+    embed, and hostile input (`x' OR 1=1 --`) comes back as an inert string.
+
+    Semicolons and control characters are still **refused rather than escaped**.
+    These templates only ever embed identifiers, codes, dates and names, never
+    free text from a silo, so refusing costs nothing real and keeps
+    `_one_statement`'s blanket semicolon check sound.
 
     Raises:
-        QueryBuildError: on a backslash, a semicolon, a control character, or a
-            value longer than 256 characters.
+        QueryBuildError: on a semicolon, a control character, or a value longer
+            than 256 characters.
     """
     if value is None:
         return "NULL"
@@ -163,12 +184,12 @@ def sql_literal(value: str | int | float | None) -> str:
         raise QueryBuildError(f"cannot render {type(value).__name__} as a SQL literal")
     if len(value) > 256:
         raise QueryBuildError(f"literal too long ({len(value)} chars); this is not real data")
-    for bad, why in (("\\", "backslash"), (";", "semicolon")):
-        if bad in value:
-            raise QueryBuildError(f"refusing to embed a {why}: {value!r}")
+    if ";" in value:
+        raise QueryBuildError(f"refusing to embed a semicolon: {value!r}")
     if any(ord(c) < 0x20 or ord(c) == 0x7F for c in value):
         raise QueryBuildError(f"refusing to embed a control character: {value!r}")
-    return "'" + value.replace("'", "''") + "'"
+    escaped = value.replace("\\", "\\\\").replace("'", "\\'")
+    return f"'{escaped}'"
 
 
 def _in_list(values: list[str]) -> str:

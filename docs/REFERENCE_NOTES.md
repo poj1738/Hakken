@@ -106,6 +106,20 @@ Error meanings (from `AGENTS.md` and the troubleshooting tables):
   in one pass instead of a self-join or an `IN`/`HAVING` subquery.
 - `DESCRIBE BY "..."` accepts letters, digits, spaces and `_ . - ,` only.
   Parentheses, slashes and colons fail validation.
+- **String literals escape with a backslash (`\'`), not a doubled quote (`''`).**
+  **Confirmed [live — Arpon's machine, 24 Oct]:** `''` does not escape — it closes one
+  literal and opens another, and adjacent literals concatenate, so `SELECT 'O''Brien'`
+  returns `OBrien` (length 6) and `SELECT 'AB' 'CD'` returns `ABCD`. The quotes stay
+  balanced and nothing raises, so the value is **silently corrupted**:
+  `WHERE zone LIKE '%''%'` matched 789 of 789 rows (the pattern had collapsed to `%%`)
+  where the backslash form matched the true 12, and an `=` against a real apostrophe
+  value returned **0 rows with no error**. Any free-SQL path must use `\'`.
+  See `docs/DECISIONS.md`, 24 Oct, and `queries.sql_literal()`.
+- `UPPER(CAST(NULL AS STRING)) LIKE 'A%'` returns no rows rather than erroring, so an
+  `OR` chain may safely test columns that are null for some sources.
+- **`UPPER()` and `LIKE` are not free.** A Q1-shaped `OR` chain (an `IN` list plus
+  nested `UPPER`/`LIKE` predicates) over 789 rows cost **24.5 s**, against 3.8 s for a
+  plain `IN` count. Trim projections and keep predicates flat.
 
 ### 1.3 Registering our synthetic silos
 

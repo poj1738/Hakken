@@ -11,6 +11,75 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-24 — `''` is **not** an escaped quote in Lightning SQL; it silently deletes the apostrophe **[live — Arpon's machine, 24 Oct]**
+
+**Use `\'` (backslash). Never `''` (doubled quote).**
+
+The standard-SQL doubled quote does not escape in this dialect. It **closes one
+string literal and opens another**, and adjacent literals are concatenated — so the
+apostrophe is deleted, the quotes stay balanced, nothing raises, and the value is
+quietly corrupted.
+
+Measured directly:
+
+| Statement | Returns |
+|---|---|
+| `SELECT 'O''Brien'` | `OBrien` — **length 6, not 7** |
+| `SELECT LENGTH('' '' '' '')` (four quotes) | `0` |
+| `SELECT 'AB' 'CD'` | `ABCD` — adjacent literals concatenate |
+| `SELECT 'O\'Brien'` | `O'Brien` — correct |
+
+And against real rows (`NY_TAXI.taxi_zones`, 789 rows, 2 zones containing an apostrophe):
+
+| Predicate | Rows | Truth |
+|---|---|---|
+| `zone LIKE '%''%'` | **789 of 789** | pattern collapsed to `%%` |
+| `zone LIKE '%\'%'` | **12** | correct |
+| `zone = 'Eltingville/Annadale/Prince''s Bay'` | **0, no error** | silently wrong |
+| `zone = 'Eltingville/Annadale/Prince\'s Bay'` | **3** | correct |
+
+**Why this matters more than it looks.** For MedTrace it is a patient-safety bug, not
+a style issue. `O'Brien`, `D'Souza`, `O'Connor` are ordinary Australian surnames. With
+the doubled form the name reaches Zetaris as `OBrien`, matches nothing, and the
+pharmacist is told **"GP: no record found" for a record that exists** — a fabricated
+coverage gap, produced by a query that succeeded. No exception, no empty-result
+warning, nothing in a trace to notice. It would have looked like a data problem.
+
+**Decided:** `queries.sql_literal()` escapes `\` → `\\` then `'` → `\'`. Backslash is
+escaped, not refused (the earlier code refused it, on the assumption that doubling the
+quote was the safe path — the exact inversion of the truth). Verified to round-trip
+every value these templates embed, and hostile input (`x' OR 1=1 --`, `x'; SELECT 1 --`)
+comes back as an inert string rather than altering the statement. Semicolons and
+control characters are still refused outright, because no template embeds free text and
+refusing keeps the statement-level "one statement, no semicolon" guard sound.
+
+**Caught by testing the dialect rather than trusting it.** The templates had been
+written to the published SQL rules and a recorded response envelope, and reviewed, and
+had 104 passing tests — one of which asserted the *wrong* escaping as correct. Nothing
+short of sending the SQL to the engine would have found it.
+
+**Also measured, same session** — the construct costs for a Q1-shaped predicate on 789
+rows, which is the realistic shape of our identity-blocking query:
+
+| Shape | Time |
+|---|---|
+| `COUNT(*)` with `IN ('a','b','c')` | 3.8 s |
+| `COUNT(*)` with `UPPER(col) LIKE 'AST%'` | 8.1 s |
+| `COUNT(*)` with `LIKE '%...%'` | 6.6 s |
+| 4-column projection, full Q1-shaped `OR` chain (IN + LIKE + nested ORs) | **24.5 s** |
+| 6-column projection, 789 rows, no `WHERE` | 9.5 s |
+
+`UPPER()` and `LIKE` are not free, and the `OR` chain is the expensive part. At ~25 s
+for Q1 the 8-query budget still fits the 5–10 minute judging limit, but with less room
+than the plan assumed. Confirms the no-`JOIN` rule and makes trimming Q1 to the 12
+identity columns (rather than all 25) worth keeping.
+
+**Verified safe for `NULL`:** `UPPER(CAST(NULL AS STRING)) LIKE 'A%'` returns 0 rows
+rather than erroring. Q1's `OR` chain over `name_previous` — null for three of the four
+sources — depends on that.
+
+---
+
 ## 2026-10-24 — Zetaris latency is the binding constraint on the whole design **[live — Arpon's machine, 24 Oct]**
 
 **Measured**, against the install's own `NY_TAXI` sample data:
