@@ -23,11 +23,21 @@ from app.domain.packs.medtrace.types import (
 #: Medicines whose dose changes **without a new prescription**, so comparing
 #: sources cannot establish the current dose however well they agree.
 #: `generic` -> the task text. See `forced_confirm`.
+#:
+#: Task wording follows the consultant's brief 12 (25 Oct): what a pharmacist
+#: actually confirms. Warfarin brands are not interchangeable (Queensland Health
+#: anticoagulant guideline); methotrexate's catastrophic error is weekly versus
+#: daily; a taper needs its step, start date and plan. DOACs are deliberately
+#: absent -- they are fixed-dose, so a change needs a new script and the
+#: dispensing record sees it.
 DOSE_CHANGES_WITHOUT_A_SCRIPT: dict[str, str] = {
-    "warfarin": "Confirm the current warfarin dose with the patient or their INR record",
-    "insulin glargine": "Confirm the current insulin glargine dose with the patient",
-    "insulin aspart": "Confirm the current insulin aspart doses with the patient",
-    "prednisolone": "Confirm which step of the prednisolone taper the patient is on",
+    "warfarin": ("Confirm the current warfarin dose, the date of the last dose, the latest "
+                 "INR and the brand (Marevan and Coumadin are not interchangeable)"),
+    "insulin glargine": "Confirm each insulin, the units per dose and the timing with the patient",
+    "insulin aspart": "Confirm each insulin, the units per dose and the timing with the patient",
+    "prednisolone": ("Confirm the current prednisolone dose, when this step started, the "
+                     "planned schedule, and whether it is long-term"),
+    "methotrexate": "Confirm the weekly methotrexate dose and the day of the week it is taken",
 }
 
 #: ATC prefixes for the same property, so an agent we have no `generic` string

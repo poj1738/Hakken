@@ -16,9 +16,8 @@ from __future__ import annotations
 from datetime import date
 
 from app.domain.packs.medtrace.fuse import _irregular_anywhere
-from app.domain.packs.medtrace.normalise import parse_frequency
+from app.domain.packs.medtrace.normalise import _leading_units, parse_frequency
 from app.domain.packs.medtrace.safety import (
-    DOSE_CHANGES_WITHOUT_A_SCRIPT,
     STEROID_TAPER_CLASS,
     STEROID_TAPER_PREFIX,
     forced_confirm,
@@ -46,6 +45,23 @@ ATC_CLASS_LENGTH = 4
 def _atc_class(atc: str | None) -> str:
     return (atc or "")[:ATC_CLASS_LENGTH]
 
+
+#: Medicines where the split of an unchanged daily dose matters clinically, so
+#: "same total, different split" is flagged (low severity) instead of
+#: suppressed. Consultant brief 11.3: levodopa (motor control), lithium and
+#: narrow-index antiepileptics (peaks and troughs), corticosteroid replacement,
+#: insulin and sulfonylureas (meal timing), time-dependent antibiotics. Matched
+#: as prefixes of the generic. Brief 8 section 2's "never flag" holds for
+#: everything else.
+SPLIT_SENSITIVE = ("levodopa", "lithium", "carbamazepine", "valpro", "phenytoin",
+                   "hydrocortisone", "prednisolone", "insulin", "gliclazide",
+                   "glibenclamide", "amoxicillin", "flucloxacillin", "cefalexin",
+                   "gentamicin")
+
+#: The task attached to a chart-vs-BPMH finding whose BPMH rests on one source
+#: (consultant brief 14.4): still a finding, but marked unverified.
+SECOND_SOURCE_TASK = ("Obtain a second source (the patient, a dispensing record or My "
+                      "Health Record) before acting: the history here rests on one source")
 
 #: Two daily doses closer than this, relatively, are the same dose. "2.5 mg"
 #: written two ways must never become a dose discrepancy.
@@ -115,12 +131,19 @@ def detect_discrepancies(
       what separates a real duplicate (Caduet and Lipitor on the same GP list)
       from the same therapy written two ways in two places, which brief 8
       section 4 says is never a finding.
-    - `dose_unconfirmable` -- every current medicine whose dose changes without
-      a new script (`safety.DOSE_CHANGES_WITHOUT_A_SCRIPT`). Agreement between
-      sources that cannot see a phone instruction is not confirmation, so it is
-      raised whether or not they visibly disagree, and severity is high either
-      way (DATA_SPEC 9.5: "never auto-resolved to one source"). These medicines
-      never also get a plain `dose` finding.
+    - `dose_unconfirmable` -- a current medicine whose dose changes without a
+      new script (`safety.forced_confirm` is not None), **when the sources
+      show it**: their daily doses disagree, or the GP or patient gives
+      directions that name no dose ("as directed per INR", "not sure how much
+      now") -- DATA_SPEC 9.5's visible trace of a phone change -- or no patient
+      statement of a regular dose exists, since the patient is the one source a
+      phone change reaches. Never resolved
+      to one source; severity high. Where the sources agree, the standing
+      "confirm the dose" duty is `safety.forced_confirm`, a task the
+      orchestrator emits for every current one -- not a finding. (This
+      replaced an earlier rule that fired for every current one: at 200
+      patients that rule was 21 of 32 false positives.) A chart that halves a
+      dose the sources agree on still gets a plain `dose` finding as well.
 
     **Not emitted yet, deliberately:**
 
@@ -155,7 +178,8 @@ def detect_discrepancies(
     found: list[DiscrepancyCandidate] = []
 
     def emit(kind: DiscrepancyType, med: FusedMed, sources: list[str], rows: list[str],
-             detail: dict, intent: str = "likely_unintentional") -> None:
+             detail: dict, intent: str = "likely_unintentional",
+             extra_tasks: list[str] | None = None, severity_cap: str | None = None) -> None:
         rows = list(dict.fromkeys(r for r in rows if r))
         if not rows:
             return
@@ -164,9 +188,23 @@ def detect_discrepancies(
                 and (med.atc or "").startswith(STEROID_TAPER_PREFIX)):
             risk = STEROID_TAPER_CLASS
         severity = SEVERITY[kind]
-        if risk is not None and kind is not DiscrepancyType.STALE_LISTING:
+        if "daily_dose_ratio" in detail:
+            # Consultant brief 11.4: harm follows exposure and drug risk, not
+            # which field was wrong. A frequency error that doubles the dose
+            # ranks with a dose error that doubles it.
+            ratio = float(detail["daily_dose_ratio"])
+            magnitude = max(ratio, 1 / ratio) if ratio > 0 else float("inf")
+            if risk is not None:
+                severity = "high" if magnitude >= 1.5 else "medium"
+            else:
+                severity = "medium" if magnitude >= 1.5 else "low"
+            if detail.get("subtype") == "regimen_split_differs":
+                severity = "low"
+        elif risk is not None and kind is not DiscrepancyType.STALE_LISTING:
             severity = "high"
-        tasks = [TASKS[kind].format(g=med.generic)]
+        if severity_cap == "low" and risk is None:
+            severity = "low"
+        tasks = [TASKS[kind].format(g=med.generic)] + list(extra_tasks or [])
         forced = forced_confirm(med.generic, med.atc)
         if forced and forced not in tasks:
             tasks.append(forced)
@@ -195,20 +233,34 @@ def detect_discrepancies(
         noted = next((c.note_text for c in charted if c.note_text), None)
         intent = "documented_intentional" if noted else "likely_unintentional"
 
-        # -- dose_unconfirmable: the dose cannot be confirmed, by construction
-        if g in DOSE_CHANGES_WITHOUT_A_SCRIPT and (present_now or (on_chart and present_now is not False)):
+        # -- dose_unconfirmable: a finding ONLY when the sources visibly conflict.
+        # The routine "confirm this dose" is safety.forced_confirm -- a task in
+        # its own lane, emitted for every current one by the orchestrator, never
+        # ranked among discrepancies (consultant brief 12.2). forced_confirm is
+        # also the predicate, so all insulins (ATC A10A) are in scope, not one.
+        if (forced_confirm(g, med.atc) is not None
+                and (present_now or (on_chart and present_now is not False))):
             sources = [s for s in ("gp", "pharmacy", "patient", "emr") if rows_of(s, g)]
-            doses = sorted({str(s.daily_dose_mg) for src in sources
+            doses = sorted({round(s.daily_dose_mg, 4) for src in sources
                             for s in by_source.get((src, g), []) if s.daily_dose_mg})
-            emit(DiscrepancyType.DOSE_UNCONFIRMABLE, med, sources,
-                 [r for src in sources for r in rows_of(src, g)],
-                 {"mechanism": "dose changes without a new script",
-                  "doses_seen": doses, "sources_disagree": len(doses) > 1},
-                 "possibly_intentional")
+            vague = [s.row_id for src in ("gp", "patient") for s in by_source.get((src, g), [])
+                     if _unstated_dose(s)]
+            disagree = len(doses) > 1 and _differ(doses[0], doses[-1])
+            if disagree or vague:
+                emit(DiscrepancyType.DOSE_UNCONFIRMABLE, med, sources,
+                     [r for src in sources for r in rows_of(src, g)],
+                     {"mechanism": "dose changes without a new script", "conflict": "confirm",
+                      "doses_seen": [str(x) for x in doses], "sources_disagree": disagree,
+                      "directions_without_a_dose": vague},
+                     "possibly_intentional")
 
-        # -- omission
-        if (not on_chart and med.per_source.get("emr") is EvidenceState.ABSENT_IN_SCOPE
-                and present_now and existence is not None):
+        # -- omission. A chart combination containing this medicine does not
+        # cover it when the combination is ALSO a separate current medicine:
+        # one chart line cannot account for two (Rosuzet charted, a separate
+        # rosuvastatin omitted).
+        absent_from_chart = med.per_source.get("emr") is EvidenceState.ABSENT_IN_SCOPE or (
+            on_chart and not charted and _covered_only_by_listed_combos(g, fused, chart_rows))
+        if (absent_from_chart and present_now and existence is not None):
             # Not on a GP listing alone: GP summaries keep about 30% of stopped
             # medicines as active (Elliott 2023; DATA_SPEC 8), so a listing with
             # nothing behind it -- no current supply, no patient saying yes -- is
@@ -229,14 +281,34 @@ def detect_discrepancies(
                        if _asserts_stopped(src, g, by_source, stmts, as_of)]
         else:
             against = []
-        if against:
+        # A supply lapse on its own is a "conflict: confirm", never a commission
+        # (consultant brief 13.3): absent dispensing is weak evidence -- another
+        # pharmacy, hospital supply, a stockpile -- and a false commission invites
+        # the team to stop a medicine the patient is taking. Someone has to have
+        # said it stopped.
+        if against and set(against) - {"pharmacy"}:
             emit(DiscrepancyType.COMMISSION, med, ["emr"] + against,
                  [c.row_id for c in charted] + [r for src in against for r in rows_of(src, g)],
                  {"reason": "on the admission chart, but not current before admission",
                   "contradicted_by": against})
+        elif against == ["pharmacy"]:
+            # ...but it is still shown. Suppressing it outright meant a charted
+            # medicine whose supply ran out months ago produced NOTHING, and the
+            # pharmacist was never told. Shown as a confirmation item: low
+            # severity (raised only by the drug's own risk class), and the
+            # task is to ask, not to stop it.
+            emit(DiscrepancyType.COMMISSION, med, ["emr", "pharmacy"],
+                 [c.row_id for c in charted] + rows_of("pharmacy", g),
+                 {"reason": "on the admission chart; dispensing lapsed, nothing else says "
+                            "it stopped", "conflict": "confirm", "contradicted_by": ["pharmacy"]},
+                 extra_tasks=[f"Ask the patient or GP whether {g} is still taken: the only "
+                              f"evidence it stopped is a lapsed supply"],
+                 severity_cap="low")
 
-        # -- dose / frequency / formulation / route: chart against the BPMH
-        if charted and present_now is not False and g not in DOSE_CHANGES_WITHOUT_A_SCRIPT:
+        # -- dose / frequency / formulation / route: chart against the BPMH. Also
+        # for phone-dose medicines: a chart that halves a dose the GP and the
+        # pharmacy agree on is a chart error, whatever else is uncertain.
+        if charted and present_now is not False:
             _compare_chart(med, charted[0], by_source, emit, intent, rows_of)
 
         # -- stale_listing
@@ -270,6 +342,52 @@ def _asserts_stopped(source: str, generic: str, by_source, stmts, as_of: date) -
         return bool(own) and not _irregular_anywhere(generic, stmts) and \
             supply_status(own, as_of) == "POSSIBLY_CEASED"
     return any(s.status == "ceased" for s in own)
+
+
+def _unstated_dose(stmt: MedStatement) -> bool:
+    """Directions that name no dose: "as directed per INR", "not sure how much
+    now", "up 2 units every three days". DATA_SPEC 9.5's visible trace of a
+    dose changed by phone. PRN is a stated regimen, not a missing one."""
+    text = (stmt.frequency or "").strip()
+    if not text or stmt.prn:
+        return False
+    per_day, prn = parse_frequency(text)
+    return per_day is None and not prn
+
+
+def _covered_only_by_listed_combos(generic, fused, chart_rows) -> bool:
+    """Is this medicine on the chart only inside combinations that are
+    themselves separate current medicines in the BPMH?"""
+    combos = []
+    for med in fused:
+        if med.generic == generic or "/" not in med.generic:
+            continue
+        if generic in med.generic.split("/") and chart_rows(med.generic):
+            combos.append(med)
+    if not combos:
+        return False
+    def current(med):
+        ex = med.attributes.get("existence")
+        return ex is not None and not ex.abstained and ex.value == "present"
+    return all(current(c) for c in combos)
+
+
+def _administrations(stmt: MedStatement) -> float | None:
+    """Administrations a day: "2 tds" is 3, "1 bd" is 2. For a dispensing,
+    which has no directions, one unit per administration is assumed."""
+    per_day = _per_day(stmt)
+    if not per_day:
+        return None
+    if stmt.source == "pharmacy" or not stmt.frequency:
+        return per_day
+    units = _leading_units(stmt.frequency) or 1.0
+    return per_day / units
+
+
+def _single_source(backers: list[str]) -> str | None:
+    """The one pre-admission source a BPMH value rests on, or None if several."""
+    independent = sorted(set(backers) - {"emr"})
+    return independent[0] if len(independent) == 1 else None
 
 
 def _per_day(stmt: MedStatement) -> float | None:
@@ -306,22 +424,46 @@ def _compare_chart(med, chart, by_source, emit, intent, rows_of) -> None:
              [chart.row_id] + [r for s in freq_backers for r in rows_of(s, g)],
              {"charted": chart.frequency, "bpmh": ref_freq, "why": "PRN against regular"},
              intent)
-    elif (ref_dose is not None and chart.daily_dose_mg
-          and _differ(float(chart.daily_dose_mg), float(ref_dose))):
-        chart_per_day = _per_day(chart)
+    elif ref_dose is not None and chart.daily_dose_mg:
+        chart_dd, ref_dd = float(chart.daily_dose_mg), float(ref_dose)
         ref_stmt = next((s for src in ("gp", "patient", "pharmacy", "emr") if src in dose_backers
                          for s in by_source.get((src, g), []) if s.daily_dose_mg), None)
-        ref_per_day = _per_day(ref_stmt) if ref_stmt is not None else None
-        kind = DiscrepancyType.DOSE
-        if chart_per_day and ref_per_day and _differ(chart_per_day, ref_per_day):
-            chart_unit = float(chart.daily_dose_mg) / chart_per_day
-            ref_unit = float(ref_dose) / ref_per_day
-            if not _differ(chart_unit, ref_unit):
+        chart_admin = _administrations(chart)
+        ref_admin = _administrations(ref_stmt) if ref_stmt is not None else None
+        admin_differs = bool(chart_admin and ref_admin and _differ(chart_admin, ref_admin))
+        single = _single_source(dose_backers)
+        extra = [SECOND_SOURCE_TASK] if single else []
+        detail = {"charted_daily_mg": chart.daily_dose_mg, "bpmh_daily_mg": ref_dose,
+                  "charted_frequency": chart.frequency,
+                  "daily_dose_ratio": round(chart_dd / ref_dd, 4) if ref_dd else 0.0,
+                  "statement": f"charted {chart_dd:g} mg/day against {ref_dd:g} mg/day "
+                               f"before admission"}
+        if single:
+            detail["bpmh_single_source"] = single
+        if chart_admin and ref_admin:
+            per_dose_chart, per_dose_ref = chart_dd / chart_admin, ref_dd / ref_admin
+            detail["administrations_ratio"] = round(chart_admin / ref_admin, 4)
+            detail["per_dose_ratio"] = round(per_dose_chart / per_dose_ref, 4) if per_dose_ref else 0.0
+        rows = [chart.row_id] + [r for s in dose_backers for r in rows_of(s, g)]
+        if _differ(chart_dd, ref_dd):
+            # Classified by what changed, per ADMINISTRATION (consultant brief
+            # 11.2): "1 bd" for "1 daily" is frequency; "2 tablets daily" for
+            # "1 tablet daily" is dose -- the dose per administration changed;
+            # both changing is "dose and frequency", kept under frequency with
+            # the subtype recorded.
+            if admin_differs:
+                per_dose_differs = _differ(detail.get("per_dose_ratio", 1.0), 1.0)
+                detail["subtype"] = "dose_and_frequency" if per_dose_differs else "frequency"
                 kind = DiscrepancyType.FREQUENCY
-        emit(kind, med, ["emr"] + dose_backers,
-             [chart.row_id] + [r for s in dose_backers for r in rows_of(s, g)],
-             {"charted_daily_mg": chart.daily_dose_mg, "bpmh_daily_mg": ref_dose,
-              "charted_frequency": chart.frequency}, intent)
+            else:
+                detail["subtype"] = "dose"
+                kind = DiscrepancyType.DOSE
+            emit(kind, med, ["emr"] + dose_backers, rows, detail, intent, extra)
+        elif admin_differs and g.startswith(SPLIT_SENSITIVE) and not chart_prn:
+            # The same daily dose split differently. Never a finding (brief 8
+            # section 2) -- except for medicines where the split itself matters.
+            detail["subtype"] = "regimen_split_differs"
+            emit(DiscrepancyType.FREQUENCY, med, ["emr"] + dose_backers, rows, detail, intent, extra)
     elif ref_dose is None and ref_freq not in (None, "prn") and not chart_prn:
         # No dose to compare (strength unstated on both sides): fall back to the
         # number of doses a day.

@@ -12,11 +12,11 @@ which is deliberately not the 16-digit IHI format and never carries the real
 
 Two documented deviations from `docs/DATA_SPEC.md`:
 
-1. **Population is 40 by default (20 tune / 20 held-out), not 200.** Decided
-   24 Oct: the rates, splits and operators are all per spec, and the count is a
-   single `--patients` flag, so scaling up is a flag rather than a rewrite.
-   Smaller silos also query faster, which matters -- Zetaris latency tracks
-   bytes scanned (`docs/DECISIONS.md`, 24 Oct).
+1. **Population is 200 (100 tune / 100 held-out), as specified** -- restored
+   25 Oct. It was 40 from 24 Oct, which left several finding types with 1-4
+   instances per split and hid the largest error source entirely (21 of 32
+   false positives appeared only at 200). Silos are ~6 MB; Zetaris latency
+   tracks bytes scanned, so re-time the live queries after `make refresh`.
 2. **`random.Random` rather than `numpy.random.Generator(PCG64(...))`.** The
    spec names numpy; using it would add a dependency to `requirements.txt`, a
    shared file, for the RNG alone. Determinism is what actually matters and is
@@ -126,7 +126,9 @@ LAY_TERMS = {
 }
 #: DATA_SPEC 9.5: regimens whose dose changes by phone, with no new script, so
 #: the dispensing record cannot reconstruct it.
-PHONE_DOSE_GENERICS = ("warfarin", "insulin glargine", "prednisolone")
+#: All insulins, not one (consultant brief 12.3: APINCH covers "all insulins",
+#: and bolus doses are titrated without new scripts just as basal ones are).
+PHONE_DOSE_GENERICS = ("warfarin", "insulin glargine", "insulin aspart", "prednisolone")
 
 
 def phone_dose_gp_directions(med: "Med", rng: random.Random, usual: str) -> str:
@@ -138,7 +140,7 @@ def phone_dose_gp_directions(med: "Med", rng: random.Random, usual: str) -> str:
     """
     if med.generic == "warfarin":
         return "as directed per INR" if rng.random() < 0.5 else usual
-    if med.generic == "insulin glargine":
+    if med.generic.startswith("insulin"):
         return "as directed" if rng.random() < 0.6 else usual
     return usual
 
@@ -155,7 +157,7 @@ def phone_dose_patient_words(med: "Med", rng: random.Random) -> str:
         if rng.random() < 0.6 and mg > 1:
             return f"{mg - 1:g} mg Mon Wed Fri, {mg:g} mg the other days"
         return "not sure how much now, the clinic changes it"
-    if med.generic == "insulin glargine":
+    if med.generic.startswith("insulin"):
         return rng.choice(["up 2 units every three days", "they told me to go up a bit",
                            "changes with my sugars"])
     return rng.choice(["down to the next step this week", "cutting down each week",
@@ -436,6 +438,10 @@ class Med:
         self.start = AS_OF - dt.timedelta(days=rng.randint(60, 3650))
         self.stop: dt.date | None = None
         self.changed_by_phone = False
+        # Whether the phone change shows in any rendered row, and the intent
+        # drawn for it. A dose_unconfirmable is planted only if it shows.
+        self.phone_visible = False
+        self.phone_intent = "possibly_intentional"
         self.private = rng.random() < PRIVATE_SCRIPT_RATE
         self.hidden_at_second_pharmacy = False
         self.dispensings: list[dt.date] = []
@@ -724,9 +730,8 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
         if med.generic in PHONE_DOSE_GENERICS and med.current:
             if rng.random() < 0.85:
                 med.changed_by_phone = True
-                plant("dose_unconfirmable", med, ["gp", "pharmacy", "patient"], [],
-                      {"mechanism": "dose changed without a new script"},
-                      "possibly_intentional" if rng.random() < 0.6 else "likely_unintentional")
+                med.phone_intent = ("possibly_intentional" if rng.random() < 0.6
+                                    else "likely_unintentional")
 
     # -- EMR ----------------------------------------------------------------
     given, family, dob_text = render_name_for("emr", p, rng, corruptions)
@@ -771,7 +776,16 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
         # dose / frequency discrepancies
         charted_strength = med.strength
         charted_freq = med.regimen
-        if rng.random() < HIDDEN_ERROR_RATES["emr"]["dose"]:
+        # A chart dose or frequency error is planted citing the GP line as the
+        # truth, so it is only plantable where that line states the dose. A GP
+        # list that says "as directed" (a phone-changed dose), or no GP line at
+        # all, leaves nothing to contradict the chart: the finding would exist
+        # only in the answer key. Same rule as the stale listings.
+        comparable = (p.present["gp"] and med.gp_listing != "deleted"
+                      and not med.changed_by_phone)
+        if not comparable:
+            pass
+        elif rng.random() < HIDDEN_ERROR_RATES["emr"]["dose"]:
             halved = (dose or 0) / 2
             charted_strength = f"{halved:g} mg" if halved else med.strength
             plant("dose", med, ["emr", "gp"], [], {"charted": charted_strength,
@@ -847,7 +861,9 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
                          else f"{med.generic} {med.strength}")
             directions = FREQ_WORDS.get(med.regimen, med.regimen)
             if med.changed_by_phone:
+                usual = directions
                 directions = phone_dose_gp_directions(med, rng, directions)
+                med.phone_visible = med.phone_visible or directions != usual
             status = "active" if med.gp_listing == "active" else "ceased"
             row_id = rows.add("gp", dict(gp_base, drug_text=drug_text,
                                          amt_code=code_for(med, "amt_mpp"),
@@ -934,6 +950,7 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
             how_often = FREQ_WORDS.get(med.regimen, med.regimen)
             if med.changed_by_phone:
                 how_often = phone_dose_patient_words(med, rng)
+                med.phone_visible = True
             rows.add("patient", dict(pat_base, med_described=described,
                                      how_often=how_often, still_taking=still))
         for med in p.otc:
@@ -950,6 +967,16 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
     if found < 2:
         notices.append({"type": "bpmh_not_confirmable", "detail":
                         f"only {found + 1} of 4 sources found"})
+
+    # -- dose_unconfirmable, planted only where it SHOWS ---------------------
+    # Consultant brief 12.2: the routine "confirm this dose" is a task, not a
+    # finding; a finding is a visible conflict. So a phone change that every
+    # rendered source hides -- the GP repeating the old dose, no interview --
+    # is a task for the pharmacist, not a planted finding for the detector.
+    for med in p.meds:
+        if med.changed_by_phone and med.phone_visible:
+            plant("dose_unconfirmable", med, ["gp", "pharmacy", "patient"], [],
+                  {"mechanism": "dose changed without a new script"}, med.phone_intent)
 
     # -- duplication (DATA_SPEC 4.3) ----------------------------------------
     for med in p.meds:
@@ -1265,8 +1292,8 @@ def load_nicknames() -> dict[str, tuple[list[str], str]]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--patients", type=int, default=40,
-                    help="total patients, split evenly tune/held-out (default 40)")
+    ap.add_argument("--patients", type=int, default=200,
+                    help="total patients, split evenly tune/held-out (default 200)")
     ap.add_argument("--fixtures", type=int, default=10,
                     help="how many tune patients get Q1/Q2/Q3 fixtures")
     ap.add_argument("--seed", type=int, default=SEED)

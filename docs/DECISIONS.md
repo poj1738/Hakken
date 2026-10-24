@@ -11,6 +11,53 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-25 — Consultant rulings on the detector applied; population back to 200 **[consultant review + measured, 25 Oct]**
+
+The consultant pharmacist's review of briefs 11–14 is
+`docs/research/MedTrace detect.py_ Consultant Pharmacist Review of Medication
+Reconciliation Rules 11 to 14.md`. Three of the four rules stood, each with a
+change; this entry supersedes the matching points in the entry below.
+
+| Brief | Ruling | What changed |
+|---|---|---|
+| 11 | Label fine; severity must follow the dose change and the drug | Dose vs frequency judged **per administration** ("2 tablets daily" for 1 is dose). Severity from the daily-dose ratio and APINCHS class. `subtype`, ratios and a plain-English `statement` in `detail`. Equal-daily-dose split changes flagged (low) only for `detect.SPLIT_SENSITIVE` |
+| 12 | Confirming a phone-changed dose is a **task**, not a ranked finding | `dose_unconfirmable` fires only on a **visible conflict**. The routine confirmation is `safety.forced_confirm`, emitted by the orchestrator for every current one. All insulins in scope; methotrexate added; DOACs excluded (fixed-dose) |
+| 13 | The patient's "I stopped" outranks an active GP list; supply evidence is asymmetric; **a lapse alone is never a commission** | Patient existence prior 0.65 → **0.80**. Lapse weighs 0.75 of a running supply (≈0.64). Lapse-only → a low-severity commission marked `conflict: confirm` with an ask-first task. GP 0.60 relabelled an **assumption**: Elliott 2023's 16.9% is a prescription-exchange rate, not a GP-list one |
+| 14 | Excluding the chart from the BPMH is correct | Unchanged. A finding resting on one BPMH source is marked `bpmh_single_source` with a second-source task |
+
+**Ground truth followed the same definitions.** The generator now plants
+`dose_unconfirmable` only where the change shows in a rendered row, and treats
+insulin aspart as a phone-dose medicine. That is the rule used all day: a planted
+finding must be supported by evidence some silo actually contains.
+
+**Population restored to 200** (DATA_SPEC's number). At 40 the largest error
+source was invisible: `dose_unconfirmable` was 21 of 32 false positives only once
+there were enough patients to see it. **Zetaris costs nothing extra at 200**: Q1
+1.99 s, Q2 1.92 s, Q3 2.95 s, the same as at 40, because the tables are cached.
+
+**Scores** (200 patients, simulated review):
+
+| split | precision | recall | F1 | high-risk recall |
+|---|---|---|---|---|
+| tune | 0.90 | 0.97 | 0.93 | 34/34 |
+| **held-out** | **0.95** | **0.95** | **0.95** | **35/37** |
+| held-out, after a post-hoc fix | 0.95 | 0.97 | 0.96 | 35/37 |
+| held-out, no human review | 0.94 | 0.93 | 0.93 | 35/37 |
+
+The post-hoc row: the first held-out run showed commission recall of 0.53,
+because a lapse-only case produced nothing at all, contrary to the consultant's
+"conflict: confirm". The fix implements the ruling, but it was *noticed* on
+held-out, so the clean figure to quote is 0.95. **DATA_SPEC's 100% high-risk
+recall is not met on held-out.** The two misses are commissions (P0123 insulin
+aspart, P0174 temazepam). They are recorded here and deliberately not tuned
+against; `test_scorecard` pins 35/37 as a regression floor, not as the target.
+
+Also fixed: the interview silo's "Given Family" field was fuzzy-matched whole
+against a given name, so a one-letter typo lost a patient's record (P0076).
+Linkage at 200: 535 auto-merged, 31 review, 2 lost, 0 false merges.
+
+---
+
 ## 2026-10-25 — How the detector decides what is a finding **[built and scored against ground truth, 25 Oct]**
 
 Six decisions made while implementing `fuse`, `detect` and `triage`. Each was

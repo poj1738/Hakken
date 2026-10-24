@@ -124,7 +124,10 @@ def _compare_given(a: SourceRow, b: SourceRow, lex: Lexicon) -> tuple[float, str
             label = "ambiguous nickname" if ambiguous else "nickname"
             return PARTIAL[key], f"{label} {a.name_given} ~ {b.name_given}"
 
-    score = jellyfish.jaro_winkler_similarity(left, right)
+    # Compare GIVEN names only -- not a given name against a whole combined
+    # "Given Family" or "SURNAME, Given" field.
+    left_given, right_given = _split_name(a)[0] or left, _split_name(b)[0] or right
+    score = jellyfish.jaro_winkler_similarity(left_given, right_given)
     if score >= FUZZY_THRESHOLD:
         return PARTIAL["given_fuzzy"], f"given name differs slightly ({score:.2f})"
     return WEIGHTS["given"][1], f"given name differs ({a.name_given} vs {b.name_given})"
@@ -144,24 +147,41 @@ def _is_ambiguous(name: str, lex: Lexicon) -> bool:
                for member in family for other in family)
 
 
-def _current_surname(row: SourceRow) -> str:
-    """`name_family`, or the surname inside a combined "SURNAME, Given" field."""
+def _split_name(row: SourceRow) -> tuple[str, str]:
+    """(given, family), normalised, from separate fields or a combined one.
+
+    Two silos write the whole name in `name_given`: the pharmacy as
+    "SURNAME, Given", the patient interview as "Given Family". Comparing the
+    combined string as if it were a given name made a one-letter typo fatal --
+    "Marjorie" against "Marorie Kaur" scored as a different given name, the
+    surname was never compared at all, and P0076's interview record was lost.
+    """
     if row.name_family:
-        return normalise_text(row.name_family)
-    if row.name_given and "," in row.name_given:
-        return normalise_text(row.name_given.split(",", 1)[0])
-    return ""
+        return normalise_text(row.name_given), normalise_text(row.name_family)
+    combined = normalise_text(row.name_given)
+    if "," in (row.name_given or ""):
+        family, _, given = (row.name_given or "").partition(",")
+        return normalise_text(given), normalise_text(family)
+    parts = combined.split()
+    if len(parts) >= 2:
+        return parts[0], parts[-1]
+    return combined, ""
+
+
+def _current_surname(row: SourceRow) -> str:
+    """`name_family`, or the surname inside a combined name field."""
+    return _split_name(row)[1]
 
 
 def _compare_surname(a: SourceRow, b: SourceRow) -> tuple[float, str | None]:
     """Surnames, against both the current and any recorded previous surname."""
     lefts = {normalise_text(a.name_family), normalise_text(a.name_previous)} - {""}
     rights = {normalise_text(b.name_family), normalise_text(b.name_previous)} - {""}
-    # The pharmacy silo has no surname column; its surname is the first part of
-    # the combined name field.
+    # The pharmacy and interview silos have no surname column; the surname is
+    # inside the combined name field (see _split_name).
     for row, bucket in ((a, lefts), (b, rights)):
-        if not row.name_family and row.name_given and "," in (row.name_given or ""):
-            bucket.add(normalise_text(row.name_given.split(",", 1)[0]))
+        if not row.name_family and _current_surname(row):
+            bucket.add(_current_surname(row))
     if not lefts or not rights:
         return 0.0, None
 

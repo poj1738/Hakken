@@ -3,7 +3,9 @@
 One file, current state only. Overwrite it as things change — the history lives in
 `docs/HANDOFF.md` and in git. Read this first at session start.
 
-**Last updated:** 2026-10-25 09:35 AEDT by Arpon
+**Last updated:** 2026-10-25 12:30 AEDT by Arpon
+
+> **On `arpon/population` (green, awaiting merge):** consultant rulings applied, population 200, held-out F1 0.95, high-risk 35/37. See the latest HANDOFF entry.
 
 ## Status
 
@@ -28,8 +30,8 @@ queries Zetaris yet (rule 1 — though the registration itself is live and verif
 | **MedTrace contract** (`types.py`) | Arpon | **frozen, on `main`.** Shared file — changes need sign-off, a HANDOFF entry and a PR line |
 | SQL templates (`queries.py`) | Arpon | **done, run live.** Q0–Q3 and Q_REF; `q_shortages` (Q4) deliberately unwritten |
 | Clinical logic — all 11 modules | Arpon | **done.** `fuse` (trust-weighted BPMH), `detect` (9 of 11 types emitted; 2 deliberately not — see `docs/DECISIONS.md` 25 Oct), `triage` (ranking with an absolute APINCHS floor) |
-| **Detector scorecard** (`scripts/eval.py`) | Arpon | **held-out: precision 0.83, recall 0.94, F1 0.88, high-risk recall 2/2** (simulated review); 0.79 F1 with no human review. Tune 0.91. Pinned by `tests/eval/test_scorecard.py` |
-| Identity linkage | Arpon | 0 false merges across all 40 patients; 92 true links auto-merge, 16 go to review, 2 lost |
+| **Detector scorecard** (`scripts/eval.py`) | Arpon | **200 patients, held-out: precision 0.95, recall 0.95, F1 0.95, high-risk 35/37** (simulated review); 0.93 F1 with no human review. Tune 0.93, high-risk 34/34. Consultant rulings 11–14 applied. Pinned by `tests/eval/test_scorecard.py` |
+| Identity linkage | Arpon | 200 patients: 0 false merges; 535 true links auto-merge, 31 go to review, 2 lost |
 | Reference data | Arpon | **done** — 224 lexicon rows, 203 with a real PBS code |
 | Synthetic generator, ground truth | Arpon | **done** — 40 patients, 60 planted findings, identity traps. Ground truth now cites only the patient's own rows (9 of 20 omissions used to cite someone else's) |
 | Fixtures for `SAMPLE_MODE` | Arpon | **done** — Q0 (admissions, new), Q1–Q3 for 10 patients, Q_REF. All diffed against live Zetaris: identical |
@@ -53,6 +55,8 @@ feedback loop by Monday morning at the latest.
 
 ## Next up
 
+**Arnav's session: read `docs/TODO_ARNAV.md` first** — everything needed from Arpon's side, in order.
+
 1. **Arnav** — in disqualification-risk order: Meterless adapter; orchestrator wired
    to the domain pack with the Writer as the first real Nemotron call; API and
    `run.py`; World Model and its 8 checks (then swap Arpon's local `decide`); H-MEM
@@ -66,12 +70,8 @@ feedback loop by Monday morning at the latest.
 
 ## Waiting on Arpon (decisions only he can make)
 
-1. **Population size.** 20 tune patients leave several types with 1–4 instances
-   per split, so the Wilson intervals are wide. Raise `--patients` before the
-   final eval.
-2. **Consultant briefs 11–14** (`docs/RESEARCH_QUESTIONS.md`, round three) — the
-   detector's four judgement calls. Brief 12 decides insulin aspart, currently 6 of
-   the 12 false positives.
+1. ~~Population size~~ — **200, done 25 Oct.**
+2. ~~Consultant briefs 11–14~~ — **answered and applied 25 Oct** (`docs/DECISIONS.md`).
 3. **Sotalol** — DATA_SPEC `C07AA07` (not APINCHS) vs PBS `C01BD` (`Ext`).
 4. **DATA_SPEC §4.2 bundle 6** shares sum to 0.95.
 5. **Four formulation-trap drugs have one form each**, so no IR/MR pair can be planted.
