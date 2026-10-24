@@ -27,6 +27,96 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-24 15:10 AEDT · Arpon · arpon/skeleton
+
+**Did:** PLAN step 3b, the MedTrace domain-pack skeleton, brought forward ahead of
+steps 1 and 2 because Arnav is blocked on it. `app/domain/packs/medtrace/` now has
+`types.py` (final), all ten modules from PLAN 2.5 with their real signatures and
+docstrings, `queries.py` with Q_REF and Q0–Q3 **written as real Lightning SQL**,
+`SOURCE_TRUST_PRIORS` filled in, and a local `decide()` at 0.85/0.82 with a TODO to
+swap in World Model's. 104 new tests; 160 total green, secret scan clean.
+
+Six places where the plan and the repo disagreed, each resolved in favour of the repo
+and each documented in the module it affects:
+
+1. **`SqlResult` did not exist.** PLAN 2.5 types `rows_from_sql(result: SqlResult)`
+   against a name that is nowhere in the repo. Defined in `types.py` from the envelope
+   already recorded in `tests/fixtures/zetaris/`, because `parse.py` consumes it and
+   `app/adapters/zetaris.py` is Arnav's file — the shape is the contract between us.
+   `timeUsed` is **optional**: the fixtures strip it, so requiring it would fail every
+   `SAMPLE_MODE` replay.
+2. **No `DISTINCT`, no window functions, no `JOIN`s, no subqueries in any template.**
+   `REFERENCE_NOTES` 1.2 says a second reference to a `UNION ALL`-of-`explode()` view
+   fails outright, and `medtrace.all_sources` is exactly that shape; `DISTINCT` over
+   one is listed in PLAN 2.1 as an unproven spike; and a 2-table `JOIN` took 91 s
+   (`DECISIONS.md`, 24 Oct). So Q0 and Q1 do one flat scan and **deduplicate in
+   Python**. This refines PLAN 2.4, which assumed one record per row for both.
+   Returning 60 rows instead of 8 is free; a second query is 4–91 s.
+3. **Per-source views carry the harmonised columns; `all_sources` is a plain
+   `UNION ALL`.** PLAN 2.3 reads as though the renaming happens in `all_sources`, but
+   then PLAN 2.1's fallback ("if the union fails, query the 4 views separately") would
+   need every template rewritten. With the harmonising pushed down one level it is a
+   one-line change. `register_sources.py` (step 6) will follow this.
+4. **The trust-attribute vocabulary in PLAN 2.5 is inconsistent.** `fuse` is typed
+   `trust: dict[tuple[str, str], float]` over the fused attributes (existence,
+   daily_dose, frequency, release, route) but the example priors name `strength`,
+   `intended_dose`, `actually_taking`, `name` and `admission_chart`. Resolved by
+   declaring `types.TrustAttribute` as the union of both, keeping all seven of the
+   plan's example values **verbatim** so the H-MEM seed matches what we agreed. A test
+   asserts those seven.
+5. **PLAN 2.5 names `DiscrepancyType`, `FusedValue`, `GateResult` and the notice types
+   without defining them.** Defined from PLAN 2.6, plus a `Notice` model.
+6. **Q4 (`q_shortages`) is deliberately not written.** `medtrace.tga_shortages` is not
+   registered and nobody has seen its columns, so writing SQL against it would be
+   inventing an endpoint. It raises with a pointer to PLAN 3, Monday.
+
+Two bugs the tests caught in my own code before it shipped, both now regression-tested:
+
+- `q_identity_candidates` built its surname prefix by stripping punctuation, so
+  `O'Brien` became `OBRI` and `UPPER(name_family) LIKE 'OBRI%'` never matched
+  `O'BRIEN`. **Every apostrophe and hyphen surname would have dropped out of the
+  candidate set silently** — invisible in testing, and a missed link shows the
+  pharmacist one fewer source. The prefix now keeps the characters a surname really
+  contains and stops at the first one that is not letter/apostrophe/hyphen/space, which
+  also means `%` and `_` can never reach a `LIKE` pattern as wildcards.
+- `NotRequired[int]` is **silently ignored** under `from __future__ import
+  annotations`: the annotation stays a string and `__required_keys__` reports the key
+  as required anyway. `SqlResult` is split across two classes with `total=False`
+  instead, which is a class flag and is honoured. Worth knowing before anyone writes
+  another optional-key TypedDict in this repo.
+
+**Changed shared files:** **new** `app/domain/packs/medtrace/types.py` — the frozen
+shared file from PLAN 1. Nothing else shared was touched: `app/schemas.py`,
+`app/config.py`, `.env.example`, `requirements.txt`, `Makefile`, `CLAUDE.md` and CI are
+all unchanged. `jellyfish` is **not** in `requirements.txt` yet — nothing imports it
+while the bodies are stubs; it arrives with step 7.
+
+**Broken:** Nothing. Every stub raises `NotImplementedError("Arpon: <file>")`, so a
+missing piece names its owner rather than returning `None`. Unproven, in order of how
+much rests on it: whether the Zetaris containers can reach `host.docker.internal:8100`
+at all (step 1, next); whether the union view registers, caches and queries; and
+whether the harmonised views accept these templates against real data. **No SQL in
+`queries.py` has been run against Zetaris yet** — it is written to the recorded
+envelope and the documented dialect rules, not measured.
+
+**Needs from teammates:**
+- **Arnav** — import from `app.domain.packs.medtrace.*` now; do not write your own
+  stubs. `queries.py`, `identity.decide()` and `trust.SOURCE_TRUST_PRIORS` are real and
+  usable today; everything else raises and wants a fixture-backed fallback **in your
+  own code**. Don't edit anything under `app/domain/`. The signature table in
+  `tests/unit/test_medtrace_skeleton.py` is the contract — if you need a signature
+  changed, ask me rather than editing it, since the test exists to stop exactly that
+  drift. When World Model lands, `identity.decide` becomes a delegation to yours; the
+  thresholds are already the same numbers, and a test pins both edges inclusive.
+- **Anshu** — the vocabulary your grid renders is `types.EvidenceState` (three-valued:
+  `unknown` must look different from `absent_in_scope`), `types.DiscrepancyType` (11)
+  and `types.NoticeType` (6).
+
+**Next:** PLAN step 1 — Zetaris up, then the `host.docker.internal:8100` reachability
+spike, and message Arnav either way. Then step 2 (reference build). Step 3
+(`DATA_SPEC.md`) Arpon is writing by hand, not in this session.
+
+
 ### 2026-10-24 11:15 AEDT · Arpon · arpon/team-workflow
 
 **Did:** Separated shared rules from per-machine facts. `CLAUDE.md` had grown a "Known
