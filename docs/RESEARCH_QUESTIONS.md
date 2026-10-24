@@ -368,3 +368,272 @@ The project must document every data source's origin, licence, subset and regene
 method, and must not misrepresent what it used. Getting this wrong in either direction is
 bad: over-claiming a licence is a real breach, and under-claiming means we ship a
 submission a judge cannot reproduce.
+
+---
+---
+
+# Round two
+
+Briefs 1–5 are answered (see `docs/DECISIONS.md`, 24 Oct). These five are the next
+highest-value questions, **ordered by how much they change the submission**. Brief 6 is
+worth more than the other four combined.
+
+The same rules apply: cite everything, say "not found" rather than filling a gap, and
+flag extrapolation from non-Australian sources.
+
+| # | Question | Why it matters | Effort |
+|---|---|---|---|
+| 6 | Does this synthetic data look real to a pharmacist? | The one thing no amount of code review catches | ~1–2 h |
+| 7 | What is the *current* citable basis for our high-risk extensions? | Brief 1 showed ours rests on a superseded 2015 poster | ~1 h |
+| 8 | Which differences must **never** be flagged? | Every one we miss is a false positive in the live demo | ~1.5 h |
+| 9 | Are the statistics in our 3-minute pitch correct? | A judge in this field will know | ~45 min |
+| 10 | Age-stratified medicine utilisation (unfinished from brief 4) | Population realism | ~1 h |
+
+---
+
+## 6. Does this synthetic data look real to a pharmacist?
+
+### Context
+
+**This is the highest-value brief, and it needs a pharmacist or a prescriber rather than
+a researcher.** Everything else on this list is a fact to look up. This one is judgement,
+and it is the failure mode that no test we write can catch: the code can be perfectly
+correct and the data still obviously fake to anyone who reads medication lists for a
+living.
+
+**`docs/research/SAMPLE_PATIENTS.md` contains three complete generated patients**,
+rendered verbatim — the hospital admission chart, the GP list, twelve months of pharmacy
+dispensing, the patient interview, and the errors we deliberately planted. Read those
+first; this brief is about them.
+
+We have already found two problems ourselves by looking at that output, which is why we
+are asking:
+
+- 35% of patients had a given name contradicting their sex ("Kenneth Lee, F"). Fixed.
+- Our lookalike-trap pairs did not share a sex, which made them separable for free.
+  Fixed.
+
+Both were invisible in 340 passing tests and obvious in thirty seconds of reading.
+
+### What we need you to tell us
+
+1. **Would you believe these medication lists?** Not "are they possible" — would a real
+   80-year-old plausibly be on *this* combination? Name anything that looks wrong:
+   - combinations that should not co-occur (we enforce one anticoagulant and one RAS
+     blocker per patient; are there other pairs that simply do not happen?);
+   - doses or frequencies that are not how the drug is actually prescribed;
+   - a medicine that is on the list but would realistically have been stopped;
+   - anything *missing* that you would expect alongside what is there — a PPI with
+     chronic NSAID use, for instance, or the absence of any analgesia.
+2. **Is the dispensing realistic?** We generate roughly 20–40 dispensings per patient per
+   year with adherence drawn from a Beta(6, 1.5) distribution, fill intervals jittered,
+   and 60-day dispensing for 40% of eligible items. Does the pattern look like a real
+   pharmacy record?
+3. **Are the planted errors the errors that actually happen?** We plant omission,
+   commission, dose, frequency, formulation, duplication, stale GP listing and
+   "dose_unconfirmable". For each, is our *example* realistic? Specifically:
+   - Is a GP list that still shows a drug ceased 11 months ago the common shape of a
+     stale listing, or does it usually look different?
+   - Our `dose_unconfirmable` cases are warfarin, insulin and tapering prednisolone.
+     Are there others where the dose changes without a new script?
+4. **What do we plant that you would not care about?** If a type is technically a
+   discrepancy but no pharmacist would act on it, we would rather drop it than report a
+   finding that trains people to ignore the tool.
+5. **What do we* not* plant that you would most want caught?** Our 11 types come from the
+   literature. If the error you actually chase on a ward is missing from that list, that
+   is the most useful single thing you could tell us.
+6. **The free-text patient interview.** We render medicines as lay terms ("my blood
+   thinner", "the water tablet"), brands, generics and vague descriptions ("a little
+   white one"), at 25/45/20/10%. Is that the right mix, and are those the words people
+   actually use in Australia?
+
+### What to give us back
+
+Prose is fine — a list of "this is wrong because X" is more useful than a table. Rank
+them if you can: we have limited time and would rather fix three real problems than
+twenty cosmetic ones.
+
+---
+
+## 7. What is the current, citable basis for a high-risk medicines list beyond core APINCHS?
+
+### Context
+
+Brief 1 produced an uncomfortable finding we need to resolve properly.
+
+We classify high-risk medicines by ATC prefix using a 40-row table. Rows 1–33 map to core
+ACSQHC APINCHS and are solid. **Rows 34–40 are "extensions"** — digoxin, class III
+antiarrhythmics, sulfonylureas, sulfonylurea combinations, clozapine, lithium and
+neuromuscular blockers — and brief 1 found that at least two of them rest on a **WA Health
+APINCHS poster from August 2015**, while WA Country Health's *current* list (v6.05,
+7 October 2026) contains no antiarrhythmics at all.
+
+So our extension rows may be citing a superseded document. We have labelled them honestly
+in the data, but "labelled honestly as weakly sourced" is not the same as right, and
+these rows decide whether a medicine is high-risk — which drives the single number the
+demo leads with.
+
+### What we need you to find out
+
+1. **Which Australian high-risk medicines lists are current as of October 2026?** For
+   each: publisher, version, date, and whether it is a *national* standard or a facility
+   or state policy. Cover at least ACSQHC, SA Health, WA Health / WA Country Health, NSW
+   Clinical Excellence Commission, Safer Care Victoria and Queensland Health.
+2. **For each of our seven extension rows, is there a current citable source?**
+   digoxin · class III antiarrhythmics (amiodarone, sotalol) · sulfonylureas (gliclazide,
+   glimepiride) · metformin/glibenclamide · clozapine · lithium · neuromuscular blockers.
+   Name the document and the wording for each one you can support, and say plainly which
+   you cannot.
+3. **Is there a current list that uses ATC codes directly?** Everything we have found maps
+   by drug name, which is why we built the prefix table ourselves. A published
+   ATC-based mapping would let us cite rather than construct.
+4. **How do these lists treat a medicine that is high-risk only in some circumstances?**
+   Prednisolone is our example: not APINCHS, but a tapering course genuinely cannot be
+   reconciled from dispensing records. Is there an established way to express "high-risk
+   for this purpose only", or did we invent that distinction?
+5. **What would a reviewer expect to see?** If we publish "APINCHS recall", does that
+   phrase commit us to the core ACSQHC list only? We plan to report core and extended
+   recall separately — is that the convention, or is there a better one?
+
+### What to give us back
+
+A row-by-row verdict on our seven extensions (keep / keep-with-weaker-claim / drop), each
+with its current citation. Plus a clear statement of what "APINCHS" may and may not be
+claimed to cover.
+
+---
+
+## 8. Which differences must *never* be flagged?
+
+### Context
+
+A medication reconciliation tool is judged as much on what it stays quiet about as on
+what it catches. Our own rules already say: never flag a brand-vs-generic difference,
+never flag a notation difference, never flag the same ingredient at an equivalent daily
+dose. The demo deliberately shows "Lipitor" and "atorvastatin" **not** being flagged.
+
+We are about to write the comparison logic, so **this brief directly determines how many
+false positives appear in a live demo.** Every pair you give us is one we suppress; every
+one we miss is an alert a pharmacist would roll their eyes at.
+
+Our reference table has about 108 products — the full list is
+`data/reference_src/medicines.csv`, and the condition bundles are in
+`docs/DATA_SPEC.md` §4.2. The known-hard case already in our spec is perindopril:
+**arginine 5 mg = erbumine 4 mg**, same drug, different salt, different number.
+
+### What we need you to find out
+
+1. **Salt and ester equivalences** among our products where the *number changes but the
+   medicine does not*. Perindopril arginine/erbumine is the one we know. Candidates worth
+   checking: metoprolol tartrate vs succinate (we believe these are **not** equivalent
+   1:1 — please confirm, because we currently treat them as a genuine discrepancy),
+   amlodipine besylate/maleate, bisoprolol fumarate, quetiapine fumarate, venlafaxine
+   base vs hydrochloride, desvenlafaxine base vs succinate.
+2. **Dose-form equivalences that are not errors.** 2 × 20 mg versus 1 × 40 mg daily is
+   plainly the same. Where is that *not* true among our products — where splitting or
+   combining a dose genuinely matters (modified-release tablets that must not be halved,
+   for example)?
+3. **Frequency notations that mean the same thing** in Australian practice: `bd` / "twice
+   daily" / "morning and night" / "1 tab bd"; `mane` / "in the morning"; `nocte` /
+   "at night". Are there notations we should treat as equivalent that we might not think
+   of, and any that look equivalent but are not?
+4. **Combination versus components.** If a patient's GP list shows Coversyl Plus and the
+   hospital chart shows perindopril + indapamide separately, that is the same therapy
+   written two ways — **not** a duplication. But Coversyl Plus *plus* separate
+   perindopril **is** a duplication. Is that distinction as clean in practice as it looks,
+   and are there combinations where the components are not interchangeable with the
+   combination product?
+5. **Brand families that are not interchangeable.** Our rule says a brand difference is
+   never a finding. Where is that wrong? Narrow-therapeutic-index medicines and
+   modified-release products are the obvious candidates — is there an Australian list of
+   products where brand substitution is discouraged or flagged (the "a" flag on the PBS,
+   for instance)?
+
+### What to give us back
+
+A list of pairs with a verdict: **never flag** / **always flag** / **depends, and here is
+the condition**. Concrete products from our list are far more useful than general
+principles. If you can only do one section, do section 1 and section 5.
+
+---
+
+## 9. Are the statistics in our three-minute pitch correct and current?
+
+### Context
+
+Our demo opens with claims about the scale of the problem, and closes with a scorecard.
+A judge in this field will know whether the opening numbers are right, and a wrong or
+stale statistic in the first thirty seconds costs more credibility than it buys.
+
+The claims we currently plan to make:
+
+- **"53.6% of admitted older patients have at least one unintended medication
+  discrepancy"** — attributed to Cornish et al. 2005, *Archives of Internal Medicine*.
+- **"About 250,000 medicine-related hospital admissions a year in Australia"** —
+  attributed to PSA 2019.
+- Positioning: a **draft** Best Possible Medication History for pharmacist confirmation,
+  consistent with **ACSQHC NSQHS Standard 4, Actions 4.5 and 4.6**, which we describe as
+  requiring at least two independent sources.
+
+### What we need you to find out
+
+1. **Is each number stated correctly**, in the right units, from the right study, and
+   does it say what we claim? Cornish 2005 is Canadian and twenty years old — is there a
+   more current Australian figure we should lead with instead?
+2. **The 250,000 figure** — is that the current PSA number, what exactly does it count
+   (admissions? presentations? medicine-related problems?), and is there a newer estimate?
+   We have also seen a cost figure quoted alongside it; is that sound?
+3. **Standard 4, Actions 4.5 and 4.6** — quote the actual wording. Does 4.5 in fact
+   require **at least two independent sources** for a BPMH, or is that a common gloss?
+   Our entire "BPMH not confirmable" banner rests on that reading, so if it is wrong the
+   banner is wrong.
+4. **Is "Best Possible Medication History" the correct Australian term**, and are we
+   using it the way the standard does? We are careful to call our output a *draft* BPMH
+   requiring pharmacist confirmation — is that the right framing, or does the term imply
+   something we should not claim?
+5. **Anything else in this space a knowledgeable judge would expect us to cite** and
+   would notice the absence of.
+
+### What to give us back
+
+For each claim: correct as stated / correct but better phrased as X / wrong, and the
+source. Plus the exact Standard 4 wording.
+
+---
+
+## 10. Age-stratified medicine utilisation (finishing brief 4)
+
+### Context
+
+Brief 4 found the PBS volumes we needed but **no age-restricted agent-level data**, so
+our prescribing shares are all-ages figures applied to a population aged 60–90. The
+consultant noted two directional problems with that: mirtazapine is the 5th most
+dispensed medicine in residential aged care and is probably under-weighted, while
+venlafaxine and desvenlafaxine appear in the top 10 for women aged 18–39 and are probably
+over-weighted for our cohort.
+
+This is the lowest-priority of the five. It affects how believable the population is, not
+whether anything works.
+
+### What we need you to find out
+
+1. **Any agent-level dispensing data restricted to 65+ or 70+** in Australia. Worth
+   trying: AIHW's medicines and polypharmacy reporting, the PBS "under co-payment"
+   datasets, the *Australian Prescriber* top-10 series (does it break down by age?),
+   residential aged care medication studies, and the 45 and Up Study.
+2. If agent-level data does not exist, **class-level by age** would still help: what
+   share of people aged 65+ are on a statin, a PPI, an antidepressant, an anticoagulant?
+3. **Condition prevalence by age band** for our 16 bundles, if published Australian
+   figures exist. Our bundle weights are currently ordered by PBS utilisation rank rather
+   than measured prevalence, which the spec flags as an assumption.
+4. **Sex differences worth modelling.** We currently vary only osteoporosis, BPH and
+   hypothyroidism by sex. Is that the right set?
+5. **Polypharmacy distribution.** We use a mean of 8.4 regular medicines with 34% on ten
+   or more. AIHW reports 5+ in 40% of people aged 75+. Is our distribution defensible, and
+   is there a published distribution shape rather than a single threshold?
+
+### What to give us back
+
+Whatever age-stratified figures exist, with sources. "No age-stratified agent-level data
+is published" is a perfectly good answer — we will say so in the submission rather than
+implying a precision we do not have.

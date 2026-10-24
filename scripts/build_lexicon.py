@@ -58,7 +58,7 @@ LEXICON_COLUMNS = (
     "ingredients", "dos_weight",
 )
 APINCHS_COLUMNS = ("atc_prefix", "apinchs_class", "label")
-NICKNAME_COLUMNS = ("canonical", "variant")
+NICKNAME_COLUMNS = ("canonical", "variant", "sex")
 
 
 def log(msg: str) -> None:
@@ -315,7 +315,8 @@ def build() -> int:
                             "label": row["label"]})
     apinchs.sort(key=lambda r: (-len(r["atc_prefix"]), r["atc_prefix"]))
 
-    nick = [{"canonical": r["canonical"], "variant": r["variant"]} for r in nicknames]
+    nick = [{"canonical": r["canonical"], "variant": r["variant"],
+         "sex": r.get("sex", "")} for r in nicknames]
 
     # -- write ---------------------------------------------------------------
     OUT.mkdir(parents=True, exist_ok=True)

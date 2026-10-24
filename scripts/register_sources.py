@@ -86,7 +86,7 @@ REFERENCES = [
     ("MT_REF", "apinchs_raw", "/ref/apinchs", REFERENCE_VIEWS["apinchs"],
      ("atc_prefix", "apinchs_class", "label")),
     ("MT_REF", "nicknames_raw", "/ref/nicknames", REFERENCE_VIEWS["nicknames"],
-     ("canonical", "variant")),
+     ("canonical", "variant", "sex")),
 ]
 
 try:
