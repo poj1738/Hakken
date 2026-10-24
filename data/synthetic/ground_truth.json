@@ -1238,7 +1238,8 @@
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000013"
+      "GP-000058",
+      "PHM-000413"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -1998,15 +1999,7 @@
     "private_script_items": [],
     "prior_discharge": false
    },
-   "corruptions": [
-    {
-     "operator": "nickname",
-     "source": "gp",
-     "field": "given",
-     "before": "Nicholas",
-     "after": "Nick"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [],
    "timeline": [
     {
@@ -2104,22 +2097,6 @@
    "planted": [
     {
      "id": "F0015-01",
-     "type": "commission",
-     "generic": "hydroxychloroquine",
-     "sources_involved": [
-      "emr"
-     ],
-     "row_ids": [
-      "EMR-000134"
-     ],
-     "detail": {
-      "ceased_on": "2025-11-08"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0015-02",
      "type": "dose_unconfirmable",
      "generic": "warfarin",
      "sources_involved": [
@@ -2139,7 +2116,41 @@
      "intent": "possibly_intentional"
     },
     {
+     "id": "F0015-02",
+     "type": "omission",
+     "generic": "escitalopram",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000104",
+      "PHM-000709"
+     ],
+     "detail": {
+      "reason": "not charted at admission"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    },
+    {
      "id": "F0015-03",
+     "type": "commission",
+     "generic": "hydroxychloroquine",
+     "sources_involved": [
+      "emr"
+     ],
+     "row_ids": [
+      "EMR-000133"
+     ],
+     "detail": {
+      "ceased_on": "2025-11-08"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0015-04",
      "type": "duplication",
      "generic": "aspirin/clopidogrel",
      "sources_involved": [
@@ -2163,7 +2174,7 @@
      "type": "patient_only_item",
      "generic": "turmeric",
      "row_ids": [
-      "PAT-000131"
+      "PAT-000130"
      ],
      "detail": "OTC or complementary"
     },
@@ -2171,7 +2182,7 @@
      "type": "patient_only_item",
      "generic": "magnesium",
      "row_ids": [
-      "PAT-000132"
+      "PAT-000131"
      ],
      "detail": "OTC or complementary"
     }
@@ -2314,7 +2325,7 @@
      "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000143"
+      "PAT-000142"
      ],
      "detail": "OTC or complementary"
     },
@@ -2322,7 +2333,7 @@
      "type": "patient_only_item",
      "generic": "turmeric",
      "row_ids": [
-      "PAT-000144"
+      "PAT-000143"
      ],
      "detail": "OTC or complementary"
     }
@@ -2436,8 +2447,8 @@
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000022",
-      "GP-000097"
+      "GP-000122",
+      "PHM-000806"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -2454,7 +2465,8 @@
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000099"
+      "GP-000129",
+      "PHM-000850"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -2597,7 +2609,7 @@
       "emr"
      ],
      "row_ids": [
-      "EMR-000155"
+      "EMR-000154"
      ],
      "detail": {
       "ceased_on": "2025-12-21"
@@ -2708,7 +2720,8 @@
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000096"
+      "GP-000132",
+      "PHM-000885"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -2722,7 +2735,7 @@
      "type": "patient_only_item",
      "generic": "paracetamol",
      "row_ids": [
-      "PAT-000166"
+      "PAT-000165"
      ],
      "detail": "OTC or complementary"
     }
@@ -2751,6 +2764,20 @@
    },
    "corruptions": [
     {
+     "operator": "nickname",
+     "source": "gp",
+     "field": "given",
+     "before": "Veronica",
+     "after": "Ronnie"
+    },
+    {
+     "operator": "maiden_married_surname",
+     "source": "gp",
+     "field": "family",
+     "before": "Chen",
+     "after": "Rossi"
+    },
+    {
      "operator": "maiden_married_surname",
      "source": "patient",
      "field": "family",
@@ -2772,7 +2799,7 @@
      "start": "2022-01-07",
      "stop": null,
      "true_daily_dose_mg": 300.0,
-     "changed_by_phone": false
+     "changed_by_phone": true
     },
     {
      "generic": "clopidogrel",
@@ -2841,6 +2868,40 @@
    "planted": [
     {
      "id": "F0020-01",
+     "type": "dose_unconfirmable",
+     "generic": "insulin glargine",
+     "sources_involved": [
+      "gp",
+      "pharmacy",
+      "patient"
+     ],
+     "row_ids": [
+      "GP-000138"
+     ],
+     "detail": {
+      "mechanism": "dose changed without a new script"
+     },
+     "high_risk_class": "Y",
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0020-02",
+     "type": "commission",
+     "generic": "paracetamol",
+     "sources_involved": [
+      "emr"
+     ],
+     "row_ids": [
+      "EMR-000170"
+     ],
+     "detail": {
+      "ceased_on": "2026-07-18"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0020-03",
      "type": "stale_listing",
      "generic": "alendronate",
      "sources_involved": [
@@ -2867,7 +2928,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000175"
+      "PAT-000172"
      ],
      "detail": "OTC or complementary"
     }
@@ -2983,7 +3044,7 @@
      "type": "patient_only_item",
      "generic": "turmeric",
      "row_ids": [
-      "PAT-000183"
+      "PAT-000180"
      ],
      "detail": "OTC or complementary"
     }
@@ -3116,7 +3177,7 @@
      "type": "patient_only_item",
      "generic": "fish oil",
      "row_ids": [
-      "PAT-000192"
+      "PAT-000189"
      ],
      "detail": "OTC or complementary"
     },
@@ -3124,7 +3185,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000193"
+      "PAT-000190"
      ],
      "detail": "OTC or complementary"
     }
@@ -3266,8 +3327,8 @@
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000037",
-      "GP-000114"
+      "GP-000166",
+      "PHM-001023"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -3406,7 +3467,7 @@
      "type": "patient_only_item",
      "generic": "paracetamol",
      "row_ids": [
-      "PAT-000209"
+      "PAT-000206"
      ],
      "detail": "OTC or complementary"
     },
@@ -3414,7 +3475,7 @@
      "type": "patient_only_item",
      "generic": "turmeric",
      "row_ids": [
-      "PAT-000210"
+      "PAT-000207"
      ],
      "detail": "OTC or complementary"
     }
@@ -3685,8 +3746,8 @@
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000117",
-      "GP-000146"
+      "GP-000184",
+      "PHM-001153"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -3718,7 +3779,7 @@
      "type": "patient_only_item",
      "generic": "fish oil",
      "row_ids": [
-      "PAT-000225"
+      "PAT-000222"
      ],
      "detail": "OTC or complementary"
     }
@@ -3833,7 +3894,7 @@
      "type": "patient_only_item",
      "generic": "turmeric",
      "row_ids": [
-      "PAT-000233"
+      "PAT-000230"
      ],
      "detail": "OTC or complementary"
     }
@@ -4028,7 +4089,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000245"
+      "PAT-000242"
      ],
      "detail": "OTC or complementary"
     }
@@ -4175,7 +4236,7 @@
      "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000253"
+      "PAT-000250"
      ],
      "detail": "OTC or complementary"
     },
@@ -4183,7 +4244,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000254"
+      "PAT-000251"
      ],
      "detail": "OTC or complementary"
     }
@@ -4314,7 +4375,7 @@
      "type": "patient_only_item",
      "generic": "turmeric",
      "row_ids": [
-      "PAT-000262"
+      "PAT-000259"
      ],
      "detail": "OTC or complementary"
     }
@@ -4421,7 +4482,8 @@
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000091"
+      "GP-000234",
+      "PHM-001366"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -4519,7 +4581,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000274"
+      "PAT-000271"
      ],
      "detail": "OTC or complementary"
     }
@@ -4783,7 +4845,7 @@
      "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000281"
+      "PAT-000278"
      ],
      "detail": "OTC or complementary"
     }
@@ -4883,7 +4945,8 @@
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000204"
+      "GP-000257",
+      "PHM-001518"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -4915,7 +4978,7 @@
      "type": "patient_only_item",
      "generic": "turmeric",
      "row_ids": [
-      "PAT-000289"
+      "PAT-000286"
      ],
      "detail": "OTC or complementary"
     },
@@ -4923,7 +4986,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000290"
+      "PAT-000287"
      ],
      "detail": "OTC or complementary"
     }
@@ -5064,7 +5127,7 @@
      "type": "patient_only_item",
      "generic": "turmeric",
      "row_ids": [
-      "PAT-000301"
+      "PAT-000298"
      ],
      "detail": "OTC or complementary"
     }
@@ -5160,7 +5223,7 @@
      "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000308"
+      "PAT-000305"
      ],
      "detail": "OTC or complementary"
     },
@@ -5168,7 +5231,7 @@
      "type": "patient_only_item",
      "generic": "fish oil",
      "row_ids": [
-      "PAT-000309"
+      "PAT-000306"
      ],
      "detail": "OTC or complementary"
     }
@@ -5359,15 +5422,7 @@
     ],
     "prior_discharge": false
    },
-   "corruptions": [
-    {
-     "operator": "single_char_typo",
-     "source": "emr",
-     "field": "given",
-     "before": "Douglas",
-     "after": "Dougls"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [
     {
      "kind": "twins",
@@ -5382,7 +5437,7 @@
      "start": "2020-03-12",
      "stop": null,
      "true_daily_dose_mg": 100.0,
-     "changed_by_phone": false
+     "changed_by_phone": true
     },
     {
      "generic": "aspirin",
@@ -5458,24 +5513,23 @@
    "planted": [
     {
      "id": "F0039-01",
-     "type": "omission",
-     "generic": "amlodipine",
+     "type": "dose_unconfirmable",
+     "generic": "insulin glargine",
      "sources_involved": [
       "gp",
-      "pharmacy"
+      "pharmacy",
+      "patient"
      ],
      "row_ids": [
-      "GP-000096",
-      "GP-000140",
-      "GP-000154",
-      "GP-000259",
-      "GP-000270"
+      "GP-000293",
+      "PHM-001708",
+      "PAT-000318"
      ],
      "detail": {
-      "reason": "not charted at admission"
+      "mechanism": "dose changed without a new script"
      },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
+     "high_risk_class": "Y",
+     "intent": "possibly_intentional"
     }
    ],
    "notices": [
@@ -5483,7 +5537,7 @@
      "type": "patient_only_item",
      "generic": "magnesium",
      "row_ids": [
-      "PAT-000332"
+      "PAT-000328"
      ],
      "detail": "OTC or complementary"
     },
@@ -5491,7 +5545,7 @@
      "type": "patient_only_item",
      "generic": "fish oil",
      "row_ids": [
-      "PAT-000333"
+      "PAT-000329"
      ],
      "detail": "OTC or complementary"
     }
