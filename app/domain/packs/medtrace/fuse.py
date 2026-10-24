@@ -204,6 +204,11 @@ def _existence_votes(
             votes[source] = (ABSENT if stmt.status == "ceased" else PRESENT,
                              _recency(source, stmt.doc_date, as_of), stmt.row_id)
             continue
+        if (source == "patient" and stmt is not None and stmt.status == "unknown"
+                and state is EvidenceState.PRESENT):
+            # The patient said "unsure" whether they still take it. That is
+            # not evidence either way, so it is no vote -- not a vote for.
+            continue
         value = PRESENT if state is EvidenceState.PRESENT else ABSENT
         row_id = stmt.row_id if stmt is not None else ""
         recency = _recency(source, stmt.doc_date, as_of) if stmt is not None else 1.0

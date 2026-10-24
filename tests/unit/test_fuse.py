@@ -125,3 +125,14 @@ def test_output_is_deterministic_and_sorted_by_generic() -> None:
     first = fuse(stmts, evidence, TRUST, ADMITTED)
     assert [m.generic for m in first] == ["amlodipine", "warfarin"]
     assert first == fuse(list(reversed(stmts)), evidence, TRUST, ADMITTED)
+
+
+def test_a_patient_who_is_unsure_does_not_vote() -> None:
+    """"Unsure" whether still taking maps to status unknown. It used to count as
+    present, which propped up medicines the patient had actually stopped."""
+    med = one([fill(5.0, days_ago=300), stmt("patient", dose=5.0, status="unknown",
+                                               row_id="PAT-1")],
+              {"pharmacy": P, "patient": P})
+    assert "patient" not in med.attributes["existence"].supporting
+    assert "patient" not in med.attributes["existence"].dissenting
+    assert med.attributes["existence"].value == "absent"
