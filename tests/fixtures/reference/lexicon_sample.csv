@@ -1,201 +1,201 @@
 pbs_code,brand,generic,amt_mp,amt_mpp,amt_tpp,atc_primary,strength,form,release,pack_qty,repeats,is_combination,ingredients,dos_weight
-13494F,Coversyl,perindopril,SYN-AMT-MP-0067,SYN-AMT-MPP-0001,SYN-AMT-TPP-0001,C09AA04,5 mg,tablet,IR,60,5,false,perindopril,0.000000
-13555K,Coversyl,perindopril,SYN-AMT-MP-0067,SYN-AMT-MPP-0002,SYN-AMT-TPP-0002,C09AA04,10 mg,tablet,IR,60,5,false,perindopril,0.000000
-13371R,Coversyl,perindopril,SYN-AMT-MP-0067,SYN-AMT-MPP-0003,SYN-AMT-TPP-0003,C09AA04,4 mg,tablet,IR,60,5,false,perindopril,0.000000
-13372T,Coversyl,perindopril,SYN-AMT-MP-0067,SYN-AMT-MPP-0004,SYN-AMT-TPP-0004,C09AA04,8 mg,tablet,IR,60,5,false,perindopril,0.000000
+13494F,Coversyl,perindopril,SYN-AMT-MP-0068,SYN-AMT-MPP-0001,SYN-AMT-TPP-0001,C09AA04,5 mg,tablet,IR,60,5,false,perindopril,0.000000
+13555K,Coversyl,perindopril,SYN-AMT-MP-0068,SYN-AMT-MPP-0002,SYN-AMT-TPP-0002,C09AA04,10 mg,tablet,IR,60,5,false,perindopril,0.000000
+13371R,Coversyl,perindopril,SYN-AMT-MP-0068,SYN-AMT-MPP-0003,SYN-AMT-TPP-0003,C09AA04,4 mg,tablet,IR,60,5,false,perindopril,0.000000
+13372T,Coversyl,perindopril,SYN-AMT-MP-0068,SYN-AMT-MPP-0004,SYN-AMT-TPP-0004,C09AA04,8 mg,tablet,IR,60,5,false,perindopril,0.000000
 13532F,Norvasc,amlodipine,SYN-AMT-MP-0004,SYN-AMT-MPP-0005,SYN-AMT-TPP-0005,C08CA01,5 mg,tablet,IR,60,5,false,amlodipine,0.000000
 13562T,Norvasc,amlodipine,SYN-AMT-MP-0004,SYN-AMT-MPP-0006,SYN-AMT-TPP-0006,C08CA01,10 mg,tablet,IR,60,5,false,amlodipine,0.000000
 13436E,Atacand,candesartan,SYN-AMT-MP-0014,SYN-AMT-MPP-0007,SYN-AMT-TPP-0007,C09CA06,8 mg,tablet,IR,60,5,false,candesartan,0.000000
 13565Y,Atacand,candesartan,SYN-AMT-MP-0014,SYN-AMT-MPP-0008,SYN-AMT-TPP-0008,C09CA06,16 mg,tablet,IR,60,5,false,candesartan,0.000000
 13438G,Atacand,candesartan,SYN-AMT-MP-0014,SYN-AMT-MPP-0009,SYN-AMT-TPP-0009,C09CA06,32 mg,tablet,IR,60,5,false,candesartan,0.000000
-13437F,Micardis,telmisartan,SYN-AMT-MP-0088,SYN-AMT-MPP-0010,SYN-AMT-TPP-0010,C09CA07,40 mg,tablet,IR,56,5,false,telmisartan,0.000000
-13593K,Micardis,telmisartan,SYN-AMT-MP-0088,SYN-AMT-MPP-0011,SYN-AMT-TPP-0011,C09CA07,80 mg,tablet,IR,56,5,false,telmisartan,0.000000
-13380F,Avapro,irbesartan,SYN-AMT-MP-0049,SYN-AMT-MPP-0012,SYN-AMT-TPP-0012,C09CA04,150 mg,tablet,IR,60,5,false,irbesartan,0.000000
-13564X,Avapro,irbesartan,SYN-AMT-MP-0049,SYN-AMT-MPP-0013,SYN-AMT-TPP-0013,C09CA04,300 mg,tablet,IR,60,5,false,irbesartan,0.000000
-13405M,Tritace,ramipril,SYN-AMT-MP-0073,SYN-AMT-MPP-0014,SYN-AMT-TPP-0014,C09AA05,5 mg,capsule,IR,60,5,false,ramipril,0.000000
-1316G,Tritace,ramipril,SYN-AMT-MP-0073,SYN-AMT-MPP-0015,SYN-AMT-TPP-0015,C09AA05,10 mg,capsule,IR,30,5,false,ramipril,0.029466
-13494F,Coversyl Plus,perindopril/indapamide,SYN-AMT-MP-0069,SYN-AMT-MPP-0016,SYN-AMT-TPP-0016,C09BA04,5/1.25 mg,tablet,IR,60,5,true,perindopril;indapamide,0.000000
-13380F,Avapro HCT,irbesartan/hydrochlorothiazide,SYN-AMT-MP-0050,SYN-AMT-MPP-0017,SYN-AMT-TPP-0017,C09DA04,150/12.5 mg,tablet,IR,60,5,true,irbesartan;hydrochlorothiazide,0.000000
-13564X,Avapro HCT,irbesartan/hydrochlorothiazide,SYN-AMT-MP-0050,SYN-AMT-MPP-0018,SYN-AMT-TPP-0018,C09DA04,300/12.5 mg,tablet,IR,60,5,true,irbesartan;hydrochlorothiazide,0.000000
-13380F,Karvezide,irbesartan/hydrochlorothiazide,SYN-AMT-MP-0050,SYN-AMT-MPP-0019,SYN-AMT-TPP-0019,C09DA04,150/12.5 mg,tablet,IR,60,5,true,irbesartan;hydrochlorothiazide,0.000000
-13564X,Karvezide,irbesartan/hydrochlorothiazide,SYN-AMT-MP-0050,SYN-AMT-MPP-0020,SYN-AMT-TPP-0020,C09DA04,300/12.5 mg,tablet,IR,60,5,true,irbesartan;hydrochlorothiazide,0.000000
-13565Y,Atacand Plus,candesartan/hydrochlorothiazide,SYN-AMT-MP-0015,SYN-AMT-MPP-0021,SYN-AMT-TPP-0021,C09DA06,16/12.5 mg,tablet,IR,60,5,true,candesartan;hydrochlorothiazide,0.000000
-13437F,Twynsta,telmisartan/amlodipine,SYN-AMT-MP-0089,SYN-AMT-MPP-0022,SYN-AMT-TPP-0022,C09DB04,40/5 mg,tablet,IR,56,5,true,telmisartan;amlodipine,0.000000
-13593K,Twynsta,telmisartan/amlodipine,SYN-AMT-MP-0089,SYN-AMT-MPP-0023,SYN-AMT-TPP-0023,C09DB04,80/5 mg,tablet,IR,56,5,true,telmisartan;amlodipine,0.000000
-13494F,Coveram,perindopril/amlodipine,SYN-AMT-MP-0068,SYN-AMT-MPP-0024,SYN-AMT-TPP-0024,C09BB04,5/5 mg,tablet,IR,60,5,true,perindopril;amlodipine,0.000000
-13555K,Coveram,perindopril/amlodipine,SYN-AMT-MP-0068,SYN-AMT-MPP-0025,SYN-AMT-TPP-0025,C09BB04,10/5 mg,tablet,IR,60,5,true,perindopril;amlodipine,0.000000
+13437F,Micardis,telmisartan,SYN-AMT-MP-0089,SYN-AMT-MPP-0010,SYN-AMT-TPP-0010,C09CA07,40 mg,tablet,IR,56,5,false,telmisartan,0.000000
+13593K,Micardis,telmisartan,SYN-AMT-MP-0089,SYN-AMT-MPP-0011,SYN-AMT-TPP-0011,C09CA07,80 mg,tablet,IR,56,5,false,telmisartan,0.000000
+13380F,Avapro,irbesartan,SYN-AMT-MP-0050,SYN-AMT-MPP-0012,SYN-AMT-TPP-0012,C09CA04,150 mg,tablet,IR,60,5,false,irbesartan,0.000000
+13564X,Avapro,irbesartan,SYN-AMT-MP-0050,SYN-AMT-MPP-0013,SYN-AMT-TPP-0013,C09CA04,300 mg,tablet,IR,60,5,false,irbesartan,0.000000
+13405M,Tritace,ramipril,SYN-AMT-MP-0074,SYN-AMT-MPP-0014,SYN-AMT-TPP-0014,C09AA05,5 mg,capsule,IR,60,5,false,ramipril,0.000000
+1316G,Tritace,ramipril,SYN-AMT-MP-0074,SYN-AMT-MPP-0015,SYN-AMT-TPP-0015,C09AA05,10 mg,capsule,IR,30,5,false,ramipril,0.026836
+13413Y,Coversyl Plus,perindopril/indapamide,SYN-AMT-MP-0070,SYN-AMT-MPP-0016,SYN-AMT-TPP-0016,C09BA04,5/1.25 mg,tablet,IR,60,5,true,perindopril;indapamide,0.000000
+13572H,Avapro HCT,irbesartan/hydrochlorothiazide,SYN-AMT-MP-0051,SYN-AMT-MPP-0017,SYN-AMT-TPP-0017,C09DA04,150/12.5 mg,tablet,IR,60,5,true,irbesartan;hydrochlorothiazide,0.000000
+13446Q,Avapro HCT,irbesartan/hydrochlorothiazide,SYN-AMT-MP-0051,SYN-AMT-MPP-0018,SYN-AMT-TPP-0018,C09DA04,300/12.5 mg,tablet,IR,60,5,true,irbesartan;hydrochlorothiazide,0.000000
+13572H,Karvezide,irbesartan/hydrochlorothiazide,SYN-AMT-MP-0051,SYN-AMT-MPP-0019,SYN-AMT-TPP-0019,C09DA04,150/12.5 mg,tablet,IR,60,5,true,irbesartan;hydrochlorothiazide,0.000000
+13446Q,Karvezide,irbesartan/hydrochlorothiazide,SYN-AMT-MP-0051,SYN-AMT-MPP-0020,SYN-AMT-TPP-0020,C09DA04,300/12.5 mg,tablet,IR,60,5,true,irbesartan;hydrochlorothiazide,0.000000
+13391T,Atacand Plus,candesartan/hydrochlorothiazide,SYN-AMT-MP-0015,SYN-AMT-MPP-0021,SYN-AMT-TPP-0021,C09DA06,16/12.5 mg,tablet,IR,60,5,true,candesartan;hydrochlorothiazide,0.000000
+13483P,Twynsta,telmisartan/amlodipine,SYN-AMT-MP-0090,SYN-AMT-MPP-0022,SYN-AMT-TPP-0022,C09DB04,40/5 mg,tablet,IR,56,5,true,telmisartan;amlodipine,0.000000
+13450X,Twynsta,telmisartan/amlodipine,SYN-AMT-MP-0090,SYN-AMT-MPP-0023,SYN-AMT-TPP-0023,C09DB04,80/5 mg,tablet,IR,56,5,true,telmisartan;amlodipine,0.000000
+13381G,Coveram,perindopril/amlodipine,SYN-AMT-MP-0069,SYN-AMT-MPP-0024,SYN-AMT-TPP-0024,C09BB04,5/5 mg,tablet,IR,60,5,true,perindopril;amlodipine,0.000000
+13381G,Coveram,perindopril/amlodipine,SYN-AMT-MP-0069,SYN-AMT-MPP-0025,SYN-AMT-TPP-0025,C09BB04,10/5 mg,tablet,IR,60,5,true,perindopril;amlodipine,0.000000
 13532F,Norvasc,amlodipine,SYN-AMT-MP-0004,SYN-AMT-MPP-0026,SYN-AMT-TPP-0026,C08CA01,5 mg,tablet,IR,60,5,false,amlodipine,0.000000
-13406N,Crestor,rosuvastatin,SYN-AMT-MP-0076,SYN-AMT-MPP-0027,SYN-AMT-TPP-0027,C10AA07,5 mg,tablet,IR,60,5,false,rosuvastatin,0.000000
-13586C,Crestor,rosuvastatin,SYN-AMT-MP-0076,SYN-AMT-MPP-0028,SYN-AMT-TPP-0028,C10AA07,10 mg,tablet,IR,60,5,false,rosuvastatin,0.000000
-13588E,Crestor,rosuvastatin,SYN-AMT-MP-0076,SYN-AMT-MPP-0029,SYN-AMT-TPP-0029,C10AA07,20 mg,tablet,IR,60,5,false,rosuvastatin,0.000000
-13589F,Crestor,rosuvastatin,SYN-AMT-MP-0076,SYN-AMT-MPP-0030,SYN-AMT-TPP-0030,C10AA07,40 mg,tablet,IR,60,5,false,rosuvastatin,0.000000
+13406N,Crestor,rosuvastatin,SYN-AMT-MP-0077,SYN-AMT-MPP-0027,SYN-AMT-TPP-0027,C10AA07,5 mg,tablet,IR,60,5,false,rosuvastatin,0.000000
+13586C,Crestor,rosuvastatin,SYN-AMT-MP-0077,SYN-AMT-MPP-0028,SYN-AMT-TPP-0028,C10AA07,10 mg,tablet,IR,60,5,false,rosuvastatin,0.000000
+13588E,Crestor,rosuvastatin,SYN-AMT-MP-0077,SYN-AMT-MPP-0029,SYN-AMT-TPP-0029,C10AA07,20 mg,tablet,IR,60,5,false,rosuvastatin,0.000000
+13589F,Crestor,rosuvastatin,SYN-AMT-MP-0077,SYN-AMT-MPP-0030,SYN-AMT-TPP-0030,C10AA07,40 mg,tablet,IR,60,5,false,rosuvastatin,0.000000
 13495G,Lipitor,atorvastatin,SYN-AMT-MP-0009,SYN-AMT-MPP-0031,SYN-AMT-TPP-0031,C10AA05,10 mg,tablet,IR,60,5,false,atorvastatin,0.000000
 13529C,Lipitor,atorvastatin,SYN-AMT-MP-0009,SYN-AMT-MPP-0032,SYN-AMT-TPP-0032,C10AA05,20 mg,tablet,IR,60,5,false,atorvastatin,0.000000
 13468W,Lipitor,atorvastatin,SYN-AMT-MP-0009,SYN-AMT-MPP-0033,SYN-AMT-TPP-0033,C10AA05,40 mg,tablet,IR,60,5,false,atorvastatin,0.000000
 13374X,Lipitor,atorvastatin,SYN-AMT-MP-0009,SYN-AMT-MPP-0034,SYN-AMT-TPP-0034,C10AA05,80 mg,tablet,IR,60,5,false,atorvastatin,0.000000
-13373W,Zocor,simvastatin,SYN-AMT-MP-0081,SYN-AMT-MPP-0035,SYN-AMT-TPP-0035,C10AA01,20 mg,tablet,IR,60,5,false,simvastatin,0.000000
-13471B,Zocor,simvastatin,SYN-AMT-MP-0081,SYN-AMT-MPP-0036,SYN-AMT-TPP-0036,C10AA01,40 mg,tablet,IR,60,5,false,simvastatin,0.000000
-13532F,Caduet,amlodipine/atorvastatin,SYN-AMT-MP-0005,SYN-AMT-MPP-0037,SYN-AMT-TPP-0037,C10BX03,5/10 mg,tablet,IR,60,5,true,amlodipine;atorvastatin,0.000000
-13562T,Caduet,amlodipine/atorvastatin,SYN-AMT-MP-0005,SYN-AMT-MPP-0038,SYN-AMT-TPP-0038,C10BX03,10/80 mg,tablet,IR,60,5,true,amlodipine;atorvastatin,0.000000
-13440J,Rosuzet,ezetimibe/rosuvastatin,SYN-AMT-MP-0035,SYN-AMT-MPP-0039,SYN-AMT-TPP-0039,C10BA06,10/10 mg,tablet,IR,60,5,true,ezetimibe;rosuvastatin,0.000000
-13440J,Rosuzet,ezetimibe/rosuvastatin,SYN-AMT-MP-0035,SYN-AMT-MPP-0040,SYN-AMT-TPP-0040,C10BA06,10/40 mg,tablet,IR,60,5,true,ezetimibe;rosuvastatin,0.000000
-13440J,Ezetrol,ezetimibe,SYN-AMT-MP-0033,SYN-AMT-MPP-0041,SYN-AMT-TPP-0041,C10AX09,10 mg,tablet,IR,60,5,false,ezetimibe,0.000000
-14501F,Somac,pantoprazole,SYN-AMT-MP-0064,SYN-AMT-MPP-0042,SYN-AMT-TPP-0042,A02BC02,20 mg,tablet,IR,60,5,false,pantoprazole,0.000000
-11678P,Somac,pantoprazole,SYN-AMT-MP-0064,SYN-AMT-MPP-0043,SYN-AMT-TPP-0043,A02BC02,40 mg,tablet,IR,30,5,false,pantoprazole,0.000000
-11692J,Nexium,esomeprazole,SYN-AMT-MP-0032,SYN-AMT-MPP-0044,SYN-AMT-TPP-0044,A02BC05,20 mg,tablet,IR,30,5,false,esomeprazole,0.000000
-12283L,Nexium,esomeprazole,SYN-AMT-MP-0032,SYN-AMT-MPP-0045,SYN-AMT-TPP-0045,A02BC05,40 mg,tablet,IR,60,5,false,esomeprazole,0.000000
-14502G,Pariet,rabeprazole,SYN-AMT-MP-0072,SYN-AMT-MPP-0046,SYN-AMT-TPP-0046,A02BC04,10 mg,tablet,IR,56,5,false,rabeprazole,0.000000
-11670F,Pariet,rabeprazole,SYN-AMT-MP-0072,SYN-AMT-MPP-0047,SYN-AMT-TPP-0047,A02BC04,20 mg,tablet,IR,30,5,false,rabeprazole,0.000000
-15047Y,Pepcidine,famotidine,SYN-AMT-MP-0036,SYN-AMT-MPP-0048,SYN-AMT-TPP-0048,A02BA03,20 mg,tablet,IR,120,5,false,famotidine,0.000000
-10598T,Panadol Osteo,paracetamol,SYN-AMT-MP-0065,SYN-AMT-MPP-0049,SYN-AMT-TPP-0049,N02BE01,665 mg,modified release tablet,MR,192,5,false,paracetamol,0.003618
-12518W,OxyContin,oxycodone,SYN-AMT-MP-0062,SYN-AMT-MPP-0050,SYN-AMT-TPP-0050,N02AA05,10 mg,modified release tablet,MR,56,0,false,oxycodone,0.000000
-12510K,OxyContin,oxycodone,SYN-AMT-MP-0062,SYN-AMT-MPP-0051,SYN-AMT-TPP-0051,N02AA05,20 mg,modified release tablet,MR,56,0,false,oxycodone,0.000000
-12031F,Targin,oxycodone/naloxone,SYN-AMT-MP-0063,SYN-AMT-MPP-0052,SYN-AMT-TPP-0052,N02AA55,10/5 mg,modified release tablet,MR,10,0,true,oxycodone;naloxone,0.000000
-12510K,Targin,oxycodone/naloxone,SYN-AMT-MP-0063,SYN-AMT-MPP-0053,SYN-AMT-TPP-0053,N02AA55,20/10 mg,modified release tablet,MR,56,0,true,oxycodone;naloxone,0.000000
-10756D,Norspan,buprenorphine,SYN-AMT-MP-0012,SYN-AMT-MPP-0054,SYN-AMT-TPP-0054,N02AE01,5 microgram/h,patch,MR,2,0,false,buprenorphine,0.000383
+13373W,Zocor,simvastatin,SYN-AMT-MP-0082,SYN-AMT-MPP-0035,SYN-AMT-TPP-0035,C10AA01,20 mg,tablet,IR,60,5,false,simvastatin,0.000000
+13471B,Zocor,simvastatin,SYN-AMT-MP-0082,SYN-AMT-MPP-0036,SYN-AMT-TPP-0036,C10AA01,40 mg,tablet,IR,60,5,false,simvastatin,0.000000
+13415C,Caduet,amlodipine/atorvastatin,SYN-AMT-MP-0005,SYN-AMT-MPP-0037,SYN-AMT-TPP-0037,C10BX03,5/10 mg,tablet,IR,60,5,true,amlodipine;atorvastatin,0.000000
+13384K,Caduet,amlodipine/atorvastatin,SYN-AMT-MP-0005,SYN-AMT-MPP-0038,SYN-AMT-TPP-0038,C10BX03,10/80 mg,tablet,IR,60,5,true,amlodipine;atorvastatin,0.000000
+10201X,Rosuzet,ezetimibe/rosuvastatin,SYN-AMT-MP-0036,SYN-AMT-MPP-0039,SYN-AMT-TPP-0039,C10BA06,10/10 mg,tablet,IR,1,5,true,ezetimibe;rosuvastatin,0.007072
+10201X,Rosuzet,ezetimibe/rosuvastatin,SYN-AMT-MP-0036,SYN-AMT-MPP-0040,SYN-AMT-TPP-0040,C10BA06,10/40 mg,tablet,IR,1,5,true,ezetimibe;rosuvastatin,0.007072
+13440J,Ezetrol,ezetimibe,SYN-AMT-MP-0034,SYN-AMT-MPP-0041,SYN-AMT-TPP-0041,C10AX09,10 mg,tablet,IR,60,5,false,ezetimibe,0.000000
+14501F,Somac,pantoprazole,SYN-AMT-MP-0065,SYN-AMT-MPP-0042,SYN-AMT-TPP-0042,A02BC02,20 mg,tablet,IR,60,5,false,pantoprazole,0.000000
+11678P,Somac,pantoprazole,SYN-AMT-MP-0065,SYN-AMT-MPP-0043,SYN-AMT-TPP-0043,A02BC02,40 mg,tablet,IR,30,5,false,pantoprazole,0.000000
+11692J,Nexium,esomeprazole,SYN-AMT-MP-0033,SYN-AMT-MPP-0044,SYN-AMT-TPP-0044,A02BC05,20 mg,tablet,IR,30,5,false,esomeprazole,0.000000
+12283L,Nexium,esomeprazole,SYN-AMT-MP-0033,SYN-AMT-MPP-0045,SYN-AMT-TPP-0045,A02BC05,40 mg,tablet,IR,60,5,false,esomeprazole,0.000000
+14502G,Pariet,rabeprazole,SYN-AMT-MP-0073,SYN-AMT-MPP-0046,SYN-AMT-TPP-0046,A02BC04,10 mg,tablet,IR,56,5,false,rabeprazole,0.000000
+11670F,Pariet,rabeprazole,SYN-AMT-MP-0073,SYN-AMT-MPP-0047,SYN-AMT-TPP-0047,A02BC04,20 mg,tablet,IR,30,5,false,rabeprazole,0.000000
+15047Y,Pepcidine,famotidine,SYN-AMT-MP-0037,SYN-AMT-MPP-0048,SYN-AMT-TPP-0048,A02BA03,20 mg,tablet,IR,120,5,false,famotidine,0.000000
+10598T,Panadol Osteo,paracetamol,SYN-AMT-MP-0066,SYN-AMT-MPP-0049,SYN-AMT-TPP-0049,N02BE01,665 mg,modified release tablet,MR,192,5,false,paracetamol,0.003295
+12518W,OxyContin,oxycodone,SYN-AMT-MP-0063,SYN-AMT-MPP-0050,SYN-AMT-TPP-0050,N02AA05,10 mg,modified release tablet,MR,56,0,false,oxycodone,0.000000
+12510K,OxyContin,oxycodone,SYN-AMT-MP-0063,SYN-AMT-MPP-0051,SYN-AMT-TPP-0051,N02AA05,20 mg,modified release tablet,MR,56,0,false,oxycodone,0.000000
+12486E,Targin,oxycodone/naloxone,SYN-AMT-MP-0064,SYN-AMT-MPP-0052,SYN-AMT-TPP-0052,N02AA55,10/5 mg,modified release tablet,MR,56,0,true,oxycodone;naloxone,0.000000
+12475N,Targin,oxycodone/naloxone,SYN-AMT-MP-0064,SYN-AMT-MPP-0053,SYN-AMT-TPP-0053,N02AA55,20/10 mg,modified release tablet,MR,56,0,true,oxycodone;naloxone,0.000000
+10756D,Norspan,buprenorphine,SYN-AMT-MP-0012,SYN-AMT-MPP-0054,SYN-AMT-TPP-0054,N02AE01,5 microgram/h,patch,MR,2,0,false,buprenorphine,0.000349
 10948F,Norspan,buprenorphine,SYN-AMT-MP-0012,SYN-AMT-MPP-0055,SYN-AMT-TPP-0055,N02AE01,10 microgram/h,patch,MR,4,0,false,buprenorphine,0.000000
 10970J,Norspan,buprenorphine,SYN-AMT-MP-0012,SYN-AMT-MPP-0056,SYN-AMT-TPP-0056,N02AE01,20 microgram/h,patch,MR,4,0,false,buprenorphine,0.000000
-10092E,Palexia SR,tapentadol,SYN-AMT-MP-0087,SYN-AMT-MPP-0057,SYN-AMT-TPP-0057,N02AX06,50 mg,modified release tablet,MR,28,0,false,tapentadol,0.002165
-10094G,Palexia SR,tapentadol,SYN-AMT-MP-0087,SYN-AMT-MPP-0058,SYN-AMT-TPP-0058,N02AX06,100 mg,modified release tablet,MR,28,0,false,tapentadol,0.009726
-2335X,Lyrica,pregabalin,SYN-AMT-MP-0071,SYN-AMT-MPP-0059,SYN-AMT-TPP-0059,N03AX16,75 mg,capsule,IR,56,5,false,pregabalin,0.156126
-8439E,Celebrex,celecoxib,SYN-AMT-MP-0017,SYN-AMT-MPP-0060,SYN-AMT-TPP-0060,M01AH01,100 mg,capsule,IR,60,3,false,celecoxib,0.022843
-8440F,Celebrex,celecoxib,SYN-AMT-MP-0017,SYN-AMT-MPP-0061,SYN-AMT-TPP-0061,M01AH01,200 mg,capsule,IR,30,3,false,celecoxib,0.084780
-13233L,Endone,oxycodone,SYN-AMT-MP-0062,SYN-AMT-MPP-0062,SYN-AMT-TPP-0062,N02AA05,5 mg,tablet,IR,10,0,false,oxycodone,0.000000
-13976N,Diabex,metformin,SYN-AMT-MP-0057,SYN-AMT-MPP-0063,SYN-AMT-TPP-0063,A10BA02,500 mg,tablet,IR,200,5,false,metformin,0.000000
-13976N,Diabex,metformin,SYN-AMT-MP-0057,SYN-AMT-MPP-0064,SYN-AMT-TPP-0064,A10BA02,1000 mg,tablet,IR,200,5,false,metformin,0.000000
-13976N,Diaformin,metformin,SYN-AMT-MP-0057,SYN-AMT-MPP-0065,SYN-AMT-TPP-0065,A10BA02,500 mg,tablet,IR,200,5,false,metformin,0.000000
-13976N,Diaformin,metformin,SYN-AMT-MP-0057,SYN-AMT-MPP-0066,SYN-AMT-TPP-0066,A10BA02,1000 mg,tablet,IR,200,5,false,metformin,0.000000
-13847T,Diabex XR,metformin,SYN-AMT-MP-0057,SYN-AMT-MPP-0067,SYN-AMT-TPP-0067,A10BA02,1000 mg,modified release tablet,MR,120,5,false,metformin,0.000000
-14740T,Diamicron MR,gliclazide,SYN-AMT-MP-0043,SYN-AMT-MPP-0068,SYN-AMT-TPP-0068,A10BB09,30 mg,modified release tablet,MR,200,5,false,gliclazide,0.000000
-13922R,Diamicron MR,gliclazide,SYN-AMT-MP-0043,SYN-AMT-MPP-0069,SYN-AMT-TPP-0069,A10BB09,60 mg,modified release tablet,MR,120,5,false,gliclazide,0.000000
-10206E,Jardiance,empagliflozin,SYN-AMT-MP-0028,SYN-AMT-MPP-0070,SYN-AMT-TPP-0070,A10BK03,10 mg,tablet,IR,30,5,false,empagliflozin,0.005489
-10202Y,Jardiance,empagliflozin,SYN-AMT-MP-0028,SYN-AMT-MPP-0071,SYN-AMT-TPP-0071,A10BK03,25 mg,tablet,IR,30,5,false,empagliflozin,0.004338
-10011X,Forxiga,dapagliflozin,SYN-AMT-MP-0021,SYN-AMT-MPP-0072,SYN-AMT-TPP-0072,A10BK01,10 mg,tablet,IR,28,5,false,dapagliflozin,0.051513
-14058X,Janumet,sitagliptin/metformin,SYN-AMT-MP-0082,SYN-AMT-MPP-0073,SYN-AMT-TPP-0073,A10BD07,50/1000 mg,tablet,IR,56,5,true,sitagliptin;metformin,0.000000
-10202Y,Jardiamet,empagliflozin/metformin,SYN-AMT-MP-0029,SYN-AMT-MPP-0074,SYN-AMT-TPP-0074,A10BD20,12.5/1000 mg,tablet,IR,30,5,true,empagliflozin;metformin,0.004338
-9039R,Optisulin,insulin glargine,SYN-AMT-MP-0048,SYN-AMT-MPP-0075,SYN-AMT-TPP-0075,A10AE04,100 units/mL,injection,MR,5,1,false,insulin glargine,0.037330
-11302W,Optisulin,insulin glargine,SYN-AMT-MP-0048,SYN-AMT-MPP-0076,SYN-AMT-TPP-0076,A10AE04,300 units/mL,injection,MR,5,1,false,insulin glargine,0.000000
-11815W,Toujeo,insulin glargine,SYN-AMT-MP-0048,SYN-AMT-MPP-0077,SYN-AMT-TPP-0077,A10AE04,100 units/mL,injection,MR,5,1,false,insulin glargine,0.000000
-11302W,Toujeo,insulin glargine,SYN-AMT-MP-0048,SYN-AMT-MPP-0078,SYN-AMT-TPP-0078,A10AE04,300 units/mL,injection,MR,5,1,false,insulin glargine,0.000000
-12075M,Ozempic,semaglutide,SYN-AMT-MP-0079,SYN-AMT-MPP-0079,SYN-AMT-TPP-0079,A10BJ06,0.5 mg,injection,IR,1,5,false,semaglutide,0.000000
-12075M,Ozempic,semaglutide,SYN-AMT-MP-0079,SYN-AMT-MPP-0080,SYN-AMT-TPP-0080,A10BJ06,1 mg,injection,IR,1,5,false,semaglutide,0.000000
-13922R,Diamicron MR,gliclazide,SYN-AMT-MP-0043,SYN-AMT-MPP-0081,SYN-AMT-TPP-0081,A10BB09,60 mg,modified release tablet,MR,120,5,false,gliclazide,0.000000
-8571D,NovoRapid,insulin aspart,SYN-AMT-MP-0047,SYN-AMT-MPP-0082,SYN-AMT-TPP-0082,A10AB05,100 units/mL,injection,IR,5,2,false,insulin aspart,0.001369
-14349F,Lexapro,escitalopram,SYN-AMT-MP-0031,SYN-AMT-MPP-0083,SYN-AMT-TPP-0083,N06AB10,10 mg,tablet,IR,56,2,false,escitalopram,0.000000
-10181W,Lexapro,escitalopram,SYN-AMT-MP-0031,SYN-AMT-MPP-0084,SYN-AMT-TPP-0084,N06AB10,20 mg,tablet,IR,1,5,false,escitalopram,0.000804
-14400X,Zoloft,sertraline,SYN-AMT-MP-0080,SYN-AMT-MPP-0085,SYN-AMT-TPP-0085,N06AB06,50 mg,tablet,IR,60,2,false,sertraline,0.000000
-14404D,Zoloft,sertraline,SYN-AMT-MP-0080,SYN-AMT-MPP-0086,SYN-AMT-TPP-0086,N06AB06,100 mg,tablet,IR,60,2,false,sertraline,0.000000
-14400X,Zoloft,sertraline,SYN-AMT-MP-0080,SYN-AMT-MPP-0087,SYN-AMT-TPP-0087,N06AB06,200 mg,tablet,IR,60,2,false,sertraline,0.000000
-14369G,Avanza,mirtazapine,SYN-AMT-MP-0061,SYN-AMT-MPP-0088,SYN-AMT-TPP-0088,N06AX11,15 mg,tablet,IR,60,2,false,mirtazapine,0.000000
-14473R,Avanza,mirtazapine,SYN-AMT-MP-0061,SYN-AMT-MPP-0089,SYN-AMT-TPP-0089,N06AX11,30 mg,tablet,IR,60,2,false,mirtazapine,0.000000
-14475W,Avanza,mirtazapine,SYN-AMT-MP-0061,SYN-AMT-MPP-0090,SYN-AMT-TPP-0090,N06AX11,45 mg,tablet,IR,60,2,false,mirtazapine,0.000000
-14472Q,Efexor-XR,venlafaxine,SYN-AMT-MP-0095,SYN-AMT-MPP-0091,SYN-AMT-TPP-0091,N06AX16,75 mg,modified release capsule,MR,56,2,false,venlafaxine,0.000000
-14402B,Efexor-XR,venlafaxine,SYN-AMT-MP-0095,SYN-AMT-MPP-0092,SYN-AMT-TPP-0092,N06AX16,150 mg,modified release capsule,MR,56,2,false,venlafaxine,0.000000
-14402B,Efexor-XR,venlafaxine,SYN-AMT-MP-0095,SYN-AMT-MPP-0093,SYN-AMT-TPP-0093,N06AX16,225 mg,modified release capsule,MR,56,2,false,venlafaxine,0.000000
-9155W,Cymbalta,duloxetine,SYN-AMT-MP-0026,SYN-AMT-MPP-0094,SYN-AMT-TPP-0094,N06AX21,30 mg,capsule,MR,28,0,false,duloxetine,0.022723
-14712H,Cymbalta,duloxetine,SYN-AMT-MP-0026,SYN-AMT-MPP-0095,SYN-AMT-TPP-0095,N06AX21,60 mg,capsule,MR,56,2,false,duloxetine,0.000000
-2088X,Normison,temazepam,SYN-AMT-MP-0090,SYN-AMT-MPP-0096,SYN-AMT-TPP-0096,N05CD07,10 mg,tablet,IR,50,5,false,temazepam,0.002719
-4077N,Cartia,aspirin,SYN-AMT-MP-0007,SYN-AMT-MPP-0097,SYN-AMT-TPP-0097,B01AC06,100 mg,tablet,IR,84,1,false,aspirin,0.004421
-4078P,Astrix,aspirin,SYN-AMT-MP-0007,SYN-AMT-MPP-0098,SYN-AMT-TPP-0098,B01AC06,100 mg,tablet,IR,84,1,false,aspirin,0.000538
-13365K,Plavix,clopidogrel,SYN-AMT-MP-0018,SYN-AMT-MPP-0099,SYN-AMT-TPP-0099,B01AC04,75 mg,tablet,IR,56,5,false,clopidogrel,0.000000
-13399F,Iscover,clopidogrel,SYN-AMT-MP-0018,SYN-AMT-MPP-0100,SYN-AMT-TPP-0100,B01AC04,75 mg,tablet,IR,56,5,false,clopidogrel,0.000000
-13524T,Brilinta,ticagrelor,SYN-AMT-MP-0091,SYN-AMT-MPP-0101,SYN-AMT-TPP-0101,B01AC24,90 mg,tablet,IR,112,5,false,ticagrelor,0.000000
-10590J,CoPlavix,aspirin/clopidogrel,SYN-AMT-MP-0008,SYN-AMT-MPP-0102,SYN-AMT-TPP-0102,B01AC30,100/75 mg,tablet,IR,112,1,true,aspirin;clopidogrel,0.001132
-10590J,DuoCover,aspirin/clopidogrel,SYN-AMT-MP-0008,SYN-AMT-MPP-0103,SYN-AMT-TPP-0103,B01AC30,100/75 mg,tablet,IR,112,1,true,aspirin;clopidogrel,0.001132
-13461L,Imdur,isosorbide mononitrate,SYN-AMT-MP-0051,SYN-AMT-MPP-0104,SYN-AMT-TPP-0104,C01DA14,60 mg,modified release tablet,MR,60,5,false,isosorbide mononitrate,0.000000
-13461L,Duride,isosorbide mononitrate,SYN-AMT-MP-0051,SYN-AMT-MPP-0105,SYN-AMT-TPP-0105,C01DA14,60 mg,modified release tablet,MR,60,5,false,isosorbide mononitrate,0.000000
-13549D,Nitrolingual Pumpspray,glyceryl trinitrate,SYN-AMT-MP-0045,SYN-AMT-MPP-0106,SYN-AMT-TPP-0106,C01DA02,400 microgram/dose,spray,IR,2,5,false,glyceryl trinitrate,0.000000
-SYN-PBS-0107,Betaloc,metoprolol,SYN-AMT-MP-0059,SYN-AMT-MPP-0107,SYN-AMT-TPP-0107,C07AB02,25 mg,tablet,IR,60,5,false,metoprolol,0.000000
-SYN-PBS-0108,Betaloc,metoprolol,SYN-AMT-MP-0059,SYN-AMT-MPP-0108,SYN-AMT-TPP-0108,C07AB02,50 mg,tablet,IR,60,5,false,metoprolol,0.000000
-SYN-PBS-0109,Minax,metoprolol,SYN-AMT-MP-0059,SYN-AMT-MPP-0109,SYN-AMT-TPP-0109,C07AB02,25 mg,tablet,IR,60,5,false,metoprolol,0.000000
-SYN-PBS-0110,Minax,metoprolol,SYN-AMT-MP-0059,SYN-AMT-MPP-0110,SYN-AMT-TPP-0110,C07AB02,50 mg,tablet,IR,60,5,false,metoprolol,0.000000
-13464P,Eliquis,apixaban,SYN-AMT-MP-0006,SYN-AMT-MPP-0111,SYN-AMT-TPP-0111,B01AF02,2.5 mg,tablet,IR,120,5,false,apixaban,0.000000
-13464P,Eliquis,apixaban,SYN-AMT-MP-0006,SYN-AMT-MPP-0112,SYN-AMT-TPP-0112,B01AF02,5 mg,tablet,IR,120,5,false,apixaban,0.000000
-13463N,Xarelto,rivaroxaban,SYN-AMT-MP-0075,SYN-AMT-MPP-0113,SYN-AMT-TPP-0113,B01AF01,15 mg,tablet,IR,56,5,false,rivaroxaban,0.000000
-13462M,Xarelto,rivaroxaban,SYN-AMT-MP-0075,SYN-AMT-MPP-0114,SYN-AMT-TPP-0114,B01AF01,20 mg,tablet,IR,56,5,false,rivaroxaban,0.000000
-2843P,Marevan,warfarin,SYN-AMT-MP-0096,SYN-AMT-MPP-0115,SYN-AMT-TPP-0115,B01AA03,1 mg,tablet,IR,50,2,false,warfarin,0.071751
-2209G,Marevan,warfarin,SYN-AMT-MP-0096,SYN-AMT-MPP-0116,SYN-AMT-TPP-0116,B01AA03,2 mg,tablet,IR,50,2,false,warfarin,0.062793
-2844Q,Marevan,warfarin,SYN-AMT-MP-0096,SYN-AMT-MPP-0117,SYN-AMT-TPP-0117,B01AA03,3 mg,tablet,IR,50,2,false,warfarin,0.020580
-2211J,Marevan,warfarin,SYN-AMT-MP-0096,SYN-AMT-MPP-0118,SYN-AMT-TPP-0118,B01AA03,5 mg,tablet,IR,50,2,false,warfarin,0.038733
-2843P,Coumadin,warfarin,SYN-AMT-MP-0096,SYN-AMT-MPP-0119,SYN-AMT-TPP-0119,B01AA03,1 mg,tablet,IR,50,2,false,warfarin,0.071751
-2209G,Coumadin,warfarin,SYN-AMT-MP-0096,SYN-AMT-MPP-0120,SYN-AMT-TPP-0120,B01AA03,2 mg,tablet,IR,50,2,false,warfarin,0.062793
-2844Q,Coumadin,warfarin,SYN-AMT-MP-0096,SYN-AMT-MPP-0121,SYN-AMT-TPP-0121,B01AA03,3 mg,tablet,IR,50,2,false,warfarin,0.020580
-2211J,Coumadin,warfarin,SYN-AMT-MP-0096,SYN-AMT-MPP-0122,SYN-AMT-TPP-0122,B01AA03,5 mg,tablet,IR,50,2,false,warfarin,0.038733
-13523R,Pradaxa,dabigatran,SYN-AMT-MP-0020,SYN-AMT-MPP-0123,SYN-AMT-TPP-0123,B01AE07,110 mg,capsule,IR,120,5,false,dabigatran,0.000000
-13489Y,Pradaxa,dabigatran,SYN-AMT-MP-0020,SYN-AMT-MPP-0124,SYN-AMT-TPP-0124,B01AE07,150 mg,capsule,IR,120,5,false,dabigatran,0.000000
-2605D,Lanoxin,digoxin,SYN-AMT-MP-0023,SYN-AMT-MPP-0125,SYN-AMT-TPP-0125,C01AA05,62.5 microgram,tablet,IR,200,1,false,digoxin,0.024422
-1322N,Lanoxin,digoxin,SYN-AMT-MP-0023,SYN-AMT-MPP-0126,SYN-AMT-TPP-0126,C01AA05,125 microgram,tablet,IR,100,1,false,digoxin,0.006679
-2605D,Lanoxin PG,digoxin,SYN-AMT-MP-0023,SYN-AMT-MPP-0127,SYN-AMT-TPP-0127,C01AA05,62.5 microgram,tablet,IR,200,1,false,digoxin,0.024422
-1322N,Lanoxin PG,digoxin,SYN-AMT-MP-0023,SYN-AMT-MPP-0128,SYN-AMT-TPP-0128,C01AA05,125 microgram,tablet,IR,100,1,false,digoxin,0.006679
-8398B,Sotacor,sotalol,SYN-AMT-MP-0084,SYN-AMT-MPP-0129,SYN-AMT-TPP-0129,C07AA07,80 mg,tablet,IR,60,5,false,sotalol,0.038128
-1312C,Cardizem CD,diltiazem,SYN-AMT-MP-0024,SYN-AMT-MPP-0130,SYN-AMT-TPP-0130,C08DB01,180 mg,modified release capsule,MR,30,5,false,diltiazem,0.037078
-1313D,Cardizem CD,diltiazem,SYN-AMT-MP-0024,SYN-AMT-MPP-0131,SYN-AMT-TPP-0131,C08DB01,240 mg,modified release capsule,MR,30,5,false,diltiazem,0.030424
-5457F,Prolia,denosumab,SYN-AMT-MP-0022,SYN-AMT-MPP-0132,SYN-AMT-TPP-0132,M05BX04,60 mg,injection,IR,1,0,false,denosumab,0.041685
-13499L,Fosamax,alendronate,SYN-AMT-MP-0001,SYN-AMT-MPP-0133,SYN-AMT-TPP-0133,M05BA04,70 mg,tablet,IR,8,5,false,alendronate,0.000000
-13499L,Fosamax Plus,alendronate/colecalciferol,SYN-AMT-MP-0002,SYN-AMT-MPP-0134,SYN-AMT-TPP-0134,M05BB03,70 mg/140 microgram,tablet,IR,8,5,true,alendronate;colecalciferol,0.000000
-13364J,Actonel,risedronate,SYN-AMT-MP-0074,SYN-AMT-MPP-0135,SYN-AMT-TPP-0135,M05BA07,35 mg,tablet,IR,8,5,false,risedronate,0.000000
-13488X,Actonel,risedronate,SYN-AMT-MP-0074,SYN-AMT-MPP-0136,SYN-AMT-TPP-0136,M05BA07,150 mg,tablet,IR,2,5,false,risedronate,0.000000
-9288W,Aclasta,zoledronic acid,SYN-AMT-MP-0097,SYN-AMT-MPP-0137,SYN-AMT-TPP-0137,M05BA08,5 mg,injection,IR,1,0,false,zoledronic acid,0.001633
-SYN-PBS-0138,Ostelin,colecalciferol,SYN-AMT-MP-0019,SYN-AMT-MPP-0138,SYN-AMT-TPP-0138,A11CC05,1000 IU,capsule,IR,30,5,false,colecalciferol,0.000000
-14200J,Flomax,tamsulosin,SYN-AMT-MP-0086,SYN-AMT-MPP-0139,SYN-AMT-TPP-0139,G04CA02,400 microgram,modified release tablet,MR,60,5,false,tamsulosin,0.000000
-10095H,Duodart,dutasteride/tamsulosin,SYN-AMT-MP-0027,SYN-AMT-MPP-0140,SYN-AMT-TPP-0140,G04CA52,0.5/0.4 mg,capsule,MR,30,5,true,dutasteride;tamsulosin,0.000087
-SYN-PBS-0141,Betmiga,mirabegron,SYN-AMT-MP-0060,SYN-AMT-MPP-0141,SYN-AMT-TPP-0141,G04BD12,25 mg,modified release tablet,MR,30,5,false,mirabegron,0.000000
-SYN-PBS-0142,Betmiga,mirabegron,SYN-AMT-MP-0060,SYN-AMT-MPP-0142,SYN-AMT-TPP-0142,G04BD12,50 mg,modified release tablet,MR,30,5,false,mirabegron,0.000000
-14361W,Spiriva,tiotropium,SYN-AMT-MP-0092,SYN-AMT-MPP-0143,SYN-AMT-TPP-0143,R03BB04,18 microgram,inhaler,IR,60,5,false,tiotropium,0.000000
-14331G,Symbicort,budesonide/formoterol,SYN-AMT-MP-0011,SYN-AMT-MPP-0144,SYN-AMT-TPP-0144,R03AK07,200/6 microgram,inhaler,IR,2,5,true,budesonide;formoterol,0.000000
-SYN-PBS-0145,Seretide,fluticasone/salmeterol,SYN-AMT-MP-0040,SYN-AMT-MPP-0145,SYN-AMT-TPP-0145,R03AK06,250/25 microgram,inhaler,IR,1,5,true,fluticasone;salmeterol,0.000000
-11719T,Trelegy Ellipta,fluticasone furoate/umeclidinium/vilanterol,SYN-AMT-MP-0039,SYN-AMT-MPP-0146,SYN-AMT-TPP-0146,R03AL08,100/62.5/25 microgram,inhaler,IR,1,5,true,fluticasone furoate;umeclidinium;vilanterol,0.000000
-10187E,Anoro Ellipta,umeclidinium/vilanterol,SYN-AMT-MP-0094,SYN-AMT-MPP-0147,SYN-AMT-TPP-0147,R03AL03,62.5/25 microgram,inhaler,IR,1,5,true,umeclidinium;vilanterol,0.005782
-12108G,Ventolin,salbutamol,SYN-AMT-MP-0078,SYN-AMT-MPP-0148,SYN-AMT-TPP-0148,R03AC02,100 microgram/dose,inhaler,IR,1,0,false,salbutamol,0.000000
-12108G,Asmol,salbutamol,SYN-AMT-MP-0078,SYN-AMT-MPP-0149,SYN-AMT-TPP-0149,R03AC02,100 microgram/dose,inhaler,IR,1,0,false,salbutamol,0.000000
-2413B,Lasix,furosemide,SYN-AMT-MP-0042,SYN-AMT-MPP-0150,SYN-AMT-TPP-0150,C03CA01,20 mg,tablet,IR,5,0,false,furosemide,0.000901
-13472C,Lasix,furosemide,SYN-AMT-MP-0042,SYN-AMT-MPP-0151,SYN-AMT-TPP-0151,C03CA01,40 mg,tablet,IR,200,1,false,furosemide,0.000000
-13504R,Lasix,furosemide,SYN-AMT-MP-0042,SYN-AMT-MPP-0152,SYN-AMT-TPP-0152,C03CA01,80 mg,tablet,IR,2,3,false,furosemide,0.000000
-12222G,Urex,furosemide,SYN-AMT-MP-0042,SYN-AMT-MPP-0153,SYN-AMT-TPP-0153,C03CA01,20 mg,tablet,IR,50,0,false,furosemide,0.000000
-13472C,Urex,furosemide,SYN-AMT-MP-0042,SYN-AMT-MPP-0154,SYN-AMT-TPP-0154,C03CA01,40 mg,tablet,IR,200,1,false,furosemide,0.000000
-12222G,Urex,furosemide,SYN-AMT-MP-0042,SYN-AMT-MPP-0155,SYN-AMT-TPP-0155,C03CA01,80 mg,tablet,IR,50,0,false,furosemide,0.000000
-SYN-PBS-0156,Entresto,sacubitril/valsartan,SYN-AMT-MP-0077,SYN-AMT-MPP-0156,SYN-AMT-TPP-0156,C09DX04,24/26 mg,tablet,IR,60,5,true,sacubitril;valsartan,0.000000
-SYN-PBS-0157,Entresto,sacubitril/valsartan,SYN-AMT-MP-0077,SYN-AMT-MPP-0157,SYN-AMT-TPP-0157,C09DX04,49/51 mg,tablet,IR,60,5,true,sacubitril;valsartan,0.000000
-SYN-PBS-0158,Entresto,sacubitril/valsartan,SYN-AMT-MP-0077,SYN-AMT-MPP-0158,SYN-AMT-TPP-0158,C09DX04,97/103 mg,tablet,IR,60,5,true,sacubitril;valsartan,0.000000
-13419G,Bicor,bisoprolol,SYN-AMT-MP-0010,SYN-AMT-MPP-0159,SYN-AMT-TPP-0159,C07AB07,1.25 mg,tablet,IR,56,5,false,bisoprolol,0.000000
-13419G,Bicor,bisoprolol,SYN-AMT-MP-0010,SYN-AMT-MPP-0160,SYN-AMT-TPP-0160,C07AB07,2.5 mg,tablet,IR,56,5,false,bisoprolol,0.000000
-13419G,Bicor,bisoprolol,SYN-AMT-MP-0010,SYN-AMT-MPP-0161,SYN-AMT-TPP-0161,C07AB07,5 mg,tablet,IR,56,5,false,bisoprolol,0.000000
-13444N,Bicor,bisoprolol,SYN-AMT-MP-0010,SYN-AMT-MPP-0162,SYN-AMT-TPP-0162,C07AB07,10 mg,tablet,IR,56,5,false,bisoprolol,0.000000
-13417E,Dilatrend,carvedilol,SYN-AMT-MP-0016,SYN-AMT-MPP-0163,SYN-AMT-TPP-0163,C07AG02,6.25 mg,tablet,IR,120,5,false,carvedilol,0.000000
-13418F,Dilatrend,carvedilol,SYN-AMT-MP-0016,SYN-AMT-MPP-0164,SYN-AMT-TPP-0164,C07AG02,12.5 mg,tablet,IR,120,5,false,carvedilol,0.000000
-13387N,Dilatrend,carvedilol,SYN-AMT-MP-0016,SYN-AMT-MPP-0165,SYN-AMT-TPP-0165,C07AG02,25 mg,tablet,IR,120,5,false,carvedilol,0.000000
-13590G,Inspra,eplerenone,SYN-AMT-MP-0030,SYN-AMT-MPP-0166,SYN-AMT-TPP-0166,C03DA04,25 mg,tablet,IR,60,5,false,eplerenone,0.000000
-13503Q,Aldactone,spironolactone,SYN-AMT-MP-0085,SYN-AMT-MPP-0167,SYN-AMT-TPP-0167,C03DA01,25 mg,tablet,IR,200,5,false,spironolactone,0.000000
-10011X,Forxiga,dapagliflozin,SYN-AMT-MP-0021,SYN-AMT-MPP-0168,SYN-AMT-TPP-0168,A10BK01,10 mg,tablet,IR,28,5,false,dapagliflozin,0.051513
-2174K,Eutroxsig,levothyroxine,SYN-AMT-MP-0055,SYN-AMT-MPP-0169,SYN-AMT-TPP-0169,H03AA01,50 microgram,tablet,IR,200,1,false,levothyroxine,0.039938
-2175L,Eutroxsig,levothyroxine,SYN-AMT-MP-0055,SYN-AMT-MPP-0170,SYN-AMT-TPP-0170,H03AA01,100 microgram,tablet,IR,200,1,false,levothyroxine,0.038644
-2173J,Eutroxsig,levothyroxine,SYN-AMT-MP-0055,SYN-AMT-MPP-0171,SYN-AMT-TPP-0171,H03AA01,150 microgram,tablet,IR,200,1,false,levothyroxine,0.002788
-2174K,Oroxine,levothyroxine,SYN-AMT-MP-0055,SYN-AMT-MPP-0172,SYN-AMT-TPP-0172,H03AA01,50 microgram,tablet,IR,200,1,false,levothyroxine,0.039938
-2175L,Oroxine,levothyroxine,SYN-AMT-MP-0055,SYN-AMT-MPP-0173,SYN-AMT-TPP-0173,H03AA01,100 microgram,tablet,IR,200,1,false,levothyroxine,0.038644
-2173J,Oroxine,levothyroxine,SYN-AMT-MP-0055,SYN-AMT-MPP-0174,SYN-AMT-TPP-0174,H03AA01,150 microgram,tablet,IR,200,1,false,levothyroxine,0.002788
-13358C,Zyloprim,allopurinol,SYN-AMT-MP-0003,SYN-AMT-MPP-0175,SYN-AMT-TPP-0175,M04AA01,100 mg,tablet,IR,400,2,false,allopurinol,0.000000
-13575L,Zyloprim,allopurinol,SYN-AMT-MP-0003,SYN-AMT-MPP-0176,SYN-AMT-TPP-0176,M04AA01,300 mg,tablet,IR,120,2,false,allopurinol,0.000000
-13358C,Progout,allopurinol,SYN-AMT-MP-0003,SYN-AMT-MPP-0177,SYN-AMT-TPP-0177,M04AA01,100 mg,tablet,IR,400,2,false,allopurinol,0.000000
-13575L,Progout,allopurinol,SYN-AMT-MP-0003,SYN-AMT-MPP-0178,SYN-AMT-TPP-0178,M04AA01,300 mg,tablet,IR,120,2,false,allopurinol,0.000000
-10445R,Adenuric,febuxostat,SYN-AMT-MP-0037,SYN-AMT-MPP-0179,SYN-AMT-TPP-0179,M04AA03,80 mg,tablet,IR,28,5,false,febuxostat,0.001118
-13457G,Rocaltrol,calcitriol,SYN-AMT-MP-0013,SYN-AMT-MPP-0180,SYN-AMT-TPP-0180,A11CC04,0.25 microgram,capsule,IR,200,3,false,calcitriol,0.000000
-SYN-PBS-0181,Sinemet,levodopa/carbidopa,SYN-AMT-MP-0054,SYN-AMT-MPP-0181,SYN-AMT-TPP-0181,N04BA02,100/25 mg,tablet,IR,60,5,true,levodopa;carbidopa,0.000000
-SYN-PBS-0182,Kinson,levodopa/carbidopa,SYN-AMT-MP-0054,SYN-AMT-MPP-0182,SYN-AMT-TPP-0182,N04BA02,100/25 mg,tablet,IR,60,5,true,levodopa;carbidopa,0.000000
-SYN-PBS-0183,Madopar,levodopa/benserazide,SYN-AMT-MP-0053,SYN-AMT-MPP-0183,SYN-AMT-TPP-0183,N04BA02,100/25 mg,capsule,IR,60,5,true,levodopa;benserazide,0.000000
-14034P,Keppra,levetiracetam,SYN-AMT-MP-0052,SYN-AMT-MPP-0184,SYN-AMT-TPP-0184,N03AX14,500 mg,tablet,IR,120,5,false,levetiracetam,0.000000
-SYN-PBS-0185,Epilim,sodium valproate,SYN-AMT-MP-0083,SYN-AMT-MPP-0185,SYN-AMT-TPP-0185,N03AG01,500 mg,modified release tablet,MR,60,5,false,sodium valproate,0.000000
-2532G,Aricept,donepezil,SYN-AMT-MP-0025,SYN-AMT-MPP-0186,SYN-AMT-TPP-0186,N06DA02,5 mg,tablet,IR,28,5,false,donepezil,0.006964
-2479L,Aricept,donepezil,SYN-AMT-MP-0025,SYN-AMT-MPP-0187,SYN-AMT-TPP-0187,N06DA02,10 mg,tablet,IR,28,5,false,donepezil,0.019536
-1622J,Methoblastin,methotrexate,SYN-AMT-MP-0058,SYN-AMT-MPP-0188,SYN-AMT-TPP-0188,L04AX03,2.5 mg,tablet,IR,30,5,false,methotrexate,0.003285
-14643Q,Methoblastin,methotrexate,SYN-AMT-MP-0058,SYN-AMT-MPP-0189,SYN-AMT-TPP-0189,L04AX03,10 mg,tablet,IR,10,5,false,methotrexate,0.000000
-13888Y,Panafcortelone,prednisolone,SYN-AMT-MP-0070,SYN-AMT-MPP-0190,SYN-AMT-TPP-0190,H02AB06,1 mg,tablet,IR,200,4,false,prednisolone,0.000000
-14045F,Panafcortelone,prednisolone,SYN-AMT-MP-0070,SYN-AMT-MPP-0191,SYN-AMT-TPP-0191,H02AB06,5 mg,tablet,IR,120,4,false,prednisolone,0.000000
-1916W,Panafcortelone,prednisolone,SYN-AMT-MP-0070,SYN-AMT-MPP-0192,SYN-AMT-TPP-0192,H02AB06,25 mg,tablet,IR,30,4,false,prednisolone,0.048813
-13888Y,Solone,prednisolone,SYN-AMT-MP-0070,SYN-AMT-MPP-0193,SYN-AMT-TPP-0193,H02AB06,1 mg,tablet,IR,200,4,false,prednisolone,0.000000
-14045F,Solone,prednisolone,SYN-AMT-MP-0070,SYN-AMT-MPP-0194,SYN-AMT-TPP-0194,H02AB06,5 mg,tablet,IR,120,4,false,prednisolone,0.000000
-1916W,Solone,prednisolone,SYN-AMT-MP-0070,SYN-AMT-MPP-0195,SYN-AMT-TPP-0195,H02AB06,25 mg,tablet,IR,30,4,false,prednisolone,0.048813
-1512N,Plaquenil,hydroxychloroquine,SYN-AMT-MP-0046,SYN-AMT-MPP-0196,SYN-AMT-TPP-0196,P01BA02,200 mg,tablet,IR,100,3,false,hydroxychloroquine,0.015851
-10573L,Megafol,folic acid,SYN-AMT-MP-0041,SYN-AMT-MPP-0197,SYN-AMT-TPP-0197,B03BB01,5 mg,tablet,IR,200,1,false,folic acid,0.000130
-13440J,Atozet,ezetimibe/atorvastatin,SYN-AMT-MP-0034,SYN-AMT-MPP-0198,SYN-AMT-TPP-0198,C10BA05,10/10 mg,tablet,IR,60,5,true,ezetimibe;atorvastatin,0.000000
-13440J,Atozet,ezetimibe/atorvastatin,SYN-AMT-MP-0034,SYN-AMT-MPP-0199,SYN-AMT-TPP-0199,C10BA05,10/40 mg,tablet,IR,60,5,true,ezetimibe;atorvastatin,0.000000
-13440J,Atozet,ezetimibe/atorvastatin,SYN-AMT-MP-0034,SYN-AMT-MPP-0200,SYN-AMT-TPP-0200,C10BA05,10/80 mg,tablet,IR,60,5,true,ezetimibe;atorvastatin,0.000000
+10092E,Palexia SR,tapentadol,SYN-AMT-MP-0088,SYN-AMT-MPP-0057,SYN-AMT-TPP-0057,N02AX06,50 mg,modified release tablet,MR,28,0,false,tapentadol,0.001971
+10094G,Palexia SR,tapentadol,SYN-AMT-MP-0088,SYN-AMT-MPP-0058,SYN-AMT-TPP-0058,N02AX06,100 mg,modified release tablet,MR,28,0,false,tapentadol,0.008858
+2335X,Lyrica,pregabalin,SYN-AMT-MP-0072,SYN-AMT-MPP-0059,SYN-AMT-TPP-0059,N03AX16,75 mg,capsule,IR,56,5,false,pregabalin,0.142190
+8439E,Celebrex,celecoxib,SYN-AMT-MP-0017,SYN-AMT-MPP-0060,SYN-AMT-TPP-0060,M01AH01,100 mg,capsule,IR,60,3,false,celecoxib,0.020804
+8440F,Celebrex,celecoxib,SYN-AMT-MP-0017,SYN-AMT-MPP-0061,SYN-AMT-TPP-0061,M01AH01,200 mg,capsule,IR,30,3,false,celecoxib,0.077212
+13233L,Endone,oxycodone,SYN-AMT-MP-0063,SYN-AMT-MPP-0062,SYN-AMT-TPP-0062,N02AA05,5 mg,tablet,IR,10,0,false,oxycodone,0.000000
+13976N,Diabex,metformin,SYN-AMT-MP-0058,SYN-AMT-MPP-0063,SYN-AMT-TPP-0063,A10BA02,500 mg,tablet,IR,200,5,false,metformin,0.000000
+13976N,Diabex,metformin,SYN-AMT-MP-0058,SYN-AMT-MPP-0064,SYN-AMT-TPP-0064,A10BA02,1000 mg,tablet,IR,200,5,false,metformin,0.000000
+13976N,Diaformin,metformin,SYN-AMT-MP-0058,SYN-AMT-MPP-0065,SYN-AMT-TPP-0065,A10BA02,500 mg,tablet,IR,200,5,false,metformin,0.000000
+13976N,Diaformin,metformin,SYN-AMT-MP-0058,SYN-AMT-MPP-0066,SYN-AMT-TPP-0066,A10BA02,1000 mg,tablet,IR,200,5,false,metformin,0.000000
+13847T,Diabex XR,metformin,SYN-AMT-MP-0058,SYN-AMT-MPP-0067,SYN-AMT-TPP-0067,A10BA02,1000 mg,modified release tablet,MR,120,5,false,metformin,0.000000
+14740T,Diamicron MR,gliclazide,SYN-AMT-MP-0044,SYN-AMT-MPP-0068,SYN-AMT-TPP-0068,A10BB09,30 mg,modified release tablet,MR,200,5,false,gliclazide,0.000000
+13922R,Diamicron MR,gliclazide,SYN-AMT-MP-0044,SYN-AMT-MPP-0069,SYN-AMT-TPP-0069,A10BB09,60 mg,modified release tablet,MR,120,5,false,gliclazide,0.000000
+10206E,Jardiance,empagliflozin,SYN-AMT-MP-0029,SYN-AMT-MPP-0070,SYN-AMT-TPP-0070,A10BK03,10 mg,tablet,IR,30,5,false,empagliflozin,0.004999
+10202Y,Jardiance,empagliflozin,SYN-AMT-MP-0029,SYN-AMT-MPP-0071,SYN-AMT-TPP-0071,A10BK03,25 mg,tablet,IR,30,5,false,empagliflozin,0.003951
+10011X,Forxiga,dapagliflozin,SYN-AMT-MP-0021,SYN-AMT-MPP-0072,SYN-AMT-TPP-0072,A10BK01,10 mg,tablet,IR,28,5,false,dapagliflozin,0.046914
+13994M,Janumet,sitagliptin/metformin,SYN-AMT-MP-0083,SYN-AMT-MPP-0073,SYN-AMT-TPP-0073,A10BD07,50/1000 mg,tablet,IR,112,5,true,sitagliptin;metformin,0.000000
+10633P,Jardiamet,empagliflozin/metformin,SYN-AMT-MP-0030,SYN-AMT-MPP-0074,SYN-AMT-TPP-0074,A10BD20,12.5/1000 mg,tablet,IR,60,5,true,empagliflozin;metformin,0.000036
+9039R,Optisulin,insulin glargine,SYN-AMT-MP-0049,SYN-AMT-MPP-0075,SYN-AMT-TPP-0075,A10AE04,100 units/mL,injection,MR,5,1,false,insulin glargine,0.033998
+11302W,Optisulin,insulin glargine,SYN-AMT-MP-0049,SYN-AMT-MPP-0076,SYN-AMT-TPP-0076,A10AE04,300 units/mL,injection,MR,5,1,false,insulin glargine,0.000000
+11815W,Toujeo,insulin glargine,SYN-AMT-MP-0049,SYN-AMT-MPP-0077,SYN-AMT-TPP-0077,A10AE04,100 units/mL,injection,MR,5,1,false,insulin glargine,0.000000
+11302W,Toujeo,insulin glargine,SYN-AMT-MP-0049,SYN-AMT-MPP-0078,SYN-AMT-TPP-0078,A10AE04,300 units/mL,injection,MR,5,1,false,insulin glargine,0.000000
+12075M,Ozempic,semaglutide,SYN-AMT-MP-0080,SYN-AMT-MPP-0079,SYN-AMT-TPP-0079,A10BJ06,0.5 mg,injection,IR,1,5,false,semaglutide,0.000000
+12075M,Ozempic,semaglutide,SYN-AMT-MP-0080,SYN-AMT-MPP-0080,SYN-AMT-TPP-0080,A10BJ06,1 mg,injection,IR,1,5,false,semaglutide,0.000000
+13922R,Diamicron MR,gliclazide,SYN-AMT-MP-0044,SYN-AMT-MPP-0081,SYN-AMT-TPP-0081,A10BB09,60 mg,modified release tablet,MR,120,5,false,gliclazide,0.000000
+13896J,APX-Gliclazide,gliclazide,SYN-AMT-MP-0044,SYN-AMT-MPP-0082,SYN-AMT-TPP-0082,A10BB09,80 mg,tablet,IR,200,5,false,gliclazide,0.000000
+13896J,Nidem,gliclazide,SYN-AMT-MP-0044,SYN-AMT-MPP-0083,SYN-AMT-TPP-0083,A10BB09,80 mg,tablet,IR,200,5,false,gliclazide,0.000000
+8571D,NovoRapid,insulin aspart,SYN-AMT-MP-0048,SYN-AMT-MPP-0084,SYN-AMT-TPP-0084,A10AB05,100 units/mL,injection,IR,5,2,false,insulin aspart,0.001246
+14349F,Lexapro,escitalopram,SYN-AMT-MP-0032,SYN-AMT-MPP-0085,SYN-AMT-TPP-0085,N06AB10,10 mg,tablet,IR,56,2,false,escitalopram,0.000000
+10181W,Lexapro,escitalopram,SYN-AMT-MP-0032,SYN-AMT-MPP-0086,SYN-AMT-TPP-0086,N06AB10,20 mg,tablet,IR,1,5,false,escitalopram,0.000732
+14400X,Zoloft,sertraline,SYN-AMT-MP-0081,SYN-AMT-MPP-0087,SYN-AMT-TPP-0087,N06AB06,50 mg,tablet,IR,60,2,false,sertraline,0.000000
+14404D,Zoloft,sertraline,SYN-AMT-MP-0081,SYN-AMT-MPP-0088,SYN-AMT-TPP-0088,N06AB06,100 mg,tablet,IR,60,2,false,sertraline,0.000000
+14400X,Zoloft,sertraline,SYN-AMT-MP-0081,SYN-AMT-MPP-0089,SYN-AMT-TPP-0089,N06AB06,200 mg,tablet,IR,60,2,false,sertraline,0.000000
+14369G,Avanza,mirtazapine,SYN-AMT-MP-0062,SYN-AMT-MPP-0090,SYN-AMT-TPP-0090,N06AX11,15 mg,tablet,IR,60,2,false,mirtazapine,0.000000
+14473R,Avanza,mirtazapine,SYN-AMT-MP-0062,SYN-AMT-MPP-0091,SYN-AMT-TPP-0091,N06AX11,30 mg,tablet,IR,60,2,false,mirtazapine,0.000000
+14475W,Avanza,mirtazapine,SYN-AMT-MP-0062,SYN-AMT-MPP-0092,SYN-AMT-TPP-0092,N06AX11,45 mg,tablet,IR,60,2,false,mirtazapine,0.000000
+8868R,Efexor-XR,venlafaxine,SYN-AMT-MP-0096,SYN-AMT-MPP-0093,SYN-AMT-TPP-0093,N06AX16,37.5 mg,modified release capsule,MR,28,0,false,venlafaxine,0.010421
+14472Q,Efexor-XR,venlafaxine,SYN-AMT-MP-0096,SYN-AMT-MPP-0094,SYN-AMT-TPP-0094,N06AX16,75 mg,modified release capsule,MR,56,2,false,venlafaxine,0.000000
+14402B,Efexor-XR,venlafaxine,SYN-AMT-MP-0096,SYN-AMT-MPP-0095,SYN-AMT-TPP-0095,N06AX16,150 mg,modified release capsule,MR,56,2,false,venlafaxine,0.000000
+9155W,Cymbalta,duloxetine,SYN-AMT-MP-0027,SYN-AMT-MPP-0096,SYN-AMT-TPP-0096,N06AX21,30 mg,capsule,MR,28,0,false,duloxetine,0.020694
+14712H,Cymbalta,duloxetine,SYN-AMT-MP-0027,SYN-AMT-MPP-0097,SYN-AMT-TPP-0097,N06AX21,60 mg,capsule,MR,56,2,false,duloxetine,0.000000
+10241B,Desfax,desvenlafaxine,SYN-AMT-MP-0023,SYN-AMT-MPP-0098,SYN-AMT-TPP-0098,N06AX23,50 mg,modified release tablet,MR,28,5,false,desvenlafaxine,0.011116
+10231L,Desfax,desvenlafaxine,SYN-AMT-MP-0023,SYN-AMT-MPP-0099,SYN-AMT-TPP-0099,N06AX23,100 mg,modified release tablet,MR,28,5,false,desvenlafaxine,0.013998
+14451N,Pristiq,desvenlafaxine,SYN-AMT-MP-0023,SYN-AMT-MPP-0100,SYN-AMT-TPP-0100,N06AX23,50 mg,modified release tablet,MR,56,2,false,desvenlafaxine,0.000000
+14545M,Pristiq,desvenlafaxine,SYN-AMT-MP-0023,SYN-AMT-MPP-0101,SYN-AMT-TPP-0101,N06AX23,100 mg,modified release tablet,MR,56,2,false,desvenlafaxine,0.000000
+2088X,Normison,temazepam,SYN-AMT-MP-0091,SYN-AMT-MPP-0102,SYN-AMT-TPP-0102,N05CD07,10 mg,tablet,IR,50,5,false,temazepam,0.002477
+4077N,Cartia,aspirin,SYN-AMT-MP-0007,SYN-AMT-MPP-0103,SYN-AMT-TPP-0103,B01AC06,100 mg,tablet,IR,84,1,false,aspirin,0.004027
+4078P,Astrix,aspirin,SYN-AMT-MP-0007,SYN-AMT-MPP-0104,SYN-AMT-TPP-0104,B01AC06,100 mg,tablet,IR,84,1,false,aspirin,0.000490
+13365K,Plavix,clopidogrel,SYN-AMT-MP-0018,SYN-AMT-MPP-0105,SYN-AMT-TPP-0105,B01AC04,75 mg,tablet,IR,56,5,false,clopidogrel,0.000000
+13399F,Iscover,clopidogrel,SYN-AMT-MP-0018,SYN-AMT-MPP-0106,SYN-AMT-TPP-0106,B01AC04,75 mg,tablet,IR,56,5,false,clopidogrel,0.000000
+13524T,Brilinta,ticagrelor,SYN-AMT-MP-0092,SYN-AMT-MPP-0107,SYN-AMT-TPP-0107,B01AC24,90 mg,tablet,IR,112,5,false,ticagrelor,0.000000
+13427Q,CoPlavix,aspirin/clopidogrel,SYN-AMT-MP-0008,SYN-AMT-MPP-0108,SYN-AMT-TPP-0108,B01AC30,100/75 mg,tablet,IR,60,5,true,aspirin;clopidogrel,0.000000
+13427Q,DuoCover,aspirin/clopidogrel,SYN-AMT-MP-0008,SYN-AMT-MPP-0109,SYN-AMT-TPP-0109,B01AC30,100/75 mg,tablet,IR,60,5,true,aspirin;clopidogrel,0.000000
+13461L,Imdur,isosorbide mononitrate,SYN-AMT-MP-0052,SYN-AMT-MPP-0110,SYN-AMT-TPP-0110,C01DA14,60 mg,modified release tablet,MR,60,5,false,isosorbide mononitrate,0.000000
+13461L,Duride,isosorbide mononitrate,SYN-AMT-MP-0052,SYN-AMT-MPP-0111,SYN-AMT-TPP-0111,C01DA14,60 mg,modified release tablet,MR,60,5,false,isosorbide mononitrate,0.000000
+13549D,Nitrolingual Pumpspray,glyceryl trinitrate,SYN-AMT-MP-0046,SYN-AMT-MPP-0112,SYN-AMT-TPP-0112,C01DA02,400 microgram/dose,spray,IR,2,5,false,glyceryl trinitrate,0.000000
+SYN-PBS-0113,Betaloc,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0113,SYN-AMT-TPP-0113,C07AB02,25 mg,tablet,IR,60,5,false,metoprolol,0.000000
+SYN-PBS-0114,Betaloc,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0114,SYN-AMT-TPP-0114,C07AB02,50 mg,tablet,IR,60,5,false,metoprolol,0.000000
+SYN-PBS-0115,Minax,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0115,SYN-AMT-TPP-0115,C07AB02,25 mg,tablet,IR,60,5,false,metoprolol,0.000000
+SYN-PBS-0116,Minax,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0116,SYN-AMT-TPP-0116,C07AB02,50 mg,tablet,IR,60,5,false,metoprolol,0.000000
+SYN-PBS-0117,Toprol-XL,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0117,SYN-AMT-TPP-0117,C07AB02,47.5 mg,modified release tablet,MR,30,5,false,metoprolol,0.000000
+SYN-PBS-0118,Toprol-XL,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0118,SYN-AMT-TPP-0118,C07AB02,95 mg,modified release tablet,MR,30,5,false,metoprolol,0.000000
+SYN-PBS-0119,Toprol-XL,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0119,SYN-AMT-TPP-0119,C07AB02,190 mg,modified release tablet,MR,30,5,false,metoprolol,0.000000
+SYN-PBS-0120,Metrol-XL,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0120,SYN-AMT-TPP-0120,C07AB02,47.5 mg,modified release tablet,MR,30,5,false,metoprolol,0.000000
+SYN-PBS-0121,Metrol-XL,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0121,SYN-AMT-TPP-0121,C07AB02,95 mg,modified release tablet,MR,30,5,false,metoprolol,0.000000
+SYN-PBS-0122,Metrol-XL,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0122,SYN-AMT-TPP-0122,C07AB02,190 mg,modified release tablet,MR,30,5,false,metoprolol,0.000000
+SYN-PBS-0123,Minax XL,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0123,SYN-AMT-TPP-0123,C07AB02,47.5 mg,modified release tablet,MR,30,5,false,metoprolol,0.000000
+SYN-PBS-0124,Minax XL,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0124,SYN-AMT-TPP-0124,C07AB02,95 mg,modified release tablet,MR,30,5,false,metoprolol,0.000000
+SYN-PBS-0125,Minax XL,metoprolol,SYN-AMT-MP-0060,SYN-AMT-MPP-0125,SYN-AMT-TPP-0125,C07AB02,190 mg,modified release tablet,MR,30,5,false,metoprolol,0.000000
+13464P,Eliquis,apixaban,SYN-AMT-MP-0006,SYN-AMT-MPP-0126,SYN-AMT-TPP-0126,B01AF02,2.5 mg,tablet,IR,120,5,false,apixaban,0.000000
+13464P,Eliquis,apixaban,SYN-AMT-MP-0006,SYN-AMT-MPP-0127,SYN-AMT-TPP-0127,B01AF02,5 mg,tablet,IR,120,5,false,apixaban,0.000000
+13463N,Xarelto,rivaroxaban,SYN-AMT-MP-0076,SYN-AMT-MPP-0128,SYN-AMT-TPP-0128,B01AF01,15 mg,tablet,IR,56,5,false,rivaroxaban,0.000000
+13462M,Xarelto,rivaroxaban,SYN-AMT-MP-0076,SYN-AMT-MPP-0129,SYN-AMT-TPP-0129,B01AF01,20 mg,tablet,IR,56,5,false,rivaroxaban,0.000000
+2843P,Marevan,warfarin,SYN-AMT-MP-0097,SYN-AMT-MPP-0130,SYN-AMT-TPP-0130,B01AA03,1 mg,tablet,IR,50,2,false,warfarin,0.065347
+2209G,Marevan,warfarin,SYN-AMT-MP-0097,SYN-AMT-MPP-0131,SYN-AMT-TPP-0131,B01AA03,2 mg,tablet,IR,50,2,false,warfarin,0.057188
+2844Q,Marevan,warfarin,SYN-AMT-MP-0097,SYN-AMT-MPP-0132,SYN-AMT-TPP-0132,B01AA03,3 mg,tablet,IR,50,2,false,warfarin,0.018743
+2211J,Marevan,warfarin,SYN-AMT-MP-0097,SYN-AMT-MPP-0133,SYN-AMT-TPP-0133,B01AA03,5 mg,tablet,IR,50,2,false,warfarin,0.035275
+2843P,Coumadin,warfarin,SYN-AMT-MP-0097,SYN-AMT-MPP-0134,SYN-AMT-TPP-0134,B01AA03,1 mg,tablet,IR,50,2,false,warfarin,0.065347
+2209G,Coumadin,warfarin,SYN-AMT-MP-0097,SYN-AMT-MPP-0135,SYN-AMT-TPP-0135,B01AA03,2 mg,tablet,IR,50,2,false,warfarin,0.057188
+2844Q,Coumadin,warfarin,SYN-AMT-MP-0097,SYN-AMT-MPP-0136,SYN-AMT-TPP-0136,B01AA03,3 mg,tablet,IR,50,2,false,warfarin,0.018743
+2211J,Coumadin,warfarin,SYN-AMT-MP-0097,SYN-AMT-MPP-0137,SYN-AMT-TPP-0137,B01AA03,5 mg,tablet,IR,50,2,false,warfarin,0.035275
+13523R,Pradaxa,dabigatran,SYN-AMT-MP-0020,SYN-AMT-MPP-0138,SYN-AMT-TPP-0138,B01AE07,110 mg,capsule,IR,120,5,false,dabigatran,0.000000
+13489Y,Pradaxa,dabigatran,SYN-AMT-MP-0020,SYN-AMT-MPP-0139,SYN-AMT-TPP-0139,B01AE07,150 mg,capsule,IR,120,5,false,dabigatran,0.000000
+2605D,Lanoxin,digoxin,SYN-AMT-MP-0024,SYN-AMT-MPP-0140,SYN-AMT-TPP-0140,C01AA05,62.5 microgram,tablet,IR,200,1,false,digoxin,0.022242
+1322N,Lanoxin,digoxin,SYN-AMT-MP-0024,SYN-AMT-MPP-0141,SYN-AMT-TPP-0141,C01AA05,125 microgram,tablet,IR,100,1,false,digoxin,0.006082
+2605D,Lanoxin PG,digoxin,SYN-AMT-MP-0024,SYN-AMT-MPP-0142,SYN-AMT-TPP-0142,C01AA05,62.5 microgram,tablet,IR,200,1,false,digoxin,0.022242
+1322N,Lanoxin PG,digoxin,SYN-AMT-MP-0024,SYN-AMT-MPP-0143,SYN-AMT-TPP-0143,C01AA05,125 microgram,tablet,IR,100,1,false,digoxin,0.006082
+8398B,Sotacor,sotalol,SYN-AMT-MP-0085,SYN-AMT-MPP-0144,SYN-AMT-TPP-0144,C07AA07,80 mg,tablet,IR,60,5,false,sotalol,0.034724
+1312C,Cardizem CD,diltiazem,SYN-AMT-MP-0025,SYN-AMT-MPP-0145,SYN-AMT-TPP-0145,C08DB01,180 mg,modified release capsule,MR,30,5,false,diltiazem,0.033769
+1313D,Cardizem CD,diltiazem,SYN-AMT-MP-0025,SYN-AMT-MPP-0146,SYN-AMT-TPP-0146,C08DB01,240 mg,modified release capsule,MR,30,5,false,diltiazem,0.027708
+1335G,Cardizem,diltiazem,SYN-AMT-MP-0025,SYN-AMT-MPP-0147,SYN-AMT-TPP-0147,C08DB01,60 mg,tablet,IR,90,5,false,diltiazem,0.004073
+1335G,Vasocardol,diltiazem,SYN-AMT-MP-0025,SYN-AMT-MPP-0148,SYN-AMT-TPP-0148,C08DB01,60 mg,tablet,IR,90,5,false,diltiazem,0.004073
+5457F,Prolia,denosumab,SYN-AMT-MP-0022,SYN-AMT-MPP-0149,SYN-AMT-TPP-0149,M05BX04,60 mg,injection,IR,1,0,false,denosumab,0.037964
+13499L,Fosamax,alendronate,SYN-AMT-MP-0001,SYN-AMT-MPP-0150,SYN-AMT-TPP-0150,M05BA04,70 mg,tablet,IR,8,5,false,alendronate,0.000000
+14003B,Fosamax Plus,alendronate/colecalciferol,SYN-AMT-MP-0002,SYN-AMT-MPP-0151,SYN-AMT-TPP-0151,M05BB03,70 mg/140 microgram,tablet,IR,8,5,true,alendronate;colecalciferol,0.000000
+13364J,Actonel,risedronate,SYN-AMT-MP-0075,SYN-AMT-MPP-0152,SYN-AMT-TPP-0152,M05BA07,35 mg,tablet,IR,8,5,false,risedronate,0.000000
+13488X,Actonel,risedronate,SYN-AMT-MP-0075,SYN-AMT-MPP-0153,SYN-AMT-TPP-0153,M05BA07,150 mg,tablet,IR,2,5,false,risedronate,0.000000
+9288W,Aclasta,zoledronic acid,SYN-AMT-MP-0098,SYN-AMT-MPP-0154,SYN-AMT-TPP-0154,M05BA08,5 mg,injection,IR,1,0,false,zoledronic acid,0.001488
+SYN-PBS-0155,Ostelin,colecalciferol,SYN-AMT-MP-0019,SYN-AMT-MPP-0155,SYN-AMT-TPP-0155,A11CC05,1000 IU,capsule,IR,30,5,false,colecalciferol,0.000000
+14200J,Flomaxtra,tamsulosin,SYN-AMT-MP-0087,SYN-AMT-MPP-0156,SYN-AMT-TPP-0156,G04CA02,400 microgram,modified release tablet,MR,60,5,false,tamsulosin,0.000000
+10102Q,Duodart,dutasteride/tamsulosin,SYN-AMT-MP-0028,SYN-AMT-MPP-0157,SYN-AMT-TPP-0157,G04CA52,0.5/0.4 mg,capsule,MR,30,5,true,dutasteride;tamsulosin,0.000623
+SYN-PBS-0158,Betmiga,mirabegron,SYN-AMT-MP-0061,SYN-AMT-MPP-0158,SYN-AMT-TPP-0158,G04BD12,25 mg,modified release tablet,MR,30,5,false,mirabegron,0.000000
+SYN-PBS-0159,Betmiga,mirabegron,SYN-AMT-MP-0061,SYN-AMT-MPP-0159,SYN-AMT-TPP-0159,G04BD12,50 mg,modified release tablet,MR,30,5,false,mirabegron,0.000000
+14361W,Spiriva,tiotropium,SYN-AMT-MP-0093,SYN-AMT-MPP-0160,SYN-AMT-TPP-0160,R03BB04,18 microgram,inhaler,IR,60,5,false,tiotropium,0.000000
+10018G,Symbicort,budesonide/formoterol,SYN-AMT-MP-0011,SYN-AMT-MPP-0161,SYN-AMT-TPP-0161,R03AK07,200/6 microgram,inhaler,IR,2,5,true,budesonide;formoterol,0.015846
+14311F,Seretide,fluticasone/salmeterol,SYN-AMT-MP-0041,SYN-AMT-MPP-0162,SYN-AMT-TPP-0162,R03AK06,250/25 microgram,inhaler,IR,2,5,true,fluticasone;salmeterol,0.000000
+11379X,Trelegy Ellipta,fluticasone furoate/umeclidinium/vilanterol,SYN-AMT-MP-0040,SYN-AMT-MPP-0163,SYN-AMT-TPP-0163,R03AL08,100/62.5/25 microgram,inhaler,IR,1,5,true,fluticasone furoate;umeclidinium;vilanterol,0.000000
+10188F,Anoro Ellipta,umeclidinium/vilanterol,SYN-AMT-MP-0095,SYN-AMT-MPP-0164,SYN-AMT-TPP-0164,R03AL03,62.5/25 microgram,inhaler,IR,1,5,true,umeclidinium;vilanterol,0.005287
+12108G,Ventolin,salbutamol,SYN-AMT-MP-0079,SYN-AMT-MPP-0165,SYN-AMT-TPP-0165,R03AC02,100 microgram/dose,inhaler,IR,1,0,false,salbutamol,0.000000
+12108G,Asmol,salbutamol,SYN-AMT-MP-0079,SYN-AMT-MPP-0166,SYN-AMT-TPP-0166,R03AC02,100 microgram/dose,inhaler,IR,1,0,false,salbutamol,0.000000
+2413B,Lasix,furosemide,SYN-AMT-MP-0043,SYN-AMT-MPP-0167,SYN-AMT-TPP-0167,C03CA01,20 mg,tablet,IR,5,0,false,furosemide,0.000821
+13472C,Lasix,furosemide,SYN-AMT-MP-0043,SYN-AMT-MPP-0168,SYN-AMT-TPP-0168,C03CA01,40 mg,tablet,IR,200,1,false,furosemide,0.000000
+13504R,Lasix,furosemide,SYN-AMT-MP-0043,SYN-AMT-MPP-0169,SYN-AMT-TPP-0169,C03CA01,80 mg,tablet,IR,2,3,false,furosemide,0.000000
+12222G,Urex,furosemide,SYN-AMT-MP-0043,SYN-AMT-MPP-0170,SYN-AMT-TPP-0170,C03CA01,20 mg,tablet,IR,50,0,false,furosemide,0.000000
+13472C,Urex,furosemide,SYN-AMT-MP-0043,SYN-AMT-MPP-0171,SYN-AMT-TPP-0171,C03CA01,40 mg,tablet,IR,200,1,false,furosemide,0.000000
+12222G,Urex,furosemide,SYN-AMT-MP-0043,SYN-AMT-MPP-0172,SYN-AMT-TPP-0172,C03CA01,80 mg,tablet,IR,50,0,false,furosemide,0.000000
+11123K,Entresto,sacubitril/valsartan,SYN-AMT-MP-0078,SYN-AMT-MPP-0173,SYN-AMT-TPP-0173,C09DX04,24/26 mg,tablet,IR,56,5,true,sacubitril;valsartan,0.000000
+11122J,Entresto,sacubitril/valsartan,SYN-AMT-MP-0078,SYN-AMT-MPP-0174,SYN-AMT-TPP-0174,C09DX04,49/51 mg,tablet,IR,56,5,true,sacubitril;valsartan,0.000000
+11122J,Entresto,sacubitril/valsartan,SYN-AMT-MP-0078,SYN-AMT-MPP-0175,SYN-AMT-TPP-0175,C09DX04,97/103 mg,tablet,IR,56,5,true,sacubitril;valsartan,0.000000
+13419G,Bicor,bisoprolol,SYN-AMT-MP-0010,SYN-AMT-MPP-0176,SYN-AMT-TPP-0176,C07AB07,1.25 mg,tablet,IR,56,5,false,bisoprolol,0.000000
+13419G,Bicor,bisoprolol,SYN-AMT-MP-0010,SYN-AMT-MPP-0177,SYN-AMT-TPP-0177,C07AB07,2.5 mg,tablet,IR,56,5,false,bisoprolol,0.000000
+13419G,Bicor,bisoprolol,SYN-AMT-MP-0010,SYN-AMT-MPP-0178,SYN-AMT-TPP-0178,C07AB07,5 mg,tablet,IR,56,5,false,bisoprolol,0.000000
+13444N,Bicor,bisoprolol,SYN-AMT-MP-0010,SYN-AMT-MPP-0179,SYN-AMT-TPP-0179,C07AB07,10 mg,tablet,IR,56,5,false,bisoprolol,0.000000
+13417E,Dilatrend,carvedilol,SYN-AMT-MP-0016,SYN-AMT-MPP-0180,SYN-AMT-TPP-0180,C07AG02,6.25 mg,tablet,IR,120,5,false,carvedilol,0.000000
+13418F,Dilatrend,carvedilol,SYN-AMT-MP-0016,SYN-AMT-MPP-0181,SYN-AMT-TPP-0181,C07AG02,12.5 mg,tablet,IR,120,5,false,carvedilol,0.000000
+13387N,Dilatrend,carvedilol,SYN-AMT-MP-0016,SYN-AMT-MPP-0182,SYN-AMT-TPP-0182,C07AG02,25 mg,tablet,IR,120,5,false,carvedilol,0.000000
+13590G,Inspra,eplerenone,SYN-AMT-MP-0031,SYN-AMT-MPP-0183,SYN-AMT-TPP-0183,C03DA04,25 mg,tablet,IR,60,5,false,eplerenone,0.000000
+13503Q,Aldactone,spironolactone,SYN-AMT-MP-0086,SYN-AMT-MPP-0184,SYN-AMT-TPP-0184,C03DA01,25 mg,tablet,IR,200,5,false,spironolactone,0.000000
+10011X,Forxiga,dapagliflozin,SYN-AMT-MP-0021,SYN-AMT-MPP-0185,SYN-AMT-TPP-0185,A10BK01,10 mg,tablet,IR,28,5,false,dapagliflozin,0.046914
+2174K,Eutroxsig,levothyroxine,SYN-AMT-MP-0056,SYN-AMT-MPP-0186,SYN-AMT-TPP-0186,H03AA01,50 microgram,tablet,IR,200,1,false,levothyroxine,0.036373
+2175L,Eutroxsig,levothyroxine,SYN-AMT-MP-0056,SYN-AMT-MPP-0187,SYN-AMT-TPP-0187,H03AA01,100 microgram,tablet,IR,200,1,false,levothyroxine,0.035194
+2173J,Eutroxsig,levothyroxine,SYN-AMT-MP-0056,SYN-AMT-MPP-0188,SYN-AMT-TPP-0188,H03AA01,150 microgram,tablet,IR,200,1,false,levothyroxine,0.002540
+2174K,Oroxine,levothyroxine,SYN-AMT-MP-0056,SYN-AMT-MPP-0189,SYN-AMT-TPP-0189,H03AA01,50 microgram,tablet,IR,200,1,false,levothyroxine,0.036373
+2175L,Oroxine,levothyroxine,SYN-AMT-MP-0056,SYN-AMT-MPP-0190,SYN-AMT-TPP-0190,H03AA01,100 microgram,tablet,IR,200,1,false,levothyroxine,0.035194
+2173J,Oroxine,levothyroxine,SYN-AMT-MP-0056,SYN-AMT-MPP-0191,SYN-AMT-TPP-0191,H03AA01,150 microgram,tablet,IR,200,1,false,levothyroxine,0.002540
+13358C,Zyloprim,allopurinol,SYN-AMT-MP-0003,SYN-AMT-MPP-0192,SYN-AMT-TPP-0192,M04AA01,100 mg,tablet,IR,400,2,false,allopurinol,0.000000
+13575L,Zyloprim,allopurinol,SYN-AMT-MP-0003,SYN-AMT-MPP-0193,SYN-AMT-TPP-0193,M04AA01,300 mg,tablet,IR,120,2,false,allopurinol,0.000000
+13358C,Progout,allopurinol,SYN-AMT-MP-0003,SYN-AMT-MPP-0194,SYN-AMT-TPP-0194,M04AA01,100 mg,tablet,IR,400,2,false,allopurinol,0.000000
+13575L,Progout,allopurinol,SYN-AMT-MP-0003,SYN-AMT-MPP-0195,SYN-AMT-TPP-0195,M04AA01,300 mg,tablet,IR,120,2,false,allopurinol,0.000000
+10445R,Adenuric,febuxostat,SYN-AMT-MP-0038,SYN-AMT-MPP-0196,SYN-AMT-TPP-0196,M04AA03,80 mg,tablet,IR,28,5,false,febuxostat,0.001018
+13457G,Rocaltrol,calcitriol,SYN-AMT-MP-0013,SYN-AMT-MPP-0197,SYN-AMT-TPP-0197,A11CC04,0.25 microgram,capsule,IR,200,3,false,calcitriol,0.000000
+11910W,Sinemet,levodopa/carbidopa,SYN-AMT-MP-0055,SYN-AMT-MPP-0198,SYN-AMT-TPP-0198,N04BA02,100/25 mg,tablet,IR,28,5,true,levodopa;carbidopa,0.000000
+1242J,Kinson,levodopa/carbidopa,SYN-AMT-MP-0055,SYN-AMT-MPP-0199,SYN-AMT-TPP-0199,N04BA02,100/25 mg,tablet,IR,100,5,true,levodopa;carbidopa,0.018811
+14387F,Madopar,levodopa/benserazide,SYN-AMT-MP-0054,SYN-AMT-MPP-0200,SYN-AMT-TPP-0200,N04BA02,100/25 mg,capsule,IR,200,5,true,levodopa;benserazide,0.000000

@@ -1,676 +1,844 @@
 {
  "headers": [
   "canonical",
-  "variant"
+  "variant",
+  "sex"
  ],
  "data": [
   [
    "Margaret",
-   "Peggy"
+   "Peggy",
+   "F"
   ],
   [
    "Margaret",
-   "Peg"
+   "Peg",
+   "F"
   ],
   [
    "Margaret",
-   "Maggie"
+   "Maggie",
+   "F"
   ],
   [
    "Margaret",
-   "Marg"
+   "Marg",
+   "F"
   ],
   [
    "Elizabeth",
-   "Betty"
+   "Betty",
+   "F"
   ],
   [
    "Elizabeth",
-   "Liz"
+   "Liz",
+   "F"
   ],
   [
    "Elizabeth",
-   "Beth"
+   "Beth",
+   "F"
   ],
   [
    "Elizabeth",
-   "Betsy"
+   "Betsy",
+   "F"
   ],
   [
    "Patricia",
-   "Pat"
+   "Pat",
+   "F"
   ],
   [
    "Patricia",
-   "Trish"
+   "Trish",
+   "F"
   ],
   [
    "Patricia",
-   "Patty"
+   "Patty",
+   "F"
   ],
   [
    "Dorothy",
-   "Dot"
+   "Dot",
+   "F"
   ],
   [
    "Dorothy",
-   "Dottie"
+   "Dottie",
+   "F"
   ],
   [
    "Beverley",
-   "Bev"
+   "Bev",
+   "F"
   ],
   [
    "Barbara",
-   "Barb"
+   "Barb",
+   "F"
   ],
   [
    "Barbara",
-   "Babs"
+   "Babs",
+   "F"
   ],
   [
    "Katherine",
-   "Kathy"
+   "Kathy",
+   "F"
   ],
   [
    "Katherine",
-   "Kate"
+   "Kate",
+   "F"
   ],
   [
    "Katherine",
-   "Kath"
+   "Kath",
+   "F"
   ],
   [
    "Catherine",
-   "Cathy"
+   "Cathy",
+   "F"
   ],
   [
    "Catherine",
-   "Cath"
+   "Cath",
+   "F"
   ],
   [
    "Susan",
-   "Sue"
+   "Sue",
+   "F"
   ],
   [
    "Susan",
-   "Susie"
+   "Susie",
+   "F"
   ],
   [
    "Susan",
-   "Shazza"
+   "Shazza",
+   "F"
   ],
   [
    "Judith",
-   "Judy"
+   "Judy",
+   "F"
   ],
   [
    "Judith",
-   "Jude"
+   "Jude",
+   "F"
   ],
   [
    "Jennifer",
-   "Jenny"
+   "Jenny",
+   "F"
   ],
   [
    "Jennifer",
-   "Jen"
+   "Jen",
+   "F"
   ],
   [
    "Deborah",
-   "Deb"
+   "Deb",
+   "F"
   ],
   [
    "Deborah",
-   "Debbie"
+   "Debbie",
+   "F"
   ],
   [
    "Christine",
-   "Chris"
+   "Chris",
+   "F"
   ],
   [
    "Christine",
-   "Chrissie"
+   "Chrissie",
+   "F"
   ],
   [
    "Kathleen",
-   "Kathy"
+   "Kathy",
+   "F"
   ],
   [
    "Kathleen",
-   "Kath"
+   "Kath",
+   "F"
   ],
   [
    "Pamela",
-   "Pam"
+   "Pam",
+   "F"
   ],
   [
    "Sandra",
-   "Sandy"
+   "Sandy",
+   "F"
   ],
   [
    "Janet",
-   "Jan"
+   "Jan",
+   "F"
   ],
   [
    "Janice",
-   "Jan"
+   "Jan",
+   "F"
   ],
   [
    "Marjorie",
-   "Marj"
+   "Marj",
+   "F"
   ],
   [
    "Maureen",
-   "Mo"
+   "Mo",
+   "F"
   ],
   [
    "Edith",
-   "Edie"
+   "Edie",
+   "F"
   ],
   [
    "Gwendoline",
-   "Gwen"
+   "Gwen",
+   "F"
   ],
   [
    "Veronica",
-   "Ronnie"
+   "Ronnie",
+   "F"
   ],
   [
    "Valerie",
-   "Val"
+   "Val",
+   "F"
   ],
   [
    "Shirley",
-   "Shirl"
+   "Shirl",
+   "F"
   ],
   [
    "Lorraine",
-   "Lorrie"
+   "Lorrie",
+   "F"
   ],
   [
    "Yvonne",
-   "Vonnie"
+   "Vonnie",
+   "F"
   ],
   [
    "Josephine",
-   "Jo"
+   "Jo",
+   "F"
   ],
   [
    "Josephine",
-   "Josie"
+   "Josie",
+   "F"
   ],
   [
    "Rosemary",
-   "Rose"
+   "Rose",
+   "F"
   ],
   [
    "Rosemary",
-   "Rosie"
+   "Rosie",
+   "F"
   ],
   [
    "Theresa",
-   "Terry"
+   "Terry",
+   "F"
   ],
   [
    "Theresa",
-   "Tess"
+   "Tess",
+   "F"
   ],
   [
    "Helen",
-   "Nell"
+   "Nell",
+   "F"
   ],
   [
    "Frances",
-   "Fran"
+   "Fran",
+   "F"
   ],
   [
    "Annette",
-   "Nettie"
+   "Nettie",
+   "F"
   ],
   [
    "Winifred",
-   "Win"
+   "Win",
+   "F"
   ],
   [
    "Carolyn",
-   "Carol"
+   "Carol",
+   "F"
   ],
   [
    "Caroline",
-   "Carrie"
+   "Carrie",
+   "F"
   ],
   [
    "Geraldine",
-   "Gerry"
+   "Gerry",
+   "F"
   ],
   [
    "Phyllis",
-   "Phyl"
+   "Phyl",
+   "F"
   ],
   [
    "Nancy",
-   "Nan"
+   "Nan",
+   "F"
   ],
   [
    "Agnes",
-   "Aggie"
+   "Aggie",
+   "F"
   ],
   [
    "Gloria",
-   "Glo"
+   "Glo",
+   "F"
   ],
   [
    "Lillian",
-   "Lil"
+   "Lil",
+   "F"
   ],
   [
    "Mavis",
-   "Mave"
+   "Mave",
+   "F"
   ],
   [
    "Olive",
-   "Ollie"
+   "Ollie",
+   "F"
   ],
   [
    "Joan",
-   "Joanie"
+   "Joanie",
+   "F"
   ],
   [
    "Isabel",
-   "Izzy"
+   "Izzy",
+   "F"
   ],
   [
    "Isabel",
-   "Belle"
+   "Belle",
+   "F"
   ],
   [
    "Virginia",
-   "Ginny"
+   "Ginny",
+   "F"
   ],
   [
    "Victoria",
-   "Vicki"
+   "Vicki",
+   "F"
   ],
   [
    "Victoria",
-   "Vicky"
+   "Vicky",
+   "F"
   ],
   [
    "Mary",
-   "Molly"
+   "Molly",
+   "F"
   ],
   [
    "Mary",
-   "May"
+   "May",
+   "F"
   ],
   [
    "Angela",
-   "Angie"
+   "Angie",
+   "F"
   ],
   [
    "Ann",
-   "Annie"
+   "Annie",
+   "F"
   ],
   [
    "Robert",
-   "Bob"
+   "Bob",
+   "M"
   ],
   [
    "Robert",
-   "Bobby"
+   "Bobby",
+   "M"
   ],
   [
    "Robert",
-   "Rob"
+   "Rob",
+   "M"
   ],
   [
    "Robert",
-   "Robbie"
+   "Robbie",
+   "M"
   ],
   [
    "William",
-   "Bill"
+   "Bill",
+   "M"
   ],
   [
    "William",
-   "Billy"
+   "Billy",
+   "M"
   ],
   [
    "William",
-   "Will"
+   "Will",
+   "M"
   ],
   [
    "Richard",
-   "Dick"
+   "Dick",
+   "M"
   ],
   [
    "Richard",
-   "Rick"
+   "Rick",
+   "M"
   ],
   [
    "Richard",
-   "Richie"
+   "Richie",
+   "M"
   ],
   [
    "John",
-   "Jack"
+   "Jack",
+   "M"
   ],
   [
    "John",
-   "Johnny"
+   "Johnny",
+   "M"
   ],
   [
    "Edward",
-   "Ted"
+   "Ted",
+   "M"
   ],
   [
    "Edward",
-   "Ed"
+   "Ed",
+   "M"
   ],
   [
    "Edward",
-   "Eddie"
+   "Eddie",
+   "M"
   ],
   [
    "Edward",
-   "Ned"
+   "Ned",
+   "M"
   ],
   [
    "Geoffrey",
-   "Geoff"
+   "Geoff",
+   "M"
   ],
   [
    "Michael",
-   "Mick"
+   "Mick",
+   "M"
   ],
   [
    "Michael",
-   "Mike"
+   "Mike",
+   "M"
   ],
   [
    "James",
-   "Jim"
+   "Jim",
+   "M"
   ],
   [
    "James",
-   "Jimmy"
+   "Jimmy",
+   "M"
   ],
   [
    "Charles",
-   "Charlie"
+   "Charlie",
+   "M"
   ],
   [
    "Thomas",
-   "Tom"
+   "Tom",
+   "M"
   ],
   [
    "Thomas",
-   "Tommy"
+   "Tommy",
+   "M"
   ],
   [
    "Anthony",
-   "Tony"
+   "Tony",
+   "M"
   ],
   [
    "Christopher",
-   "Chris"
+   "Chris",
+   "M"
   ],
   [
    "David",
-   "Dave"
+   "Dave",
+   "M"
   ],
   [
    "Peter",
-   "Pete"
+   "Pete",
+   "M"
   ],
   [
    "Kenneth",
-   "Ken"
+   "Ken",
+   "M"
   ],
   [
    "Kenneth",
-   "Kenny"
+   "Kenny",
+   "M"
   ],
   [
    "Ronald",
-   "Ron"
+   "Ron",
+   "M"
   ],
   [
    "Ronald",
-   "Ronnie"
+   "Ronnie",
+   "M"
   ],
   [
    "Donald",
-   "Don"
+   "Don",
+   "M"
   ],
   [
    "Raymond",
-   "Ray"
+   "Ray",
+   "M"
   ],
   [
    "Lawrence",
-   "Larry"
+   "Larry",
+   "M"
   ],
   [
    "Lawrence",
-   "Laurie"
+   "Laurie",
+   "M"
   ],
   [
    "Terence",
-   "Terry"
+   "Terry",
+   "M"
   ],
   [
    "Gregory",
-   "Greg"
+   "Greg",
+   "M"
   ],
   [
    "Francis",
-   "Frank"
+   "Frank",
+   "M"
   ],
   [
    "Frederick",
-   "Fred"
+   "Fred",
+   "M"
   ],
   [
    "Frederick",
-   "Freddie"
+   "Freddie",
+   "M"
   ],
   [
    "Leonard",
-   "Len"
+   "Len",
+   "M"
   ],
   [
    "Vincent",
-   "Vince"
+   "Vince",
+   "M"
   ],
   [
    "Stanley",
-   "Stan"
+   "Stan",
+   "M"
   ],
   [
    "Albert",
-   "Bert"
+   "Bert",
+   "M"
   ],
   [
    "Alfred",
-   "Alf"
+   "Alf",
+   "M"
   ],
   [
    "Herbert",
-   "Herb"
+   "Herb",
+   "M"
   ],
   [
    "Walter",
-   "Wally"
+   "Wally",
+   "M"
   ],
   [
    "Arthur",
-   "Art"
+   "Art",
+   "M"
   ],
   [
    "Arthur",
-   "Artie"
+   "Artie",
+   "M"
   ],
   [
    "Harold",
-   "Harry"
+   "Harry",
+   "M"
   ],
   [
    "Henry",
-   "Harry"
+   "Harry",
+   "M"
   ],
   [
    "Joseph",
-   "Joe"
+   "Joe",
+   "M"
   ],
   [
    "Daniel",
-   "Dan"
+   "Dan",
+   "M"
   ],
   [
    "Daniel",
-   "Danny"
+   "Danny",
+   "M"
   ],
   [
    "Samuel",
-   "Sam"
+   "Sam",
+   "M"
   ],
   [
    "Benjamin",
-   "Ben"
+   "Ben",
+   "M"
   ],
   [
    "Nicholas",
-   "Nick"
+   "Nick",
+   "M"
   ],
   [
    "Patrick",
-   "Paddy"
+   "Paddy",
+   "M"
   ],
   [
    "Patrick",
-   "Pat"
+   "Pat",
+   "M"
   ],
   [
    "Andrew",
-   "Andy"
+   "Andy",
+   "M"
   ],
   [
    "Stephen",
-   "Steve"
+   "Steve",
+   "M"
   ],
   [
    "Douglas",
-   "Doug"
+   "Doug",
+   "M"
   ],
   [
    "Malcolm",
-   "Mal"
+   "Mal",
+   "M"
   ],
   [
    "Norman",
-   "Norm"
+   "Norm",
+   "M"
   ],
   [
    "Gordon",
-   "Gordy"
+   "Gordy",
+   "M"
   ],
   [
    "Russell",
-   "Russ"
+   "Russ",
+   "M"
   ],
   [
    "Barry",
-   "Bazza"
+   "Bazza",
+   "M"
   ],
   [
    "Barry",
-   "Baz"
+   "Baz",
+   "M"
   ],
   [
    "Neville",
-   "Nev"
+   "Nev",
+   "M"
   ],
   [
    "Trevor",
-   "Trev"
+   "Trev",
+   "M"
   ],
   [
    "Desmond",
-   "Des"
+   "Des",
+   "M"
   ],
   [
    "Clifford",
-   "Cliff"
+   "Cliff",
+   "M"
   ],
   [
    "Rodney",
-   "Rod"
+   "Rod",
+   "M"
   ],
   [
    "Colin",
-   "Col"
+   "Col",
+   "M"
   ],
   [
    "Dennis",
-   "Den"
+   "Den",
+   "M"
   ],
   [
    "Phillip",
-   "Phil"
+   "Phil",
+   "M"
   ],
   [
    "Timothy",
-   "Tim"
+   "Tim",
+   "M"
   ],
   [
    "Matthew",
-   "Matt"
+   "Matt",
+   "M"
   ],
   [
    "Jeffrey",
-   "Jeff"
+   "Jeff",
+   "M"
   ],
   [
    "Gerald",
-   "Gerry"
+   "Gerry",
+   "M"
   ],
   [
    "Maxwell",
-   "Max"
+   "Max",
+   "M"
   ],
   [
    "Leslie",
-   "Les"
+   "Les",
+   "M"
   ],
   [
    "Sidney",
-   "Sid"
+   "Sid",
+   "M"
   ],
   [
    "Ernest",
-   "Ernie"
+   "Ernie",
+   "M"
   ],
   [
    "Reginald",
-   "Reg"
+   "Reg",
+   "M"
   ],
   [
    "Martin",
-   "Marty"
+   "Marty",
+   "M"
   ],
   [
    "Kevin",
-   "Kev"
+   "Kev",
+   "M"
   ],
   [
    "Garry",
-   "Gazza"
+   "Gazza",
+   "M"
   ],
   [
    "Allan",
-   "Al"
+   "Al",
+   "M"
   ]
  ],
  "total": 167

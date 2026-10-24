@@ -120,77 +120,77 @@
    "timeline": [
     {
      "generic": "perindopril/indapamide",
-     "start": "2025-09-28",
-     "stop": null,
-     "true_daily_dose_mg": 5.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "amlodipine",
      "start": "2022-04-18",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "famotidine",
+     "generic": "amlodipine",
      "start": "2025-12-20",
      "stop": null,
+     "true_daily_dose_mg": 5.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "famotidine",
+     "start": "2019-09-13",
+     "stop": "2025-12-28",
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "pregabalin",
-     "start": "2019-09-13",
+     "start": "2018-12-17",
      "stop": null,
      "true_daily_dose_mg": 150.0,
      "changed_by_phone": false
     },
     {
      "generic": "rosuvastatin",
-     "start": "2018-12-17",
-     "stop": "2026-08-26",
-     "true_daily_dose_mg": 40.0,
+     "start": "2019-12-28",
+     "stop": null,
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
      "generic": "empagliflozin/metformin",
-     "start": "2019-12-28",
+     "start": "2018-03-12",
      "stop": null,
      "true_daily_dose_mg": 25.0,
      "changed_by_phone": false
     },
     {
-     "generic": "sertraline",
-     "start": "2018-03-12",
-     "stop": null,
-     "true_daily_dose_mg": 50.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "temazepam",
+     "generic": "escitalopram",
      "start": "2022-03-30",
      "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
-     "generic": "isosorbide mononitrate",
+     "generic": "aspirin",
      "start": "2022-07-11",
      "stop": null,
-     "true_daily_dose_mg": 60.0,
+     "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
-     "generic": "glyceryl trinitrate",
+     "generic": "denosumab",
      "start": "2021-10-09",
-     "stop": "2026-07-22",
-     "true_daily_dose_mg": 0.4,
+     "stop": null,
+     "true_daily_dose_mg": 0.3297,
      "changed_by_phone": false
     },
     {
-     "generic": "amlodipine/atorvastatin",
-     "start": "2023-08-18",
+     "generic": "colecalciferol",
+     "start": "2021-07-29",
+     "stop": "2026-04-16",
+     "true_daily_dose_mg": 1000.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "perindopril/amlodipine",
+     "start": "2018-07-29",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
@@ -199,37 +199,72 @@
    "planted": [
     {
      "id": "F0001-01",
-     "type": "frequency",
-     "generic": "isosorbide mononitrate",
+     "type": "omission",
+     "generic": "pregabalin",
      "sources_involved": [
-      "emr",
-      "gp"
+      "gp",
+      "pharmacy"
      ],
      "row_ids": [
-      "EMR-000008",
-      "GP-000008"
+      "GP-000004",
+      "PHM-000021"
      ],
      "detail": {
-      "charted": "1 bd",
-      "truth": "1 mane"
+      "reason": "not charted at admission"
+     },
+     "high_risk_class": null,
+     "intent": "documented_intentional"
+    },
+    {
+     "id": "F0001-02",
+     "type": "stale_listing",
+     "generic": "famotidine",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000003"
+     ],
+     "detail": {
+      "last_dispensed": "2025-12-23"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
     },
     {
-     "id": "F0001-02",
+     "id": "F0001-03",
      "type": "duplication",
-     "generic": "amlodipine/atorvastatin",
+     "generic": "perindopril/indapamide",
      "sources_involved": [
       "gp"
      ],
      "row_ids": [
-      "GP-000010"
+      "GP-000001"
      ],
      "detail": {
-      "overlaps_with": "amlodipine",
+      "overlaps_with": "perindopril/amlodipine",
       "shared": [
-       "amlodipine"
+       "perindopril"
+      ]
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0001-04",
+     "type": "duplication",
+     "generic": "perindopril/amlodipine",
+     "sources_involved": [
+      "gp"
+     ],
+     "row_ids": [
+      "GP-000011"
+     ],
+     "detail": {
+      "overlaps_with": "perindopril/indapamide",
+      "shared": [
+       "perindopril"
       ]
      },
      "high_risk_class": null,
@@ -239,17 +274,9 @@
    "notices": [
     {
      "type": "patient_only_item",
-     "generic": "fish oil",
-     "row_ids": [
-      "PAT-000010"
-     ],
-     "detail": "OTC or complementary"
-    },
-    {
-     "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000011"
+      "PAT-000010"
      ],
      "detail": "OTC or complementary"
     }
@@ -277,11 +304,33 @@
     "patient_present": true,
     "second_pharmacy_hidden": false,
     "private_script_items": [
-     "pantoprazole"
+     "celecoxib"
     ],
     "prior_discharge": false
    },
-   "corruptions": [],
+   "corruptions": [
+    {
+     "operator": "nickname",
+     "source": "pharmacy",
+     "field": "given",
+     "before": "Thomas",
+     "after": "Tom"
+    },
+    {
+     "operator": "nickname",
+     "source": "patient",
+     "field": "given",
+     "before": "Thomas",
+     "after": "Tom"
+    },
+    {
+     "operator": "single_char_typo",
+     "source": "patient",
+     "field": "given",
+     "before": "Tom",
+     "after": "Tom"
+    }
+   ],
    "identity_traps": [
     {
      "kind": "lookalike_pair",
@@ -292,133 +341,102 @@
    ],
    "timeline": [
     {
-     "generic": "amlodipine",
+     "generic": "perindopril",
      "start": "2017-07-29",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "rosuvastatin",
+     "generic": "amlodipine",
      "start": "2018-06-15",
      "stop": null,
-     "true_daily_dose_mg": 20.0,
+     "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "ezetimibe",
+     "generic": "rosuvastatin",
      "start": "2017-12-26",
      "stop": null,
-     "true_daily_dose_mg": 10.0,
+     "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "pantoprazole",
+     "generic": "celecoxib",
      "start": "2021-03-29",
      "stop": null,
-     "true_daily_dose_mg": 40.0,
+     "true_daily_dose_mg": 200.0,
      "changed_by_phone": false
     },
     {
-     "generic": "paracetamol",
+     "generic": "metformin",
      "start": "2022-09-01",
      "stop": null,
-     "true_daily_dose_mg": 3990.0,
+     "true_daily_dose_mg": 1500.0,
      "changed_by_phone": false
     },
     {
-     "generic": "empagliflozin",
+     "generic": "gliclazide",
      "start": "2017-08-10",
      "stop": null,
-     "true_daily_dose_mg": 25.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "venlafaxine",
-     "start": "2023-07-13",
-     "stop": null,
-     "true_daily_dose_mg": 75.0,
+     "true_daily_dose_mg": 60.0,
      "changed_by_phone": false
     },
     {
      "generic": "aspirin",
-     "start": "2018-06-01",
+     "start": "2023-07-13",
      "stop": null,
      "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
      "generic": "glyceryl trinitrate",
-     "start": "2019-10-30",
-     "stop": null,
+     "start": "2018-06-01",
+     "stop": "2026-04-18",
      "true_daily_dose_mg": 0.4,
      "changed_by_phone": false
     },
     {
-     "generic": "dutasteride/tamsulosin",
-     "start": "2017-04-01",
+     "generic": "metoprolol",
+     "start": "2019-10-30",
      "stop": null,
-     "true_daily_dose_mg": 0.5,
+     "true_daily_dose_mg": 50.0,
      "changed_by_phone": false
     },
     {
-     "generic": "apixaban",
+     "generic": "mirabegron",
+     "start": "2017-04-01",
+     "stop": null,
+     "true_daily_dose_mg": 50.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "esomeprazole",
      "start": "2023-04-23",
      "stop": null,
-     "true_daily_dose_mg": 10.0,
+     "true_daily_dose_mg": 40.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "venlafaxine",
+     "start": "2019-12-30",
+     "stop": null,
+     "true_daily_dose_mg": 37.5,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0002-01",
-     "type": "frequency",
-     "generic": "empagliflozin",
-     "sources_involved": [
-      "emr",
-      "gp"
-     ],
-     "row_ids": [
-      "EMR-000015",
-      "GP-000016"
-     ],
-     "detail": {
-      "charted": "1 bd",
-      "truth": "1 daily"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0002-02",
-     "type": "frequency",
-     "generic": "venlafaxine",
-     "sources_involved": [
-      "emr",
-      "gp"
-     ],
-     "row_ids": [
-      "EMR-000016",
-      "GP-000017"
-     ],
-     "detail": {
-      "charted": "1 bd",
-      "truth": "1 daily"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0002-03",
      "type": "omission",
-     "generic": "glyceryl trinitrate",
+     "generic": "mirabegron",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000019",
-      "PHM-000226"
+      "GP-000021",
+      "PHM-000200"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -427,26 +445,40 @@
      "intent": "likely_unintentional"
     },
     {
-     "id": "F0002-04",
-     "type": "frequency",
-     "generic": "dutasteride/tamsulosin",
+     "id": "F0002-02",
+     "type": "commission",
+     "generic": "glyceryl trinitrate",
      "sources_involved": [
-      "emr",
-      "gp"
+      "emr"
      ],
      "row_ids": [
-      "EMR-000018",
-      "GP-000020"
+      "EMR-000019"
      ],
      "detail": {
-      "charted": "1 bd",
-      "truth": "1 daily"
+      "ceased_on": "2026-04-18"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
     }
    ],
-   "notices": []
+   "notices": [
+    {
+     "type": "patient_only_item",
+     "generic": "glucosamine",
+     "row_ids": [
+      "PAT-000023"
+     ],
+     "detail": "OTC or complementary"
+    },
+    {
+     "type": "patient_only_item",
+     "generic": "paracetamol",
+     "row_ids": [
+      "PAT-000024"
+     ],
+     "detail": "OTC or complementary"
+    }
+   ]
   },
   {
    "patient_key": "P0003",
@@ -474,25 +506,11 @@
    },
    "corruptions": [
     {
-     "operator": "single_char_typo",
-     "source": "emr",
-     "field": "given",
-     "before": "Christine",
-     "after": "Chritine"
-    },
-    {
      "operator": "nickname",
      "source": "gp",
      "field": "given",
      "before": "Christine",
-     "after": "Chris"
-    },
-    {
-     "operator": "single_char_typo",
-     "source": "gp",
-     "field": "given",
-     "before": "Chris",
-     "after": "Chis"
+     "after": "Chrissie"
     }
    ],
    "identity_traps": [
@@ -507,119 +525,74 @@
    "timeline": [
     {
      "generic": "candesartan",
-     "start": "2018-11-02",
-     "stop": null,
-     "true_daily_dose_mg": 32.0,
+     "start": "2020-09-01",
+     "stop": "2026-05-30",
+     "true_daily_dose_mg": 8.0,
      "changed_by_phone": false
     },
     {
      "generic": "amlodipine",
-     "start": "2026-07-13",
+     "start": "2019-01-09",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "atorvastatin",
-     "start": "2017-08-08",
+     "start": "2021-06-16",
      "stop": null,
-     "true_daily_dose_mg": 40.0,
+     "true_daily_dose_mg": 80.0,
      "changed_by_phone": false
     },
     {
      "generic": "esomeprazole",
-     "start": "2021-04-07",
+     "start": "2024-05-12",
      "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "paracetamol",
-     "start": "2019-09-19",
+     "start": "2021-05-29",
      "stop": null,
      "true_daily_dose_mg": 3990.0,
      "changed_by_phone": false
     },
     {
      "generic": "empagliflozin",
-     "start": "2022-10-08",
+     "start": "2017-12-22",
      "stop": null,
      "true_daily_dose_mg": 25.0,
      "changed_by_phone": false
     },
     {
-     "generic": "venlafaxine",
-     "start": "2019-09-22",
+     "generic": "escitalopram",
+     "start": "2025-01-14",
      "stop": null,
-     "true_daily_dose_mg": 225.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "empagliflozin/metformin",
-     "start": "2023-06-05",
-     "stop": null,
-     "true_daily_dose_mg": 25.0,
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0003-01",
-     "type": "dose",
-     "generic": "paracetamol",
+     "type": "stale_listing",
+     "generic": "candesartan",
      "sources_involved": [
-      "emr",
-      "gp"
+      "gp",
+      "pharmacy"
      ],
      "row_ids": [
-      "EMR-000024",
-      "GP-000026"
+      "GP-000024"
      ],
      "detail": {
-      "charted": "332.5 mg",
-      "truth": "665 mg"
-     },
-     "high_risk_class": null,
-     "intent": "documented_intentional"
-    },
-    {
-     "id": "F0003-02",
-     "type": "duplication",
-     "generic": "empagliflozin/metformin",
-     "sources_involved": [
-      "gp"
-     ],
-     "row_ids": [
-      "GP-000029"
-     ],
-     "detail": {
-      "overlaps_with": "empagliflozin",
-      "shared": [
-       "empagliflozin"
-      ]
+      "last_dispensed": "2026-05-28"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
     }
    ],
-   "notices": [
-    {
-     "type": "patient_only_item",
-     "generic": "paracetamol",
-     "row_ids": [
-      "PAT-000028"
-     ],
-     "detail": "OTC or complementary"
-    },
-    {
-     "type": "patient_only_item",
-     "generic": "colecalciferol",
-     "row_ids": [
-      "PAT-000029"
-     ],
-     "detail": "OTC or complementary"
-    }
-   ]
+   "notices": []
   },
   {
    "patient_key": "P0004",
@@ -645,15 +618,7 @@
     "private_script_items": [],
     "prior_discharge": true
    },
-   "corruptions": [
-    {
-     "operator": "nickname",
-     "source": "gp",
-     "field": "given",
-     "before": "Richard",
-     "after": "Dick"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [
     {
      "kind": "lookalike_pair",
@@ -664,66 +629,66 @@
    ],
    "timeline": [
     {
-     "generic": "levothyroxine",
+     "generic": "candesartan",
      "start": "2022-06-29",
      "stop": null,
-     "true_daily_dose_mg": 0.05,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "insulin aspart",
-     "start": "2018-12-16",
-     "stop": null,
-     "true_daily_dose_mg": 300.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "candesartan",
-     "start": "2017-09-12",
-     "stop": null,
-     "true_daily_dose_mg": 32.0,
+     "true_daily_dose_mg": 8.0,
      "changed_by_phone": false
     },
     {
      "generic": "atorvastatin",
-     "start": "2022-01-16",
+     "start": "2018-12-16",
      "stop": null,
-     "true_daily_dose_mg": 10.0,
+     "true_daily_dose_mg": 80.0,
      "changed_by_phone": false
     },
     {
      "generic": "paracetamol",
-     "start": "2018-09-30",
+     "start": "2022-08-13",
      "stop": null,
      "true_daily_dose_mg": 3990.0,
      "changed_by_phone": false
     },
     {
      "generic": "risedronate",
-     "start": "2017-11-13",
-     "stop": "2025-12-17",
+     "start": "2021-09-25",
+     "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "colecalciferol",
-     "start": "2026-02-18",
+     "start": "2020-05-09",
      "stop": null,
      "true_daily_dose_mg": 1000.0,
      "changed_by_phone": false
     },
     {
+     "generic": "levothyroxine",
+     "start": "2023-02-24",
+     "stop": "2025-12-17",
+     "true_daily_dose_mg": 0.15,
+     "changed_by_phone": false
+    },
+    {
      "generic": "spironolactone",
-     "start": "2020-12-20",
+     "start": "2026-02-18",
      "stop": null,
      "true_daily_dose_mg": 25.0,
      "changed_by_phone": false
     },
     {
      "generic": "pantoprazole",
-     "start": "2020-12-25",
+     "start": "2020-12-20",
      "stop": null,
      "true_daily_dose_mg": 40.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "dapagliflozin",
+     "start": "2020-12-25",
+     "stop": null,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
@@ -737,85 +702,32 @@
    "planted": [
     {
      "id": "F0004-01",
-     "type": "omission",
-     "generic": "levothyroxine",
+     "type": "dose",
+     "generic": "colecalciferol",
      "sources_involved": [
-      "gp",
-      "pharmacy"
+      "emr",
+      "gp"
      ],
      "row_ids": [
-      "GP-000030",
-      "PHM-000390"
+      "EMR-000030",
+      "GP-000035"
      ],
      "detail": {
-      "reason": "not charted at admission"
+      "charted": "500 mg",
+      "truth": "1000 IU"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
     },
     {
      "id": "F0004-02",
-     "type": "omission",
-     "generic": "paracetamol",
-     "sources_involved": [
-      "gp",
-      "pharmacy"
-     ],
-     "row_ids": [
-      "GP-000034",
-      "PHM-000431"
-     ],
-     "detail": {
-      "reason": "not charted at admission"
-     },
-     "high_risk_class": null,
-     "intent": "documented_intentional"
-    },
-    {
-     "id": "F0004-03",
-     "type": "omission",
-     "generic": "colecalciferol",
-     "sources_involved": [
-      "gp",
-      "pharmacy"
-     ],
-     "row_ids": [
-      "GP-000036",
-      "PHM-000465"
-     ],
-     "detail": {
-      "reason": "not charted at admission"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0004-04",
-     "type": "omission",
-     "generic": "amlodipine/atorvastatin",
-     "sources_involved": [
-      "gp",
-      "pharmacy"
-     ],
-     "row_ids": [
-      "GP-000039",
-      "PHM-000496"
-     ],
-     "detail": {
-      "reason": "not charted at admission"
-     },
-     "high_risk_class": null,
-     "intent": "documented_intentional"
-    },
-    {
-     "id": "F0004-05",
      "type": "commission",
-     "generic": "risedronate",
+     "generic": "levothyroxine",
      "sources_involved": [
       "emr"
      ],
      "row_ids": [
-      "EMR-000033"
+      "EMR-000035"
      ],
      "detail": {
       "ceased_on": "2025-12-17"
@@ -824,31 +736,31 @@
      "intent": "likely_unintentional"
     },
     {
-     "id": "F0004-06",
+     "id": "F0004-03",
      "type": "stale_listing",
-     "generic": "risedronate",
+     "generic": "levothyroxine",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000035"
+      "GP-000036"
      ],
      "detail": {
-      "last_dispensed": "2025-10-24"
+      "last_dispensed": "2025-11-23"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
     },
     {
-     "id": "F0004-07",
+     "id": "F0004-04",
      "type": "duplication",
      "generic": "amlodipine/atorvastatin",
      "sources_involved": [
       "gp"
      ],
      "row_ids": [
-      "GP-000039"
+      "GP-000040"
      ],
      "detail": {
       "overlaps_with": "atorvastatin",
@@ -883,18 +795,13 @@
     "pharmacy_present": true,
     "patient_present": true,
     "second_pharmacy_hidden": false,
-    "private_script_items": [],
-    "prior_discharge": false
+    "private_script_items": [
+     "amlodipine",
+     "sertraline"
+    ],
+    "prior_discharge": true
    },
-   "corruptions": [
-    {
-     "operator": "nickname",
-     "source": "patient",
-     "field": "given",
-     "before": "Barbara",
-     "after": "Barb"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [
     {
      "kind": "lookalike_pair",
@@ -905,61 +812,124 @@
    ],
    "timeline": [
     {
-     "generic": "irbesartan",
-     "start": "2018-05-12",
-     "stop": "2025-11-06",
-     "true_daily_dose_mg": 150.0,
+     "generic": "clopidogrel",
+     "start": "2025-12-16",
+     "stop": null,
+     "true_daily_dose_mg": 75.0,
      "changed_by_phone": false
     },
     {
-     "generic": "amlodipine",
-     "start": "2022-10-11",
+     "generic": "apixaban",
+     "start": "2017-07-24",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "ezetimibe/rosuvastatin",
-     "start": "2020-11-07",
+     "generic": "amlodipine",
+     "start": "2018-07-13",
      "stop": null,
-     "true_daily_dose_mg": 10.0,
+     "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "paracetamol",
-     "start": "2023-03-30",
-     "stop": null,
-     "true_daily_dose_mg": 3990.0,
+     "generic": "atorvastatin",
+     "start": "2020-11-05",
+     "stop": "2026-04-18",
+     "true_daily_dose_mg": 80.0,
      "changed_by_phone": false
     },
     {
      "generic": "tamsulosin",
-     "start": "2024-07-04",
+     "start": "2021-09-10",
      "stop": null,
      "true_daily_dose_mg": 0.4,
      "changed_by_phone": false
     },
     {
      "generic": "pantoprazole",
-     "start": "2017-07-24",
-     "stop": "2025-12-07",
+     "start": "2018-02-11",
+     "stop": null,
      "true_daily_dose_mg": 20.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "paracetamol",
+     "start": "2024-02-22",
+     "stop": null,
+     "true_daily_dose_mg": 3990.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "metformin",
+     "start": "2020-06-07",
+     "stop": null,
+     "true_daily_dose_mg": 2000.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "sertraline",
+     "start": "2024-07-04",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "umeclidinium/vilanterol",
+     "start": "2025-06-30",
+     "stop": null,
+     "true_daily_dose_mg": 0.0625,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0005-01",
+     "type": "omission",
+     "generic": "apixaban",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000042",
+      "PHM-000422"
+     ],
+     "detail": {
+      "reason": "not charted at admission"
+     },
+     "high_risk_class": "Y",
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0005-02",
      "type": "commission",
-     "generic": "pantoprazole",
+     "generic": "atorvastatin",
      "sources_involved": [
       "emr"
      ],
      "row_ids": [
-      "EMR-000042"
+      "EMR-000048"
      ],
      "detail": {
-      "ceased_on": "2025-12-07"
+      "ceased_on": "2026-04-18"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0005-03",
+     "type": "stale_listing",
+     "generic": "atorvastatin",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000044"
+     ],
+     "detail": {
+      "last_dispensed": "2026-04-08"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
@@ -970,7 +940,7 @@
      "type": "patient_only_item",
      "generic": "magnesium",
      "row_ids": [
-      "PAT-000044"
+      "PAT-000048"
      ],
      "detail": "OTC or complementary"
     },
@@ -978,7 +948,7 @@
      "type": "patient_only_item",
      "generic": "turmeric",
      "row_ids": [
-      "PAT-000045"
+      "PAT-000049"
      ],
      "detail": "OTC or complementary"
     }
@@ -1016,105 +986,122 @@
    ],
    "timeline": [
     {
-     "generic": "insulin aspart",
-     "start": "2022-05-06",
-     "stop": null,
-     "true_daily_dose_mg": 300.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "apixaban",
-     "start": "2021-10-30",
-     "stop": "2026-02-21",
-     "true_daily_dose_mg": 10.0,
-     "changed_by_phone": false
-    },
-    {
      "generic": "telmisartan",
-     "start": "2026-04-15",
+     "start": "2021-10-30",
      "stop": null,
      "true_daily_dose_mg": 80.0,
      "changed_by_phone": false
     },
     {
      "generic": "donepezil",
-     "start": "2023-04-29",
+     "start": "2026-04-15",
      "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "rosuvastatin",
-     "start": "2022-09-12",
-     "stop": "2026-09-15",
-     "true_daily_dose_mg": 20.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "pantoprazole",
-     "start": "2026-05-17",
+     "start": "2023-04-29",
      "stop": null,
      "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
+     "generic": "pantoprazole",
+     "start": "2022-09-12",
+     "stop": null,
+     "true_daily_dose_mg": 40.0,
+     "changed_by_phone": false
+    },
+    {
      "generic": "paracetamol",
-     "start": "2023-05-29",
+     "start": "2026-05-17",
      "stop": null,
      "true_daily_dose_mg": 3990.0,
      "changed_by_phone": false
     },
     {
      "generic": "metformin",
-     "start": "2022-09-10",
+     "start": "2023-05-29",
      "stop": null,
-     "true_daily_dose_mg": 1000.0,
+     "true_daily_dose_mg": 2000.0,
      "changed_by_phone": false
     },
     {
-     "generic": "escitalopram",
+     "generic": "insulin aspart",
+     "start": "2022-09-10",
+     "stop": null,
+     "true_daily_dose_mg": 300.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "sertraline",
      "start": "2023-06-10",
+     "stop": null,
+     "true_daily_dose_mg": 50.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "aspirin",
+     "start": "2025-12-13",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "alendronate",
+     "start": "2026-05-11",
      "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
-     "generic": "isosorbide mononitrate",
-     "start": "2025-12-13",
-     "stop": null,
-     "true_daily_dose_mg": 60.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "glyceryl trinitrate",
-     "start": "2026-05-11",
-     "stop": null,
-     "true_daily_dose_mg": 0.4,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "risedronate",
+     "generic": "rivaroxaban",
      "start": "2022-10-20",
      "stop": null,
-     "true_daily_dose_mg": 1.1667,
+     "true_daily_dose_mg": 15.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "digoxin",
+     "start": "2017-11-07",
+     "stop": null,
+     "true_daily_dose_mg": 0.125,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0006-01",
+     "type": "omission",
+     "generic": "aspirin",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "PHM-000650"
+     ],
+     "detail": {
+      "reason": "not charted at admission"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0006-02",
      "type": "dose",
-     "generic": "pantoprazole",
+     "generic": "alendronate",
      "sources_involved": [
       "emr",
       "gp"
      ],
      "row_ids": [
-      "EMR-000046"
+      "EMR-000061"
      ],
      "detail": {
-      "charted": "10 mg",
-      "truth": "20 mg"
+      "charted": "35 mg",
+      "truth": "70 mg"
      },
      "high_risk_class": null,
      "intent": "documented_intentional"
@@ -1125,6 +1112,14 @@
      "type": "coverage_gap",
      "source": "gp",
      "detail": "no GP record found"
+    },
+    {
+     "type": "patient_only_item",
+     "generic": "magnesium",
+     "row_ids": [
+      "PAT-000060"
+     ],
+     "detail": "OTC or complementary"
     }
    ]
   },
@@ -1152,22 +1147,14 @@
     "private_script_items": [],
     "prior_discharge": false
    },
-   "corruptions": [
-    {
-     "operator": "single_char_typo",
-     "source": "pharmacy",
-     "field": "given",
-     "before": "Annette",
-     "after": "Anette"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [],
    "timeline": [
     {
      "generic": "rosuvastatin",
-     "start": "2023-11-15",
+     "start": "2021-08-30",
      "stop": null,
-     "true_daily_dose_mg": 20.0,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
@@ -1185,36 +1172,53 @@
      "changed_by_phone": false
     },
     {
-     "generic": "ticagrelor",
+     "generic": "duloxetine",
      "start": "2020-11-21",
      "stop": null,
-     "true_daily_dose_mg": 180.0,
+     "true_daily_dose_mg": 60.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "aspirin",
+     "start": "2024-11-10",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "glyceryl trinitrate",
+     "start": "2021-07-20",
+     "stop": null,
+     "true_daily_dose_mg": 0.4,
      "changed_by_phone": false
     },
     {
      "generic": "metoprolol",
-     "start": "2024-11-10",
-     "stop": null,
-     "true_daily_dose_mg": 50.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "budesonide/formoterol",
-     "start": "2021-07-20",
-     "stop": null,
-     "true_daily_dose_mg": 0.8,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "salbutamol",
      "start": "2022-05-07",
      "stop": "2025-12-30",
-     "true_daily_dose_mg": 0.2,
+     "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     }
    ],
    "planted": [],
-   "notices": []
+   "notices": [
+    {
+     "type": "patient_only_item",
+     "generic": "fish oil",
+     "row_ids": [
+      "PAT-000066"
+     ],
+     "detail": "OTC or complementary"
+    },
+    {
+     "type": "patient_only_item",
+     "generic": "magnesium",
+     "row_ids": [
+      "PAT-000067"
+     ],
+     "detail": "OTC or complementary"
+    }
+   ]
   },
   {
    "patient_key": "P0008",
@@ -1237,12 +1241,32 @@
     "pharmacy_present": true,
     "patient_present": true,
     "second_pharmacy_hidden": false,
-    "private_script_items": [
-     "aspirin"
-    ],
+    "private_script_items": [],
     "prior_discharge": false
    },
-   "corruptions": [],
+   "corruptions": [
+    {
+     "operator": "nickname",
+     "source": "gp",
+     "field": "given",
+     "before": "Clifford",
+     "after": "Cliff"
+    },
+    {
+     "operator": "nickname",
+     "source": "patient",
+     "field": "given",
+     "before": "Clifford",
+     "after": "Cliff"
+    },
+    {
+     "operator": "single_char_typo",
+     "source": "patient",
+     "field": "given",
+     "before": "Cliff",
+     "after": "Clliff"
+    }
+   ],
    "identity_traps": [
     {
      "kind": "lookalike_pair",
@@ -1254,86 +1278,86 @@
    "timeline": [
     {
      "generic": "sacubitril/valsartan",
-     "start": "2016-12-06",
+     "start": "2023-02-04",
      "stop": null,
-     "true_daily_dose_mg": 194.0,
+     "true_daily_dose_mg": 98.0,
      "changed_by_phone": false
     },
     {
      "generic": "levothyroxine",
-     "start": "2025-04-28",
+     "start": "2018-08-17",
      "stop": null,
-     "true_daily_dose_mg": 0.1,
+     "true_daily_dose_mg": 0.15,
      "changed_by_phone": false
     },
     {
      "generic": "rosuvastatin",
-     "start": "2017-03-10",
+     "start": "2023-04-12",
      "stop": null,
-     "true_daily_dose_mg": 5.0,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "ezetimibe",
-     "start": "2017-11-28",
+     "start": "2018-07-23",
      "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "pantoprazole",
-     "start": "2018-07-23",
-     "stop": null,
-     "true_daily_dose_mg": 40.0,
+     "start": "2022-09-12",
+     "stop": "2026-04-07",
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
      "generic": "oxycodone/naloxone",
-     "start": "2022-09-12",
+     "start": "2021-04-04",
      "stop": null,
      "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
      "generic": "metformin",
-     "start": "2021-04-04",
+     "start": "2022-06-27",
      "stop": null,
-     "true_daily_dose_mg": 1000.0,
+     "true_daily_dose_mg": 2000.0,
      "changed_by_phone": false
     },
     {
-     "generic": "mirtazapine",
-     "start": "2022-06-27",
-     "stop": "2026-07-08",
-     "true_daily_dose_mg": 30.0,
+     "generic": "sertraline",
+     "start": "2021-05-02",
+     "stop": null,
+     "true_daily_dose_mg": 200.0,
      "changed_by_phone": false
     },
     {
      "generic": "aspirin",
-     "start": "2019-01-22",
+     "start": "2018-01-30",
      "stop": null,
      "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
+     "generic": "metoprolol",
+     "start": "2022-05-01",
+     "stop": null,
+     "true_daily_dose_mg": 50.0,
+     "changed_by_phone": false
+    },
+    {
      "generic": "tamsulosin",
-     "start": "2021-10-05",
+     "start": "2022-02-03",
      "stop": null,
      "true_daily_dose_mg": 0.4,
      "changed_by_phone": false
     },
     {
-     "generic": "apixaban",
-     "start": "2024-05-08",
-     "stop": null,
-     "true_daily_dose_mg": 5.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "digoxin",
-     "start": "2019-05-05",
-     "stop": null,
-     "true_daily_dose_mg": 0.125,
+     "generic": "rivaroxaban",
+     "start": "2020-02-06",
+     "stop": "2026-01-15",
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     }
    ],
@@ -1347,8 +1371,7 @@
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000054",
-      "PHM-000841"
+      "GP-000014"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -1359,28 +1382,45 @@
     {
      "id": "F0008-02",
      "type": "omission",
-     "generic": "metformin",
+     "generic": "aspirin",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000058",
-      "PHM-000880"
+      "GP-000018",
+      "GP-000054"
      ],
      "detail": {
       "reason": "not charted at admission"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0008-03",
+     "type": "stale_listing",
+     "generic": "rivaroxaban",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000068"
+     ],
+     "detail": {
+      "last_dispensed": "2025-12-27"
+     },
+     "high_risk_class": "Y",
+     "intent": "likely_unintentional"
     }
    ],
    "notices": [
     {
      "type": "patient_only_item",
-     "generic": "fish oil",
+     "generic": "turmeric",
      "row_ids": [
-      "PAT-000073"
+      "PAT-000078"
      ],
      "detail": "OTC or complementary"
     }
@@ -1410,7 +1450,15 @@
     "private_script_items": [],
     "prior_discharge": true
    },
-   "corruptions": [],
+   "corruptions": [
+    {
+     "operator": "nickname",
+     "source": "patient",
+     "field": "given",
+     "before": "Joseph",
+     "after": "Joe"
+    }
+   ],
    "identity_traps": [],
    "timeline": [
     {
@@ -1428,17 +1476,17 @@
      "changed_by_phone": false
     },
     {
-     "generic": "furosemide",
+     "generic": "budesonide/formoterol",
      "start": "2023-11-24",
      "stop": null,
-     "true_daily_dose_mg": 20.0,
+     "true_daily_dose_mg": 0.8,
      "changed_by_phone": false
     },
     {
-     "generic": "dapagliflozin",
+     "generic": "salbutamol",
      "start": "2018-03-23",
      "stop": null,
-     "true_daily_dose_mg": 10.0,
+     "true_daily_dose_mg": 0.2,
      "changed_by_phone": false
     },
     {
@@ -1449,27 +1497,17 @@
      "changed_by_phone": false
     }
    ],
-   "planted": [
+   "planted": [],
+   "notices": [
     {
-     "id": "F0009-01",
-     "type": "omission",
-     "generic": "furosemide",
-     "sources_involved": [
-      "gp",
-      "pharmacy"
-     ],
+     "type": "patient_only_item",
+     "generic": "colecalciferol",
      "row_ids": [
-      "GP-000066",
-      "PHM-000956"
+      "PAT-000082"
      ],
-     "detail": {
-      "reason": "not charted at admission"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
+     "detail": "OTC or complementary"
     }
-   ],
-   "notices": []
+   ]
   },
   {
    "patient_key": "P0010",
@@ -1492,92 +1530,84 @@
     "private_script_items": [],
     "prior_discharge": true
    },
-   "corruptions": [
-    {
-     "operator": "nickname",
-     "source": "patient",
-     "field": "given",
-     "before": "Geraldine",
-     "after": "Gerry"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [],
    "timeline": [
     {
      "generic": "perindopril",
-     "start": "2016-12-07",
+     "start": "2020-10-22",
      "stop": "2026-09-14",
-     "true_daily_dose_mg": 5.0,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "rosuvastatin",
-     "start": "2022-07-13",
+     "start": "2025-04-20",
      "stop": null,
-     "true_daily_dose_mg": 40.0,
+     "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "ticagrelor",
-     "start": "2019-11-14",
+     "start": "2023-05-11",
      "stop": null,
      "true_daily_dose_mg": 180.0,
      "changed_by_phone": false
     },
     {
      "generic": "glyceryl trinitrate",
-     "start": "2026-08-01",
+     "start": "2026-06-02",
      "stop": null,
      "true_daily_dose_mg": 0.4,
      "changed_by_phone": false
     },
     {
      "generic": "metoprolol",
-     "start": "2017-12-20",
+     "start": "2026-02-10",
      "stop": null,
      "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
-     "generic": "levothyroxine",
+     "generic": "tiotropium",
      "start": "2026-01-31",
      "stop": null,
-     "true_daily_dose_mg": 0.1,
+     "true_daily_dose_mg": 0.018,
      "changed_by_phone": false
     },
     {
-     "generic": "esomeprazole",
+     "generic": "salbutamol",
      "start": "2021-12-13",
      "stop": null,
-     "true_daily_dose_mg": 40.0,
+     "true_daily_dose_mg": 0.2,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "prednisolone",
+     "start": "2017-02-10",
+     "stop": "2026-05-20",
+     "true_daily_dose_mg": 5.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "folic acid",
+     "start": "2020-01-07",
+     "stop": null,
+     "true_daily_dose_mg": 0.7143,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "pantoprazole",
+     "start": "2018-07-28",
+     "stop": null,
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
      "generic": "paracetamol",
-     "start": "2017-02-10",
-     "stop": "2026-05-20",
-     "true_daily_dose_mg": 3990.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "metformin",
-     "start": "2020-01-07",
-     "stop": null,
-     "true_daily_dose_mg": 2000.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "gliclazide",
-     "start": "2018-07-28",
-     "stop": null,
-     "true_daily_dose_mg": 60.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "sertraline",
      "start": "2017-05-27",
      "stop": "2026-09-01",
-     "true_daily_dose_mg": 100.0,
+     "true_daily_dose_mg": 3990.0,
      "changed_by_phone": false
     }
    ],
@@ -1587,22 +1617,6 @@
      "type": "coverage_gap",
      "source": "gp",
      "detail": "no GP record found"
-    },
-    {
-     "type": "patient_only_item",
-     "generic": "colecalciferol",
-     "row_ids": [
-      "PAT-000085"
-     ],
-     "detail": "OTC or complementary"
-    },
-    {
-     "type": "patient_only_item",
-     "generic": "fish oil",
-     "row_ids": [
-      "PAT-000086"
-     ],
-     "detail": "OTC or complementary"
     }
    ]
   },
@@ -1630,7 +1644,15 @@
     "private_script_items": [],
     "prior_discharge": false
    },
-   "corruptions": [],
+   "corruptions": [
+    {
+     "operator": "nickname",
+     "source": "patient",
+     "field": "given",
+     "before": "Agnes",
+     "after": "Aggie"
+    }
+   ],
    "identity_traps": [
     {
      "kind": "twins",
@@ -1641,43 +1663,94 @@
    ],
    "timeline": [
     {
-     "generic": "levothyroxine",
+     "generic": "insulin aspart",
      "start": "2021-01-27",
      "stop": null,
-     "true_daily_dose_mg": 0.05,
+     "true_daily_dose_mg": 300.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "clopidogrel",
+     "start": "2025-07-12",
+     "stop": null,
+     "true_daily_dose_mg": 75.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "apixaban",
+     "start": "2021-10-25",
+     "stop": "2026-03-19",
+     "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "metformin",
-     "start": "2025-07-12",
+     "start": "2017-02-13",
      "stop": null,
      "true_daily_dose_mg": 1000.0,
      "changed_by_phone": false
     },
     {
-     "generic": "sertraline",
-     "start": "2024-06-27",
-     "stop": "2026-06-16",
-     "true_daily_dose_mg": 200.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "alendronate",
-     "start": "2018-03-07",
+     "generic": "glyceryl trinitrate",
+     "start": "2019-07-01",
      "stop": null,
-     "true_daily_dose_mg": 10.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "tiotropium",
-     "start": "2021-02-03",
-     "stop": "2026-07-01",
-     "true_daily_dose_mg": 0.018,
+     "true_daily_dose_mg": 0.4,
      "changed_by_phone": false
     }
    ],
-   "planted": [],
-   "notices": []
+   "planted": [
+    {
+     "id": "F0011-01",
+     "type": "commission",
+     "generic": "apixaban",
+     "sources_involved": [
+      "emr"
+     ],
+     "row_ids": [
+      "EMR-000099"
+     ],
+     "detail": {
+      "ceased_on": "2026-03-19"
+     },
+     "high_risk_class": "Y",
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0011-02",
+     "type": "stale_listing",
+     "generic": "apixaban",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000076"
+     ],
+     "detail": {
+      "last_dispensed": "2026-01-13"
+     },
+     "high_risk_class": "Y",
+     "intent": "likely_unintentional"
+    }
+   ],
+   "notices": [
+    {
+     "type": "patient_only_item",
+     "generic": "magnesium",
+     "row_ids": [
+      "PAT-000097"
+     ],
+     "detail": "OTC or complementary"
+    },
+    {
+     "type": "patient_only_item",
+     "generic": "fish oil",
+     "row_ids": [
+      "PAT-000098"
+     ],
+     "detail": "OTC or complementary"
+    }
+   ]
   },
   {
    "patient_key": "P0012",
@@ -1703,118 +1776,131 @@
     "private_script_items": [],
     "prior_discharge": true
    },
-   "corruptions": [
-    {
-     "operator": "nickname",
-     "source": "gp",
-     "field": "given",
-     "before": "Michael",
-     "after": "Mike"
-    },
-    {
-     "operator": "nickname",
-     "source": "patient",
-     "field": "given",
-     "before": "Michael",
-     "after": "Mike"
-    },
-    {
-     "operator": "single_char_typo",
-     "source": "patient",
-     "field": "given",
-     "before": "Mike",
-     "after": "Miike"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [],
    "timeline": [
     {
+     "generic": "clopidogrel",
+     "start": "2020-03-13",
+     "stop": null,
+     "true_daily_dose_mg": 75.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "apixaban",
+     "start": "2022-07-30",
+     "stop": null,
+     "true_daily_dose_mg": 10.0,
+     "changed_by_phone": false
+    },
+    {
      "generic": "gliclazide",
-     "start": "2021-01-04",
+     "start": "2018-03-21",
      "stop": null,
      "true_daily_dose_mg": 45.0,
      "changed_by_phone": false
     },
     {
      "generic": "candesartan",
-     "start": "2019-05-14",
+     "start": "2022-07-27",
      "stop": null,
-     "true_daily_dose_mg": 32.0,
+     "true_daily_dose_mg": 16.0,
      "changed_by_phone": false
     },
     {
      "generic": "atorvastatin",
-     "start": "2017-08-20",
-     "stop": null,
-     "true_daily_dose_mg": 40.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "pantoprazole",
-     "start": "2022-07-27",
-     "stop": null,
-     "true_daily_dose_mg": 40.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "celecoxib",
      "start": "2024-03-29",
      "stop": null,
-     "true_daily_dose_mg": 200.0,
+     "true_daily_dose_mg": 80.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "ezetimibe",
+     "start": "2023-05-17",
+     "stop": null,
+     "true_daily_dose_mg": 10.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "famotidine",
+     "start": "2022-11-30",
+     "stop": null,
+     "true_daily_dose_mg": 40.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "oxycodone/naloxone",
+     "start": "2020-01-19",
+     "stop": null,
+     "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "mirtazapine",
-     "start": "2023-05-17",
-     "stop": null,
-     "true_daily_dose_mg": 30.0,
+     "start": "2017-11-22",
+     "stop": "2026-07-11",
+     "true_daily_dose_mg": 15.0,
      "changed_by_phone": false
     },
     {
-     "generic": "aspirin",
-     "start": "2022-11-30",
+     "generic": "metoprolol",
+     "start": "2022-07-25",
      "stop": null,
      "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
      "generic": "denosumab",
-     "start": "2020-01-19",
+     "start": "2020-02-03",
      "stop": null,
      "true_daily_dose_mg": 0.3297,
      "changed_by_phone": false
     },
     {
-     "generic": "apixaban",
-     "start": "2017-11-22",
-     "stop": "2026-07-11",
-     "true_daily_dose_mg": 5.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "diltiazem",
-     "start": "2022-07-25",
-     "stop": null,
-     "true_daily_dose_mg": 240.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "umeclidinium/vilanterol",
-     "start": "2020-02-03",
-     "stop": null,
-     "true_daily_dose_mg": 0.0625,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "salbutamol",
+     "generic": "digoxin",
      "start": "2023-01-19",
      "stop": "2026-03-21",
-     "true_daily_dose_mg": 0.2,
+     "true_daily_dose_mg": 0.0625,
      "changed_by_phone": false
     }
    ],
-   "planted": [],
-   "notices": []
+   "planted": [
+    {
+     "id": "F0012-01",
+     "type": "stale_listing",
+     "generic": "digoxin",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000090"
+     ],
+     "detail": {
+      "last_dispensed": "2026-02-05"
+     },
+     "high_risk_class": "ext",
+     "intent": "likely_unintentional"
+    }
+   ],
+   "notices": [
+    {
+     "type": "patient_only_item",
+     "generic": "turmeric",
+     "row_ids": [
+      "PAT-000110"
+     ],
+     "detail": "OTC or complementary"
+    },
+    {
+     "type": "patient_only_item",
+     "generic": "magnesium",
+     "row_ids": [
+      "PAT-000111"
+     ],
+     "detail": "OTC or complementary"
+    }
+   ]
   },
   {
    "patient_key": "P0013",
@@ -1832,72 +1918,99 @@
     "patient_present": true,
     "second_pharmacy_hidden": false,
     "private_script_items": [
-     "oxycodone"
+     "esomeprazole"
     ],
     "prior_discharge": true
    },
-   "corruptions": [
-    {
-     "operator": "nickname",
-     "source": "patient",
-     "field": "given",
-     "before": "Harold",
-     "after": "Harry"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [],
    "timeline": [
     {
      "generic": "candesartan",
-     "start": "2019-05-16",
-     "stop": null,
+     "start": "2022-11-08",
+     "stop": "2025-12-12",
      "true_daily_dose_mg": 16.0,
      "changed_by_phone": false
     },
     {
      "generic": "amlodipine",
-     "start": "2022-11-08",
+     "start": "2021-12-30",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "atorvastatin",
-     "start": "2021-12-30",
+     "start": "2020-11-20",
      "stop": null,
-     "true_daily_dose_mg": 80.0,
+     "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "esomeprazole",
-     "start": "2020-11-20",
-     "stop": "2025-12-03",
+     "start": "2026-05-05",
+     "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "oxycodone",
-     "start": "2026-05-05",
-     "stop": "2026-08-28",
+     "start": "2020-10-29",
+     "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "gliclazide",
-     "start": "2020-10-29",
+     "start": "2019-10-10",
      "stop": null,
-     "true_daily_dose_mg": 90.0,
+     "true_daily_dose_mg": 45.0,
      "changed_by_phone": false
     },
     {
-     "generic": "insulin aspart",
-     "start": "2019-10-10",
-     "stop": null,
-     "true_daily_dose_mg": 300.0,
+     "generic": "sertraline",
+     "start": "2024-09-06",
+     "stop": "2026-01-28",
+     "true_daily_dose_mg": 200.0,
      "changed_by_phone": false
     }
    ],
-   "planted": [],
+   "planted": [
+    {
+     "id": "F0013-01",
+     "type": "dose",
+     "generic": "amlodipine",
+     "sources_involved": [
+      "emr",
+      "gp"
+     ],
+     "row_ids": [
+      "EMR-000112"
+     ],
+     "detail": {
+      "charted": "2.5 mg",
+      "truth": "5 mg"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0013-02",
+     "type": "commission",
+     "generic": "candesartan",
+     "sources_involved": [
+      "emr"
+     ],
+     "row_ids": [
+      "EMR-000117"
+     ],
+     "detail": {
+      "ceased_on": "2025-12-12"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    }
+   ],
    "notices": [
     {
      "type": "coverage_gap",
@@ -1913,7 +2026,7 @@
      "type": "patient_only_item",
      "generic": "glucosamine",
      "row_ids": [
-      "PAT-000109"
+      "PAT-000118"
      ],
      "detail": "OTC or complementary"
     },
@@ -1951,95 +2064,69 @@
    "identity_traps": [],
    "timeline": [
     {
-     "generic": "rosuvastatin",
-     "start": "2018-09-21",
+     "generic": "atorvastatin",
+     "start": "2020-08-18",
+     "stop": null,
+     "true_daily_dose_mg": 20.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "ezetimibe",
+     "start": "2017-05-09",
+     "stop": null,
+     "true_daily_dose_mg": 10.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "esomeprazole",
+     "start": "2019-07-13",
+     "stop": null,
+     "true_daily_dose_mg": 40.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "paracetamol",
+     "start": "2024-03-21",
+     "stop": null,
+     "true_daily_dose_mg": 3990.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "metformin",
+     "start": "2022-11-22",
+     "stop": null,
+     "true_daily_dose_mg": 2000.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "perindopril",
+     "start": "2025-03-19",
      "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "amlodipine",
-     "start": "2019-03-01",
-     "stop": "2025-11-27",
-     "true_daily_dose_mg": 10.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "pantoprazole",
-     "start": "2021-09-27",
-     "stop": "2026-07-03",
-     "true_daily_dose_mg": 20.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "paracetamol",
-     "start": "2022-06-20",
+     "start": "2026-02-01",
      "stop": null,
-     "true_daily_dose_mg": 3990.0,
+     "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "dapagliflozin",
-     "start": "2019-06-02",
-     "stop": null,
-     "true_daily_dose_mg": 10.0,
+     "generic": "venlafaxine",
+     "start": "2023-02-16",
+     "stop": "2026-01-09",
+     "true_daily_dose_mg": 37.5,
      "changed_by_phone": false
     }
    ],
-   "planted": [
-    {
-     "id": "F0014-01",
-     "type": "frequency",
-     "generic": "rosuvastatin",
-     "sources_involved": [
-      "emr",
-      "gp"
-     ],
-     "row_ids": [
-      "EMR-000108",
-      "GP-000086"
-     ],
-     "detail": {
-      "charted": "1 bd",
-      "truth": "1 daily"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0014-02",
-     "type": "dose",
-     "generic": "paracetamol",
-     "sources_involved": [
-      "emr",
-      "gp"
-     ],
-     "row_ids": [
-      "EMR-000109",
-      "GP-000089"
-     ],
-     "detail": {
-      "charted": "332.5 mg",
-      "truth": "665 mg"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
-    }
-   ],
+   "planted": [],
    "notices": [
     {
      "type": "patient_only_item",
-     "generic": "paracetamol",
+     "generic": "turmeric",
      "row_ids": [
-      "PAT-000115"
-     ],
-     "detail": "OTC or complementary"
-    },
-    {
-     "type": "patient_only_item",
-     "generic": "magnesium",
-     "row_ids": [
-      "PAT-000116"
+      "PAT-000125"
      ],
      "detail": "OTC or complementary"
     }
@@ -2069,63 +2156,57 @@
     "private_script_items": [],
     "prior_discharge": false
    },
-   "corruptions": [],
+   "corruptions": [
+    {
+     "operator": "nickname",
+     "source": "gp",
+     "field": "given",
+     "before": "Nicholas",
+     "after": "Nick"
+    }
+   ],
    "identity_traps": [],
    "timeline": [
     {
-     "generic": "telmisartan",
-     "start": "2017-09-02",
-     "stop": "2026-08-30",
-     "true_daily_dose_mg": 40.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "rosuvastatin",
-     "start": "2022-08-08",
-     "stop": "2025-11-12",
-     "true_daily_dose_mg": 10.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "clopidogrel",
-     "start": "2021-08-28",
+     "generic": "warfarin",
+     "start": "2026-06-22",
      "stop": null,
-     "true_daily_dose_mg": 75.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "famotidine",
-     "start": "2026-06-19",
-     "stop": null,
-     "true_daily_dose_mg": 40.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "paracetamol",
-     "start": "2026-06-05",
-     "stop": null,
-     "true_daily_dose_mg": 3990.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "metformin",
-     "start": "2018-05-02",
-     "stop": null,
-     "true_daily_dose_mg": 1500.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "gliclazide",
-     "start": "2021-11-29",
-     "stop": null,
-     "true_daily_dose_mg": 60.0,
-     "changed_by_phone": false
+     "true_daily_dose_mg": 5.0,
+     "changed_by_phone": true
     },
     {
      "generic": "insulin aspart",
-     "start": "2021-05-26",
+     "start": "2021-01-07",
      "stop": null,
      "true_daily_dose_mg": 300.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "aspirin",
+     "start": "2026-06-05",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "perindopril",
+     "start": "2018-05-02",
+     "stop": null,
+     "true_daily_dose_mg": 5.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "atorvastatin",
+     "start": "2021-11-29",
+     "stop": null,
+     "true_daily_dose_mg": 40.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "celecoxib",
+     "start": "2021-05-26",
+     "stop": null,
+     "true_daily_dose_mg": 200.0,
      "changed_by_phone": false
     },
     {
@@ -2136,17 +2217,45 @@
      "changed_by_phone": false
     },
     {
-     "generic": "tamsulosin",
+     "generic": "hydroxychloroquine",
      "start": "2022-07-17",
-     "stop": null,
-     "true_daily_dose_mg": 0.4,
+     "stop": "2025-11-08",
+     "true_daily_dose_mg": 400.0,
      "changed_by_phone": false
     },
     {
-     "generic": "rivaroxaban",
+     "generic": "folic acid",
      "start": "2020-11-19",
      "stop": null,
+     "true_daily_dose_mg": 0.7143,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "rabeprazole",
+     "start": "2022-06-02",
+     "stop": null,
      "true_daily_dose_mg": 20.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "empagliflozin",
+     "start": "2019-09-19",
+     "stop": null,
+     "true_daily_dose_mg": 10.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "gliclazide",
+     "start": "2023-12-20",
+     "stop": null,
+     "true_daily_dose_mg": 60.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "aspirin/clopidogrel",
+     "start": "2024-12-06",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     }
    ],
@@ -2154,33 +2263,92 @@
     {
      "id": "F0015-01",
      "type": "omission",
-     "generic": "clopidogrel",
+     "generic": "warfarin",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000093",
-      "PHM-001401"
+      "GP-000099",
+      "PHM-001443"
+     ],
+     "detail": {
+      "reason": "not charted at admission"
+     },
+     "high_risk_class": "Y",
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0015-02",
+     "type": "omission",
+     "generic": "escitalopram",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000105",
+      "PHM-001516"
      ],
      "detail": {
       "reason": "not charted at admission"
      },
      "high_risk_class": null,
+     "intent": "documented_intentional"
+    },
+    {
+     "id": "F0015-03",
+     "type": "frequency",
+     "generic": "gliclazide",
+     "sources_involved": [
+      "emr",
+      "gp"
+     ],
+     "row_ids": [
+      "EMR-000136",
+      "GP-000110"
+     ],
+     "detail": {
+      "charted": "1 bd",
+      "truth": "1 mane"
+     },
+     "high_risk_class": "ext",
      "intent": "likely_unintentional"
     },
     {
-     "id": "F0015-02",
-     "type": "commission",
-     "generic": "rosuvastatin",
+     "id": "F0015-04",
+     "type": "dose_unconfirmable",
+     "generic": "warfarin",
      "sources_involved": [
-      "emr"
+      "gp",
+      "pharmacy",
+      "patient"
      ],
      "row_ids": [
-      "EMR-000119"
+      "GP-000099",
+      "PHM-001443"
      ],
      "detail": {
-      "ceased_on": "2025-11-12"
+      "mechanism": "dose changed without a new script"
+     },
+     "high_risk_class": "Y",
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0015-05",
+     "type": "duplication",
+     "generic": "aspirin/clopidogrel",
+     "sources_involved": [
+      "gp"
+     ],
+     "row_ids": [
+      "GP-000111"
+     ],
+     "detail": {
+      "overlaps_with": "aspirin",
+      "shared": [
+       "aspirin"
+      ]
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
@@ -2199,30 +2367,26 @@
     ],
     "pharmacy": [
      "C000016"
+    ],
+    "patient": [
+     "INT00016"
     ]
    },
    "coverage_truth": {
     "gp_present": true,
     "pharmacy_present": true,
-    "patient_present": false,
+    "patient_present": true,
     "second_pharmacy_hidden": false,
     "private_script_items": [],
-    "prior_discharge": true
+    "prior_discharge": false
    },
    "corruptions": [
     {
-     "operator": "nickname",
-     "source": "gp",
-     "field": "given",
-     "before": "Vincent",
-     "after": "Vince"
-    },
-    {
      "operator": "single_char_typo",
-     "source": "pharmacy",
+     "source": "patient",
      "field": "given",
-     "before": "Vincent",
-     "after": "Vincennt"
+     "before": "Edith",
+     "after": "Ediith"
     }
    ],
    "identity_traps": [
@@ -2235,121 +2399,99 @@
    ],
    "timeline": [
     {
-     "generic": "aspirin",
-     "start": "2016-11-25",
-     "stop": null,
-     "true_daily_dose_mg": 100.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "escitalopram",
-     "start": "2020-05-09",
-     "stop": null,
-     "true_daily_dose_mg": 10.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "levetiracetam",
-     "start": "2020-05-26",
-     "stop": null,
-     "true_daily_dose_mg": 1000.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "irbesartan/hydrochlorothiazide",
+     "generic": "apixaban",
      "start": "2020-04-18",
-     "stop": null,
-     "true_daily_dose_mg": 150.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "amlodipine",
-     "start": "2020-05-27",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "rosuvastatin",
+     "generic": "clopidogrel",
+     "start": "2020-05-27",
+     "stop": null,
+     "true_daily_dose_mg": 75.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "amlodipine",
      "start": "2017-02-10",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "esomeprazole",
+     "generic": "pantoprazole",
      "start": "2026-08-15",
      "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
-     "generic": "celecoxib",
+     "generic": "metformin",
      "start": "2021-06-06",
-     "stop": null,
-     "true_daily_dose_mg": 200.0,
+     "stop": "2025-10-28",
+     "true_daily_dose_mg": 1500.0,
      "changed_by_phone": false
     },
     {
-     "generic": "metformin",
+     "generic": "rosuvastatin",
      "start": "2017-11-12",
      "stop": null,
-     "true_daily_dose_mg": 1500.0,
+     "true_daily_dose_mg": 40.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "paracetamol",
+     "start": "2024-03-10",
+     "stop": null,
+     "true_daily_dose_mg": 3990.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "escitalopram",
+     "start": "2020-10-04",
+     "stop": "2026-06-13",
+     "true_daily_dose_mg": 20.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "tamsulosin",
+     "start": "2021-02-03",
+     "stop": null,
+     "true_daily_dose_mg": 0.4,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "tiotropium",
+     "start": "2020-02-10",
+     "stop": null,
+     "true_daily_dose_mg": 0.018,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "sitagliptin/metformin",
+     "start": "2017-08-14",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0016-01",
-     "type": "omission",
-     "generic": "aspirin",
-     "sources_involved": [
-      "gp",
-      "pharmacy"
-     ],
-     "row_ids": [
-      "GP-000060"
-     ],
-     "detail": {
-      "reason": "not charted at admission"
-     },
-     "high_risk_class": null,
-     "intent": "documented_intentional"
-    },
-    {
-     "id": "F0016-02",
      "type": "dose",
-     "generic": "irbesartan/hydrochlorothiazide",
+     "generic": "amlodipine",
      "sources_involved": [
       "emr",
       "gp"
      ],
      "row_ids": [
-      "EMR-000122",
-      "GP-000105"
+      "EMR-000140",
+      "GP-000114"
      ],
      "detail": {
-      "charted": "75 mg",
-      "truth": "150/12.5 mg"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0016-03",
-     "type": "dose",
-     "generic": "celecoxib",
-     "sources_involved": [
-      "emr",
-      "gp"
-     ],
-     "row_ids": [
-      "EMR-000126",
-      "GP-000109"
-     ],
-     "detail": {
-      "charted": "100 mg",
-      "truth": "200 mg"
+      "charted": "2.5 mg",
+      "truth": "5 mg"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
@@ -2357,9 +2499,20 @@
    ],
    "notices": [
     {
-     "type": "coverage_gap",
-     "source": "patient",
-     "detail": "no interview (delirium, no carer available)"
+     "type": "patient_only_item",
+     "generic": "fish oil",
+     "row_ids": [
+      "PAT-000148"
+     ],
+     "detail": "OTC or complementary"
+    },
+    {
+     "type": "patient_only_item",
+     "generic": "glucosamine",
+     "row_ids": [
+      "PAT-000149"
+     ],
+     "detail": "OTC or complementary"
     }
    ]
   },
@@ -2387,105 +2540,114 @@
     "private_script_items": [],
     "prior_discharge": false
    },
-   "corruptions": [
-    {
-     "operator": "nickname",
-     "source": "gp",
-     "field": "given",
-     "before": "Sandra",
-     "after": "Sandy"
-    },
-    {
-     "operator": "nickname",
-     "source": "patient",
-     "field": "given",
-     "before": "Sandra",
-     "after": "Sandy"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [],
    "timeline": [
     {
      "generic": "rosuvastatin",
-     "start": "2025-05-18",
+     "start": "2023-06-09",
      "stop": null,
-     "true_daily_dose_mg": 5.0,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
-     "generic": "mirtazapine",
-     "start": "2025-03-04",
+     "generic": "venlafaxine",
+     "start": "2017-03-28",
      "stop": null,
-     "true_daily_dose_mg": 45.0,
+     "true_daily_dose_mg": 150.0,
      "changed_by_phone": false
     },
     {
      "generic": "aspirin",
-     "start": "2021-01-29",
+     "start": "2021-03-24",
      "stop": null,
      "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
      "generic": "metoprolol",
-     "start": "2019-11-30",
+     "start": "2025-02-23",
      "stop": null,
      "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
-     "generic": "amlodipine",
-     "start": "2025-02-23",
-     "stop": null,
-     "true_daily_dose_mg": 10.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "esomeprazole",
+     "generic": "telmisartan",
      "start": "2018-11-20",
-     "stop": null,
-     "true_daily_dose_mg": 20.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "oxycodone",
-     "start": "2020-06-10",
      "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
-     "generic": "empagliflozin",
-     "start": "2023-11-11",
-     "stop": null,
-     "true_daily_dose_mg": 10.0,
+     "generic": "esomeprazole",
+     "start": "2020-06-10",
+     "stop": "2026-03-10",
+     "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
-     "generic": "gliclazide",
-     "start": "2016-11-22",
+     "generic": "paracetamol",
+     "start": "2023-11-11",
      "stop": null,
-     "true_daily_dose_mg": 60.0,
+     "true_daily_dose_mg": 3990.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "metformin",
+     "start": "2016-11-22",
+     "stop": "2026-03-11",
+     "true_daily_dose_mg": 2000.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "insulin aspart",
+     "start": "2022-12-06",
+     "stop": null,
+     "true_daily_dose_mg": 300.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "sitagliptin/metformin",
+     "start": "2017-10-16",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0017-01",
-     "type": "omission",
-     "generic": "aspirin",
+     "type": "stale_listing",
+     "generic": "esomeprazole",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000060"
+      "GP-000127"
      ],
      "detail": {
-      "reason": "not charted at admission"
+      "last_dispensed": "2026-02-16"
      },
      "high_risk_class": null,
-     "intent": "documented_intentional"
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0017-02",
+     "type": "stale_listing",
+     "generic": "metformin",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000129"
+     ],
+     "detail": {
+      "last_dispensed": "2026-02-13"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
     }
    ],
    "notices": []
@@ -2496,9 +2658,6 @@
     "emr": [
      "MRN0000018"
     ],
-    "gp": [
-     "GPP000018"
-    ],
     "pharmacy": [
      "C000018"
     ],
@@ -2507,68 +2666,86 @@
     ]
    },
    "coverage_truth": {
-    "gp_present": true,
+    "gp_present": false,
     "pharmacy_present": true,
     "patient_present": true,
-    "second_pharmacy_hidden": false,
+    "second_pharmacy_hidden": true,
     "private_script_items": [],
-    "prior_discharge": false
+    "prior_discharge": true
    },
    "corruptions": [],
    "identity_traps": [],
    "timeline": [
     {
-     "generic": "perindopril",
+     "generic": "amlodipine",
      "start": "2016-10-30",
-     "stop": null,
+     "stop": "2025-11-23",
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "paracetamol",
+     "generic": "rosuvastatin",
      "start": "2024-02-22",
      "stop": null,
-     "true_daily_dose_mg": 3990.0,
+     "true_daily_dose_mg": 40.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "ezetimibe",
+     "start": "2023-06-09",
+     "stop": null,
+     "true_daily_dose_mg": 10.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "sertraline",
+     "start": "2024-04-06",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
      "generic": "tamsulosin",
-     "start": "2023-06-09",
+     "start": "2021-12-19",
      "stop": null,
      "true_daily_dose_mg": 0.4,
      "changed_by_phone": false
     },
     {
-     "generic": "allopurinol",
-     "start": "2024-04-06",
+     "generic": "bisoprolol",
+     "start": "2018-01-14",
      "stop": null,
-     "true_daily_dose_mg": 300.0,
+     "true_daily_dose_mg": 1.25,
      "changed_by_phone": false
     },
     {
-     "generic": "rosuvastatin",
-     "start": "2021-12-19",
+     "generic": "spironolactone",
+     "start": "2018-09-12",
+     "stop": "2025-12-21",
+     "true_daily_dose_mg": 25.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "allopurinol",
+     "start": "2023-05-02",
      "stop": null,
-     "true_daily_dose_mg": 5.0,
+     "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0018-01",
-     "type": "frequency",
-     "generic": "allopurinol",
+     "type": "commission",
+     "generic": "spironolactone",
      "sources_involved": [
-      "emr",
-      "gp"
+      "emr"
      ],
      "row_ids": [
-      "EMR-000142",
-      "GP-000123"
+      "EMR-000161"
      ],
      "detail": {
-      "charted": "1 bd",
-      "truth": "1 daily"
+      "ceased_on": "2025-12-21"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
@@ -2576,18 +2753,28 @@
    ],
    "notices": [
     {
+     "type": "coverage_gap",
+     "source": "gp",
+     "detail": "no GP record found"
+    },
+    {
+     "type": "possible_second_pharmacy",
+     "source": "pharmacy",
+     "detail": "dispensing split across two pharmacies, one exposed"
+    },
+    {
      "type": "patient_only_item",
-     "generic": "magnesium",
+     "generic": "fish oil",
      "row_ids": [
-      "PAT-000136"
+      "PAT-000168"
      ],
      "detail": "OTC or complementary"
     },
     {
      "type": "patient_only_item",
-     "generic": "glucosamine",
+     "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000137"
+      "PAT-000169"
      ],
      "detail": "OTC or complementary"
     }
@@ -2602,101 +2789,100 @@
     "gp": [
      "GPP000019"
     ],
+    "pharmacy": [
+     "C000019"
+    ],
     "patient": [
      "INT00019"
     ]
    },
    "coverage_truth": {
     "gp_present": true,
-    "pharmacy_present": false,
+    "pharmacy_present": true,
     "patient_present": true,
     "second_pharmacy_hidden": false,
     "private_script_items": [
-     "ramipril"
+     "ezetimibe/rosuvastatin"
     ],
-    "prior_discharge": true
+    "prior_discharge": false
    },
-   "corruptions": [],
+   "corruptions": [
+    {
+     "operator": "single_char_typo",
+     "source": "patient",
+     "field": "given",
+     "before": "Vincent",
+     "after": "Vinent"
+    }
+   ],
    "identity_traps": [],
    "timeline": [
     {
-     "generic": "aspirin",
-     "start": "2022-08-01",
+     "generic": "perindopril/indapamide",
+     "start": "2020-07-16",
      "stop": null,
-     "true_daily_dose_mg": 100.0,
+     "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "ramipril",
+     "generic": "amlodipine",
+     "start": "2024-06-06",
+     "stop": null,
+     "true_daily_dose_mg": 5.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "ezetimibe/rosuvastatin",
      "start": "2023-01-18",
-     "stop": "2026-03-22",
+     "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
-     "generic": "oxycodone/naloxone",
+     "generic": "ezetimibe",
      "start": "2024-07-01",
      "stop": null,
-     "true_daily_dose_mg": 20.0,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
-     "generic": "dutasteride/tamsulosin",
+     "generic": "metformin",
      "start": "2019-07-31",
      "stop": null,
-     "true_daily_dose_mg": 0.5,
+     "true_daily_dose_mg": 1000.0,
      "changed_by_phone": false
     },
     {
-     "generic": "atorvastatin",
+     "generic": "bisoprolol",
      "start": "2024-11-02",
-     "stop": "2025-11-07",
-     "true_daily_dose_mg": 20.0,
+     "stop": null,
+     "true_daily_dose_mg": 2.5,
      "changed_by_phone": false
     },
     {
-     "generic": "rabeprazole",
+     "generic": "spironolactone",
      "start": "2021-11-02",
      "stop": null,
-     "true_daily_dose_mg": 20.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "dapagliflozin",
-     "start": "2018-07-18",
-     "stop": null,
-     "true_daily_dose_mg": 10.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "venlafaxine",
-     "start": "2018-08-27",
-     "stop": null,
-     "true_daily_dose_mg": 150.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "temazepam",
-     "start": "2018-11-26",
-     "stop": "2026-04-14",
-     "true_daily_dose_mg": 10.0,
+     "true_daily_dose_mg": 25.0,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0019-01",
-     "type": "stale_listing",
-     "generic": "atorvastatin",
+     "type": "duplication",
+     "generic": "ezetimibe/rosuvastatin",
      "sources_involved": [
-      "gp",
-      "pharmacy"
+      "gp"
      ],
      "row_ids": [
-      "GP-000129"
+      "GP-000134"
      ],
      "detail": {
-      "last_dispensed": "2025-10-24"
+      "overlaps_with": "ezetimibe",
+      "shared": [
+       "ezetimibe"
+      ]
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
@@ -2704,15 +2890,10 @@
    ],
    "notices": [
     {
-     "type": "coverage_gap",
-     "source": "pharmacy",
-     "detail": "no dispensing record found"
-    },
-    {
      "type": "patient_only_item",
-     "generic": "fish oil",
+     "generic": "turmeric",
      "row_ids": [
-      "PAT-000146"
+      "PAT-000175"
      ],
      "detail": "OTC or complementary"
     }
@@ -2741,11 +2922,18 @@
    },
    "corruptions": [
     {
-     "operator": "nickname",
+     "operator": "maiden_married_surname",
+     "source": "gp",
+     "field": "family",
+     "before": "Chen",
+     "after": "Rossi"
+    },
+    {
+     "operator": "maiden_married_surname",
      "source": "patient",
-     "field": "given",
-     "before": "Richard",
-     "after": "Richie"
+     "field": "family",
+     "before": "Chen",
+     "after": "Rossi"
     }
    ],
    "identity_traps": [
@@ -2759,72 +2947,72 @@
    "timeline": [
     {
      "generic": "insulin glargine",
-     "start": "2023-05-18",
-     "stop": null,
-     "true_daily_dose_mg": 100.0,
-     "changed_by_phone": true
-    },
-    {
-     "generic": "insulin aspart",
      "start": "2022-01-07",
      "stop": null,
      "true_daily_dose_mg": 300.0,
+     "changed_by_phone": true
+    },
+    {
+     "generic": "clopidogrel",
+     "start": "2018-05-10",
+     "stop": null,
+     "true_daily_dose_mg": 75.0,
      "changed_by_phone": false
     },
     {
      "generic": "amlodipine",
-     "start": "2018-05-10",
+     "start": "2021-11-10",
      "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "esomeprazole",
-     "start": "2021-11-10",
-     "stop": null,
+     "start": "2018-09-26",
+     "stop": "2026-04-05",
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "gliclazide",
-     "start": "2018-09-26",
+     "start": "2022-10-15",
      "stop": null,
      "true_daily_dose_mg": 60.0,
      "changed_by_phone": false
     },
     {
-     "generic": "alendronate/colecalciferol",
-     "start": "2022-10-15",
-     "stop": "2026-01-18",
-     "true_daily_dose_mg": 0.01,
+     "generic": "metoprolol",
+     "start": "2023-03-21",
+     "stop": "2026-08-24",
+     "true_daily_dose_mg": 100.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "alendronate",
+     "start": "2025-06-28",
+     "stop": null,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "atorvastatin",
-     "start": "2023-03-21",
-     "stop": null,
-     "true_daily_dose_mg": 80.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "oxycodone/naloxone",
-     "start": "2025-06-28",
-     "stop": null,
-     "true_daily_dose_mg": 40.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "mirtazapine",
      "start": "2023-08-03",
      "stop": null,
-     "true_daily_dose_mg": 15.0,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
-     "generic": "isosorbide mononitrate",
+     "generic": "paracetamol",
      "start": "2020-08-16",
-     "stop": "2025-12-25",
-     "true_daily_dose_mg": 60.0,
+     "stop": "2026-02-05",
+     "true_daily_dose_mg": 3990.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "escitalopram",
+     "start": "2018-05-17",
+     "stop": "2025-12-30",
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     }
    ],
@@ -2832,41 +3020,60 @@
     {
      "id": "F0020-01",
      "type": "frequency",
-     "generic": "atorvastatin",
+     "generic": "insulin glargine",
      "sources_involved": [
       "emr",
       "gp"
      ],
      "row_ids": [
-      "EMR-000159",
-      "GP-000140"
+      "EMR-000172",
+      "GP-000139"
      ],
      "detail": {
       "charted": "1 bd",
-      "truth": "1 daily"
+      "truth": "10 to 40 units nocte"
      },
-     "high_risk_class": null,
+     "high_risk_class": "Y",
      "intent": "likely_unintentional"
     },
     {
      "id": "F0020-02",
-     "type": "stale_listing",
-     "generic": "isosorbide mononitrate",
+     "type": "omission",
+     "generic": "amlodipine",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000143"
+      "GP-000013",
+      "GP-000114",
+      "GP-000133"
      ],
      "detail": {
-      "last_dispensed": "2025-11-26"
+      "reason": "not charted at admission"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
     },
     {
      "id": "F0020-03",
+     "type": "stale_listing",
+     "generic": "esomeprazole",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000142"
+     ],
+     "detail": {
+      "last_dispensed": "2026-02-26"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0020-04",
      "type": "dose_unconfirmable",
      "generic": "insulin glargine",
      "sources_involved": [
@@ -2875,14 +3082,14 @@
       "patient"
      ],
      "row_ids": [
-      "GP-000134",
-      "PAT-000147"
+      "GP-000139",
+      "PAT-000176"
      ],
      "detail": {
       "mechanism": "dose changed without a new script"
      },
      "high_risk_class": "Y",
-     "intent": "likely_unintentional"
+     "intent": "possibly_intentional"
     }
    ],
    "notices": [
@@ -2895,7 +3102,15 @@
      "type": "patient_only_item",
      "generic": "fish oil",
      "row_ids": [
-      "PAT-000156"
+      "PAT-000184"
+     ],
+     "detail": "OTC or complementary"
+    },
+    {
+     "type": "patient_only_item",
+     "generic": "glucosamine",
+     "row_ids": [
+      "PAT-000185"
      ],
      "detail": "OTC or complementary"
     }
@@ -2925,15 +3140,7 @@
     "private_script_items": [],
     "prior_discharge": true
    },
-   "corruptions": [
-    {
-     "operator": "nickname",
-     "source": "patient",
-     "field": "given",
-     "before": "Richard",
-     "after": "Richie"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [
     {
      "kind": "twins",
@@ -2999,7 +3206,7 @@
      "type": "patient_only_item",
      "generic": "paracetamol",
      "row_ids": [
-      "PAT-000164"
+      "PAT-000192"
      ],
      "detail": "OTC or complementary"
     }
@@ -3033,45 +3240,45 @@
    "identity_traps": [],
    "timeline": [
     {
-     "generic": "aspirin",
-     "start": "2020-12-18",
-     "stop": null,
-     "true_daily_dose_mg": 100.0,
-     "changed_by_phone": false
-    },
-    {
      "generic": "amlodipine",
-     "start": "2017-01-04",
-     "stop": "2026-04-03",
-     "true_daily_dose_mg": 10.0,
+     "start": "2025-08-15",
+     "stop": null,
+     "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "esomeprazole",
-     "start": "2020-06-05",
-     "stop": null,
+     "start": "2017-01-04",
+     "stop": "2026-04-03",
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "celecoxib",
-     "start": "2021-09-24",
+     "start": "2020-06-05",
      "stop": null,
      "true_daily_dose_mg": 200.0,
      "changed_by_phone": false
     },
     {
      "generic": "oxycodone",
-     "start": "2024-08-31",
+     "start": "2021-09-24",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "escitalopram",
+     "start": "2024-08-31",
+     "stop": null,
+     "true_daily_dose_mg": 20.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "aspirin",
      "start": "2022-02-22",
      "stop": null,
-     "true_daily_dose_mg": 10.0,
+     "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
@@ -3092,17 +3299,71 @@
    "planted": [
     {
      "id": "F0022-01",
-     "type": "stale_listing",
+     "type": "omission",
      "generic": "amlodipine",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000152"
+      "GP-000013",
+      "GP-000114",
+      "GP-000133"
      ],
      "detail": {
-      "last_dispensed": "2026-01-13"
+      "reason": "not charted at admission"
+     },
+     "high_risk_class": null,
+     "intent": "documented_intentional"
+    },
+    {
+     "id": "F0022-02",
+     "type": "omission",
+     "generic": "escitalopram",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000160",
+      "PHM-002046"
+     ],
+     "detail": {
+      "reason": "not charted at admission"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0022-03",
+     "type": "omission",
+     "generic": "metoprolol",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000125"
+     ],
+     "detail": {
+      "reason": "not charted at admission"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0022-04",
+     "type": "stale_listing",
+     "generic": "esomeprazole",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000157"
+     ],
+     "detail": {
+      "last_dispensed": "2026-03-06"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
@@ -3111,17 +3372,17 @@
    "notices": [
     {
      "type": "patient_only_item",
-     "generic": "glucosamine",
+     "generic": "magnesium",
      "row_ids": [
-      "PAT-000172"
+      "PAT-000200"
      ],
      "detail": "OTC or complementary"
     },
     {
      "type": "patient_only_item",
-     "generic": "colecalciferol",
+     "generic": "fish oil",
      "row_ids": [
-      "PAT-000173"
+      "PAT-000201"
      ],
      "detail": "OTC or complementary"
     }
@@ -3149,12 +3410,20 @@
     "patient_present": true,
     "second_pharmacy_hidden": false,
     "private_script_items": [
-     "esomeprazole",
-     "semaglutide"
+     "insulin aspart",
+     "pregabalin"
     ],
     "prior_discharge": false
    },
-   "corruptions": [],
+   "corruptions": [
+    {
+     "operator": "nickname",
+     "source": "gp",
+     "field": "given",
+     "before": "Michael",
+     "after": "Mike"
+    }
+   ],
    "identity_traps": [
     {
      "kind": "lookalike_pair",
@@ -3166,162 +3435,129 @@
    "timeline": [
     {
      "generic": "perindopril",
-     "start": "2024-09-05",
-     "stop": "2026-02-17",
+     "start": "2025-11-10",
+     "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "atorvastatin",
-     "start": "2022-02-22",
-     "stop": "2026-02-10",
-     "true_daily_dose_mg": 40.0,
+     "start": "2017-06-03",
+     "stop": null,
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
      "generic": "aspirin",
-     "start": "2022-09-13",
+     "start": "2017-12-05",
      "stop": null,
      "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
-     "generic": "rivaroxaban",
+     "generic": "dutasteride/tamsulosin",
+     "start": "2022-09-13",
+     "stop": null,
+     "true_daily_dose_mg": 0.5,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "pantoprazole",
      "start": "2024-12-12",
      "stop": null,
-     "true_daily_dose_mg": 15.0,
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
-     "generic": "esomeprazole",
+     "generic": "pregabalin",
      "start": "2026-03-22",
      "stop": null,
-     "true_daily_dose_mg": 40.0,
+     "true_daily_dose_mg": 150.0,
      "changed_by_phone": false
     },
     {
-     "generic": "oxycodone/naloxone",
+     "generic": "dapagliflozin",
      "start": "2021-05-12",
      "stop": null,
-     "true_daily_dose_mg": 40.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "oxycodone",
-     "start": "2021-05-28",
-     "stop": null,
-     "true_daily_dose_mg": 5.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "semaglutide",
-     "start": "2025-07-20",
-     "stop": "2026-08-08",
-     "true_daily_dose_mg": 0.0714,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "gliclazide",
-     "start": "2025-10-20",
+     "start": "2021-05-28",
      "stop": null,
      "true_daily_dose_mg": 60.0,
      "changed_by_phone": false
     },
     {
-     "generic": "escitalopram",
-     "start": "2022-05-16",
-     "stop": "2026-04-04",
-     "true_daily_dose_mg": 10.0,
+     "generic": "insulin aspart",
+     "start": "2025-07-20",
+     "stop": null,
+     "true_daily_dose_mg": 300.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "mirtazapine",
+     "start": "2025-10-20",
+     "stop": null,
+     "true_daily_dose_mg": 15.0,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0023-01",
-     "type": "omission",
-     "generic": "rivaroxaban",
+     "type": "dose",
+     "generic": "dapagliflozin",
      "sources_involved": [
-      "gp",
-      "pharmacy"
+      "emr",
+      "gp"
      ],
      "row_ids": [
-      "GP-000101"
+      "EMR-000198",
+      "GP-000170"
      ],
      "detail": {
-      "reason": "not charted at admission"
+      "charted": "5 mg",
+      "truth": "10 mg"
      },
-     "high_risk_class": "Y",
+     "high_risk_class": null,
      "intent": "likely_unintentional"
     },
     {
      "id": "F0023-02",
-     "type": "omission",
-     "generic": "oxycodone/naloxone",
+     "type": "frequency",
+     "generic": "gliclazide",
      "sources_involved": [
-      "gp",
-      "pharmacy"
-     ],
-     "row_ids": [
-      "GP-000057"
-     ],
-     "detail": {
-      "reason": "not charted at admission"
-     },
-     "high_risk_class": "Y",
-     "intent": "documented_intentional"
-    },
-    {
-     "id": "F0023-03",
-     "type": "omission",
-     "generic": "oxycodone",
-     "sources_involved": [
-      "gp",
-      "pharmacy"
-     ],
-     "row_ids": [
-      "GP-000165",
-      "PHM-001965"
-     ],
-     "detail": {
-      "reason": "not charted at admission"
-     },
-     "high_risk_class": "Y",
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0023-04",
-     "type": "duplication",
-     "generic": "oxycodone/naloxone",
-     "sources_involved": [
+      "emr",
       "gp"
      ],
      "row_ids": [
-      "GP-000164"
+      "EMR-000199",
+      "GP-000171"
      ],
      "detail": {
-      "overlaps_with": "oxycodone",
-      "shared": [
-       "oxycodone"
-      ]
+      "charted": "1 bd",
+      "truth": "1 mane"
      },
-     "high_risk_class": "Y",
+     "high_risk_class": "ext",
      "intent": "likely_unintentional"
     }
    ],
    "notices": [
     {
      "type": "patient_only_item",
-     "generic": "paracetamol",
+     "generic": "turmeric",
      "row_ids": [
-      "PAT-000183"
+      "PAT-000211"
      ],
      "detail": "OTC or complementary"
     },
     {
      "type": "patient_only_item",
-     "generic": "fish oil",
+     "generic": "magnesium",
      "row_ids": [
-      "PAT-000184"
+      "PAT-000212"
      ],
      "detail": "OTC or complementary"
     }
@@ -3346,7 +3582,7 @@
     "patient_present": true,
     "second_pharmacy_hidden": false,
     "private_script_items": [
-     "amlodipine"
+     "rosuvastatin"
     ],
     "prior_discharge": false
    },
@@ -3354,10 +3590,10 @@
    "identity_traps": [],
    "timeline": [
     {
-     "generic": "mirtazapine",
+     "generic": "venlafaxine",
      "start": "2024-04-29",
      "stop": null,
-     "true_daily_dose_mg": 45.0,
+     "true_daily_dose_mg": 150.0,
      "changed_by_phone": false
     },
     {
@@ -3375,45 +3611,45 @@
      "changed_by_phone": false
     },
     {
-     "generic": "alendronate",
+     "generic": "metoprolol",
      "start": "2022-09-23",
      "stop": null,
-     "true_daily_dose_mg": 10.0,
+     "true_daily_dose_mg": 47.5,
      "changed_by_phone": false
     },
     {
-     "generic": "colecalciferol",
+     "generic": "carvedilol",
      "start": "2016-11-25",
      "stop": null,
-     "true_daily_dose_mg": 1000.0,
+     "true_daily_dose_mg": 12.5,
      "changed_by_phone": false
     },
     {
-     "generic": "levothyroxine",
+     "generic": "spironolactone",
      "start": "2018-06-13",
      "stop": null,
-     "true_daily_dose_mg": 0.05,
+     "true_daily_dose_mg": 25.0,
      "changed_by_phone": false
     },
     {
-     "generic": "perindopril/indapamide",
+     "generic": "perindopril",
      "start": "2022-12-19",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "amlodipine",
+     "generic": "rosuvastatin",
      "start": "2026-01-26",
      "stop": null,
-     "true_daily_dose_mg": 5.0,
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
-     "generic": "rosuvastatin",
+     "generic": "esomeprazole",
      "start": "2017-09-09",
      "stop": "2026-03-21",
-     "true_daily_dose_mg": 20.0,
+     "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     }
    ],
@@ -3421,13 +3657,13 @@
     {
      "id": "F0024-01",
      "type": "omission",
-     "generic": "alendronate",
+     "generic": "carvedilol",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000139"
+      "PHM-002313"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -3441,14 +3677,6 @@
      "type": "coverage_gap",
      "source": "gp",
      "detail": "no GP record found"
-    },
-    {
-     "type": "patient_only_item",
-     "generic": "paracetamol",
-     "row_ids": [
-      "PAT-000192"
-     ],
-     "detail": "OTC or complementary"
     }
    ]
   },
@@ -3472,121 +3700,135 @@
     "gp_present": true,
     "pharmacy_present": true,
     "patient_present": true,
-    "second_pharmacy_hidden": false,
-    "private_script_items": [
-     "alendronate"
-    ],
+    "second_pharmacy_hidden": true,
+    "private_script_items": [],
     "prior_discharge": false
    },
-   "corruptions": [],
+   "corruptions": [
+    {
+     "operator": "nickname",
+     "source": "gp",
+     "field": "given",
+     "before": "Geraldine",
+     "after": "Gerry"
+    }
+   ],
    "identity_traps": [],
    "timeline": [
     {
-     "generic": "perindopril",
-     "start": "2018-01-20",
-     "stop": "2026-02-04",
+     "generic": "perindopril/indapamide",
+     "start": "2023-06-10",
+     "stop": "2026-07-28",
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "atorvastatin",
+     "start": "2018-01-20",
+     "stop": null,
+     "true_daily_dose_mg": 10.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "esomeprazole",
      "start": "2018-02-06",
-     "stop": "2026-08-14",
+     "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
-     "generic": "insulin glargine",
+     "generic": "desvenlafaxine",
      "start": "2022-05-11",
      "stop": null,
-     "true_daily_dose_mg": 100.0,
-     "changed_by_phone": true
+     "true_daily_dose_mg": 50.0,
+     "changed_by_phone": false
     },
     {
-     "generic": "levothyroxine",
+     "generic": "buprenorphine",
      "start": "2025-03-19",
      "stop": null,
-     "true_daily_dose_mg": 0.05,
+     "true_daily_dose_mg": 0.0007,
      "changed_by_phone": false
     },
     {
-     "generic": "rabeprazole",
+     "generic": "metformin",
      "start": "2023-11-25",
      "stop": null,
-     "true_daily_dose_mg": 10.0,
+     "true_daily_dose_mg": 1000.0,
      "changed_by_phone": false
     },
     {
-     "generic": "oxycodone",
+     "generic": "clopidogrel",
      "start": "2026-06-19",
      "stop": null,
-     "true_daily_dose_mg": 20.0,
+     "true_daily_dose_mg": 75.0,
      "changed_by_phone": false
     },
     {
-     "generic": "escitalopram",
+     "generic": "glyceryl trinitrate",
      "start": "2025-12-13",
      "stop": null,
-     "true_daily_dose_mg": 10.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "aspirin",
-     "start": "2025-03-16",
-     "stop": null,
-     "true_daily_dose_mg": 100.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "metoprolol",
-     "start": "2018-09-15",
-     "stop": null,
-     "true_daily_dose_mg": 100.0,
+     "true_daily_dose_mg": 0.4,
      "changed_by_phone": false
     },
     {
      "generic": "alendronate",
-     "start": "2025-05-16",
-     "stop": null,
+     "start": "2025-03-16",
+     "stop": "2026-05-28",
      "true_daily_dose_mg": 10.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "rivaroxaban",
-     "start": "2018-07-14",
-     "stop": null,
-     "true_daily_dose_mg": 15.0,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0025-01",
-     "type": "omission",
-     "generic": "escitalopram",
+     "type": "frequency",
+     "generic": "esomeprazole",
      "sources_involved": [
-      "gp",
-      "pharmacy"
+      "emr",
+      "gp"
      ],
      "row_ids": [
-      "GP-000099"
+      "EMR-000210",
+      "GP-000176"
      ],
      "detail": {
-      "reason": "not charted at admission"
+      "charted": "1 bd",
+      "truth": "1 daily"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
     },
     {
      "id": "F0025-02",
+     "type": "dose",
+     "generic": "desvenlafaxine",
+     "sources_involved": [
+      "emr",
+      "gp"
+     ],
+     "row_ids": [
+      "EMR-000211",
+      "GP-000177"
+     ],
+     "detail": {
+      "charted": "25 mg",
+      "truth": "50 mg"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0025-03",
      "type": "omission",
-     "generic": "metoprolol",
+     "generic": "metformin",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000114"
+      "GP-000179",
+      "PHM-002385"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -3595,32 +3837,34 @@
      "intent": "likely_unintentional"
     },
     {
-     "id": "F0025-03",
-     "type": "dose_unconfirmable",
-     "generic": "insulin glargine",
+     "id": "F0025-04",
+     "type": "stale_listing",
+     "generic": "alendronate",
      "sources_involved": [
       "gp",
-      "pharmacy",
-      "patient"
+      "pharmacy"
      ],
      "row_ids": [
-      "GP-000171",
-      "PHM-002154",
-      "PAT-000194"
+      "GP-000182"
      ],
      "detail": {
-      "mechanism": "dose changed without a new script"
+      "last_dispensed": "2026-04-20"
      },
-     "high_risk_class": "Y",
-     "intent": "possibly_intentional"
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
     }
    ],
    "notices": [
     {
+     "type": "possible_second_pharmacy",
+     "source": "pharmacy",
+     "detail": "dispensing split across two pharmacies, one exposed"
+    },
+    {
      "type": "patient_only_item",
-     "generic": "colecalciferol",
+     "generic": "turmeric",
      "row_ids": [
-      "PAT-000202"
+      "PAT-000227"
      ],
      "detail": "OTC or complementary"
     }
@@ -3648,7 +3892,7 @@
     "patient_present": true,
     "second_pharmacy_hidden": false,
     "private_script_items": [
-     "mirabegron"
+     "salbutamol"
     ],
     "prior_discharge": true
    },
@@ -3657,16 +3901,16 @@
    "timeline": [
     {
      "generic": "telmisartan",
-     "start": "2018-02-04",
+     "start": "2026-06-15",
      "stop": null,
      "true_daily_dose_mg": 80.0,
      "changed_by_phone": false
     },
     {
      "generic": "rosuvastatin",
-     "start": "2024-03-01",
+     "start": "2023-04-20",
      "stop": null,
-     "true_daily_dose_mg": 20.0,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
@@ -3691,24 +3935,24 @@
      "changed_by_phone": false
     },
     {
-     "generic": "levothyroxine",
+     "generic": "fluticasone furoate/umeclidinium/vilanterol",
      "start": "2017-12-18",
      "stop": null,
-     "true_daily_dose_mg": 0.05,
+     "true_daily_dose_mg": 0.1,
      "changed_by_phone": false
     },
     {
-     "generic": "mirabegron",
+     "generic": "salbutamol",
      "start": "2020-03-19",
      "stop": null,
-     "true_daily_dose_mg": 25.0,
+     "true_daily_dose_mg": 0.2,
      "changed_by_phone": false
     },
     {
-     "generic": "oxycodone",
+     "generic": "bisoprolol",
      "start": "2022-11-15",
      "stop": null,
-     "true_daily_dose_mg": 40.0,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
@@ -3729,56 +3973,28 @@
    "planted": [
     {
      "id": "F0026-01",
-     "type": "frequency",
-     "generic": "telmisartan",
-     "sources_involved": [
-      "emr",
-      "gp"
-     ],
-     "row_ids": [
-      "EMR-000199",
-      "GP-000180"
-     ],
-     "detail": {
-      "charted": "1 bd",
-      "truth": "1 daily"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0026-02",
      "type": "omission",
-     "generic": "mirabegron",
+     "generic": "rivaroxaban",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000186",
-      "PHM-002339"
+      "GP-000068"
      ],
      "detail": {
       "reason": "not charted at admission"
      },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
+     "high_risk_class": "Y",
+     "intent": "documented_intentional"
     }
    ],
    "notices": [
     {
      "type": "patient_only_item",
-     "generic": "magnesium",
+     "generic": "turmeric",
      "row_ids": [
-      "PAT-000212"
-     ],
-     "detail": "OTC or complementary"
-    },
-    {
-     "type": "patient_only_item",
-     "generic": "glucosamine",
-     "row_ids": [
-      "PAT-000213"
+      "PAT-000236"
      ],
      "detail": "OTC or complementary"
     }
@@ -3802,27 +4018,10 @@
     "pharmacy_present": false,
     "patient_present": true,
     "second_pharmacy_hidden": false,
-    "private_script_items": [
-     "metformin"
-    ],
+    "private_script_items": [],
     "prior_discharge": true
    },
-   "corruptions": [
-    {
-     "operator": "nickname",
-     "source": "gp",
-     "field": "given",
-     "before": "Catherine",
-     "after": "Cath"
-    },
-    {
-     "operator": "single_char_typo",
-     "source": "patient",
-     "field": "given",
-     "before": "Catherine",
-     "after": "Ctherine"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [
     {
      "kind": "lookalike_pair",
@@ -3833,86 +4032,88 @@
    ],
    "timeline": [
     {
-     "generic": "insulin aspart",
-     "start": "2026-04-28",
-     "stop": null,
-     "true_daily_dose_mg": 300.0,
-     "changed_by_phone": false
-    },
-    {
      "generic": "rosuvastatin",
-     "start": "2017-08-05",
+     "start": "2026-04-20",
      "stop": null,
-     "true_daily_dose_mg": 40.0,
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
      "generic": "perindopril/indapamide",
-     "start": "2026-07-02",
+     "start": "2020-01-14",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "pantoprazole",
-     "start": "2017-07-30",
+     "start": "2023-08-01",
      "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "pregabalin",
-     "start": "2026-05-26",
+     "start": "2016-11-18",
      "stop": null,
      "true_daily_dose_mg": 150.0,
      "changed_by_phone": false
     },
     {
      "generic": "metformin",
-     "start": "2023-04-13",
-     "stop": null,
+     "start": "2020-11-18",
+     "stop": "2026-08-01",
      "true_daily_dose_mg": 2000.0,
      "changed_by_phone": false
     },
     {
-     "generic": "sertraline",
-     "start": "2019-02-13",
-     "stop": "2026-01-30",
-     "true_daily_dose_mg": 100.0,
+     "generic": "escitalopram",
+     "start": "2026-05-15",
+     "stop": "2026-06-20",
+     "true_daily_dose_mg": 20.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "temazepam",
+     "start": "2022-12-08",
+     "stop": null,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0027-01",
-     "type": "omission",
+     "type": "dose",
      "generic": "pantoprazole",
+     "sources_involved": [
+      "emr",
+      "gp"
+     ],
+     "row_ids": [
+      "EMR-000229",
+      "GP-000195"
+     ],
+     "detail": {
+      "charted": "20 mg",
+      "truth": "40 mg"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    },
+    {
+     "id": "F0027-02",
+     "type": "omission",
+     "generic": "pregabalin",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000045",
-      "GP-000088"
+      "GP-000196"
      ],
      "detail": {
       "reason": "not charted at admission"
-     },
-     "high_risk_class": null,
-     "intent": "documented_intentional"
-    },
-    {
-     "id": "F0027-02",
-     "type": "commission",
-     "generic": "sertraline",
-     "sources_involved": [
-      "emr"
-     ],
-     "row_ids": [
-      "EMR-000215"
-     ],
-     "detail": {
-      "ceased_on": "2026-01-30"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
@@ -3923,6 +4124,14 @@
      "type": "coverage_gap",
      "source": "pharmacy",
      "detail": "no dispensing record found"
+    },
+    {
+     "type": "patient_only_item",
+     "generic": "colecalciferol",
+     "row_ids": [
+      "PAT-000242"
+     ],
+     "detail": "OTC or complementary"
     }
    ]
   },
@@ -3948,7 +4157,7 @@
     "patient_present": true,
     "second_pharmacy_hidden": false,
     "private_script_items": [
-     "ticagrelor"
+     "telmisartan"
     ],
     "prior_discharge": false
    },
@@ -3956,94 +4165,87 @@
    "identity_traps": [],
    "timeline": [
     {
+     "generic": "aspirin",
+     "start": "2026-03-06",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "apixaban",
+     "start": "2023-08-23",
+     "stop": "2026-09-07",
+     "true_daily_dose_mg": 5.0,
+     "changed_by_phone": false
+    },
+    {
      "generic": "ezetimibe/rosuvastatin",
-     "start": "2024-09-06",
+     "start": "2017-09-06",
      "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "esomeprazole",
-     "start": "2026-03-06",
-     "stop": "2026-09-07",
+     "start": "2020-06-04",
+     "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "oxycodone",
-     "start": "2023-08-23",
+     "start": "2026-01-25",
      "stop": null,
      "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
      "generic": "budesonide/formoterol",
-     "start": "2017-09-06",
-     "stop": null,
+     "start": "2024-10-25",
+     "stop": "2026-05-02",
      "true_daily_dose_mg": 0.8,
      "changed_by_phone": false
     },
     {
      "generic": "salbutamol",
-     "start": "2020-06-04",
+     "start": "2025-04-24",
      "stop": null,
      "true_daily_dose_mg": 0.2,
      "changed_by_phone": false
     },
     {
      "generic": "telmisartan",
-     "start": "2026-01-25",
-     "stop": "2026-05-02",
+     "start": "2018-10-23",
+     "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "metformin",
-     "start": "2024-10-25",
-     "stop": null,
-     "true_daily_dose_mg": 1000.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "duloxetine",
-     "start": "2025-04-24",
-     "stop": null,
-     "true_daily_dose_mg": 30.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "ticagrelor",
-     "start": "2018-10-23",
-     "stop": null,
-     "true_daily_dose_mg": 180.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "glyceryl trinitrate",
      "start": "2022-08-27",
      "stop": null,
-     "true_daily_dose_mg": 0.4,
+     "true_daily_dose_mg": 2000.0,
      "changed_by_phone": false
     },
     {
-     "generic": "tamsulosin",
+     "generic": "desvenlafaxine",
      "start": "2025-07-05",
-     "stop": "2026-09-07",
-     "true_daily_dose_mg": 0.4,
+     "stop": null,
+     "true_daily_dose_mg": 50.0,
      "changed_by_phone": false
     },
     {
-     "generic": "apixaban",
+     "generic": "metoprolol",
      "start": "2020-08-21",
-     "stop": null,
-     "true_daily_dose_mg": 5.0,
+     "stop": "2026-09-07",
+     "true_daily_dose_mg": 50.0,
      "changed_by_phone": false
     },
     {
-     "generic": "empagliflozin/metformin",
-     "start": "2019-08-07",
+     "generic": "mirabegron",
+     "start": "2023-08-14",
      "stop": null,
-     "true_daily_dose_mg": 25.0,
+     "true_daily_dose_mg": 50.0,
      "changed_by_phone": false
     }
    ],
@@ -4051,70 +4253,70 @@
     {
      "id": "F0028-01",
      "type": "omission",
-     "generic": "oxycodone",
+     "generic": "ezetimibe/rosuvastatin",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000117",
-      "GP-000174"
+      "GP-000134"
      ],
      "detail": {
       "reason": "not charted at admission"
      },
-     "high_risk_class": "Y",
-     "intent": "likely_unintentional"
+     "high_risk_class": null,
+     "intent": "documented_intentional"
     },
     {
      "id": "F0028-02",
-     "type": "omission",
-     "generic": "salbutamol",
+     "type": "dose",
+     "generic": "telmisartan",
      "sources_involved": [
-      "gp",
-      "pharmacy"
+      "emr",
+      "gp"
      ],
      "row_ids": [
-      "GP-000085"
+      "EMR-000237",
+      "GP-000206"
      ],
      "detail": {
-      "reason": "not charted at admission"
+      "charted": "20 mg",
+      "truth": "40 mg"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
     },
     {
      "id": "F0028-03",
-     "type": "stale_listing",
-     "generic": "telmisartan",
+     "type": "omission",
+     "generic": "desvenlafaxine",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000202"
+      "GP-000208",
+      "PHM-002727"
      ],
      "detail": {
-      "last_dispensed": "2026-04-12"
+      "reason": "not charted at admission"
      },
      "high_risk_class": null,
-     "intent": "likely_unintentional"
+     "intent": "documented_intentional"
     },
     {
      "id": "F0028-04",
-     "type": "duplication",
-     "generic": "empagliflozin/metformin",
+     "type": "stale_listing",
+     "generic": "budesonide/formoterol",
      "sources_involved": [
-      "gp"
+      "gp",
+      "pharmacy"
      ],
      "row_ids": [
-      "GP-000209"
+      "GP-000204"
      ],
      "detail": {
-      "overlaps_with": "metformin",
-      "shared": [
-       "metformin"
-      ]
+      "last_dispensed": "2026-04-23"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
@@ -4125,7 +4327,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000230"
+      "PAT-000254"
      ],
      "detail": "OTC or complementary"
     }
@@ -4155,7 +4357,15 @@
     "private_script_items": [],
     "prior_discharge": true
    },
-   "corruptions": [],
+   "corruptions": [
+    {
+     "operator": "nickname",
+     "source": "gp",
+     "field": "given",
+     "before": "Kathleen",
+     "after": "Kath"
+    }
+   ],
    "identity_traps": [
     {
      "kind": "lookalike_pair",
@@ -4166,77 +4376,113 @@
    ],
    "timeline": [
     {
-     "generic": "insulin aspart",
-     "start": "2022-10-17",
-     "stop": null,
-     "true_daily_dose_mg": 300.0,
-     "changed_by_phone": false
-    },
-    {
      "generic": "perindopril",
-     "start": "2021-02-14",
+     "start": "2023-01-22",
      "stop": null,
-     "true_daily_dose_mg": 5.0,
+     "true_daily_dose_mg": 4.0,
      "changed_by_phone": false
     },
     {
      "generic": "amlodipine",
-     "start": "2023-07-27",
+     "start": "2017-08-15",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "rabeprazole",
-     "start": "2024-04-26",
+     "start": "2019-03-25",
      "stop": null,
      "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
      "generic": "rosuvastatin",
-     "start": "2018-01-12",
-     "stop": "2026-03-11",
-     "true_daily_dose_mg": 10.0,
+     "start": "2024-04-26",
+     "stop": null,
+     "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "oxycodone/naloxone",
-     "start": "2025-08-10",
-     "stop": "2026-08-08",
+     "start": "2018-01-12",
+     "stop": "2026-03-11",
      "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
      "generic": "metformin",
-     "start": "2025-12-03",
+     "start": "2025-08-10",
      "stop": null,
      "true_daily_dose_mg": 1000.0,
      "changed_by_phone": false
     },
     {
-     "generic": "sertraline",
-     "start": "2020-02-16",
+     "generic": "escitalopram",
+     "start": "2025-12-03",
      "stop": null,
-     "true_daily_dose_mg": 200.0,
+     "true_daily_dose_mg": 10.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "temazepam",
+     "start": "2026-05-28",
+     "stop": null,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     }
    ],
-   "planted": [],
+   "planted": [
+    {
+     "id": "F0029-01",
+     "type": "omission",
+     "generic": "rosuvastatin",
+     "sources_involved": [
+      "gp",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "GP-000014",
+      "GP-000184",
+      "GP-000193"
+     ],
+     "detail": {
+      "reason": "not charted at admission"
+     },
+     "high_risk_class": null,
+     "intent": "documented_intentional"
+    },
+    {
+     "id": "F0029-02",
+     "type": "commission",
+     "generic": "oxycodone/naloxone",
+     "sources_involved": [
+      "emr"
+     ],
+     "row_ids": [
+      "EMR-000246"
+     ],
+     "detail": {
+      "ceased_on": "2026-03-11"
+     },
+     "high_risk_class": "Y",
+     "intent": "likely_unintentional"
+    }
+   ],
    "notices": [
     {
      "type": "patient_only_item",
      "generic": "magnesium",
      "row_ids": [
-      "PAT-000239"
+      "PAT-000262"
      ],
      "detail": "OTC or complementary"
     },
     {
      "type": "patient_only_item",
-     "generic": "glucosamine",
+     "generic": "paracetamol",
      "row_ids": [
-      "PAT-000240"
+      "PAT-000263"
      ],
      "detail": "OTC or complementary"
     }
@@ -4266,15 +4512,7 @@
     "private_script_items": [],
     "prior_discharge": false
    },
-   "corruptions": [
-    {
-     "operator": "single_char_typo",
-     "source": "patient",
-     "field": "given",
-     "before": "Lorraine",
-     "after": "Lorrane"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [
     {
      "kind": "overlay",
@@ -4286,92 +4524,73 @@
    ],
    "timeline": [
     {
+     "generic": "aspirin",
+     "start": "2026-07-30",
+     "stop": "2026-07-22",
+     "true_daily_dose_mg": 100.0,
+     "changed_by_phone": false
+    },
+    {
      "generic": "ezetimibe/rosuvastatin",
-     "start": "2022-06-26",
-     "stop": "2026-05-07",
+     "start": "2019-02-03",
+     "stop": "2025-11-24",
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "sitagliptin/metformin",
-     "start": "2026-07-30",
-     "stop": "2026-06-03",
+     "start": "2026-03-26",
+     "stop": "2026-02-21",
      "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
-     "generic": "insulin aspart",
-     "start": "2019-02-03",
-     "stop": null,
-     "true_daily_dose_mg": 300.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "clopidogrel",
-     "start": "2026-03-26",
-     "stop": null,
-     "true_daily_dose_mg": 75.0,
+     "generic": "mirtazapine",
+     "start": "2021-08-16",
+     "stop": "2026-05-08",
+     "true_daily_dose_mg": 30.0,
      "changed_by_phone": false
     },
     {
      "generic": "candesartan",
-     "start": "2021-08-16",
-     "stop": null,
-     "true_daily_dose_mg": 16.0,
+     "start": "2018-06-07",
+     "stop": "2026-09-12",
+     "true_daily_dose_mg": 8.0,
      "changed_by_phone": false
     },
     {
      "generic": "famotidine",
-     "start": "2018-06-07",
+     "start": "2022-03-13",
      "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "paracetamol",
-     "start": "2022-03-13",
-     "stop": null,
+     "start": "2017-09-13",
+     "stop": "2026-05-25",
      "true_daily_dose_mg": 3990.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "candesartan/hydrochlorothiazide",
+     "start": "2023-07-07",
+     "stop": "2026-04-13",
+     "true_daily_dose_mg": 16.0,
      "changed_by_phone": false
     }
    ],
-   "planted": [
+   "planted": [],
+   "notices": [
     {
-     "id": "F0030-01",
-     "type": "omission",
-     "generic": "paracetamol",
-     "sources_involved": [
-      "gp",
-      "pharmacy"
-     ],
+     "type": "patient_only_item",
+     "generic": "fish oil",
      "row_ids": [
-      "GP-000043"
+      "PAT-000271"
      ],
-     "detail": {
-      "reason": "not charted at admission"
-     },
-     "high_risk_class": null,
-     "intent": "documented_intentional"
-    },
-    {
-     "id": "F0030-02",
-     "type": "stale_listing",
-     "generic": "ezetimibe/rosuvastatin",
-     "sources_involved": [
-      "gp",
-      "pharmacy"
-     ],
-     "row_ids": [
-      "GP-000218"
-     ],
-     "detail": {
-      "last_dispensed": "2026-04-06"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
+     "detail": "OTC or complementary"
     }
-   ],
-   "notices": []
+   ]
   },
   {
    "patient_key": "P0031",
@@ -4397,78 +4616,70 @@
     "private_script_items": [],
     "prior_discharge": false
    },
-   "corruptions": [
-    {
-     "operator": "single_char_typo",
-     "source": "patient",
-     "field": "given",
-     "before": "Dorothy",
-     "after": "Dorohy"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [],
    "timeline": [
     {
      "generic": "telmisartan/amlodipine",
-     "start": "2022-11-02",
+     "start": "2021-07-11",
      "stop": null,
      "true_daily_dose_mg": 80.0,
      "changed_by_phone": false
     },
     {
      "generic": "pantoprazole",
-     "start": "2024-04-16",
-     "stop": null,
+     "start": "2020-06-29",
+     "stop": "2025-10-31",
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "paracetamol",
-     "start": "2024-09-17",
+     "start": "2021-12-09",
      "stop": null,
      "true_daily_dose_mg": 3990.0,
      "changed_by_phone": false
     },
     {
-     "generic": "duloxetine",
-     "start": "2022-08-19",
-     "stop": null,
-     "true_daily_dose_mg": 30.0,
+     "generic": "desvenlafaxine",
+     "start": "2020-03-26",
+     "stop": "2026-05-29",
+     "true_daily_dose_mg": 50.0,
      "changed_by_phone": false
     },
     {
      "generic": "clopidogrel",
-     "start": "2023-12-13",
+     "start": "2024-03-18",
      "stop": null,
      "true_daily_dose_mg": 75.0,
      "changed_by_phone": false
     },
     {
-     "generic": "levodopa/benserazide",
-     "start": "2025-10-24",
+     "generic": "levothyroxine",
+     "start": "2022-09-15",
+     "stop": null,
+     "true_daily_dose_mg": 0.15,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "allopurinol",
+     "start": "2021-01-12",
      "stop": null,
      "true_daily_dose_mg": 300.0,
      "changed_by_phone": false
     },
     {
-     "generic": "amlodipine/atorvastatin",
+     "generic": "rosuvastatin",
      "start": "2017-04-11",
-     "stop": "2025-11-22",
-     "true_daily_dose_mg": 10.0,
+     "stop": null,
+     "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
-     "generic": "metformin",
+     "generic": "ezetimibe",
      "start": "2021-05-07",
      "stop": null,
-     "true_daily_dose_mg": 1000.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "gliclazide",
-     "start": "2024-02-23",
-     "stop": null,
-     "true_daily_dose_mg": 60.0,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     }
    ],
@@ -4476,43 +4687,38 @@
     {
      "id": "F0031-01",
      "type": "omission",
-     "generic": "metformin",
+     "generic": "rosuvastatin",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000195"
+      "GP-000014",
+      "GP-000184",
+      "GP-000193",
+      "GP-000214"
      ],
      "detail": {
       "reason": "not charted at admission"
      },
      "high_risk_class": null,
      "intent": "documented_intentional"
-    },
-    {
-     "id": "F0031-02",
-     "type": "commission",
-     "generic": "amlodipine/atorvastatin",
-     "sources_involved": [
-      "emr"
-     ],
-     "row_ids": [
-      "EMR-000245"
-     ],
-     "detail": {
-      "ceased_on": "2025-11-22"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
     }
    ],
    "notices": [
     {
      "type": "patient_only_item",
+     "generic": "fish oil",
+     "row_ids": [
+      "PAT-000281"
+     ],
+     "detail": "OTC or complementary"
+    },
+    {
+     "type": "patient_only_item",
      "generic": "paracetamol",
      "row_ids": [
-      "PAT-000256"
+      "PAT-000282"
      ],
      "detail": "OTC or complementary"
     }
@@ -4537,7 +4743,7 @@
     "patient_present": true,
     "second_pharmacy_hidden": false,
     "private_script_items": [
-     "irbesartan/hydrochlorothiazide"
+     "insulin aspart"
     ],
     "prior_discharge": true
    },
@@ -4546,8 +4752,8 @@
      "operator": "nickname",
      "source": "patient",
      "field": "given",
-     "before": "Joan",
-     "after": "Joanie"
+     "before": "Kathleen",
+     "after": "Kathy"
     }
    ],
    "identity_traps": [
@@ -4561,51 +4767,44 @@
    "timeline": [
     {
      "generic": "insulin aspart",
-     "start": "2017-01-11",
-     "stop": null,
+     "start": "2025-01-16",
+     "stop": "2025-10-24",
      "true_daily_dose_mg": 300.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "apixaban",
+     "start": "2024-10-19",
+     "stop": null,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "irbesartan/hydrochlorothiazide",
-     "start": "2025-01-16",
+     "start": "2026-01-06",
      "stop": null,
-     "true_daily_dose_mg": 300.0,
+     "true_daily_dose_mg": 150.0,
      "changed_by_phone": false
     },
     {
      "generic": "amlodipine",
-     "start": "2024-10-19",
+     "start": "2025-12-05",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "amlodipine/atorvastatin",
-     "start": "2026-01-06",
-     "stop": null,
-     "true_daily_dose_mg": 5.0,
+     "start": "2026-02-04",
+     "stop": "2026-09-07",
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "metformin",
-     "start": "2025-12-05",
-     "stop": "2026-09-23",
-     "true_daily_dose_mg": 2000.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "escitalopram",
-     "start": "2026-02-04",
-     "stop": "2026-03-22",
-     "true_daily_dose_mg": 20.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "empagliflozin/metformin",
-     "start": "2024-07-12",
+     "start": "2020-10-19",
      "stop": null,
-     "true_daily_dose_mg": 25.0,
+     "true_daily_dose_mg": 1000.0,
      "changed_by_phone": false
     }
    ],
@@ -4618,9 +4817,9 @@
     },
     {
      "type": "patient_only_item",
-     "generic": "glucosamine",
+     "generic": "turmeric",
      "row_ids": [
-      "PAT-000264"
+      "PAT-000289"
      ],
      "detail": "OTC or complementary"
     }
@@ -4644,20 +4843,10 @@
     "pharmacy_present": true,
     "patient_present": false,
     "second_pharmacy_hidden": false,
-    "private_script_items": [
-     "aspirin"
-    ],
+    "private_script_items": [],
     "prior_discharge": true
    },
-   "corruptions": [
-    {
-     "operator": "nickname",
-     "source": "gp",
-     "field": "given",
-     "before": "Gordon",
-     "after": "Gordy"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [
     {
      "kind": "overlay",
@@ -4670,92 +4859,92 @@
    "timeline": [
     {
      "generic": "aspirin",
-     "start": "2020-09-11",
+     "start": "2017-08-07",
      "stop": null,
      "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
-     "generic": "rivaroxaban",
-     "start": "2017-08-07",
-     "stop": "2026-01-27",
-     "true_daily_dose_mg": 20.0,
+     "generic": "apixaban",
+     "start": "2023-08-26",
+     "stop": null,
+     "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "perindopril",
-     "start": "2023-08-26",
-     "stop": null,
-     "true_daily_dose_mg": 10.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "rosuvastatin",
      "start": "2023-06-15",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "paracetamol",
+     "generic": "rosuvastatin",
      "start": "2025-05-31",
+     "stop": null,
+     "true_daily_dose_mg": 5.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "paracetamol",
+     "start": "2017-07-31",
      "stop": null,
      "true_daily_dose_mg": 3990.0,
      "changed_by_phone": false
     },
     {
      "generic": "levodopa/carbidopa",
-     "start": "2017-07-31",
+     "start": "2021-12-12",
      "stop": null,
      "true_daily_dose_mg": 300.0,
      "changed_by_phone": false
     },
     {
      "generic": "pantoprazole",
-     "start": "2021-12-12",
+     "start": "2021-02-11",
      "stop": null,
-     "true_daily_dose_mg": 20.0,
+     "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "dapagliflozin",
-     "start": "2021-02-11",
+     "start": "2018-05-02",
      "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "gliclazide",
-     "start": "2018-05-02",
+     "start": "2024-06-29",
      "stop": null,
      "true_daily_dose_mg": 60.0,
      "changed_by_phone": false
     },
     {
      "generic": "sertraline",
-     "start": "2024-06-29",
+     "start": "2026-07-23",
      "stop": null,
      "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
-     "generic": "glyceryl trinitrate",
-     "start": "2026-07-23",
+     "generic": "metoprolol",
+     "start": "2024-08-28",
      "stop": null,
-     "true_daily_dose_mg": 0.4,
+     "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
      "generic": "tamsulosin",
-     "start": "2024-08-28",
+     "start": "2022-11-08",
      "stop": null,
      "true_daily_dose_mg": 0.4,
      "changed_by_phone": false
     },
     {
      "generic": "ezetimibe/rosuvastatin",
-     "start": "2026-04-11",
-     "stop": "2025-11-14",
+     "start": "2023-06-29",
+     "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     }
@@ -4763,57 +4952,39 @@
    "planted": [
     {
      "id": "F0033-01",
-     "type": "frequency",
+     "type": "omission",
      "generic": "perindopril",
      "sources_involved": [
-      "emr",
-      "gp"
+      "gp",
+      "pharmacy"
      ],
      "row_ids": [
-      "EMR-000256",
-      "GP-000236"
+      "GP-000012",
+      "GP-000174",
+      "GP-000194",
+      "GP-000211"
      ],
      "detail": {
-      "charted": "1 bd",
-      "truth": "1 mane"
+      "reason": "not charted at admission"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
     },
     {
      "id": "F0033-02",
-     "type": "dose",
-     "generic": "rosuvastatin",
+     "type": "duplication",
+     "generic": "ezetimibe/rosuvastatin",
      "sources_involved": [
-      "emr",
       "gp"
      ],
      "row_ids": [
-      "EMR-000257",
-      "GP-000237"
+      "GP-000248"
      ],
      "detail": {
-      "charted": "2.5 mg",
-      "truth": "5 mg"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0033-03",
-     "type": "dose",
-     "generic": "pantoprazole",
-     "sources_involved": [
-      "emr",
-      "gp"
-     ],
-     "row_ids": [
-      "EMR-000260",
-      "GP-000240"
-     ],
-     "detail": {
-      "charted": "10 mg",
-      "truth": "20 mg"
+      "overlaps_with": "rosuvastatin",
+      "shared": [
+       "rosuvastatin"
+      ]
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
@@ -4914,8 +5085,8 @@
       "gp"
      ],
      "row_ids": [
-      "EMR-000270",
-      "GP-000249"
+      "EMR-000282",
+      "GP-000251"
      ],
      "detail": {
       "charted": "1 bd",
@@ -4933,9 +5104,9 @@
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000045",
-      "GP-000088",
-      "GP-000193"
+      "GP-000061",
+      "GP-000151",
+      "GP-000168"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -4951,7 +5122,7 @@
       "emr"
      ],
      "row_ids": [
-      "EMR-000272"
+      "EMR-000284"
      ],
      "detail": {
       "ceased_on": "2026-07-16"
@@ -4965,7 +5136,7 @@
      "type": "patient_only_item",
      "generic": "colecalciferol",
      "row_ids": [
-      "PAT-000270"
+      "PAT-000295"
      ],
      "detail": "OTC or complementary"
     }
@@ -5002,6 +5173,13 @@
      "field": "given",
      "before": "Catherine",
      "after": "Cathy"
+    },
+    {
+     "operator": "nickname",
+     "source": "patient",
+     "field": "given",
+     "before": "Catherine",
+     "after": "Cathy"
     }
    ],
    "identity_traps": [
@@ -5015,37 +5193,37 @@
    "timeline": [
     {
      "generic": "rosuvastatin",
-     "start": "2026-03-03",
+     "start": "2017-10-06",
      "stop": "2025-12-15",
-     "true_daily_dose_mg": 5.0,
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
      "generic": "aspirin",
-     "start": "2021-12-11",
+     "start": "2022-01-11",
      "stop": null,
      "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
-     "generic": "levothyroxine",
-     "start": "2025-03-03",
+     "generic": "fluticasone furoate/umeclidinium/vilanterol",
+     "start": "2019-12-30",
      "stop": null,
-     "true_daily_dose_mg": 0.15,
+     "true_daily_dose_mg": 0.1,
      "changed_by_phone": false
     },
     {
-     "generic": "carvedilol",
-     "start": "2023-02-17",
+     "generic": "salbutamol",
+     "start": "2018-06-08",
      "stop": null,
-     "true_daily_dose_mg": 50.0,
+     "true_daily_dose_mg": 0.2,
      "changed_by_phone": false
     },
     {
-     "generic": "dapagliflozin",
-     "start": "2023-05-16",
+     "generic": "irbesartan/hydrochlorothiazide",
+     "start": "2025-09-26",
      "stop": null,
-     "true_daily_dose_mg": 10.0,
+     "true_daily_dose_mg": 150.0,
      "changed_by_phone": false
     },
     {
@@ -5056,14 +5234,31 @@
      "changed_by_phone": false
     },
     {
-     "generic": "famotidine",
+     "generic": "pantoprazole",
      "start": "2018-08-09",
      "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     }
    ],
-   "planted": [],
+   "planted": [
+    {
+     "id": "F0035-01",
+     "type": "commission",
+     "generic": "rosuvastatin",
+     "sources_involved": [
+      "emr"
+     ],
+     "row_ids": [
+      "EMR-000291"
+     ],
+     "detail": {
+      "ceased_on": "2025-12-15"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    }
+   ],
    "notices": []
   },
   {
@@ -5088,155 +5283,128 @@
     "patient_present": true,
     "second_pharmacy_hidden": false,
     "private_script_items": [
-     "metformin",
-     "tiotropium"
+     "alendronate"
     ],
     "prior_discharge": true
    },
    "corruptions": [
     {
      "operator": "nickname",
-     "source": "gp",
-     "field": "given",
-     "before": "Benjamin",
-     "after": "Ben"
-    },
-    {
-     "operator": "single_char_typo",
      "source": "patient",
      "field": "given",
-     "before": "Benjamin",
-     "after": "Bnjamin"
+     "before": "Caroline",
+     "after": "Carrie"
     }
    ],
    "identity_traps": [],
    "timeline": [
     {
-     "generic": "apixaban",
-     "start": "2017-08-18",
-     "stop": null,
-     "true_daily_dose_mg": 5.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "clopidogrel",
-     "start": "2019-05-31",
-     "stop": null,
-     "true_daily_dose_mg": 75.0,
-     "changed_by_phone": false
-    },
-    {
      "generic": "atorvastatin",
-     "start": "2016-11-16",
+     "start": "2019-01-13",
      "stop": null,
-     "true_daily_dose_mg": 80.0,
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
      "generic": "esomeprazole",
-     "start": "2026-04-19",
+     "start": "2019-11-29",
      "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "metformin",
-     "start": "2019-07-16",
+     "start": "2017-08-18",
      "stop": null,
      "true_daily_dose_mg": 1500.0,
      "changed_by_phone": false
     },
     {
-     "generic": "mirtazapine",
-     "start": "2022-06-23",
+     "generic": "insulin aspart",
+     "start": "2019-05-31",
      "stop": null,
-     "true_daily_dose_mg": 45.0,
+     "true_daily_dose_mg": 300.0,
      "changed_by_phone": false
     },
     {
-     "generic": "temazepam",
-     "start": "2022-09-13",
+     "generic": "ticagrelor",
+     "start": "2016-11-16",
+     "stop": null,
+     "true_daily_dose_mg": 180.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "metoprolol",
+     "start": "2026-04-19",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "alendronate",
+     "start": "2019-07-16",
      "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
-     "generic": "amlodipine",
-     "start": "2025-06-10",
-     "stop": "2025-11-19",
+     "generic": "colecalciferol",
+     "start": "2017-12-24",
+     "stop": "2026-04-01",
+     "true_daily_dose_mg": 1000.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "perindopril/indapamide",
+     "start": "2022-09-13",
+     "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "paracetamol",
+     "generic": "amlodipine",
+     "start": "2025-06-10",
+     "stop": "2026-08-12",
+     "true_daily_dose_mg": 5.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "celecoxib",
      "start": "2023-03-16",
      "stop": null,
-     "true_daily_dose_mg": 3990.0,
+     "true_daily_dose_mg": 200.0,
      "changed_by_phone": false
     },
     {
-     "generic": "alendronate/colecalciferol",
-     "start": "2017-01-31",
+     "generic": "telmisartan/amlodipine",
+     "start": "2026-05-30",
      "stop": null,
-     "true_daily_dose_mg": 0.01,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "tiotropium",
-     "start": "2024-10-26",
-     "stop": null,
-     "true_daily_dose_mg": 0.018,
+     "true_daily_dose_mg": 80.0,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0036-01",
-     "type": "omission",
-     "generic": "esomeprazole",
+     "type": "frequency",
+     "generic": "perindopril/indapamide",
      "sources_involved": [
-      "gp",
-      "pharmacy"
+      "emr",
+      "gp"
      ],
      "row_ids": [
-      "GP-000116",
-      "GP-000163",
-      "GP-000198"
+      "EMR-000302",
+      "GP-000270"
      ],
      "detail": {
-      "reason": "not charted at admission"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0036-02",
-     "type": "omission",
-     "generic": "mirtazapine",
-     "sources_involved": [
-      "gp",
-      "pharmacy"
-     ],
-     "row_ids": [
-      "GP-000112"
-     ],
-     "detail": {
-      "reason": "not charted at admission"
+      "charted": "1 bd",
+      "truth": "1 mane"
      },
      "high_risk_class": null,
      "intent": "likely_unintentional"
     }
    ],
-   "notices": [
-    {
-     "type": "patient_only_item",
-     "generic": "magnesium",
-     "row_ids": [
-      "PAT-000287"
-     ],
-     "detail": "OTC or complementary"
-    }
-   ]
+   "notices": []
   },
   {
    "patient_key": "P0037",
@@ -5267,15 +5435,15 @@
      "operator": "nickname",
      "source": "patient",
      "field": "given",
-     "before": "Lorraine",
-     "after": "Lorrie"
+     "before": "Mavis",
+     "after": "Mave"
     }
    ],
    "identity_traps": [],
    "timeline": [
     {
      "generic": "rosuvastatin",
-     "start": "2024-11-18",
+     "start": "2024-12-25",
      "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
@@ -5340,7 +5508,7 @@
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000071"
+      "GP-000049"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -5375,31 +5543,9 @@
     "private_script_items": [],
     "prior_discharge": false
    },
-   "corruptions": [
-    {
-     "operator": "nickname",
-     "source": "gp",
-     "field": "given",
-     "before": "Isabel",
-     "after": "Belle"
-    }
-   ],
+   "corruptions": [],
    "identity_traps": [],
    "timeline": [
-    {
-     "generic": "insulin aspart",
-     "start": "2024-06-22",
-     "stop": null,
-     "true_daily_dose_mg": 300.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "aspirin",
-     "start": "2019-06-23",
-     "stop": null,
-     "true_daily_dose_mg": 100.0,
-     "changed_by_phone": false
-    },
     {
      "generic": "telmisartan",
      "start": "2025-05-23",
@@ -5443,66 +5589,60 @@
      "changed_by_phone": false
     },
     {
-     "generic": "escitalopram",
+     "generic": "insulin aspart",
      "start": "2018-09-16",
-     "stop": "2025-11-19",
-     "true_daily_dose_mg": 10.0,
+     "stop": "2026-06-08",
+     "true_daily_dose_mg": 300.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "mirtazapine",
+     "start": "2020-01-01",
+     "stop": null,
+     "true_daily_dose_mg": 45.0,
+     "changed_by_phone": false
+    },
+    {
+     "generic": "aspirin",
+     "start": "2025-05-23",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
      "generic": "glyceryl trinitrate",
-     "start": "2019-04-20",
-     "stop": null,
+     "start": "2017-07-07",
+     "stop": "2026-05-23",
      "true_daily_dose_mg": 0.4,
      "changed_by_phone": false
     },
     {
-     "generic": "metoprolol",
-     "start": "2025-05-23",
+     "generic": "risedronate",
+     "start": "2022-06-21",
      "stop": null,
-     "true_daily_dose_mg": 50.0,
+     "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "alendronate/colecalciferol",
-     "start": "2017-07-07",
+     "generic": "apixaban",
+     "start": "2021-09-15",
      "stop": null,
-     "true_daily_dose_mg": 0.01,
+     "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0038-01",
-     "type": "dose",
-     "generic": "amlodipine",
-     "sources_involved": [
-      "emr",
-      "gp"
-     ],
-     "row_ids": [
-      "EMR-000306",
-      "GP-000282"
-     ],
-     "detail": {
-      "charted": "2.5 mg",
-      "truth": "5 mg"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0038-02",
      "type": "omission",
-     "generic": "metformin",
+     "generic": "risedronate",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000058",
-      "GP-000096",
-      "GP-000110"
+      "GP-000292",
+      "PHM-003745"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -5511,29 +5651,37 @@
      "intent": "likely_unintentional"
     },
     {
-     "id": "F0038-03",
+     "id": "F0038-02",
      "type": "stale_listing",
-     "generic": "escitalopram",
+     "generic": "insulin aspart",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000287"
+      "GP-000288"
      ],
      "detail": {
-      "last_dispensed": "2025-10-24"
+      "last_dispensed": "2026-06-05"
      },
-     "high_risk_class": null,
+     "high_risk_class": "Y",
      "intent": "likely_unintentional"
     }
    ],
    "notices": [
     {
      "type": "patient_only_item",
-     "generic": "turmeric",
+     "generic": "magnesium",
      "row_ids": [
-      "PAT-000307"
+      "PAT-000330"
+     ],
+     "detail": "OTC or complementary"
+    },
+    {
+     "type": "patient_only_item",
+     "generic": "paracetamol",
+     "row_ids": [
+      "PAT-000331"
      ],
      "detail": "OTC or complementary"
     }
@@ -5560,7 +5708,9 @@
     "pharmacy_present": true,
     "patient_present": true,
     "second_pharmacy_hidden": false,
-    "private_script_items": [],
+    "private_script_items": [
+     "allopurinol"
+    ],
     "prior_discharge": false
    },
    "corruptions": [],
@@ -5574,163 +5724,93 @@
    ],
    "timeline": [
     {
+     "generic": "insulin glargine",
+     "start": "2020-03-12",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
+     "changed_by_phone": true
+    },
+    {
+     "generic": "aspirin",
+     "start": "2023-04-21",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
+     "changed_by_phone": false
+    },
+    {
      "generic": "rosuvastatin",
-     "start": "2023-07-11",
+     "start": "2026-03-13",
      "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "pantoprazole",
-     "start": "2022-12-25",
+     "start": "2017-11-13",
      "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
      "generic": "sacubitril/valsartan",
-     "start": "2020-03-12",
+     "start": "2022-08-20",
      "stop": null,
-     "true_daily_dose_mg": 48.0,
+     "true_daily_dose_mg": 194.0,
      "changed_by_phone": false
     },
     {
      "generic": "spironolactone",
-     "start": "2023-04-21",
+     "start": "2020-05-06",
      "stop": null,
      "true_daily_dose_mg": 25.0,
      "changed_by_phone": false
     },
     {
      "generic": "dapagliflozin",
-     "start": "2026-03-13",
+     "start": "2023-07-13",
      "stop": null,
      "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
      "generic": "allopurinol",
-     "start": "2017-11-13",
+     "start": "2021-06-16",
      "stop": null,
-     "true_daily_dose_mg": 300.0,
+     "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     },
     {
      "generic": "amlodipine",
-     "start": "2023-08-30",
+     "start": "2023-10-06",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
      "generic": "oxycodone",
-     "start": "2020-05-06",
+     "start": "2020-06-02",
      "stop": null,
      "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
-     "generic": "insulin glargine",
-     "start": "2023-07-13",
+     "generic": "escitalopram",
+     "start": "2017-12-10",
      "stop": null,
-     "true_daily_dose_mg": 300.0,
-     "changed_by_phone": true
-    },
-    {
-     "generic": "sertraline",
-     "start": "2024-08-29",
-     "stop": null,
-     "true_daily_dose_mg": 200.0,
+     "true_daily_dose_mg": 20.0,
      "changed_by_phone": false
     },
     {
-     "generic": "temazepam",
-     "start": "2023-10-06",
-     "stop": "2026-06-16",
-     "true_daily_dose_mg": 10.0,
-     "changed_by_phone": false
-    },
-    {
-     "generic": "oxycodone/naloxone",
-     "start": "2021-10-20",
-     "stop": "2026-04-02",
-     "true_daily_dose_mg": 40.0,
+     "generic": "aspirin/clopidogrel",
+     "start": "2019-01-05",
+     "stop": null,
+     "true_daily_dose_mg": 100.0,
      "changed_by_phone": false
     }
    ],
    "planted": [
     {
      "id": "F0039-01",
-     "type": "dose",
-     "generic": "rosuvastatin",
-     "sources_involved": [
-      "emr",
-      "gp"
-     ],
-     "row_ids": [
-      "EMR-000313",
-      "GP-000291"
-     ],
-     "detail": {
-      "charted": "20 mg",
-      "truth": "40 mg"
-     },
-     "high_risk_class": null,
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0039-02",
-     "type": "omission",
-     "generic": "sertraline",
-     "sources_involved": [
-      "gp",
-      "pharmacy"
-     ],
-     "row_ids": [
-      "GP-000071",
-      "GP-000273"
-     ],
-     "detail": {
-      "reason": "not charted at admission"
-     },
-     "high_risk_class": null,
-     "intent": "documented_intentional"
-    },
-    {
-     "id": "F0039-03",
-     "type": "commission",
-     "generic": "temazepam",
-     "sources_involved": [
-      "emr"
-     ],
-     "row_ids": [
-      "EMR-000322"
-     ],
-     "detail": {
-      "ceased_on": "2026-06-16"
-     },
-     "high_risk_class": "Y",
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0039-04",
-     "type": "stale_listing",
-     "generic": "oxycodone/naloxone",
-     "sources_involved": [
-      "gp",
-      "pharmacy"
-     ],
-     "row_ids": [
-      "GP-000302"
-     ],
-     "detail": {
-      "last_dispensed": "2026-03-09"
-     },
-     "high_risk_class": "Y",
-     "intent": "likely_unintentional"
-    },
-    {
-     "id": "F0039-05",
      "type": "dose_unconfirmable",
      "generic": "insulin glargine",
      "sources_involved": [
@@ -5739,18 +5819,45 @@
       "patient"
      ],
      "row_ids": [
-      "GP-000299",
-      "PHM-003756",
-      "PAT-000316"
+      "GP-000294",
+      "PHM-003754"
      ],
      "detail": {
       "mechanism": "dose changed without a new script"
      },
      "high_risk_class": "Y",
      "intent": "possibly_intentional"
+    },
+    {
+     "id": "F0039-02",
+     "type": "duplication",
+     "generic": "aspirin/clopidogrel",
+     "sources_involved": [
+      "gp"
+     ],
+     "row_ids": [
+      "GP-000305"
+     ],
+     "detail": {
+      "overlaps_with": "aspirin",
+      "shared": [
+       "aspirin"
+      ]
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
     }
    ],
-   "notices": []
+   "notices": [
+    {
+     "type": "patient_only_item",
+     "generic": "colecalciferol",
+     "row_ids": [
+      "PAT-000343"
+     ],
+     "detail": "OTC or complementary"
+    }
+   ]
   },
   {
    "patient_key": "P0040",
@@ -5773,9 +5880,7 @@
     "pharmacy_present": true,
     "patient_present": true,
     "second_pharmacy_hidden": false,
-    "private_script_items": [
-     "clopidogrel"
-    ],
+    "private_script_items": [],
     "prior_discharge": false
    },
    "corruptions": [
@@ -5783,45 +5888,45 @@
      "operator": "nickname",
      "source": "gp",
      "field": "given",
-     "before": "Angela",
-     "after": "Angie"
+     "before": "Ann",
+     "after": "Annie"
     }
    ],
    "identity_traps": [],
    "timeline": [
     {
      "generic": "clopidogrel",
-     "start": "2024-03-15",
+     "start": "2023-01-22",
      "stop": null,
      "true_daily_dose_mg": 75.0,
      "changed_by_phone": false
     },
     {
-     "generic": "levothyroxine",
-     "start": "2021-02-23",
+     "generic": "amlodipine",
+     "start": "2025-05-07",
      "stop": "2026-07-23",
-     "true_daily_dose_mg": 0.1,
+     "true_daily_dose_mg": 10.0,
      "changed_by_phone": false
     },
     {
-     "generic": "amlodipine",
+     "generic": "rosuvastatin",
      "start": "2025-12-05",
      "stop": null,
      "true_daily_dose_mg": 5.0,
      "changed_by_phone": false
     },
     {
-     "generic": "rosuvastatin",
+     "generic": "pantoprazole",
      "start": "2020-11-25",
      "stop": null,
-     "true_daily_dose_mg": 20.0,
+     "true_daily_dose_mg": 40.0,
      "changed_by_phone": false
     },
     {
-     "generic": "pantoprazole",
+     "generic": "metoprolol",
      "start": "2021-04-15",
      "stop": null,
-     "true_daily_dose_mg": 20.0,
+     "true_daily_dose_mg": 50.0,
      "changed_by_phone": false
     }
    ],
@@ -5829,14 +5934,14 @@
     {
      "id": "F0040-01",
      "type": "frequency",
-     "generic": "amlodipine",
+     "generic": "rosuvastatin",
      "sources_involved": [
       "emr",
       "gp"
      ],
      "row_ids": [
-      "EMR-000324",
-      "GP-000305"
+      "EMR-000339",
+      "GP-000308"
      ],
      "detail": {
       "charted": "1 bd",
@@ -5848,17 +5953,15 @@
     {
      "id": "F0040-02",
      "type": "omission",
-     "generic": "rosuvastatin",
+     "generic": "pantoprazole",
      "sources_involved": [
       "gp",
       "pharmacy"
      ],
      "row_ids": [
-      "GP-000054",
-      "GP-000086",
-      "GP-000092",
-      "GP-000107",
-      "GP-000214"
+      "GP-000061",
+      "GP-000151",
+      "GP-000168"
      ],
      "detail": {
       "reason": "not charted at admission"
@@ -5872,7 +5975,7 @@
      "type": "patient_only_item",
      "generic": "magnesium",
      "row_ids": [
-      "PAT-000324"
+      "PAT-000349"
      ],
      "detail": "OTC or complementary"
     }

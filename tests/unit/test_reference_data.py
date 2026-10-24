@@ -25,13 +25,14 @@ SRC = pathlib.Path("data/reference_src")
 SPEC_BUNDLES = set(range(1, 17))
 UNSAMPLED_BUNDLES = {17, 18}
 
-#: DATA_SPEC 4.2 bundle 6's anchor shares sum to 0.95, not 1.00
-#: (0.30 + 0.28 + 0.18 + 0.12 + 0.07). Transcribed faithfully rather than
-#: silently "corrected": it is the spec's arithmetic, and Arpon should decide
-#: whether a share is missing or one is wrong. The generator normalises anchor
-#: shares before sampling, so a bundle summing to 0.95 still behaves correctly.
-#: If the spec is fixed, this test fails and tells us to update it.
-KNOWN_SPEC_SHARE_GAPS = {6: 0.95}
+#: Every bundle's anchor shares now sum to 1.00. Bundle 6 used to sum to 0.95
+#: (0.30 + 0.28 + 0.18 + 0.12 + 0.07); the gap was **a missing agent, not a
+#: typo**. Desvenlafaxine had 2,457,365 PBS scripts in 2023-24, out-ranking
+#: duloxetine's 2,261,367, so omitting it while keeping duloxetine contradicted
+#: the volume ordering the spec says it used. Added, and all six reweighted to
+#: the real split. Left empty rather than deleted: a future bundle that does not
+#: sum to 1.00 should have to be declared here deliberately.
+KNOWN_SPEC_SHARE_GAPS: dict[int, float] = {}
 
 
 def read(name: str) -> list[dict[str, str]]:
@@ -154,28 +155,46 @@ def test_release_and_form_agree(medicines: list[dict[str, str]]) -> None:
             assert row["release"] == "MR", row["generic"]
 
 
-def test_both_forms_exist_for_every_formulation_trap_drug() -> None:
-    """DATA_SPEC 5.2 plants `formulation` on metformin, metoprolol, gliclazide,
-    oxycodone, paracetamol, venlafaxine and tamsulosin -- but an IR/MR
-    discrepancy needs **both** forms in the lexicon.
+#: Drugs that must have BOTH an IR and an MR form, so a `formulation`
+#: discrepancy can be planted. Every one was verified against the October 2026
+#: PBS schedule, not assumed.
+FORMULATION_PAIRS = {"metformin", "oxycodone", "paracetamol",
+                     "metoprolol", "gliclazide", "diltiazem"}
 
-    The spec supplies both only for metformin, oxycodone and paracetamol. The
-    other four appear once each, so no IR/MR pair can be planted for them
-    without a brand and strength the spec does not give. This test records that
-    gap rather than papering over it: it is in the handoff for Arpon to fill,
-    and inventing the missing products is exactly what we agreed not to do.
+#: Named by DATA_SPEC 5.2 as formulation-eligible, but **only one form is
+#: marketed in Australia**, so no IR/MR pair can be planted for them and they
+#: are excluded from 5.2's eligible list:
+#:   venlafaxine -- PBS lists modified-release capsules only; no IR tablet found
+#:                  on the PBS or the ARTG.
+#:   tamsulosin  -- only the 400 microgram MR tablet, and it is RPBS-only
+#:                  (Authority Required), which is an odd fit for a general
+#:                  60-90 population anyway.
+#: Recorded here rather than silently dropped, so re-adding one is a deliberate
+#: act that has to come with a brand and a strength.
+NO_AUSTRALIAN_PAIR = {"venlafaxine", "tamsulosin"}
+
+
+def test_both_forms_exist_for_every_formulation_trap_drug() -> None:
+    """An IR/MR discrepancy needs **both** forms present, or it cannot be planted.
+
+    Metoprolol, gliclazide and diltiazem were added after their Australian
+    products were confirmed against the PBS schedule -- metoprolol succinate
+    controlled-release at 47.5/95/190 mg (note: **not** 100 mg; Australian MR
+    strengths are labelled by succinate weight), gliclazide 80 mg immediate
+    release, and diltiazem 60 mg tablets alongside the CD capsules we already
+    had. Venlafaxine and tamsulosin stay out because only one form is marketed
+    here.
     """
-    rows = read("medicines.csv")
     forms: dict[str, set[str]] = {}
-    for row in rows:
+    for row in read("medicines.csv"):
         forms.setdefault(row["generic"], set()).add(row["release"])
     have_both = {g for g, f in forms.items() if f == {"IR", "MR"}}
-    assert {"metformin", "oxycodone", "paracetamol"} <= have_both
-    missing = {g for g in ("metoprolol", "gliclazide", "venlafaxine", "tamsulosin")
-               if g not in have_both}
-    assert missing == {"metoprolol", "gliclazide", "venlafaxine", "tamsulosin"}, (
-        f"a formulation pair was added for {missing ^ {'metoprolol', 'gliclazide', 'venlafaxine', 'tamsulosin'}}; "
-        "update docs/DATA_SPEC.md 4.2 and this test together"
+    assert FORMULATION_PAIRS <= have_both, FORMULATION_PAIRS - have_both
+    still_single = NO_AUSTRALIAN_PAIR & have_both
+    assert not still_single, (
+        f"a formulation pair appeared for {still_single}, which was not found on the "
+        "Australian market. Confirm the brand and strength, then move it from "
+        "NO_AUSTRALIAN_PAIR to FORMULATION_PAIRS and update docs/DATA_SPEC.md 5.2."
     )
 
 

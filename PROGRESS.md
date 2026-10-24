@@ -3,7 +3,7 @@
 One file, current state only. Overwrite it as things change — the history lives in
 `docs/HANDOFF.md` and in git. Read this first at session start.
 
-**Last updated:** 2026-10-24 20:05 AEDT by Arpon
+**Last updated:** 2026-10-24 20:55 AEDT by Arpon
 
 ## Status
 
@@ -19,12 +19,13 @@ frozen; nothing downstream of it is built yet.
 | Preflight (`make preflight`) | — | working — **22 pass / 0 fail on Arpon's machine, 23 Oct** (his services only; re-run it on yours) |
 | Config layer (`app/config.py`) | — | working — validated, secrets as `SecretStr`, `ZETARIS_TIMEOUT_S` 180 |
 | Secret scan + pre-commit hook | — | working, verified to block a commit |
-| Tests | — | **249 green** on any machine — no services, isolated from any local `.env` |
+| Tests | — | **342 green** on any machine — no services, isolated from any local `.env` |
 | Team workflow, CI, onboarding | — | working |
 | **MedTrace contract** (`app/domain/packs/medtrace/types.py`) | Arpon | **frozen, on `main`.** Shared file — changes need sign-off, a HANDOFF entry and a PR line |
 | **SQL templates** (`queries.py`) | Arpon | **written and run live** — the real Q1 executed verbatim against a union view on 24 Oct. Q4 (TGA) deliberately unwritten |
 | `identity.decide()`, `SOURCE_TRUST_PRIORS` | Arpon | **real and usable today** |
-| Clinical logic (identity, normalise, coverage, supply, fuse, detect, safety, triage) | Arpon | **skeleton on `main`** (#4) — exact signatures, every body raises `NotImplementedError("Arpon: <file>")`. PLAN step 7 fills them |
+| Clinical logic — `parse`, `safety` | Arpon | **implemented** (PLAN step 7). `parse` is tested against fixtures proven byte-identical to the live views |
+| Clinical logic — `coverage`, `identity`, `normalise`, `supply`, `fuse`, `detect`, `triage` | Arpon | **skeleton** — exact signatures, every body raises `NotImplementedError("Arpon: <file>")` |
 | Reference data (PBS lexicon, APINCHS, nicknames) | Arpon | **done** — 207 lexicon rows, **188 with a real PBS code** (schedule 4751). Hand-built clinical content, real codes joined in |
 | `docs/DATA_SPEC.md` | Arpon | **on `main`** (#5), names aligned to the plan and the frozen types |
 | Synthetic generator, ground truth, fixtures | Arpon | **done** — 40 patients, 73 planted findings, identity traps, **30 Zetaris envelopes** for `SAMPLE_MODE` |

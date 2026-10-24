@@ -332,7 +332,7 @@ def q_reference(name: str) -> str:
             "dos_weight",
         ),
         "apinchs": ("atc_prefix", "apinchs_class", "label"),
-        "nicknames": ("canonical", "variant"),
+        "nicknames": ("canonical", "variant", "sex"),
     }
     if name not in REFERENCE_VIEWS:
         raise QueryBuildError(f"unknown reference view {name!r}; expected one of {sorted(REFERENCE_VIEWS)}")

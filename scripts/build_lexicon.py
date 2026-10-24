@@ -58,7 +58,7 @@ LEXICON_COLUMNS = (
     "ingredients", "dos_weight",
 )
 APINCHS_COLUMNS = ("atc_prefix", "apinchs_class", "label")
-NICKNAME_COLUMNS = ("canonical", "variant")
+NICKNAME_COLUMNS = ("canonical", "variant", "sex")
 
 
 def log(msg: str) -> None:
@@ -149,37 +149,56 @@ def match_item(pbs: dict[str, object], generic: str, brand: str, strength: str,
                ingredients: list[str]) -> dict[str, str] | None:
     """Best PBS item for one of our products, or None.
 
-    Matching is deliberately conservative: a wrong match would attach a real PBS
-    code to the wrong medicine, which is worse than falling back to a synthetic
-    one. Tried in order: generic+brand+strength, generic+strength, generic.
-    For a combination, the first ingredient is tried as the generic too, because
-    PBS names combinations inconsistently ("perindopril with indapamide").
+    **A wrong real code is far worse than a synthetic one.** A synthetic code is
+    visibly ours and resolves to nothing; a real code belonging to a *different
+    medicine* is confidently wrong, and the whole value of the `code` resolution
+    tier in `normalise_med` is that it is a fact rather than a guess.
+
+    An earlier version fell back to the first ingredient when a combination's
+    name did not match, which silently gave **every one of our 15 combination
+    products the PBS code of one of its components**: Caduet got amlodipine's,
+    Targin got OxyContin's, Panadeine Forte got plain paracetamol's. It also
+    manufactured 33 of the 35 "ATC disagreements" we then spent time reviewing,
+    because the ATC came back correct *for the wrong item*.
+
+    So matching is now by **molecule set**, never by one component:
+
+      * single-ingredient -- `drug_name` must equal the generic, then prefer a
+        brand match, then a strength appearing in `li_form`;
+      * combination -- the PBS `drug_name` must mention **every** ingredient, or
+        the PBS `brand_name` must equal ours. PBS writes these inconsistently
+        ("Amlodipine with atorvastatin", "amlodipine + atorvastatin"), so the
+        test is containment of all parts rather than an exact string.
+
+    Anything else returns `None` and gets a synthetic code.
     """
     by_generic: dict[str, list[dict[str, str]]] = pbs["by_generic"]  # type: ignore[assignment]
-    candidates: list[dict[str, str]] = []
-    for key in [norm(generic), *(norm(i) for i in ingredients[:1])]:
-        candidates = by_generic.get(key, [])
-        if candidates:
-            break
-    if not candidates:
-        # combinations: PBS often writes "a with b"
-        if len(ingredients) > 1:
-            joined = norm(f"{ingredients[0]} with {ingredients[1]}")
-            candidates = by_generic.get(joined, [])
+    want_brand = norm(brand)
+    num = strength_number(strength)
+    parts = [norm(i) for i in ingredients if i.strip()]
+    is_combination = len(parts) > 1
+
+    if is_combination:
+        # Scan every item whose name mentions all the ingredients, or whose
+        # brand is ours. Never fall back to a single component.
+        candidates = [
+            row for rows in by_generic.values() for row in rows
+            if (want_brand and norm(row.get("brand_name", "")) == want_brand)
+            or all(part in norm(row.get("drug_name", "")) for part in parts)
+        ]
+    else:
+        candidates = list(by_generic.get(norm(generic), []))
+
     if not candidates:
         return None
 
-    num = strength_number(strength)
-    want_brand = norm(brand)
-
     def score(row: dict[str, str]) -> tuple[int, int]:
-        form = norm(row.get("li_form", ""))
         return (
             1 if want_brand and norm(row.get("brand_name", "")) == want_brand else 0,
-            1 if num and num in form else 0,
+            1 if num and num in norm(row.get("li_form", "")) else 0,
         )
 
-    return max(candidates, key=lambda r: (score(r)[0] + score(r)[1], score(r)[1]))
+    return max(candidates, key=lambda row: (sum(score(row)), score(row)[1]))
 
 
 # --------------------------------------------------------------------------- #
@@ -296,7 +315,8 @@ def build() -> int:
                             "label": row["label"]})
     apinchs.sort(key=lambda r: (-len(r["atc_prefix"]), r["atc_prefix"]))
 
-    nick = [{"canonical": r["canonical"], "variant": r["variant"]} for r in nicknames]
+    nick = [{"canonical": r["canonical"], "variant": r["variant"],
+         "sex": r.get("sex", "")} for r in nicknames]
 
     # -- write ---------------------------------------------------------------
     OUT.mkdir(parents=True, exist_ok=True)

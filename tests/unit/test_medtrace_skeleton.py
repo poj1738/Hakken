@@ -59,6 +59,43 @@ MODULES = (
     "trust",
 )
 
+#: Functions with real bodies. PLAN step 7 fills the pack in module by module,
+#: so this grows and `STUB_CALLS` shrinks; the tests below derive from it rather
+#: than listing the same names twice. Everything declared must be in exactly one
+#: of the two, and a test asserts that.
+IMPLEMENTED: set[tuple[str, str]] = {
+    ("identity", "decide"),
+    ("queries", "q_reference"),
+    ("queries", "q_admissions"),
+    ("queries", "q_identity_candidates"),
+    ("queries", "q_meds_for"),
+    ("queries", "q_verify_rows"),
+    ("queries", "sql_literal"),
+    ("queries", "dob_match_literals"),
+    ("parse", "normalise_text"),
+    ("parse", "parse_date"),
+    ("parse", "parse_int"),
+    ("parse", "dicts_from_sql"),
+    ("parse", "rows_from_sql"),
+    ("parse", "build_lexicon"),
+    ("safety", "high_risk_class"),
+    ("safety", "forced_confirm"),
+    ("safety", "safety_gate"),
+    ("coverage", "coverage"),
+    ("coverage", "evidence_state"),
+    ("coverage", "bpmh_confirmable"),
+    ("coverage", "possible_second_pharmacy"),
+    ("identity", "score_pair"),
+    ("identity", "link_identity"),
+    ("identity", "detect_overlay"),
+    ("normalise", "normalise_med"),
+    ("normalise", "llm_candidates"),
+    ("normalise", "strip_salt"),
+    ("normalise", "parse_strength_mg"),
+    ("normalise", "parse_frequency"),
+    ("normalise", "parse_release"),
+}
+
 #: `(module, function) -> the exact signature`, with the quotes that
 #: `from __future__ import annotations` puts around each annotation stripped.
 #:
@@ -76,6 +113,9 @@ EXPECTED_SIGNATURES: dict[tuple[str, str], str] = {
     ("queries", "sql_literal"): "(value: str | int | float | None) -> str",
     ("queries", "dob_match_literals"): "(dob_text: str | None) -> list[str]",
     # -- parse.py -------------------------------------------------------------
+    ("parse", "normalise_text"): "(value: str | None) -> str",
+    ("parse", "parse_date"): "(value: str | None) -> date | None",
+    ("parse", "parse_int"): "(value: str | None) -> int | None",
     ("parse", "dicts_from_sql"): "(result: SqlResult) -> list[dict[str, str]]",
     ("parse", "rows_from_sql"): "(result: SqlResult) -> list[SourceRow]",
     ("parse", "build_lexicon"): (
@@ -90,6 +130,10 @@ EXPECTED_SIGNATURES: dict[tuple[str, str], str] = {
     ),
     ("identity", "detect_overlay"): "(rows_for_one_record: list[SourceRow]) -> list[str]",
     # -- normalise.py ---------------------------------------------------------
+    ("normalise", "strip_salt"): "(name: str) -> str",
+    ("normalise", "parse_strength_mg"): "(text: str | None) -> float | None",
+    ("normalise", "parse_frequency"): "(text: str | None) -> tuple[float | None, bool]",
+    ("normalise", "parse_release"): "(*texts: str | None) -> str",
     ("normalise", "normalise_med"): "(row: SourceRow, lex: Lexicon) -> MedStatement",
     ("normalise", "llm_candidates"): "(text: str, lex: Lexicon, k: int = 5) -> dict",
     # -- coverage.py ----------------------------------------------------------
@@ -201,12 +245,27 @@ _EMPTY_RESULT: Any = {"headers": [], "data": [], "total": 0, "timeUsed": 1}
 _AS_OF = date(2026, 10, 24)
 
 STUB_CALLS: tuple[tuple[str, str, tuple[Any, ...]], ...] = (
+    ("parse", "normalise_text", ("  Atorvastatin  Calcium ",)),
+    ("parse", "parse_date", ("1948-07-03",)),
+    ("parse", "parse_int", ("60",)),
+    ("identity", "decide", (0.9,)),
+    ("queries", "q_reference", ("lexicon",)),
+    ("queries", "q_admissions", ()),
+    ("queries", "q_identity_candidates", (_row(dob_raw="1948-07-03"),)),
+    ("queries", "q_meds_for", ([_LINK],)),
+    ("queries", "q_verify_rows", (["GP-000001"],)),
+    ("queries", "sql_literal", ("O'Brien",)),
+    ("queries", "dob_match_literals", ("1948-07-03",)),
     ("parse", "dicts_from_sql", (_EMPTY_RESULT,)),
     ("parse", "rows_from_sql", (_EMPTY_RESULT,)),
     ("parse", "build_lexicon", ([], [], [])),
     ("identity", "score_pair", (_row(), _row(), Lexicon())),
     ("identity", "link_identity", (_row(), [], Lexicon())),
     ("identity", "detect_overlay", ([],)),
+    ("normalise", "strip_salt", ("atorvastatin calcium",)),
+    ("normalise", "parse_strength_mg", ("40 mg",)),
+    ("normalise", "parse_frequency", ("1 tab bd",)),
+    ("normalise", "parse_release", ("modified release tablet",)),
     ("normalise", "normalise_med", (_row(), Lexicon())),
     ("normalise", "llm_candidates", ("my blood thinner", Lexicon())),
     ("coverage", "coverage", ([_LINK], [])),
@@ -225,23 +284,42 @@ STUB_CALLS: tuple[tuple[str, str, tuple[Any, ...]], ...] = (
 )
 
 
-@pytest.mark.parametrize(("module", "function", "args"), STUB_CALLS)
+@pytest.mark.parametrize(
+    ("module", "function", "args"),
+    [call for call in STUB_CALLS if (call[0], call[1]) not in IMPLEMENTED],
+)
 def test_stub_names_its_owner_and_file(module: str, function: str, args: tuple[Any, ...]) -> None:
     with pytest.raises(NotImplementedError) as excinfo:
         getattr(_module(module), function)(*args)
     assert str(excinfo.value).startswith(f"Arpon: {module}.py")
 
 
+@pytest.mark.parametrize(
+    ("module", "function", "args"),
+    [call for call in STUB_CALLS if (call[0], call[1]) in IMPLEMENTED],
+)
+def test_an_implemented_function_no_longer_raises(module: str, function: str,
+                                                  args: tuple[Any, ...]) -> None:
+    """Once a body lands it must handle the empty case rather than raise.
+
+    Every one of these is called with empty or minimal input, which is exactly
+    what a run with a missing source hands it. Raising there would turn a
+    coverage gap into a crashed run.
+    """
+    getattr(_module(module), function)(*args)
+
+
 def test_every_declared_function_is_either_implemented_or_a_named_stub() -> None:
-    """No third state: nothing in the pack may silently return `None`."""
-    implemented = {("identity", "decide")} | {
-        ("queries", name) for name in ("q_reference", "q_admissions", "q_identity_candidates",
-                                       "q_meds_for", "q_verify_rows", "sql_literal", "dob_match_literals")
-    }
+    """No third state: nothing in the pack may silently return `None`.
+
+    Every declared function is either in `IMPLEMENTED` or has an entry in
+    `STUB_CALLS`, and `STUB_CALLS` covers both so an implemented function is
+    still exercised on empty input.
+    """
     declared = set(EXPECTED_SIGNATURES)
-    stubbed = {(m, f) for m, f, _ in STUB_CALLS}
-    assert implemented | stubbed == declared
-    assert not implemented & stubbed
+    callable_entries = {(m, f) for m, f, _ in STUB_CALLS}
+    assert IMPLEMENTED <= declared, IMPLEMENTED - declared
+    assert callable_entries | IMPLEMENTED == declared, declared - (callable_entries | IMPLEMENTED)
 
 
 # --------------------------------------------------------------------------- #

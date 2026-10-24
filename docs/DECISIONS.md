@@ -11,6 +11,150 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-24 — Research briefs answered, and one of my own bugs manufactured most of a finding **[consultant research + live verification, 24 Oct]**
+
+A consultant worked the five briefs in `docs/RESEARCH_QUESTIONS.md`. Two closed from
+public sources, two need a team judgement call, one needs the Department of Health.
+
+### The ATC "disagreements" were mostly my bug
+
+I reported **35 disagreements** between DATA_SPEC and the PBS API and attributed them to
+PBS systematically giving a combination the ATC of one component. The consultant
+suspected the join instead. They were right about the cause and wrong about the
+mechanism — it was not the `atc_priority_pct` tie-break (only 37 of 6,857 codes have
+multiple ATC rows, and that logic was already correct). It was `match_item`:
+
+> When a combination's name did not match a PBS `drug_name`, it fell back to the
+> **first ingredient**. So every one of our 15 combination products was matched to a
+> plain single-ingredient item — Caduet to amlodipine, Targin to OxyContin, Panadeine
+> Forte to plain paracetamol — and then inherited that item's real PBS code and real
+> ATC.
+
+**A real code belonging to a different medicine is far worse than a synthetic one.** A
+synthetic code is visibly ours and resolves to nothing; a wrong real one is confidently
+wrong, and the entire value of the `code` tier in `normalise_med` is that it is a fact
+rather than a guess.
+
+Fixed: a combination now matches only when the PBS `drug_name` mentions **every**
+ingredient, or the brand is ours. Never a component. Results:
+
+| | before | after |
+|---|---|---|
+| real PBS codes | 188/207 | **203/224** |
+| combination products matched correctly | 0 of 22 | **22 of 22** |
+| ATC disagreements | 35 | **6** |
+| disagreements changing APINCHS class | 2 | **1** |
+
+**I have to withdraw a claim.** I told Arpon that paracetamol/codeine showed DATA_SPEC
+right and PBS wrong because "PBS loses the codeine". It does not. I had matched plain
+paracetamol. PBS returns `12022R` "Paracetamol + codeine" and agrees with the spec.
+Only **sotalol** is a genuine disagreement.
+
+The remaining five are all benign: pregabalin (PBS `N02BF02` is the newer code, neither
+is APINCHS), methotrexate (DATA_SPEC 10.1 deliberately maps it under both, both → C),
+hydroxychloroquine and magnesium (same class, more specific code).
+
+### Sotalol: keep `C07AA07`, and our extension rows are weaker than they looked
+
+**Decided: keep DATA_SPEC's `C07AA07`.** WHO deliberately keeps sotalol out of `C01BD` —
+its C01B guidance says sotalol is classified in C07AA despite class III properties. PBS
+deviates from WHO here, across both items checked (8398B, 2043M), so it is PBS-wide
+rather than strength- or indication-specific.
+
+**The uncomfortable part is our own table.** Sotalol would only become high-risk through
+our `C01BD` extension row, and that row cites a **WA Health APINCHS poster from August
+2015**. WA Country Health's *current* list (v6.05, 7 October 2026) contains **no
+antiarrhythmics at all**. Neither does core ACSQHC, nor SA Health's APINCHEN. So rows 34
+(digoxin) and 35 (amiodarone) rest on a superseded document — they are defensible as
+facility-policy extensions but should not be presented as ACSQHC. The `source` column in
+`apinchs_atc.csv` now says so.
+
+**Consequence for the scorecard:** report **core-APINCHS recall separately from
+extended-list recall**. Pooling them lets a weak extension inflate or deflate a headline
+number that reads as ACSQHC compliance.
+
+### Formulation pairs: three added, two confirmed impossible
+
+Verified against the October 2026 PBS schedule in our own snapshot, with real codes and
+real ATC — not from general knowledge:
+
+| Drug | Added | Brands | Strengths |
+|---|---|---|---|
+| metoprolol MR | ✅ | Toprol-XL, Metrol-XL, Minax XL | **47.5 / 95 / 190 mg** |
+| gliclazide IR | ✅ | APX-Gliclazide, Nidem | 80 mg |
+| diltiazem IR | ✅ | Cardizem, Vasocardol | 60 mg (we already had CD 180/240) |
+| venlafaxine IR | ❌ | not marketed in Australia | — |
+| tamsulosin IR | ❌ | not marketed; the MR is RPBS-only | — |
+
+**Note the strengths.** Australian metoprolol MR is labelled by *succinate* weight, so
+"succinate MR 100 mg" does not exist here — 95 mg is the equivalent of 100 mg tartrate.
+Writing 100 mg would have put a product in the lexicon that no Australian pharmacy
+dispenses.
+
+Two further corrections to our own data: the tamsulosin brand is **Flomaxtra**, not
+Flomax, and **Efexor-XR 225 mg** was not found on the PBS listing (strengths trimmed to
+37.5/75/150).
+
+So `formulation` now has **six** eligible drugs instead of three. Venlafaxine and
+tamsulosin are recorded in `NO_AUSTRALIAN_PAIR` with the reason, so re-adding one has to
+come with a brand and a strength.
+
+### Bundle 6 was a missing agent, not a typo
+
+The 0.95 gap is resolved. **Desvenlafaxine** had 2,457,365 PBS scripts in 2023-24,
+*out-ranking* duloxetine's 2,261,367 — so omitting it while keeping duloxetine
+contradicted the volume ordering the spec says it used. Added at `N06AX23` (from our PBS
+snapshot), and all six reweighted to the real split: escitalopram 0.264, sertraline
+0.248, venlafaxine 0.147, mirtazapine 0.144, desvenlafaxine 0.102, duloxetine 0.095.
+
+Amitriptyline is high-volume (2,862,712) but **deliberately excluded**: in this age group
+it is typically 10–50 mg for chronic pain rather than 75–150 mg for depression, so it
+does not belong in a depression bundle.
+
+**Still open:** no age-restricted agent-level volumes were found, so these are all-ages
+shares. Directionally, mirtazapine should probably be up-weighted for 60–90 (5th most
+dispensed in residential aged care) and the SNRIs down-weighted.
+
+### Sample size: our 100% APINCHS recall target needs more care than we thought
+
+- **~300 held-out patients** for 15 instances of the rarest type — and that is for a 90%
+  chance of actually getting 15, not the expected count (221).
+- **The number that matters:** with *perfect* recall, the Wilson lower bound is
+  `n/(n+3.84)`. So **15/15 supports a lower bound of only 0.80**. Claiming ≥0.95 needs
+  about **73 instances**. We cannot responsibly print "APINCHS recall 100%" off 15 cases.
+- **Reportability floor:** below 10 instances report `k/n` as indicative only; 10–29 with
+  the interval; 30+ normally.
+- **Keep Wilson.** Clopper–Pearson is wastefully conservative (Brown, Cai & DasGupta);
+  show it only as a sensitivity check if asked.
+- **Targeted enrichment beats scaling everything** — but **precision is not transferable
+  under enrichment** because it depends on prevalence. Recall is fine (it is conditional
+  on an instance existing). So precision must be reported on the natural-rate split only,
+  and the enrichment factor per type disclosed.
+- **The scorecard does not have to run through the demo query path.** Score a large
+  held-out set offline and keep the demo on a small subset — which removes the latency
+  objection to a bigger population entirely.
+- `formulation` may be the real binding constraint, not `dose_unconfirmable`: at 0.15 per
+  *eligible* patient it needs ~500 patients if 20% are eligible.
+
+### PBS licence: our conservative reading stands, and needs a letter
+
+No CC BY statement exists for the **API**. The CC BY 3.0 AU listings on `data.gov.au` are
+Services Australia's *statistical reports* (Item Report, ATC Report, Patient Category
+Report) — different products. The third-party CC BY claim for the API is an extrapolation
+from those. The Department's own copyright notice, as mirrored on MBS Online (April
+2024), reserves all other rights.
+
+So **keep `data/reference/` gitignored, keep committing only the ≤200-row attributed
+sample, and keep altering no PBS value.** Of the five operations we asked about: row
+subset probably fine, column subset ambiguous, JSON→CSV probably fine, joining a
+`pbs_code` into our own table unresolved, deriving a new value likely a modification.
+
+**Action:** email `copyright@health.gov.au` and `HPP.Support@health.gov.au` listing the
+five operations. A written answer is the only thing that settles it. Nothing blocks on
+it — our current handling is the safe side of every ambiguity.
+
+---
+
 ## 2026-10-24 — Registration is live, and Zetaris is **not** the time budget **[live — Arpon's machine, 24 Oct]**
 
 PLAN steps 5 and 6 applied with Arpon's go-ahead. All 28 statements succeeded, all

@@ -384,7 +384,7 @@ class Med:
 
 class Patient:
     def __init__(self, index: int, rng: random.Random, bundles: dict[str, list[Product]],
-                 nicknames: dict[str, list[str]]) -> None:
+                 nicknames: dict[str, tuple[list[str], str]]) -> None:
         self.key = f"P{index:04d}"
         self.rng = rng
         band = pick(rng, AGE_BANDS)
@@ -396,8 +396,13 @@ class Patient:
         self.previous_surname = ""
         if self.sex == "F" and rng.random() < MAIDEN_RATE_FEMALE:
             self.previous_surname = rng.choice([s for s in SURNAMES if s != self.family_name])
-        self.given_name = rng.choice(sorted(nicknames)) if nicknames else "Alex"
-        self.nicknames = nicknames.get(self.given_name, [])
+        # The given name must match the drawn sex. Without this, 35% of patients
+        # got a contradicting name ("Kenneth Lee, F"), which a pharmacist spots
+        # instantly -- and `sex` is a real identity comparator, so a scrambled
+        # name/sex pairing also makes linkage look easier than it is.
+        pool = sorted(n for n, (_v, sex) in nicknames.items() if sex == self.sex)
+        self.given_name = rng.choice(pool) if pool else ("Alex" if self.sex == "M" else "Robin")
+        self.nicknames = nicknames.get(self.given_name, ([], self.sex))[0]
         self.postcode = f"{rng.randint(2000, 2999)}"
         self.old_postcode = f"{rng.randint(3000, 3999)}" if rng.random() < ADDRESS_MOVE_RATE else ""
         self.ihi = f"SYN-{rng.randrange(10**11, 10**12):012d}"
@@ -795,6 +800,10 @@ def apply_identity_traps(patients: list[Patient], split: dict[str, list[str]],
             b.previous_surname = ""
             b.dob = a.dob
             b.nicknames = list(a.nicknames)
+            # Copy the sex too. Otherwise the pair is separable on sex alone, so
+            # the trap is toothless -- and it produces an implausible record
+            # ("Thomas, F") that a pharmacist would notice before the linker did.
+            b.sex = a.sex
             pair("lookalike_pair", a, b, split_name)
 
         a, b = chosen[6], chosen[7]
@@ -802,8 +811,15 @@ def apply_identity_traps(patients: list[Patient], split: dict[str, list[str]],
         b.dob = a.dob
         b.postcode = a.postcode
         b.old_postcode = ""
-        if b.given_name == a.given_name:
-            b.given_name = "Edith" if a.given_name != "Edith" else "Edna"
+        # Forcing the shared sex can strand b with a name of the other sex, so
+        # rename whenever the name no longer fits -- not only on a collision.
+        b_was = b.sex
+        b.sex = a.sex
+        if b.given_name == a.given_name or b_was != a.sex:
+            if a.sex == "F":
+                b.given_name = "Edith" if a.given_name != "Edith" else "Edna"
+            else:
+                b.given_name = "Edward" if a.given_name != "Edward" else "Ernest"
             b.nicknames = []
         pair("twins", a, b, split_name)
 
@@ -995,12 +1011,14 @@ def load_codes() -> dict[tuple[str, str, str], dict[str, str]]:
     return {(r["generic"], r["brand"], r["strength"]): r for r in records}
 
 
-def load_nicknames() -> dict[str, list[str]]:
-    pairs = read_csv(SRC / "nicknames.csv")
-    out: dict[str, list[str]] = collections.defaultdict(list)
-    for row in pairs:
-        out[row["canonical"]].append(row["variant"])
-    return dict(out)
+def load_nicknames() -> dict[str, tuple[list[str], str]]:
+    """canonical -> (its variants, the sex it belongs to)."""
+    out: dict[str, tuple[list[str], str]] = {}
+    for row in read_csv(SRC / "nicknames.csv"):
+        variants, _sex = out.get(row["canonical"], ([], row.get("sex", "F")))
+        variants.append(row["variant"])
+        out[row["canonical"]] = (variants, row.get("sex", "F"))
+    return out
 
 
 def main() -> int:

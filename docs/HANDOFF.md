@@ -27,6 +27,81 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-24 20:55 AEDT · Arpon · arpon/domain-logic (stacked on arpon/generator)
+
+**Did:** Applied the Zetaris registration (step 6) and started step 7.
+
+**1. Registration is LIVE and verified.** All 28 statements succeeded, all 8 views'
+counts match the files `datasvc` serves, and
+**`SELECT COUNT(*) FROM medtrace.all_sources` = 4,825** in 1.05 s.
+
+**Zetaris is not the time budget.** Q_REF 0.17–0.64 s, Q0 0.33 s, **Q1 1.84 s**,
+Q2 1.86 s, Q3 1.72 s — **a complete run costs about 6 s of Zetaris** against a 5–10
+minute budget. This finally closes the thread my 24 Oct correction opened: latency
+tracks bytes scanned, our silos are ~2 MB, and runs will be dominated by the model. Every
+architectural rule still stands but is now *prudent* rather than *forced* — except
+"reference the union view only once", which is a hard engine limit.
+
+**2. Going live found a bug nothing else could have.** Diffing the real
+`q_identity_candidates()` against the committed fixtures showed **every row count
+matching** — 145 vs 145, 387 vs 387, all ten patients — while **409 cells per envelope
+differed**. Live Zetaris returns JSON `null` for a column the source does not have, and
+`""` for a column it has whose value is blank; the fixture generator stringified both to
+`""`. `SAMPLE_MODE` would have replayed a shape the live view never produces, and
+because counts agreed **no count check, schema check or existing test could have caught
+it**. Fixed; all 10 fixtures now match live exactly.
+
+Kept as a command, not a one-off: **`register_sources.py --diff-fixtures`**. PLAN 2.9
+asked for exactly this ("any difference is a view bug"), and the fixtures and views can
+drift later from a `HARMONISED_MAP` edit or a regenerated silo. **Lesson for everyone: a
+row-count check is not a shape check.**
+
+**3. Step 7, two of five modules done.**
+
+- **`parse.py`** complete — the one place that casts. Dates are **day-first** for the
+  non-ISO formats because every source here is Australian. Combination strengths are
+  **dropped rather than guessed** when the ingredient and number counts disagree:
+  attaching the wrong milligrams to the wrong drug is worse than attaching none, because
+  the dose comparison would then be confidently wrong.
+- **`safety.py`** complete. A test asserts **every medicine our reference data marks
+  high-risk actually matches an APINCHS prefix** — otherwise APINCHS recall cannot reach
+  100% and would fail silently. It immediately caught **prednisolone**: DATA_SPEC 10.1
+  says prednisolone (H02AB) is *not* APINCHS and carries `steroid_taper_ext` for
+  `dose_unconfirmable` only. Implemented as that documented exception with its own label,
+  not excluded from the test.
+
+I **broke the frozen `safety_gate` signature** while writing it and the contract test
+caught it before commit. That test is now restructured around a single `IMPLEMENTED` set,
+so filling in a module is a one-line change, plus a new check that an implemented
+function handles empty input rather than raising — which is what a run with a missing
+source hands it.
+
+**Changed shared files:** `requirements.txt` — **`jellyfish==1.3.0`** added for
+Jaro-Winkler and metaphone per PLAN section 1. Verified metaphone collapses Smyth and
+Smith to `SM0`, the demo's "Margaret Smith / Peggy Smyth" case, which string distance
+alone scores as a near-miss. Also `pytest.ini` (`slow` marker; the anyio deprecation
+ignored **by message only** so our own still fail the build).
+
+**Broken:** Nothing. **342 tests green, secret scan clean on 144 files.**
+
+**Still running on this machine:** `datasvc` on `0.0.0.0:8100`, PID in `/tmp/datasvc.pid`.
+The registered tables are `CACHE`d so existing queries work without it, but a cache
+refresh or a re-register needs it up. Restart with
+`.venv/bin/python -m uvicorn datasvc.main:app --host 0.0.0.0 --port 8100`.
+
+**Needs from teammates:**
+- **Arnav** — `main` has DATA_SPEC and the skeleton. Fixtures live on `arpon/generator`
+  (PR #7). Two rules that bite: **never build a SQL literal by hand** (use
+  `queries.sql_literal()` — the doubled quote fails silently), and **keep `None` as
+  `None`**. `parse.dicts_from_sql` is now real, so use it rather than zipping yourself.
+
+**Needs from Arpon:** the five research briefs in `docs/RESEARCH_QUESTIONS.md` are with a
+consultant. Nothing in step 7 blocks on them.
+
+**Next:** `coverage.py`, then `identity.py` (both tiers, nickname and DOB comparators,
+the lookalike and transitivity guards), then `normalise.py`. Three PRs are open and
+stacked: **#6 → #7 → this one**; merge in that order.
+
 ### 2026-10-24 18:40 AEDT · Arpon · arpon/generator (stacked on arpon/reference-data)
 
 **Did:** Steps 2, 4, 5 and 6. `docs/DATA_SPEC.md` is **merged to main** (#5) and so is the
