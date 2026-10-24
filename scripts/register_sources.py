@@ -231,6 +231,85 @@ def plan_statements() -> list[tuple[str, str]]:
     return out
 
 
+def inferred_fields(client: Zetaris, db: str, table: str) -> list[str] | None:
+    """The struct field names Spark inferred for a REST table, or None."""
+    result, _secs, error = client.run(f"DESCRIBE {db}.{table}")
+    if error or not result.get("data"):
+        return None
+    for row in result["data"]:
+        text = str(row[1]) if len(row) > 1 else ""
+        if "struct<" not in text:
+            continue
+        inner = text.split("struct<", 1)[1].rsplit(">", 1)[0]
+        return [f.split(":", 1)[0].strip() for f in inner.split(",") if ":" in f]
+    return None
+
+
+def served_fields(path: str, is_silo: bool) -> list[str] | None:
+    """The field names datasvc would serve for that endpoint.
+
+    Read from the file rather than over HTTP, the same way `datasvc_counts`
+    does: `datasvc_public_url` is `host.docker.internal`, which resolves from
+    inside the Zetaris container but not from the shell running this script.
+    """
+    folder = "data/synthetic/silos" if is_silo else "data/reference"
+    file = pathlib.Path(folder) / f"{path.rsplit('/', 1)[1]}.json"
+    if not file.exists():
+        return None
+    records = json.loads(file.read_text())["records"]
+    return sorted(records[0]) if records else None
+
+
+def schema_drift(client: Zetaris) -> list[tuple[str, str, str, list[str], list[str]]]:
+    """Raw tables whose inferred schema no longer matches what datasvc serves.
+
+    A Lightning REST table infers its schema once, when it is created, and then
+    keeps it. `REFRESH TABLE` does not re-infer it -- it returns ok and changes
+    nothing. So adding a column to a generated file leaves the table reading
+    rows wider than its schema, and Spark fails the read with
+    ArrayIndexOutOfBoundsException -- but only once the cached copy is dropped,
+    which can be days later.
+
+    That is what happened to nicknames on 24 Oct: `sex` was added by the
+    name/sex correlation fix, the table kept its two-column schema, and the
+    view went on serving a stale cache until a re-cache exposed it. Nothing
+    raised in between, and the row count stayed plausible.
+    """
+    base = get_settings().datasvc_public_url.rstrip("/")
+    drifted = []
+    for is_silo, group in ((True, SILOS), (False, REFERENCES)):
+        for db, table, path, _view, _rest in group:
+            have = inferred_fields(client, db, table)
+            want = served_fields(path, is_silo)
+            if have is None or want is None:
+                continue
+            if sorted(have) != want:
+                drifted.append((db, table, base + path, sorted(have), want))
+    return drifted
+
+
+def refresh_statements() -> list[tuple[str, str]]:
+    """UNCACHE then CACHE every raw table. Creates and drops nothing.
+
+    `CACHE TABLE` on an already-cached table is a no-op, so re-running --apply
+    after regenerating the silos leaves Zetaris serving the previous
+    generation. That is not theoretical: it happened on 24 Oct, and the only
+    symptom was that patient names in the live views no longer matched any
+    committed fixture. The cached copy has to be dropped before it is rebuilt.
+
+    Worst case if UNCACHE succeeds and CACHE fails: the table is simply
+    uncached, queries still work by re-calling datasvc, and a re-run fixes it.
+    """
+    out: list[tuple[str, str]] = []
+    for db, table, _path, _view, _source in SILOS:
+        out.append((f"UNCACHE {db}.{table}", f"UNCACHE TABLE {db}.{table}"))
+        out.append((f"CACHE {db}.{table}", f"CACHE TABLE {db}.{table}"))
+    for db, table, _path, _view, _columns in REFERENCES:
+        out.append((f"UNCACHE {db}.{table}", f"UNCACHE TABLE {db}.{table}"))
+        out.append((f"CACHE {db}.{table}", f"CACHE TABLE {db}.{table}"))
+    return out
+
+
 # --------------------------------------------------------------------------- #
 # Verification
 # --------------------------------------------------------------------------- #
@@ -272,21 +351,31 @@ def verify(client: Zetaris) -> int:
     return failures
 
 
-def time_templates(client: Zetaris) -> None:
-    """Time Q_REF and Q1 to Q3 for one patient (PLAN 4 step 6)."""
+def time_templates(client: Zetaris) -> int:
+    """Time Q_REF and Q1 to Q3 for one patient, and return how many failed.
+
+    This used to return None, so a template that errored was printed in the
+    timing list and then ignored: the script still exited 0. `Q_REF(nicknames)`
+    was broken for a day that way. `COUNT(*)` in `verify()` cannot catch it
+    either, because it never names a column -- only running the real query
+    does, which is the whole point of timing them here.
+    """
     from app.domain.packs.medtrace import queries as q
     from app.domain.packs.medtrace.types import IdentityLink, SourceRow
 
+    failures = 0
     log("\n--- template timings ---")
     for name in ("lexicon", "apinchs", "nicknames"):
         _r, secs, error = client.run(q.q_reference(name), limit=5000)
-        log(f"  Q_REF {name:12} {secs:6.2f}s  {error[:80] if error else 'ok'}")
+        log(f"  Q_REF {name:12} {secs:6.2f}s  {('FAIL ' + error[:80]) if error else 'ok'}")
+        failures += bool(error)
 
     result, secs, error = client.run(q.q_admissions(), limit=5000)
-    log(f"  Q0 admissions      {secs:6.2f}s  {error[:80] if error else 'ok'}")
+    log(f"  Q0 admissions      {secs:6.2f}s  {('FAIL ' + error[:80]) if error else 'ok'}")
+    failures += bool(error)
     if error or not result or not result.get("data"):
         log("  cannot time Q1-Q3 without an anchor from Q0")
-        return
+        return failures
 
     headers = result["headers"]
     row = dict(zip(headers, result["data"][0]))
@@ -304,17 +393,21 @@ def time_templates(client: Zetaris) -> None:
 
     r1, secs, error = client.run(q.q_identity_candidates(anchor), limit=5000)
     log(f"  Q1 identity        {secs:6.2f}s  {outcome(r1, error)}")
+    failures += bool(error)
 
     link = IdentityLink(anchor_id=anchor.record_key, candidate_id=anchor.record_key,
                         match_weight=0.0, probability=1.0, band="auto-merge", tier="ihi_exact")
     r2, secs, error = client.run(q.q_meds_for([link]), limit=5000)
     log(f"  Q2 meds            {secs:6.2f}s  {outcome(r2, error)}")
+    failures += bool(error)
 
     if not error and r2 and r2.get("data"):
         idx = r2["headers"].index("row_id")
         ids = [r[idx] for r in r2["data"][:20]]
         r3, secs, error = client.run(q.q_verify_rows(ids), limit=5000)
         log(f"  Q3 verify ({len(ids):2} rows) {secs:6.2f}s  {outcome(r3, error)}")
+        failures += bool(error)
+    return failures
 
 
 # --------------------------------------------------------------------------- #
@@ -389,6 +482,13 @@ def main() -> int:
     ap.add_argument("--skip-exists", action="store_true",
                     help="treat 'already exists' as success, for a re-run")
     ap.add_argument("--verify-only", action="store_true", help="only count and time")
+    ap.add_argument("--recreate-drifted", action="store_true",
+                    help="DROP and re-create only the REST tables whose inferred "
+                         "schema no longer matches what datasvc serves. This "
+                         "drops objects -- ask Arpon first")
+    ap.add_argument("--refresh", action="store_true",
+                    help="re-cache the raw tables after regenerating the data; "
+                         "creates and drops nothing")
     args = ap.parse_args()
 
     settings = get_settings()
@@ -402,10 +502,51 @@ def main() -> int:
     if args.diff_fixtures:
         return 1 if diff_fixtures(Zetaris()) else 0
 
+    if args.recreate_drifted:
+        client = Zetaris()
+        drifted = schema_drift(client)
+        if not drifted:
+            log("\n--- no schema drift: every REST table matches what datasvc serves ---")
+            return 0
+        log(f"\n--- {len(drifted)} table(s) drifted; dropping and re-creating ---")
+        failures = 0
+        for db, table, url, have, want in drifted:
+            log(f"  {db}.{table}: inferred {have} but datasvc serves {want}")
+            for label, sql in (("DROP", f"DROP LIGHTNING DATABASE TABLE {db}.{table}"),
+                               ("CREATE", create_rest_table(db, table, url)),
+                               ("CACHE", f"CACHE TABLE {db}.{table}")):
+                _result, secs, error = client.run(sql)
+                if error:
+                    log(f"    FAIL  {label:7} {secs:6.2f}s  {error[:160]}")
+                    failures += 1
+                    break
+                log(f"    ok    {label:7} {secs:6.2f}s")
+        failures += verify(client)
+        return 1 if failures else 0
+
+    if args.refresh:
+        client = Zetaris()
+        log("\n--- refreshing cached tables (no object is created or dropped) ---")
+        failures = 0
+        for label, sql in refresh_statements():
+            _result, secs, error = client.run(sql)
+            # UNCACHE on a table that was never cached is not a problem.
+            if error and label.startswith("UNCACHE"):
+                log(f"  skip  {label:34} {secs:6.2f}s  {error[:80]}")
+                continue
+            if error:
+                log(f"  FAIL  {label:34} {secs:6.2f}s  {error[:200]}")
+                failures += 1
+                continue
+            log(f"  ok    {label:34} {secs:6.2f}s")
+        failures += verify(client)
+        failures += diff_fixtures(client, limit=6)
+        return 1 if failures else 0
+
     if args.verify_only:
         client = Zetaris()
         failures = verify(client)
-        time_templates(client)
+        failures += time_templates(client)
         failures += diff_fixtures(client, limit=6)
         return 1 if failures else 0
 
@@ -436,7 +577,7 @@ def main() -> int:
     if failures:
         return 1
     failures = verify(client)
-    time_templates(client)
+    failures += time_templates(client)
     if failures:
         log(f"\n{failures} view(s) failed verification. A successful CREATE does not prove "
             f"a usable table -- do not rely on this registration.")

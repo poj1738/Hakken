@@ -57,6 +57,7 @@ ALL_STATUSES = frozenset({"Current", "Anticipated", "Resolved", "Discontinued"})
 OUT_COLUMNS = (
     "artg_id", "medicine_name", "sponsor", "ingredients", "salt_quantity",
     "dosage_form", "status", "shortage_start", "expected_resolution",
+    "impact_rating",
     "availability", "reason", "notifiable",
 )
 
@@ -120,7 +121,10 @@ def parse(text: str) -> list[dict[str, object]]:
             unknown_statuses.add(status)
         out.append({
             "artg_id": artg,
-            "medicine_name": _pick(row, "Medicine name", "Medicine"),
+            # The column is "ARTG name". "Medicine name" matched nothing, so
+            # this was empty for all 1,010 rows while the loader reported
+            # success -- a row count is not a shape check.
+            "medicine_name": _pick(row, "ARTG name", "Medicine name", "Medicine"),
             "sponsor": _pick(row, "Sponsor"),
             "ingredients": split_ingredients(_pick(row, "ingredient")),
             # Salt mass. NOT a dispensed strength -- see the module docstring.
@@ -128,7 +132,11 @@ def parse(text: str) -> list[dict[str, object]]:
             "dosage_form": _pick(row, "Dosage form", "form"),
             "status": status,
             "shortage_start": parse_day_first(_pick(row, "start")),
-            "expected_resolution": parse_day_first(_pick(row, "resolution", "expected")),
+            "expected_resolution": parse_day_first(
+                _pick(row, "Supply impact end date", "resolution", "expected")),
+            # How badly the shortage bites. Critical and Low are not the same
+            # notice, so the triage layer needs this rather than inferring it.
+            "impact_rating": _pick(row, "Shortage impact rating", "impact rating"),
             "availability": _pick(row, "Availability"),
             "reason": _pick(row, "Reason"),
             "notifiable": status in NOTIFIABLE_STATUSES,
@@ -136,6 +144,19 @@ def parse(text: str) -> list[dict[str, object]]:
     if unknown_statuses:
         log(f"  WARNING unexpected status value(s): {sorted(unknown_statuses)} -- "
             f"expected {sorted(ALL_STATUSES)}. Check before Monday's registration.")
+    # A column name that matches nothing yields "" for every row, and the
+    # loader still reports a healthy row count. That is exactly how
+    # medicine_name and expected_resolution stayed empty for all 1,010 rows
+    # through a green run. An always-empty column is a broken mapping until
+    # someone proves otherwise, so say so loudly.
+    if out:
+        dead = [c for c in OUT_COLUMNS
+                if c != "notifiable" and not any(r.get(c) for r in out)]
+        if dead:
+            log(f"  WARNING these columns are empty for all {len(out)} rows: "
+                f"{dead}. That usually means the CSV header changed and the "
+                f"mapping no longer matches -- check against: "
+                f"{sorted(k for k in out[0] if k)[:4]}...")
     return out
 
 

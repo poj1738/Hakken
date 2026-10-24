@@ -172,10 +172,20 @@ def poisson(rng: random.Random, mean: float) -> int:
 
 
 def typo(rng: random.Random, text: str) -> str:
+    """One-character corruption that is guaranteed to change the string.
+
+    The doubling branch could return the input unchanged ("Tom" -> "Tom"), so
+    the ground truth recorded a corruption that was not there and the linker
+    was credited with surviving a typo it never saw.
+    """
     if len(text) < 4:
         return text
-    i = rng.randrange(1, len(text) - 1)
-    return text[:i] + text[i + 1:] if rng.random() < 0.5 else text[:i] + text[i] + text[i:]
+    for _ in range(6):
+        i = rng.randrange(1, len(text) - 1)
+        out = (text[:i] + text[i + 1:]) if rng.random() < 0.5 else (text[:i] + text[i] + text[i:])
+        if out != text:
+            return out
+    return text[:-1]
 
 
 # --------------------------------------------------------------------------- #
@@ -281,7 +291,15 @@ def choose_medicines(rng: random.Random, bundles: dict[str, list[Product]], sex:
                 if ras:
                     continue
                 ras = True
-            if product["generic"] in {c["generic"] for c in chosen}:
+            # Exclusions must be checked on the INGREDIENT, not the product.
+            # Checking the product let Coversyl Plus (perindopril/indapamide)
+            # and Coveram (perindopril/amlodipine) both be drawn, giving one
+            # patient two perindopril sources and two amlodipine sources on the
+            # admission chart -- a real, harmful duplication that the ground
+            # truth did not know about, so the tool would be penalised for
+            # correctly finding it. Found by a clinical review of the output.
+            taken = {i for c in chosen for i in c.ingredients}
+            if set(product.ingredients) & taken:
                 continue
             chosen.append(product)
 
@@ -316,14 +334,27 @@ def choose_medicines(rng: random.Random, bundles: dict[str, list[Product]], sex:
 # --------------------------------------------------------------------------- #
 
 
+#: Australian PI maximum maintenance dose for people over 65, in mg/day.
+#: Escitalopram 20 mg at 71 is above the PI and a pharmacist queries it on
+#: sight, so it is capped rather than generated as an accidental error.
+#: Citalopram carries a parallel TGA limit if it is ever added.
+ELDERLY_MAX_MG: dict[str, float] = {"escitalopram": 10.0}
+ELDERLY_FROM_AGE = 65
+
+
 class Med:
     """One medicine in a patient's truth, with its timeline and dispensing."""
 
-    def __init__(self, product: Product, rng: random.Random) -> None:
+    def __init__(self, product: Product, rng: random.Random, age: int | None = None) -> None:
         self.product = product
         self.generic = product["generic"]
         self.brand = rng.choice(product.brands)
         self.strength = rng.choice(product.strengths)
+        cap = ELDERLY_MAX_MG.get(self.generic)
+        if cap is not None and age is not None and age >= ELDERLY_FROM_AGE:
+            allowed = [s for s in product.strengths
+                       if (strength_mg(s) or 0) <= cap] or product.strengths[:1]
+            self.strength = rng.choice(allowed)
         self.regimen = product["regimen"]
         self.release = product["release"]
         self.route = product["route"]
@@ -341,12 +372,43 @@ class Med:
         per_day = doses_per_day(self.regimen)
         mg = strength_mg(self.strength)
         self.true_daily_dose_mg = round(mg * per_day, 4) if mg is not None else None
+        # Real PBS maximum quantity where the lexicon has one; a hand override
+        # in medicines.csv beats it; the 60/30 guess is the last resort and
+        # only applies to items with no PBS listing (OTC, and the few
+        # private-script products).
+        real_qty, real_repeats = PACKS.get((self.generic, self.brand, self.strength), (0, 0))
+        self.pbs_repeats = real_repeats
         try:
-            self.pack_qty = int(product["pack_qty_override"] or 0) or (60 if per_day >= 2 else 30)
+            self.pack_qty = (int(product["pack_qty_override"] or 0) or real_qty
+                             or (60 if per_day >= 2 else 30))
         except ValueError:
-            self.pack_qty = 30
-        self.days_supply = max(7, int(self.pack_qty / per_day)) if per_day > 0 else 30
+            self.pack_qty = real_qty or 30
+        # A device pack is ONE unit that lasts about a month, so dividing it by
+        # doses-per-day collapsed days_supply to the 7-day floor and let an
+        # inhaler or insulin pen be dispensed 50+ times a year. Pack size says
+        # nothing about duration for a device -- the same reason normalise.py
+        # refuses to infer a daily dose from one.
+        self.is_device = any(w in (product["form"] + " " + product["route"]).lower()
+                             for w in ("inhaler", "spray", "patch", "injection", "pen"))
+        if self.is_device:
+            self.days_supply = 30
+        else:
+            # Pack arithmetic alone is not trustworthy here: PBS records
+            # pack_size as 1 for some items (the quantity unit is a pack, not a
+            # tablet -- Rosuzet is listed as 1), which made one patient's
+            # Rosuzet look like a 7-day supply and gave them 53 fills in a
+            # year. A repeat count is the honest chronic/acute signal, and it
+            # comes from the same real PBS row: an item with repeats is ongoing
+            # therapy, dispensed about monthly in Australia, so a month is the
+            # floor. An item with none is a one-off course and keeps whatever
+            # the pack holds.
+            pack_days = int(self.pack_qty / per_day) if per_day > 0 else 30
+            floor = 28 if self.pbs_repeats > 0 else 5
+            self.days_supply = max(floor, pack_days)
         self.gp_listing = "active"
+        regimen = self.regimen.lower()
+        self.prn_like = ("prn" in regimen or "as needed" in regimen
+                         or "when" in regimen)
 
     @property
     def current(self) -> bool:
@@ -360,17 +422,48 @@ class Med:
                            else "ceased" if roll < 0.90 else "deleted")
 
     def build_dispensings(self, rng: random.Random) -> None:
-        """Fills over the 12-month lookback, spaced by adherence plus jitter."""
+        """Fills over the 12-month lookback, spaced by adherence plus jitter.
+
+        Three limits, all added after a clinical review found the dispensing
+        layer was the least believable part of the data:
+
+        * **PRN items get 0-2 fills a year.** A GTN spray came out with 21 fills,
+          about 4,200 doses, for a medicine taken only during angina. PBS item
+          8171C is one 200-actuation canister with 5 repeats.
+        * **A hard ceiling of `365 / days_supply` fills**, where days_supply
+          comes from the item's real PBS maximum quantity rather than a guessed
+          pack. Paracetamol 665 mg MR came out with 29 fills, then 37 once the
+          ceiling was added against a guessed pack of 60. More fills than the
+          dose can consume is oversupply, which no pharmacy record would show.
+          A device is exempt from the division: an inhaler's pack of 1 says
+          nothing about how long it lasts, so it is treated as a month.
+        * **Nothing dispensed on or after the admission date.** Two of three
+          sample patients had a fill dated the day of admission.
+        """
         if self.is_otc or self.route == "IV":
             return
         pdc = min(1.0, max(0.3, rng.betavariate(6, 1.5)))
-        end = self.stop or AS_OF
+        self.pdc = pdc
+        end = min(self.stop or AS_OF, AS_OF - dt.timedelta(days=1))
         day = max(self.start, AS_OF - dt.timedelta(days=365))
-        while day <= end:
+
+        if self.prn_like:
+            # A PRN medicine is dispensed when the pack runs out, which for an
+            # as-needed item is rarely and irregularly.
+            for _ in range(rng.randint(0, 2)):
+                if day <= end:
+                    self.dispensings.append(day)
+                    day += dt.timedelta(days=rng.randint(120, 300))
+            return
+
+        # Most fills the supply could actually be exhausted in a year, plus one
+        # for a part-used pack at the start of the window. Derived from
+        # days_supply rather than pack size, so it is correct for devices too.
+        ceiling = max(1, int(365 / max(self.days_supply, 1)) + 1)
+        while day <= end and len(self.dispensings) < ceiling:
             self.dispensings.append(day)
             gap = self.days_supply / pdc + rng.gauss(0, 3)
             day = day + dt.timedelta(days=max(int(0.6 * self.days_supply), int(gap)))
-        self.pdc = pdc
 
     def possibly_ceased(self) -> bool:
         """DATA_SPEC 9.4, with its suppressions."""
@@ -426,7 +519,8 @@ class Patient:
 
         target = pick(rng, MED_COUNTS)
         assert isinstance(target, int)
-        self.meds: list[Med] = [Med(p, rng) for p in choose_medicines(rng, bundles, self.sex, target)]
+        self.meds: list[Med] = [Med(p, rng, self.age)
+                                for p in choose_medicines(rng, bundles, self.sex, target)]
         self.otc: list[Med] = []
         self.overlay_from: Patient | None = None
 
@@ -538,6 +632,7 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
     planted: list[dict[str, object]] = []
     notices: list[dict[str, object]] = []
     corruptions: list[dict[str, object]] = []
+    overlay_ids: list[str] = []
     pid = p.key
 
     def code_for(med: Med, kind: str) -> str:
@@ -573,7 +668,19 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
         note = ""
         intent_doc = False
         if rng.random() < 0.08:
-            note = rng.choice(["withheld: contrast", "withheld: AKI", "ceased: bleeding"])
+            # "withheld: contrast" applies to metformin (and nephrotoxics), not
+            # to a beta blocker or a calcium channel blocker: RANZCR advises
+            # continuing metformin above eGFR 30, and NSW TAG states metformin
+            # is not nephrotoxic. The generator was annotating any medicine with
+            # it, which a pharmacist spots immediately.
+            if med.generic == "metformin":
+                note = rng.choice(["withheld: contrast", "withheld: AKI"])
+            elif med.atc.startswith(("C09", "C03")):
+                note = "withheld: AKI"
+            elif med.atc.startswith("C07"):
+                note = rng.choice(["withheld: bradycardia", "withheld: hypotension"])
+            else:
+                note = rng.choice(["withheld: nil by mouth", "withheld: hypotension"])
             intent_doc = True
         # dose / frequency discrepancies
         charted_strength = med.strength
@@ -671,7 +778,7 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
                     pbs_code="" if med.private else code_for(med, "pbs_code"),
                     brand=med.brand or med.generic, strength=med.strength, form=med.form,
                     qty=str(med.pack_qty), days_supply=str(med.days_supply),
-                    repeats_left=str(rng.randint(0, 5)),
+                    repeats_left=str(rng.randint(0, med.pbs_repeats)),
                     script_type="private" if med.private else "PBS",
                     prescriber=f"Dr {rng.choice('ABCDEFGH')}. {rng.choice(SURNAMES)}-SYN"))
         # Overlay (DATA_SPEC 7): another person's dispensings under this customer
@@ -680,12 +787,21 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
         if p.overlay_from is not None:
             for med in p.overlay_from.meds[:3]:
                 day = med.dispensings[-1] if med.dispensings else AS_OF
-                rows.add("pharmacy", dict(
+                overlay_ids.append(rows.add("pharmacy", dict(
                     ph_base, dispensed_on=iso(day),
                     pbs_code=code_for(med, "pbs_code"), brand=med.brand or med.generic,
                     strength=med.strength, form=med.form, qty=str(med.pack_qty),
                     days_supply=str(med.days_supply), repeats_left="0", script_type="PBS",
-                    prescriber=f"Dr {rng.choice('ABCDEFGH')}. {rng.choice(SURNAMES)}-SYN"))
+                    prescriber=f"Dr {rng.choice('ABCDEFGH')}. {rng.choice(SURNAMES)}-SYN")))
+        if overlay_ids:
+            # These rows belong to a different person. Recording the exact
+            # row_ids means a tool that flags them is scored as CORRECT. Left
+            # unlabelled, the overlay trap leaks into the data as an
+            # unexplained ACE-inhibitor-plus-ARB or two-statin record, and the
+            # tool is penalised for finding a real problem.
+            notices.append({"type": "coverage_gap", "source": "pharmacy",
+                            "row_ids": overlay_ids,
+                            "detail": "overlay: these dispensings belong to another person"})
         if p.second_pharmacy:
             notices.append({"type": "possible_second_pharmacy", "source": "pharmacy",
                             "detail": "dispensing split across two pharmacies, one exposed"})
@@ -1001,14 +1117,34 @@ def q1_matches(anchor: dict[str, str | None], row: dict[str, str | None]) -> boo
 # --------------------------------------------------------------------------- #
 
 
+# (generic, brand, strength) -> (PBS maximum quantity, PBS repeats). Filled by
+# load_codes() from the lexicon, which built it from the real PBS item file.
+PACKS: dict[tuple[str, str, str], tuple[int, int]] = {}
+
+
 def load_codes() -> dict[tuple[str, str, str], dict[str, str]]:
-    """(generic, brand, strength) -> its codes, from the built lexicon."""
+    """(generic, brand, strength) -> its codes, from the built lexicon.
+
+    Also fills PACKS, because the lexicon carries the real PBS
+    ``maximum_quantity_units`` and ``number_of_repeats`` for every item. The
+    generator used to guess a pack of 60 or 30, which made paracetamol 665 mg
+    MR look like a 10-day supply and let it be dispensed 37 times a year.
+    Med is constructed after this runs, so it can read the real number.
+    """
     path = pathlib.Path("data/reference/lexicon.json")
     if not path.exists():
         log("  (no lexicon.json -- run `make lexicon` first; codes will be blank)")
         return {}
     records = json.loads(path.read_text())["records"]
-    return {(r["generic"], r["brand"], r["strength"]): r for r in records}
+    codes = {(r["generic"], r["brand"], r["strength"]): r for r in records}
+    for key, r in codes.items():
+        try:
+            qty, repeats = int(r.get("pack_qty") or 0), int(r.get("repeats") or 0)
+        except ValueError:
+            continue
+        if qty > 0:
+            PACKS[key] = (qty, max(0, repeats))
+    return codes
 
 
 def load_nicknames() -> dict[str, tuple[list[str], str]]:

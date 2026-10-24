@@ -53,18 +53,31 @@ app = FastAPI(
     version="1.0.0",
 )
 
-_cache: dict[pathlib.Path, dict[str, Any]] = {}
+# (path, mtime_ns, size) -> payload. See _load() for why the mtime is in the key.
+_cache: dict[tuple[pathlib.Path, int, int], dict[str, Any]] = {}
 
 
 def _load(path: pathlib.Path) -> dict[str, Any]:
     """Read and cache one file.
 
     Cached in-process because a Lightning REST table may re-call its source on
-    every query (`REFERENCE_NOTES` 1.3). The files are generated and immutable
-    between runs of `make synth`, so caching cannot serve stale data within a
-    process -- and it stops a demo re-reading megabytes per query.
+    every query (`REFERENCE_NOTES` 1.3) -- it stops a demo re-reading megabytes
+    per query.
+
+    Keyed on the file's mtime and size, not just its path. The original version
+    cached on path alone, reasoning that the files are immutable between runs of
+    `make synth`. They are not immutable across one: regenerating the silos
+    while this process stayed up left it serving the previous generation, and
+    Zetaris cached THAT, so the live views disagreed with every committed
+    fixture until someone noticed the names had changed. A stale read here is
+    invisible -- the row count is plausible and nothing raises.
     """
-    if path not in _cache:
+    try:
+        stat = path.stat()
+        key = (path, stat.st_mtime_ns, stat.st_size)
+    except OSError:
+        key = (path, 0, 0)
+    if key not in _cache:
         if not path.exists():
             raise HTTPException(
                 status_code=503,
@@ -81,8 +94,12 @@ def _load(path: pathlib.Path) -> dict[str, Any]:
                 detail=f"{path} must be an object with a 'records' array; a REST table "
                        f"needs one array field to explode.",
             )
-        _cache[path] = payload
-    return _cache[path]
+        # Drop any older generation of the same file rather than growing
+        # the cache once per regeneration.
+        for stale in [k for k in _cache if k[0] == path]:
+            del _cache[stale]
+        _cache[key] = payload
+    return _cache[key]
 
 
 @app.get("/healthz")
