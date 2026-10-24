@@ -30,5 +30,7 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-24 | Arpon | Claude Code | Opus 5 | Live SQL dialect testing (found the `''` escaping bug), step-1 reachability spike, latency correction |
 | 2026-10-24 | Arpon | Claude Code | Opus 5 | Steps 2/4/5/6: PBS fetch + hand-built lexicon, synthetic generator, datasvc, Zetaris registration (dry run) |
 | 2026-10-24 | Arpon | Claude Code | Opus 5 | Zetaris registration applied live + verified; step 7 began: `parse.py` and `safety.py` |
+| 2026-10-24 | Arpon | Claude Code | Opus 5 | Step 7: `identity.py` (0 false merges) and `normalise.py`; research briefs for an outside consultant |
+| 2026-10-25 | Arpon | Claude Code | Opus 5 | Applied consultant briefs 6-10: real PBS pack sizes in the generator, TGA field mapping, brief 8 suppression rules, vetted pitch claims; fixed two silent-staleness bugs in `datasvc` and the registration verifier |
 
 The README's **AI and model usage** section summarises this for judges.
