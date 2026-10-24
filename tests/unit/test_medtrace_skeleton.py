@@ -85,6 +85,9 @@ IMPLEMENTED: set[tuple[str, str]] = {
     ("coverage", "evidence_state"),
     ("coverage", "bpmh_confirmable"),
     ("coverage", "possible_second_pharmacy"),
+    ("identity", "score_pair"),
+    ("identity", "link_identity"),
+    ("identity", "detect_overlay"),
 }
 
 #: `(module, function) -> the exact signature`, with the quotes that
