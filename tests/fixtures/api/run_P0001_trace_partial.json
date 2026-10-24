@@ -1,0 +1,235 @@
+{
+  "run_id": "run-ex-p0001",
+  "status": "running",
+  "output": {
+    "summary": "Running: normalising medicines.",
+    "recommendations": [],
+    "evidence": [],
+    "caveats": [
+      "Hand-written example for UI development (PLAN 5.8); not the output of a real run. Regenerated from real runs once the pipeline works.",
+      "Synthetic data. Not medical advice. A pharmacist must confirm every item."
+    ],
+    "artifacts": []
+  },
+  "agents": [
+    {
+      "name": "Planner",
+      "role": "plan the investigation",
+      "iterations": 1,
+      "models_used": [
+        "nvidia/nemotron-3.5-lightning-30b-a3b"
+      ],
+      "routes_requested": [
+        "meterless/fast"
+      ],
+      "status": "ok"
+    },
+    {
+      "name": "Executor",
+      "role": "fetch, link, normalise",
+      "iterations": 1,
+      "models_used": [
+        "nvidia/nemotron-3.5-lightning-30b-a3b"
+      ],
+      "routes_requested": [
+        "meterless/fast"
+      ],
+      "status": "ok"
+    }
+  ],
+  "trace_id": "run-ex-p0001",
+  "log_file": "logs/trace-run-ex-p0001.jsonl",
+  "execution_time_seconds": 21.5,
+  "error": null,
+  "memory_used": [],
+  "sample_mode": true,
+  "provider_state": "online",
+  "patient_id": "MRN0000001",
+  "coverage": {
+    "emr": {
+      "source": "emr",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "emr:MRN0000001",
+      "doc_date": "2026-10-24"
+    },
+    "gp": {
+      "source": "gp",
+      "state": "found",
+      "scope_notes": [
+        "GP list updated 2 months ago"
+      ],
+      "record_key": "gp:GPP000001",
+      "doc_date": "2026-08-23"
+    },
+    "pharmacy": {
+      "source": "pharmacy",
+      "state": "found",
+      "scope_notes": [
+        "3 dispensings excluded pending identity review (PHM-000076 to PHM-000078)"
+      ],
+      "record_key": "pharmacy:C000001",
+      "doc_date": null
+    },
+    "patient": {
+      "source": "patient",
+      "state": "found",
+      "scope_notes": [
+        "given name typo 'Marjjorie' -- linked on DOB and surname"
+      ],
+      "record_key": "patient:INT00001",
+      "doc_date": null
+    }
+  },
+  "bpmh_confirmable": false,
+  "banner": null,
+  "grid": [],
+  "findings": [],
+  "notices": [],
+  "tasks": [],
+  "identity_review": null,
+  "evidence_index": {},
+  "trust": [],
+  "trace": [
+    {
+      "timestamp": "2026-10-24T22:00:00+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Planner",
+      "action": "plan",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PLAN",
+      "message": "Plan: find the patient in GP, pharmacy and interview records, then compare medicines.",
+      "route": "meterless/fast",
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:04+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Executor",
+      "action": "find_identities",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "Found Marjorie Lee in all four sources; patient interview spells it 'Marjjorie' (one-letter typo), linked.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:08+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Executor",
+      "action": "coverage",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "COVERAGE",
+      "message": "Found in 4 of 4 sources. 3 pharmacy dispensings held back: they may belong to another person.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:12+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Executor",
+      "action": "fetch_meds",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FETCH_MEDS",
+      "message": "Fetched 96 medication rows across 4 sources in one query.",
+      "route": null,
+      "latency_ms": 2600,
+      "tokens": null,
+      "sql": "<Q2: medtrace.all_sources for 4 linked records>",
+      "row_count": 96,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:16+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Executor",
+      "action": "normalise",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "NORMALISE",
+      "message": "Normalised 96 rows: 88 by code or lexicon, 6 fuzzy, 2 left for the model.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    }
+  ],
+  "query_count": 2,
+  "zetaris_ms": 4300,
+  "model_calls": [
+    {
+      "role": "Planner",
+      "requested_route": "meterless/fast",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "request_id": "req-ex-0001",
+      "tokens": {
+        "prompt_tokens": 1450,
+        "completion_tokens": 410
+      },
+      "truncated": false
+    }
+  ]
+}

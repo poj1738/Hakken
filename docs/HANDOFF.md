@@ -27,6 +27,46 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 04:05 AEDT · Arnav · arnav/api-fixtures
+
+**Did:** PLAN 5.8 — example API responses for the UI in `tests/fixtures/api/`, one per
+endpoint: `status.json`, `patients.json`, `run_P0001_trace_partial.json` (mid-run poll),
+`run_P0001_done.json`, `run_P0002_needs_review.json`, `feedback_response.json`, plus
+one extra, **`run_P0001_gp_not_found.json`** — GP and interview not found, so the UI has
+a case with UNKNOWN cells, the BPMH banner and `bpmh_not_confirmable`.
+
+They are **hand-written illustrations, labelled as such** in `output.caveats` and in
+`tests/fixtures/api/README.md`, built through the real pydantic models so they match
+`app/schemas.py` exactly. Real where possible: demographics and row text from Arpon's
+`Q1/Q2` fixtures, P0001's two planted omissions with their real row ids, the trust priors,
+and **every identity link in the P0002 review is the actual output of
+`identity.link_identity()`** on `Q1__P0002.json`. Invented rows have `-EX` in their id.
+Patients are MRNs; `P0001` never appears inside a file.
+
+`tests/unit/test_api_fixtures.py` (20 tests) validates every file against the schema and
+checks coverage of the UI states: every `DiscrepancyType`, every `NoticeType`, all three
+coverage states, every run status the UI handles, no dangling row ids. **Any schema change
+now fails CI until these files are updated in the same PR.**
+
+**Changed shared files:** none (`app/schemas.py` unchanged since #12).
+
+**Broken:** Nothing. 464 passed / 36 skipped, secret scan clean.
+
+**Needs from teammates:**
+- **Anshu** — the files are on `main` once this merges; there were **no placeholders of
+  yours** on `main` or any branch to replace. Types: copy from `app/schemas.py` (#12) and
+  `app/domain/packs/medtrace/types.py`. The README lists which file exercises which screen.
+- **Arpon** — one observation, not verified further: on P0002, `link_identity` labels
+  `pharmacy:C000006` with *"surname matches a previous surname"*, but that row's
+  `name_family` and `name_previous` are both null (its name is the combined
+  `"PAPADOPOULOS, Thomas"` in `name_given`). The band and guards look right; the label may
+  be off. Still open from my last entry: register silos on my Zetaris or stay on fixtures,
+  and a Q0 fixture.
+
+**Next:** PLAN 5.2, the Zetaris adapter (fixture replay first).
+
+---
+
 ### 2026-10-25 03:48 AEDT · Arnav · arnav/schemas
 
 **Did:** First session. Machine set up (Windows 11 + WSL2 Ubuntu; local Zetaris, own
