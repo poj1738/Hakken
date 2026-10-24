@@ -260,6 +260,47 @@ def served_fields(path: str, is_silo: bool) -> list[str] | None:
     return sorted(records[0]) if records else None
 
 
+def view_columns(client: Zetaris, view: str) -> list[str] | None:
+    """The columns a SchemaStore view actually exposes, or None."""
+    result, _secs, error = client.run(f"DESCRIBE {view}")
+    if error or not result.get("data"):
+        return None
+    return [str(row[0]) for row in result["data"]]
+
+
+def view_drift(client: Zetaris) -> list[tuple[str, str, str, list[str], list[str]]]:
+    """Views whose SELECT list no longer matches the columns we expect.
+
+    A view pins its SELECT list at creation exactly as a REST table pins its
+    inferred schema, so rebuilding the table is not enough -- `medtrace.nicknames`
+    still exposed only `canonical, variant` after `MT_REF.nicknames_raw` had been
+    rebuilt with `sex`, and `Q_REF(nicknames)` went on failing with
+    UNRESOLVED_COLUMN. `COUNT(*)` passed throughout, because counting rows never
+    names a column.
+    """
+    drifted = []
+    for db, table, _path, view, source in SILOS:
+        have, want = view_columns(client, view), list(HARMONISED_COLUMNS)
+        if have is not None and have != want:
+            drifted.append((db, table, view, have, want))
+    for db, table, _path, view, columns in REFERENCES:
+        have, want = view_columns(client, view), list(columns)
+        if have is not None and have != want:
+            drifted.append((db, table, view, have, want))
+    return drifted
+
+
+def recreate_view(db: str, table: str, view: str) -> str:
+    """The CREATE for one view, whichever kind it is."""
+    for sdb, stable, _p, sview, source in SILOS:
+        if sview == view:
+            return create_silo_view(sdb, stable, sview, source)
+    for rdb, rtable, _p, rview, columns in REFERENCES:
+        if rview == view:
+            return create_reference_view(rdb, rtable, rview, columns)
+    raise KeyError(view)
+
+
 def schema_drift(client: Zetaris) -> list[tuple[str, str, str, list[str], list[str]]]:
     """Raw tables whose inferred schema no longer matches what datasvc serves.
 
@@ -504,13 +545,15 @@ def main() -> int:
 
     if args.recreate_drifted:
         client = Zetaris()
-        drifted = schema_drift(client)
-        if not drifted:
-            log("\n--- no schema drift: every REST table matches what datasvc serves ---")
+        tables, views = schema_drift(client), view_drift(client)
+        if not tables and not views:
+            log("\n--- no drift: every REST table and view matches what datasvc serves ---")
             return 0
-        log(f"\n--- {len(drifted)} table(s) drifted; dropping and re-creating ---")
         failures = 0
-        for db, table, url, have, want in drifted:
+
+        if tables:
+            log(f"\n--- {len(tables)} table(s) drifted; dropping and re-creating ---")
+        for db, table, url, have, want in tables:
             log(f"  {db}.{table}: inferred {have} but datasvc serves {want}")
             for label, sql in (("DROP", f"DROP LIGHTNING DATABASE TABLE {db}.{table}"),
                                ("CREATE", create_rest_table(db, table, url)),
@@ -521,7 +564,40 @@ def main() -> int:
                     failures += 1
                     break
                 log(f"    ok    {label:7} {secs:6.2f}s")
+
+        # Re-read: rebuilding a table can change what its view should expose,
+        # and a view pins its SELECT list at creation just as a table pins its
+        # inferred schema. Rebuilding the table alone left medtrace.nicknames
+        # exposing two columns and Q_REF failing on the third.
+        views = view_drift(client)
+        if views:
+            log(f"\n--- {len(views)} view(s) drifted; dropping and re-creating ---")
+        for db, table, view, have, want in views:
+            log(f"  {view}: exposes {have} but should expose {want}")
+            for label, sql in (("DROP", f"DROP VIEW {view}"),
+                               ("CREATE", recreate_view(db, table, view))):
+                _result, secs, error = client.run(sql)
+                if error:
+                    log(f"    FAIL  {label:7} {secs:6.2f}s  {error[:160]}")
+                    failures += 1
+                    break
+                log(f"    ok    {label:7} {secs:6.2f}s")
+
+        # all_sources is a UNION ALL over the four silo views, so if any of
+        # them was just replaced it has to be rebuilt on top of the new ones.
+        if any(view in {v for _d, _t, _p, v, _s in SILOS} for _d, _t, view, _h, _w in views):
+            log(f"\n--- rebuilding {ALL_SOURCES_VIEW} on the new silo views ---")
+            for label, sql in (("DROP", f"DROP VIEW {ALL_SOURCES_VIEW}"),
+                               ("CREATE", create_all_sources())):
+                _result, secs, error = client.run(sql)
+                if error:
+                    log(f"    FAIL  {label:7} {secs:6.2f}s  {error[:160]}")
+                    failures += 1
+                    break
+                log(f"    ok    {label:7} {secs:6.2f}s")
+
         failures += verify(client)
+        failures += time_templates(client)
         return 1 if failures else 0
 
     if args.refresh:
