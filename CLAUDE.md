@@ -165,3 +165,6 @@ before relying on it, and re-verify on your own machine.
 
 **Both**
 - From inside a container use `host.docker.internal`, not `localhost`.
+
+## Current plan
+Roles and today's plan: docs/PLAN_2026-10-24.md. Read it before starting work.
