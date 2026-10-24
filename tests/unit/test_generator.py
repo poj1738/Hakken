@@ -25,8 +25,15 @@ SILOS = OUT / "silos"
 FIXTURES = pathlib.Path("tests/fixtures/medtrace")
 SOURCES = ("emr", "gp", "pharmacy", "patient")
 
+# Checks the silos, not just ground_truth.json: ground truth is committed but
+# the silos are gitignored, and nearly every test here reads a silo. They used
+# to be present on a fresh clone only because the determinism test regenerated
+# them in place as a side effect -- which is exactly the behaviour that let CI
+# assert against data nobody had committed. With that removed, a clone has no
+# silos and these skip, which is what the reason has always said.
 pytestmark = pytest.mark.skipif(
-    not (OUT / "ground_truth.json").exists(),
+    not all((SILOS / f"{s}.json").exists() for s in SOURCES)
+    or not (OUT / "ground_truth.json").exists(),
     reason="run `make synth` first (data/synthetic/silos/ is gitignored)",
 )
 
