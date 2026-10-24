@@ -62,13 +62,21 @@ def _digest(paths: list[pathlib.Path]) -> str:
 def test_the_generator_is_deterministic() -> None:
     """Same seed, byte-identical output. Without this, `output_examples/` and the
     eval numbers cannot be reproduced by a judge, and every rate in DATA_SPEC
-    becomes unverifiable."""
-    targets = sorted(SILOS.glob("*.json")) + [OUT / "ground_truth.json"]
-    before = _digest(targets)
-    result = subprocess.run([sys.executable, "scripts/generate_synthetic.py"],
-                            capture_output=True, text=True, timeout=300)
-    assert result.returncode == 0, result.stderr[-2000:]
-    assert _digest(targets) == before, "a second run produced different bytes"
+    becomes unverifiable.
+
+    Runs the generator **twice and compares the two runs**, rather than
+    comparing against whatever is on disk. Comparing to the committed files
+    tests staleness, not determinism: regenerating the lexicon with real PBS
+    codes legitimately changes the output, and that must not read as a
+    non-determinism failure.
+    """
+    def regenerate() -> str:
+        result = subprocess.run([sys.executable, "scripts/generate_synthetic.py"],
+                                capture_output=True, text=True, timeout=300)
+        assert result.returncode == 0, result.stderr[-2000:]
+        return _digest(sorted(SILOS.glob("*.json")) + [OUT / "ground_truth.json"])
+
+    assert regenerate() == regenerate(), "two runs of the same seed differed"
 
 
 # --------------------------------------------------------------------------- #
