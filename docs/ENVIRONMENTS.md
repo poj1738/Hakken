@@ -46,17 +46,14 @@ suite runs with no `.env` and no network, which is exactly how CI runs it.
 
 ## Arnav
 
-**Not set up yet.**
-
 | | |
 |---|---|
-| **OS / RAM** | not recorded |
-| **Zetaris** | none → use `SAMPLE_MODE=true` until set up |
-| **Nightshift** | none |
-| **Last preflight** | never run |
-
-Start at `docs/ONBOARDING.md`. Same as above — services are not required to work on
-the adapters, engines or schemas.
+| **OS / RAM** | Windows 11 Pro, 15 GB RAM. Hakken runs inside **WSL2 Ubuntu 24.04** (`~/Hakken`), WSL capped at 10 GB / 4 CPUs. Python 3.11.17 (matches CI), Docker 29.9.2 (Docker Desktop, WSL integration on). No Node. `gh` 2.45 in WSL. |
+| **Zetaris** | **Local** — sponsor's `zetaris-platform` bundle under Docker Desktop. REST `localhost:8888/api/v1.0` (reachable from WSL), org `1`. Pre-existing `NY_TAXI` + `TPCDS_DB` sample data. |
+| **Nightshift** | **Own**, Windows edition. The runtime listens on Windows `127.0.0.1:8088` only, so WSL reaches it through a `netsh portproxy` on the WSL adapter address — `METERLESS_BASE_URL` points there, not at `127.0.0.1`. 18 `meterless/*` routes. |
+| **Last preflight** | **2026-10-25 — 20 pass / 2 fail / 1 warn.** Zetaris all green; Nightshift `online`, `meterless/auto` answered by `nvidia/nemotron-3.5-lightning-30b-a3b`. Fails: Node not installed; Auto Detect (probes localhost ports only — expected with the portproxy). |
+| **Tooling** | `gh` authenticated with write access, so PRs and CI can be driven from the terminal. |
+| **Caveats (Windows)** | (1) Clone **inside WSL**, not under `/mnt/c` — a Windows clone gets CRLF line endings that break the bash scripts. (2) WSL `networkingMode=mirrored` broke Docker Desktop's port forwarding to Zetaris (`localhost:3000` dropped every connection), so it is off. (3) Without mirrored mode WSL cannot see Windows `127.0.0.1`, hence the portproxy; its address can change after a reboot. |
 
 ---
 
