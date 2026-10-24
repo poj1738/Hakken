@@ -73,10 +73,19 @@ Column names live in **`headers`**, zipped positionally with each row in `data`.
 reference client discards everything but `data`, which is why this had to be observed
 rather than read. Recorded fixtures are in `tests/fixtures/zetaris/`.
 
-**Every value arrives as a string**, confirmed directly: `SELECT 1` yields `"1"`,
-`2.5` yields `"2.5"`, `true` yields `"true"`. The adapter must cast, and the Evaluator
-must cast before re-deriving any cited number. An empty result is `data: []` with
-`total: 0` and populated `headers` — **not** an error.
+**Every *present* value arrives as a string**, confirmed directly: `SELECT 1` yields
+`"1"`, `2.5` yields `"2.5"`, `true` yields `"true"`. The adapter must cast, and the
+Evaluator must cast before re-deriving any cited number. An empty result is `data: []`
+with `total: 0` and populated `headers` — **not** an error.
+
+**A NULL is the exception: it arrives as JSON `null`, not the string `"null"`.**
+**Confirmed [live — Arpon's machine, 24 Oct]** against a `CAST(NULL AS STRING)` column
+in a SchemaStore view: the row came back as `[null, "2664"]`, i.e. Python `None`.
+So "every value is a string" is *almost* true, and the gap matters — `parse.py` must
+treat `None` as absent rather than calling `str()` on it, or three of the four silos
+grow the literal text `"None"` in `name_previous`, `sex` and every other
+source-specific null. `"None" != None` would then read as a present, non-matching
+value in identity scoring and in `evidence_state`.
 
 The same envelope is used by `SHOW` and `SELECT` alike, so one parser covers both.
 
@@ -106,6 +115,20 @@ Error meanings (from `AGENTS.md` and the troubleshooting tables):
   in one pass instead of a self-join or an `IN`/`HAVING` subquery.
 - `DESCRIBE BY "..."` accepts letters, digits, spaces and `_ . - ,` only.
   Parentheses, slashes and colons fail validation.
+- **String literals escape with a backslash (`\'`), not a doubled quote (`''`).**
+  **Confirmed [live — Arpon's machine, 24 Oct]:** `''` does not escape — it closes one
+  literal and opens another, and adjacent literals concatenate, so `SELECT 'O''Brien'`
+  returns `OBrien` (length 6) and `SELECT 'AB' 'CD'` returns `ABCD`. The quotes stay
+  balanced and nothing raises, so the value is **silently corrupted**:
+  `WHERE zone LIKE '%''%'` matched 789 of 789 rows (the pattern had collapsed to `%%`)
+  where the backslash form matched the true 12, and an `=` against a real apostrophe
+  value returned **0 rows with no error**. Any free-SQL path must use `\'`.
+  See `docs/DECISIONS.md`, 24 Oct, and `queries.sql_literal()`.
+- `UPPER(CAST(NULL AS STRING)) LIKE 'A%'` returns no rows rather than erroring, so an
+  `OR` chain may safely test columns that are null for some sources.
+- **`UPPER()` and `LIKE` are not free.** A Q1-shaped `OR` chain (an `IN` list plus
+  nested `UPPER`/`LIKE` predicates) over 789 rows cost **24.5 s**, against 3.8 s for a
+  plain `IN` count. Trim projections and keep predicates flat.
 
 ### 1.3 Registering our synthetic silos
 

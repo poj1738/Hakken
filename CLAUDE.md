@@ -143,6 +143,12 @@ before relying on it, and re-verify on your own machine.
   names (`<source>.<table>`).
 - **Never call port 8889** — it is internal on a local install.
 - Values come back as **strings** (`"1"`, `"2.5"`, `"true"`). Cast before comparing.
+- **Escape string literals with a backslash (`\'`), never a doubled quote (`''`).**
+  `''` does not escape in Lightning SQL — it ends one literal and starts another, and
+  adjacent literals concatenate, so `'O''Brien'` becomes `OBrien`. Quotes stay
+  balanced and nothing raises, so a name with an apostrophe silently matches **zero
+  rows**. Use `app.domain.packs.medtrace.queries.sql_literal()` rather than building
+  literals by hand.
 - `SHOW DATASOURCES` does not list REST or file registrations — use
   `SHOW LIGHTNING DATABASES` and `SHOW TABLES IN <db>`.
 - `CREATE SCHEMASTORE CONTAINER` has no `IF NOT EXISTS`; a re-run fails on a duplicate.
