@@ -31,7 +31,7 @@ frozen; nothing downstream of it is built yet.
 | Synthetic generator, ground truth, fixtures | Arpon | **done** — 40 patients, 61 planted findings, identity traps, **30 Zetaris envelopes** for `SAMPLE_MODE`. Dispensing rebuilt on real PBS pack sizes (max 14 fills/year, median 5) |
 | `datasvc/` | Arpon | **done** — 7 endpoints, whole-table `{"records": [...]}` |
 | TGA shortages (`scripts/load_tga_shortages.py`) | Arpon | **parses** — 1,010 rows, 514 notifiable, impact rating Critical 90 / Medium 178 / Low 742. **Not registered**; Q4 is optional and `q_shortages` still raises |
-| `scripts/register_sources.py` | Arpon | **APPLIED live.** 7 of 8 views verified — counts match `datasvc` exactly and all 6 live-vs-fixture diffs match. **`medtrace.nicknames` is broken** (see Blocked on). `all_sources` = 2 898 rows in ~2 s |
+| `scripts/register_sources.py` | Arpon | **APPLIED AND FULLY VERIFIED live, 25 Oct.** All 8 views green, all templates green, all 6 live-vs-fixture diffs match, `--verify-only` exits 0. `all_sources` = 2 790 rows in ~2 s |
 | Zetaris / Meterless adapters | Arnav | **stub** — both unblocked, contracts fully known |
 | Orchestrator, agents, API, trace | Arnav | not started |
 | H-MEM, World Model | Arnav | not started — World Model first, `identity.decide` waits on it |
@@ -63,25 +63,24 @@ in `CLAUDE.md`.
 
 ## Blocked on
 
-**One thing, and it needs Arpon: `medtrace.nicknames` fails every query in Zetaris.**
+**Nothing is blocked.** The `medtrace.nicknames` breakage was cleared on 25 Oct —
+`Q_REF(nicknames)` returns 167 rows with `sex` populated (77 F / 90 M), and
+`--verify-only` exits **0** with all 8 views green, all templates green and all 6
+live-vs-fixture diffs matching.
 
-A Lightning REST table infers its schema **once, at creation**, and keeps it —
-`REFRESH TABLE` returns ok and changes nothing. `MT_REF.nicknames_raw` inferred
-`struct<canonical, variant>` before `sex` was added, so it now reads rows wider than
-its schema and Spark throws `ArrayIndexOutOfBoundsException`. A stale cached copy hid
-this for a day. The fix drops and re-creates that one already-broken table:
+**Worth keeping, because it will happen again:** a Lightning REST table infers its
+schema **once, at creation**, and a SchemaStore view pins its SELECT list the same
+way. `REFRESH TABLE` returns ok and changes neither. So adding a column to a
+generated file silently breaks both, and `COUNT(*)` cannot detect it because
+counting rows never names a column. Run:
 
 ```bash
 python3 scripts/register_sources.py --recreate-drifted
 ```
 
-Nothing else waits on it: nicknames only affects fuzzy given-name matching, and
-`identity.py` builds its own nickname map in `parse.py`. The other 7 views are green
-and all 6 live-vs-fixture diffs match.
-
-**Generalise from it:** adding a column to any generated file silently breaks its
-REST table the same way, and you will not see it until the cache is dropped.
-`--recreate-drifted` detects that case for every table.
+It compares every table's inferred schema and every view's columns against the
+files, rebuilds only what drifted, rebuilds `all_sources` if a silo view underneath
+it was replaced, and finishes by running the real Q_REF/Q0–Q3 templates.
 
 **The three largest risks were closed on 24 Oct** by the step-1
 spike (`docs/DECISIONS.md`):

@@ -105,7 +105,10 @@ the human-review gate makes in the product, so the pitch and the code now agree.
 `scripts/register_sources.py` and `scripts/generate_synthetic.py` all changed
 behaviour — see the two flags above if you touch Zetaris.
 
-**Broken:** **`medtrace.nicknames` fails every query in Zetaris right now.** The REST
+**Broken:** nothing. (`medtrace.nicknames` was broken for most of this session;
+**resolved 25 Oct** — see below.)
+
+**RESOLVED — `medtrace.nicknames`.** It failed every query in Zetaris. The REST
 table inferred `struct<canonical, variant>` before `sex` was added by the name/sex
 fix, and a Lightning REST table infers its schema **once, at creation** — `REFRESH
 TABLE` returns ok and changes nothing. So the view reads rows wider than its schema
@@ -117,17 +120,20 @@ cached copy was masking it, and the only check that would have caught it was bei
 discarded (see 3). Everything else is green — all 8 other views match `datasvc`
 exactly, Q0–Q3 run, and **all 6 live-vs-fixture diffs match**.
 
-**Needs from teammates — one thing, and only Arpon can do it:**
+Arpon ran `--recreate-drifted` and it took **two passes**, which is the part worth
+remembering. The first rebuilt `MT_REF.nicknames_raw` and reported every view `ok` —
+but `Q_REF(nicknames)` still failed. **A SchemaStore view pins its SELECT list at
+creation exactly as a REST table pins its inferred schema**, so the view went on
+exposing two columns over a three-column table. `COUNT(*)` passed the whole time,
+because counting rows never names a column — the same blind spot that hid the
+original breakage. The tool now checks and rebuilds views too, rebuilds
+`all_sources` when a silo view underneath it is replaced, and runs the real
+templates at the end instead of stopping at `COUNT(*)`.
 
-```bash
-python3 scripts/register_sources.py --recreate-drifted
-```
+Now green: `Q_REF(nicknames)` returns 167 rows with `sex` populated (77 F / 90 M),
+and `--verify-only` exits 0.
 
-It drops and re-creates **only** `MT_REF.nicknames_raw`, which is already
-non-functional, then re-caches and re-verifies. I stopped rather than run it because
-`CLAUDE.md` says ask before dropping a Zetaris object. Nothing else is waiting on it:
-nicknames only affects fuzzy given-name matching in identity, and `identity.py`'s own
-nickname map is built in `parse.py`, not from this view.
+**Needs from teammates:** nothing.
 
 **5. CI failed on a number that passed locally, and the cause is worth everyone's
 attention: the test suite was rewriting the data it tests.**
