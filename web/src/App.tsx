@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { API_MODE, MAX_POLLS, POLL_INTERVAL_MS, STATUS_REFRESH_MS, api, isTerminal } from "./api";
+import { API_MODE, MAX_POLL_FAILURES, MAX_POLLS, POLL_INTERVAL_MS, STATUS_REFRESH_MS, api, isTerminal } from "./api";
 import type {
   AcceptanceUpdate,
   FeedbackReason,
@@ -31,6 +31,7 @@ export default function App() {
   const [run, setRun] = useState<RunResponse | null>(null);
   const [polling, setPolling] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
+  const [pollWarning, setPollWarning] = useState<string | null>(null);
   const [decided, setDecided] = useState<Record<string, "same" | "different">>({});
   const [identityBusy, setIdentityBusy] = useState<string | null>(null);
   const [identityError, setIdentityError] = useState<string | null>(null);
@@ -92,12 +93,25 @@ export default function App() {
   const poll = useCallback(async (runId: string) => {
     const token = ++pollToken.current;
     setPolling(true);
+    setPollWarning(null);
+    let failures = 0;
     try {
       for (let i = 0; i < MAX_POLLS; i++) {
         await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
         if (token !== pollToken.current) return;
-        const r = await api.getRun(runId);
+        let r: RunResponse;
+        try {
+          r = await api.getRun(runId);
+        } catch (e) {
+          // One dropped poll must not abandon a run that is still going; give up
+          // only after MAX_POLL_FAILURES in a row.
+          if (++failures >= MAX_POLL_FAILURES) throw e;
+          if (token === pollToken.current) setPollWarning(`Lost contact with the run (${failures}/${MAX_POLL_FAILURES}), retrying: ${msg(e)}`);
+          continue;
+        }
+        failures = 0;
         if (token !== pollToken.current) return;
+        setPollWarning(null);
         setRun(r);
         if (isTerminal(r.status) || r.status === "needs_review") return;
       }
@@ -105,7 +119,10 @@ export default function App() {
     } catch (e) {
       if (token === pollToken.current) setRunError(msg(e));
     } finally {
-      if (token === pollToken.current) setPolling(false);
+      if (token === pollToken.current) {
+        setPolling(false);
+        setPollWarning(null);
+      }
     }
   }, []);
 
@@ -180,7 +197,7 @@ export default function App() {
             running={polling}
             error={runError}
           />
-          <Timeline run={run} polling={polling} />
+          <Timeline run={run} polling={polling} warning={pollWarning} />
         </div>
         <div className="main">
           {run?.status === "needs_review" && run.identity_review && (

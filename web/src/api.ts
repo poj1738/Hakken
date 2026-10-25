@@ -33,6 +33,7 @@ const API_URL = String(import.meta.env.VITE_API_URL ?? "http://localhost:8000").
 const REQUEST_TIMEOUT_MS = 30_000;
 export const POLL_INTERVAL_MS = API_MODE === "mock" ? 600 : 1500;
 // 15 minutes of polling at most; a judge's run should finish in 5-10.
+export const MAX_POLL_FAILURES = 3;
 export const STATUS_REFRESH_MS = 30_000;
 export const MAX_POLLS = Math.ceil((15 * 60 * 1000) / POLL_INTERVAL_MS);
 
