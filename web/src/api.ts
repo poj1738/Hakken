@@ -24,7 +24,7 @@ import gpNotFoundFx from "@fixtures/run_P0001_gp_not_found.json";
 import needsReviewFx from "@fixtures/run_P0002_needs_review.json";
 import feedbackFx from "@fixtures/feedback_response.json";
 // Not an API example: a placeholder until a resumed-run example exists (see the file).
-import resumedPlaceholder from "./placeholders/run_P0002_resumed.PLACEHOLDER.json";
+import resumedPlaceholder from "./placeholders/resumed_run.PLACEHOLDER.json";
 
 export const API_MODE: "mock" | "live" =
   import.meta.env.VITE_API_MODE === "live" ? "live" : "mock";
@@ -171,7 +171,9 @@ const mock = {
     const f = fx.feedback;
     // Only the recorded verdict has recorded trust updates; anything else is
     // acknowledged with none rather than with invented numbers.
-    if (req.target_id === f.target_id && req.verdict === f.verdict && (req.reason ?? null) === (f.reason ?? null)) {
+    const rec = f.trust_updates[0];
+    const sameRecord = !rec || (req.source === rec.source && req.attribute === rec.attribute);
+    if (req.target_id === f.target_id && req.verdict === f.verdict && (req.reason ?? null) === (f.reason ?? null) && sameRecord) {
       return { ...clone(f), run_id: req.run_id };
     }
     return { ...req, reason: req.reason ?? null, trust_updates: [], acceptance_updates: [] };

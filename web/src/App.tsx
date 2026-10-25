@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { API_MODE, MAX_POLL_FAILURES, MAX_POLLS, POLL_INTERVAL_MS, STATUS_REFRESH_MS, api, isTerminal } from "./api";
 import type {
   AcceptanceUpdate,
-  FeedbackReason,
   Finding,
   HealthResponse,
   PatientSummary,
@@ -15,7 +14,7 @@ import { Timeline } from "./components/Timeline";
 import { IdentityReview } from "./components/IdentityReview";
 import { CoverageStrip, Notices } from "./components/Coverage";
 import { Grid } from "./components/Grid";
-import { Flags, type FeedbackState } from "./components/Flags";
+import { Flags, type FeedbackChoice, type FeedbackState } from "./components/Flags";
 import { Tasks } from "./components/Tasks";
 import { TrustPanel } from "./components/TrustPanel";
 import { Footer } from "./components/Footer";
@@ -161,11 +160,18 @@ export default function App() {
     }
   };
 
-  const sendFeedback = async (f: Finding, verdict: "confirm" | "reject", reason?: FeedbackReason) => {
+  const sendFeedback = async (f: Finding, c: FeedbackChoice) => {
     if (!run) return;
     setFeedback((s) => ({ ...s, [f.id]: { busy: true } }));
     try {
-      const r = await api.feedback({ run_id: run.run_id, target_id: f.id, verdict, reason: reason ?? null });
+      const r = await api.feedback({
+        run_id: run.run_id,
+        target_id: f.id,
+        verdict: c.verdict,
+        reason: c.reason ?? null,
+        // Only a source_outdated reject names a record; the API rejects them elsewhere.
+        ...(c.reason === "source_outdated" ? { source: c.source, attribute: c.attribute } : {}),
+      });
       setFeedback((s) => ({ ...s, [f.id]: { result: r } }));
       setTrustUpdates((u) => [...u, ...r.trust_updates]);
       setAcceptance((a) => [...a, ...r.acceptance_updates]);

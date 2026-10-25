@@ -29,6 +29,30 @@ export type NoticeType =
   | "stale_document"
   | "known_shortage";
 
+export type TrustAttribute =
+  | "existence"
+  | "daily_dose"
+  | "frequency"
+  | "release"
+  | "route"
+  | "strength"
+  | "intended_dose"
+  | "actually_taking"
+  | "name"
+  | "admission_chart";
+export const TRUST_ATTRIBUTES: TrustAttribute[] = [
+  "existence",
+  "daily_dose",
+  "frequency",
+  "release",
+  "route",
+  "strength",
+  "intended_dose",
+  "actually_taking",
+  "name",
+  "admission_chart",
+];
+
 export type Severity = "high" | "medium" | "low";
 export type IntentStatus = "documented_intentional" | "possibly_intentional" | "likely_unintentional";
 export type IdentityBand = "auto-merge" | "review" | "new";
@@ -206,6 +230,10 @@ export interface Finding {
   intent_reason?: string | null;
   priority: number;
   explanation: string;
+  // Passed through from DiscrepancyCandidate.detail: atc_class, conflict
+  // ("confirm" = ask first), bpmh_single_source, subtype, statement,
+  // daily_dose_ratio. Free-form, so unknown keys are shown, never dropped.
+  detail: Record<string, unknown>;
   evidence: Evidence[];
   evidence_states: Partial<Record<string, EvidenceState>>;
   tasks: string[];
@@ -335,6 +363,9 @@ export interface FeedbackRequest {
   target_id: string;
   verdict: FeedbackVerdict;
   reason?: FeedbackReason | null;
+  // Required by the API when reason is "source_outdated": the H-MEM record to lower.
+  source?: Source | null;
+  attribute?: TrustAttribute | null;
 }
 
 export interface TrustUpdate {

@@ -19,14 +19,14 @@ needed. They are not real runs, and the screen says so.
 |---|---|
 | MRN0000001 | `run_P0001_done.json` |
 | MRN0000001 with `?mock=gp_not_found` | `run_P0001_gp_not_found.json` |
-| MRN0000002 | `run_P0002_needs_review.json` |
+| MRN0000015 | `run_P0002_needs_review.json` (the file kept its old name) |
 
 Other patients have no example, so mock mode says so instead of inventing a
-result. For MRN0000002, deciding every identity candidate returns
-`src/placeholders/run_P0002_resumed.PLACEHOLDER.json`: a **placeholder**, not an
+result. For MRN0000015, deciding every identity candidate returns
+`src/placeholders/resumed_run.PLACEHOLDER.json`: a **placeholder**, not an
 API example, because no resumed-run example exists yet. It says so on screen and
 shows no grid or flags. Replace it once Arnav records a real resumed run. Feedback returns `feedback_response.json` only for
-the recorded verdict (reject F-006 as "Source outdated"); any other verdict is
+the recorded verdict (reject F-006 as "Source outdated", GP daily dose); any other verdict is
 acknowledged with no trust change.
 
 **Live mode** calls `GET /status`, `GET /patients`, `POST /run`, `GET /run/{id}`

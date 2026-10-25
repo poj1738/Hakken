@@ -189,6 +189,12 @@ select { font: inherit; padding: 0.35rem; border-radius: 6px; border: 1px solid 
 .resolved { font-size: 0.8rem; min-width: 160px; }
 .abstained strong { color: var(--warn); }
 .warn-text { color: var(--warn); }
+.ask-first { background: var(--warn-bg); color: var(--warn); border-radius: 6px; padding: 0.35rem 0.55rem; margin: 0.3rem 0; font-size: 0.86rem; }
+.statement { margin: 0.2rem 0; font-style: italic; }
+.detail-tags { display: flex; flex-wrap: wrap; gap: 0.8rem; margin: 0.2rem 0; }
+.intentional { border: 1px solid var(--line); border-radius: 8px; padding: 0.4rem 0.6rem; margin: 0.4rem 0; }
+.intentional > summary { cursor: pointer; font-size: 0.88rem; }
+.tier h3 { margin-bottom: 0.3rem; }
 .no-row { color: var(--warn); font-style: normal; font-size: 0.75rem; }
 .row-abstained th { box-shadow: inset 3px 0 0 var(--warn); }
 .inspector { margin-top: 0.8rem; border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; background: #fafbfc; min-height: 3rem; }

@@ -88,7 +88,7 @@ the UI, see below.**
 2. **Resolved doses need a unit.** `FusedValue.value` is a bare number ("Daily dose: 40"); `types.py` says "canonical units" but no field names them. The UI will not print "mg" itself (insulin is in units). Add a unit, e.g. `unit` on `FusedValue`, or send the value as text with its unit. Until then the grid shows the bare number.
 3. Every `present` cell should cite at least one row. Warfarin's admission-chart and patient-interview cells cite none in both P0001 examples, so the grid marks them "no row".
 4. The cell inspector shows `sql_template_id`, not the SQL text. If PLAN 6.6 means the query itself, `Evidence` needs it.
-5. A real resumed-run example (after `POST /run/{id}/identity`) would replace `web/src/placeholders/run_P0002_resumed.PLACEHOLDER.json`. It can't go in `tests/fixtures/api/` without updating `test_api_fixtures.py`'s file list.
+5. A real resumed-run example (after `POST /run/{id}/identity`) would replace `web/src/placeholders/resumed_run.PLACEHOLDER.json`. It can't go in `tests/fixtures/api/` without updating `test_api_fixtures.py`'s file list.
 **Next:** items 7–10 (flags, tasks, trust panel, footer).
 
 ### 2026-10-25 14:34 AEDT · Arpon · arpon/judge-path
