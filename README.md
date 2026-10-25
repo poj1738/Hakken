@@ -37,9 +37,9 @@ source to trust.
 
 ### Not finished
 
-- **The H-MEM and World Model engines**, and their conformance tests. Feedback already
-  moves trust between runs (the learning demo works), but only in-process; it is not
-  durable until H-MEM lands.
+- **The H-MEM engine** and its conformance tests. Feedback already moves trust between
+  runs (the learning demo works), but only in-process; it is not durable until H-MEM
+  lands. (The World Model engine is done; see "Engines used".)
 - **The Docker run path.** The API exists now, but the image has not been built and
   run end to end.
 - **The web UI** (`web/`) is built but has only run in mock mode, against hand-written
@@ -139,12 +139,26 @@ replay saved model text.
 
 ## Engines used
 
-Planned: **H-MEM** (memory across runs, feeding the Planner and the trust ledger) and
-**World Model** (shared evidence state with provenance). Both ported to Python from the
-official specs, verified by their official conformance suites translated to pytest
-(`make conformance`). **Not yet implemented** (Phase 4). See `docs/REFERENCE_NOTES.md`
-§3–4 for the exact contracts, and `docs/DECISIONS.md` for the one place the engine spec
-and its conformance runner disagree.
+**World Model: implemented, 8/8 official conformance checks green** (`make conformance`).
+`app/engines/world_model/` is a Python port of the Meterless reference implementation:
+- stable IDs (NFKD + sha-256)
+- banded merge decisions at 0.85 / 0.82, per the conformance runner and against the
+  prose spec (`docs/DECISIONS.md`)
+- an event-sourced store with mandatory provenance, non-destructive aliases,
+  bitemporal edges and a strictly ordered audit log
+- the idempotent ingest pipeline
+
+**Where it works in the product:**
+- **Identity linkage.** `identity.decide` delegates to the engine.
+- **Patient records.** Every linked patient record is written as `patient:<source>:<id>`
+  with its Zetaris provenance, and the Executor reads whose medicines to fetch from
+  the World Model graph.
+- **Remembered identity decisions.** A pharmacist's decision on a near-miss is recorded,
+  so the next run for that patient doesn't ask again. The trace shows the decision
+  and its audit `seq`.
+
+**H-MEM:** planned (memory across runs, feeding the Planner and the trust ledger).
+**Not yet implemented.** See `docs/REFERENCE_NOTES.md` §3–4 for the exact contracts.
 
 ## AI and model usage
 
@@ -162,10 +176,10 @@ and its conformance runner disagree.
 - **AI coding tools used:** **Claude Code**, logged per session in
   `docs/AI_TOOLS_USAGE.md`. `CLAUDE.md` holds the working rules. Cursor is not used —
   see that log for why.
-- **Open-source code to be materially adapted:** the H-MEM and World Model
-  specifications and conformance vectors from the Meterless repo (Apache-2.0). Nothing
-  is ported yet; when it is, each ported test file will carry an Apache-2.0 attribution
-  header. The Zetaris REST call shape in our adapter follows that project's reference
+- **Open-source code materially adapted:** the **World Model reference implementation
+  and conformance runner** from the Meterless repo (Apache-2.0, commit `1742dec`),
+  ported to Python. Every ported file carries an Apache-2.0 attribution header. The
+  H-MEM specification and vectors will be adapted the same way. The Zetaris REST call shape in our adapter follows that project's reference
   client. Real Zetaris and Nightshift responses are recorded as test fixtures.
 - **Data:** synthetic only, seeded and deterministic: `make lexicon && make synth`
   reproduces the committed data exactly, and CI checks that on every push. Real PBS

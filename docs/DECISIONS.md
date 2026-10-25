@@ -11,6 +11,34 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-25 — World Model: a faithful Python port, and how it carries identity
+
+**Decision.** `app/engines/world_model/` translates the Meterless TypeScript reference
+(`reference/src/*.ts`, commit `1742dec`) module by module, and the conformance runner's
+8 inline cases one for one. They pass 8/8, none weakened. Port choices that matter:
+- **Synchronous, with a lock.** The reference is async with a FIFO write queue; a lock
+  gives the same single-writer discipline in our synchronous pipeline.
+- **`canonical_json` treats `None` as absent**, the way TypeScript drops `undefined`,
+  and prints integral floats as integers, as `JSON.stringify` does. That way IDs and the
+  idempotency shape match the reference for the values we use. Not verified against
+  Node: Node isn't installed on Arnav's machine.
+- **The reference's superseding rule is kept as-is:** a new open edge with the same
+  `(from, type, context)` and a different target closes the old one. So every identity
+  edge carries `context = source:<source>`. Without it, linking the pharmacy record
+  would close the GP link.
+
+**How the product uses it** (`app/agents/identity_memory.py`):
+- Linked records become `patient:<source>:<id>` entities with Zetaris provenance, and
+  confirmed links become `same-person-as` edges. The medicine fetch reads the linked set
+  from the graph.
+- Pharmacist decisions are `same-person-as` / `distinct-from` edges with
+  `kind: "pharmacist"` provenance, so **a decided near-miss is not asked about again**.
+- Persisted at `STATE_DIR/.world/medtrace.json` live. In memory in SAMPLE_MODE, so an
+  offline run writes no state.
+
+`identity.decide` delegates to the engine's `decide` (Arpon's planned swap). The tune
+scorecard is identical before and after: `ALL 145 17 5 precision 0.90 recall 0.97 F1 0.93`.
+
 ## 2026-10-25 — SAMPLE_MODE answers Q3 from the patient's recorded Q2 + Q3 envelopes
 
 **Decision.** In SAMPLE_MODE, `ZetarisClient` answers a Q3 (`q_verify_rows`) with the

@@ -27,6 +27,43 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 · Arnav · arnav/world-model
+
+**Did:** World Model (TODO_ARNAV §4, ticked). **Sponsor rule 2's engine half is now real.**
+- **`app/engines/world_model/`** is a Python port of the Meterless reference
+  (`reference/src/*.ts`, commit `1742dec`). **8/8 official conformance checks**,
+  ported one for one to `tests/engines/` (`make conformance` now runs them). It has
+  an Apache-2.0 header on every ported file, and `docs/PREEXISTING.md` is updated.
+- **`identity.decide` delegates to the engine** (Arpon's planned swap). Following the
+  §5 guardrails, the scorecard `--split tune` is identical before and after:
+  `ALL 145 17 5 precision 0.90 recall 0.97 F1 0.93`. Skeleton, identity and scorecard tests pass.
+- **The user-facing feature** (`app/agents/identity_memory.py`):
+  - Every linked record is written as `patient:<source>:<id>` with Zetaris provenance.
+  - Confirmed links are `same-person-as` edges, and the medicine fetch reads the
+    linked set from the World Model graph.
+  - **A pharmacist's identity decision is remembered:** on P0015, run 2 doesn't pause
+    for review.
+  - Persisted under `STATE_DIR` live, in memory in SAMPLE_MODE.
+  - Trace events carry `engine: "world_model"` and `engine_op`.
+- The README "Engines used" section and `docs/DECISIONS.md` are updated.
+
+6 feature tests (including survival across a restart). `make test`: 738 passed.
+
+**Changed shared files:** none on the list. **`app/domain/packs/medtrace/identity.py`**:
+`decide` delegates, and the two thresholds come from the engine (same values, same
+public names).
+
+**Broken:** nothing.
+
+**Needs from teammates:**
+- **Anshu:** World Model trace events have `engine == "world_model"`. A small badge in
+  the timeline would show judges the engine working.
+
+**Next:** H-MEM and its 13 vectors, wired into feedback so trust persists. Then
+Arpon's handed-over items (§5).
+
+---
+
 ### 2026-10-25 18:57 AEDT · Arpon · handover (out of credits for the week)
 
 **Did:** (1) Ran a codebase scan of `main` at 3b0a01a. Seven reviewers raised 57 findings and two skeptics checked each one; 55 survived, merged into **34 items by owner** in `docs/SCAN_2026-10-25.md` (#32). (2) Handed every open Arpon item to Arnav: `docs/TODO_ARNAV.md` §5, with guardrails for editing the scored domain pack (#33). (3) Fixed scan S3, the Docker web stage failing on `@fixtures` (#34). `docker build --target web` now succeeds; the full image is still unbuilt on this machine because of slow Docker downloads. (4) Earlier today: TGA cleared and Q4 registered and live-checked (36 medicines with a known shortage), learning demo verified over HTTP, judge-path reproducibility in CI, lexicon consistency for teammates' Zetaris.
