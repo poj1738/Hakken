@@ -175,6 +175,24 @@ def test_field_evidence_is_written_for_a_human(lex) -> None:
     assert all(len(v) > 10 and not v[0].isdigit() for v in evidence.values())
 
 
+def test_every_evidence_sentence_starts_with_a_verdict_the_ui_can_read(lex) -> None:
+    """The UI colours each field from this prefix (Anshu, 25 Oct). It used to
+    guess from the wording, and "surname sounds the same" contains no keyword."""
+    from app.domain.packs.medtrace.identity import EVIDENCE_VERDICTS
+    a = row(name_given="Margaret", name_family="Smith", dob=date(1948, 7, 3), postcode="2000")
+    b = row("pharmacy", "C1", name_given="Peggy", name_family="Smyth", dob=date(1948, 3, 7),
+            postcode="2010")
+    evidence = score_pair(a, b, lex).field_evidence
+    assert all(v.split(": ", 1)[0] in EVIDENCE_VERDICTS for v in evidence.values()), evidence
+    assert evidence["given"].startswith("partial: ")      # a nickname is part credit
+    assert evidence["surname"].startswith("partial: ")    # a sound-alike, too
+    assert evidence["dob"].startswith("partial: ")        # a day/month swap
+    assert evidence["postcode"].startswith("differs: ")
+    same = score_pair(a, row("gp", "G1", name_given="Margaret", name_family="Smith",
+                             dob=date(1948, 7, 3)), lex).field_evidence
+    assert same["surname"] == "agrees: surname matches exactly"
+
+
 @pytest.mark.parametrize(("probability", "band"), [
     (1.0, "auto-merge"), (0.85, "auto-merge"), (0.8499, "review"),
     (0.82, "review"), (0.8199, "new"), (0.0, "new"),
@@ -340,7 +358,7 @@ def test_a_combined_name_field_surname_is_an_exact_match_not_a_previous_one(lex)
     pharmacy = row("pharmacy", "C1", name_given="PAPADOPOULOS, Thomas",
                    dob=date(1945, 3, 2), dob_raw="1945-03-02")
     link = score_pair(emr, pharmacy, lex)
-    assert link.field_evidence["surname"] == "surname matches exactly"
+    assert link.field_evidence["surname"] == "agrees: surname matches exactly"
 
 
 def test_a_typo_inside_a_combined_given_family_field_is_still_a_close_given_name(lex) -> None:
@@ -354,4 +372,4 @@ def test_a_typo_inside_a_combined_given_family_field_is_still_a_close_given_name
                     dob_raw="1950-04-09")
     link = score_pair(emr, interview, lex)
     assert "slightly" in link.field_evidence["given"]
-    assert link.field_evidence["surname"] == "surname matches exactly"
+    assert link.field_evidence["surname"] == "agrees: surname matches exactly"

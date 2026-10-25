@@ -11,6 +11,28 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-25 — TGA use cleared and Q4 switched on; identity evidence carries a verdict **[consultant + team decision, 25 Oct]**
+
+**TGA.** The team's consultant confirmed that using the TGA Medicine Shortage Reports
+export in this hackathon is unrestricted because the use is non-commercial. So
+`datasvc` now serves `/ref/tga`, its guard test changed from "not served" to "served
+only now it is cleared", and `register_sources.py --with-tga` (and `--refresh
+--with-tga`) is the documented path. The export stays gitignored and is never committed;
+anything beyond local, non-commercial demo use needs the question asked again
+(`docs/DATA_LICENCES.md` §4). Registering the table in Zetaris needs a human to run the
+command (the agent's permission check blocks creating Zetaris objects).
+
+**The repo stays public.** The team chose this on 25 Oct; it had been public before the
+question came up.
+
+**Identity evidence.** Every `IdentityLink.field_evidence` sentence now starts with
+`agrees:`, `partial:`, `differs:` or `held:` (`identity.EVIDENCE_VERDICTS`), taken from the
+score itself: full agreement weight, part credit (nickname, sound-alike surname,
+day/month swap) or disagreement weight. The UI was colouring fields by keywords in the
+prose, and "surname sounds the same" contains none. `types.py` stays frozen; the
+contract is in the string, and pinned by
+`test_every_evidence_sentence_starts_with_a_verdict_the_ui_can_read`.
+
 ## 2026-10-25 — A judge's clean clone now reproduces the data exactly, and CI proves it **[judge-clone audit, 25 Oct]**
 
 A subagent walked a fresh clone through the README. The main path worked, but the

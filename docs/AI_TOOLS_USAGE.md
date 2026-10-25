@@ -40,5 +40,6 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-25 | Anshu | Claude Code (cloud session) | Opus 5.5 | Web UI in `web/`: all ten PLAN §6 items in mock mode against `tests/fixtures/api/`, checked with Playwright screenshots |
 | 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Q4 shortages query (gated on licence), scorecard JSON and dashboard, data-licence audit (PBS copyright notices), fresh-clone audit via a subagent |
 | 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Applied the fresh-clone audit: reproducible data build checked in CI, honest make targets, README/metadata/Docker fixes |
+| 2026-10-25 | Arpon | Claude Code | Opus 5.5 | TGA cleared and Q4 switched on (registration left to Arpon); identity evidence verdict prefix for the UI |
 
 The README's **AI and model usage** section summarises this for judges.

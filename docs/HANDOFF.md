@@ -27,6 +27,14 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 15:10 AEDT · Arpon · arpon/tga-on
+
+**Did:** (1) **TGA cleared** by the consultant for non-commercial hackathon use. `datasvc` serves `/ref/tga`, the docs record the ruling, and `register_sources.py --with-tga` also works with `--refresh`. Restarted Arpon's local `datasvc` so it serves the route. (2) **Identity evidence has a verdict prefix** for Anshu's UI: `agrees:` / `partial:` / `differs:` / `held:` at the start of every `field_evidence` sentence, from the score itself. (3) Repo stays public (team decision).
+**Changed shared files:** none on the list.
+**Broken:** **Q4 is not registered in Arpon's Zetaris yet.** The agent's permission check blocked creating Zetaris objects, so Arpon runs `.venv/bin/python scripts/register_sources.py --apply --skip-exists --with-tga` himself. Until then a live `q_shortages` call fails with an unknown view.
+**Needs from teammates:** Anshu — colour identity fields from the prefix (`value.split(": ", 1)[0]`, one of `identity.EVIDENCE_VERDICTS`) instead of the keyword regex in `IdentityReview.tsx`; `partial` deserves its own colour. Arnav — real runs now produce prefixed evidence, so hand-written `field_evidence` in `tests/fixtures/api/` will differ until they are regenerated from runs. Q4 is available for a `check_shortages` step; render rows as "known shortage", never "unavailable".
+**Next:** nothing on Arpon's side after the registration command.
+
 ### 2026-10-25 14:34 AEDT · Arpon · arpon/judge-path
 
 **Did:** Applied the fresh-clone audit. `make lexicon && make synth` on a clean clone used to rewrite 21 committed fixtures and fail 2 tests. It now reproduces them byte for byte (the generator falls back to the committed lexicon). CI runs that build and `git diff --exit-code`, so the scorecard tests run in CI instead of skipping. Also: honest `make examples`/`validate`/`conformance`, README Quickstart (Docker labelled not working yet, data build documented), `python3` in the docs, `metadata.json` status and pre-existing components, `.dockerignore`, pip timeout in the Dockerfile, `.env.example` PBS comment.

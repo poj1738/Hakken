@@ -41,11 +41,12 @@ REF_DIR = pathlib.Path("data/reference")
 SILOS = {"emr": "emr.json", "gp": "gp.json", "pharmacy": "pharmacy.json",
          "patient": "patient.json"}
 
-#: `GET /ref/<name>`. `tga` is deliberately absent: Q4 is Monday and optional,
-#: and registering a view over data we have not licensed would be worse than
-#: shipping without it.
+#: `GET /ref/<name>`. `tga` (Q4's TGA shortage export) was held back until its
+#: use was cleared: the team's consultant confirmed on 25 Oct that non-commercial
+#: hackathon use is unrestricted (docs/DATA_LICENCES.md section 4). The file stays
+#: gitignored; it is served locally and only to Zetaris.
 REFERENCES = {"lexicon": "lexicon.json", "apinchs": "apinchs.json",
-              "nicknames": "nicknames.json"}
+              "nicknames": "nicknames.json", "tga": "tga_shortages.json"}
 
 app = FastAPI(
     title="MedTrace datasvc",
