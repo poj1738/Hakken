@@ -145,7 +145,11 @@ the demo.
 - [x] Meterless adapter (Nightshift) — rules 2 and 3. (Adapter done and verified live,
   25 Oct. The rules are only *met* once an agent calls it.)
 - [ ] Orchestrator wired to the pack as in section 1, with the **Writer as the
-  first real Nemotron call** — `SAMPLE_MODE` replay first, then live.
+  first real Nemotron call**. In `SAMPLE_MODE`, "replay" means the **Zetaris query
+  results** from `tests/fixtures/medtrace/` only. Model steps run the offline
+  reasoner on that data and **never replay saved model text** (CLAUDE.md rules 6
+  and 8). Arnav's session read the earlier wording ("`SAMPLE_MODE` replay first")
+  correctly, against the repo's rules; this line was ambiguous, not the rule.
 - [ ] API (`POST /run`, `GET /run/{id}`, `GET /status`, `GET /patients`) and
   `run.py` — rule 8.
 - [ ] **World Model + its 8 conformance checks** (rule 2). Then swap
