@@ -6,6 +6,10 @@ WORKDIR /web
 COPY web/package*.json ./
 RUN if [ -f package.json ]; then npm ci --no-audit --no-fund; fi
 COPY web/ ./
+# The UI's mock mode imports the API examples through `@fixtures` -> ../tests/fixtures/api
+# (web/tsconfig.json, web/vite.config.ts). From WORKDIR /web that is /tests/fixtures/api,
+# so it has to exist here or tsc fails with "Cannot find module" (scan S3, 25 Oct).
+COPY tests/fixtures/api/ /tests/fixtures/api/
 RUN if [ -f package.json ]; then npm run build; else mkdir -p dist; fi
 
 FROM python:3.11-slim
