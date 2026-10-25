@@ -27,6 +27,22 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 18:57 AEDT · Arpon · handover (out of credits for the week)
+
+**Did:** (1) Ran a codebase scan of `main` at 3b0a01a. Seven reviewers raised 57 findings and two skeptics checked each one; 55 survived, merged into **34 items by owner** in `docs/SCAN_2026-10-25.md` (#32). (2) Handed every open Arpon item to Arnav: `docs/TODO_ARNAV.md` §5, with guardrails for editing the scored domain pack (#33). (3) Fixed scan S3, the Docker web stage failing on `@fixtures` (#34). `docker build --target web` now succeeds; the full image is still unbuilt on this machine because of slow Docker downloads. (4) Earlier today: TGA cleared and Q4 registered and live-checked (36 medicines with a known shortage), learning demo verified over HTTP, judge-path reproducibility in CI, lexicon consistency for teammates' Zetaris.
+**Changed shared files:** none in this batch (`Dockerfile` only).
+**Broken:** nothing. Still open: **no Meterless engine or conformance test** (rule 2), and **`output_examples/` is empty** (rule 8). Both are Arnav's, top of the list.
+**Needs from teammates:**
+- **Arnav:** everything left, in the order given in the prompt Arpon sent you:
+  1. World Model + 8 conformance checks, then swap `identity.decide` for it.
+  2. H-MEM + feedback, with `memory_used` populated.
+  3. `scripts/generate_examples.py` and `output_examples/`: every input, the identity resumes, the learning sequence, and at least 3 live Nemotron runs.
+  4. Your scan items S5–S18 and S26–S31.
+  5. Arpon's §5 items.
+  6. Docs, the full `docker compose up`, and `make validate`.
+- **Anshu:** S4 (grid-cell feedback for learning-demo step 1, the item that matters most for the demo), S24, S25. `output_examples/` too, if Arnav hands it over.
+**Next:** Arpon is off Claude until his credits reset. He can still run commands Claude is blocked from (Zetaris registration) if asked in chat.
+
 ### 2026-10-25 · Arnav · arnav/planner-driven
 
 **Did:** "Option A", as Arnav asked: **the Planner decides what is needed, and the

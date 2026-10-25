@@ -41,6 +41,7 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Q4 shortages query (gated on licence), scorecard JSON and dashboard, data-licence audit (PBS copyright notices), fresh-clone audit via a subagent |
 | 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Applied the fresh-clone audit: reproducible data build checked in CI, honest make targets, README/metadata/Docker fixes |
 | 2026-10-25 | Arpon | Claude Code | Opus 5.5 | TGA cleared and Q4 switched on (registration left to Arpon); identity evidence verdict prefix for the UI |
+| 2026-10-25 | Arpon | Claude Code (multi-agent workflow) | Opus 5.5 | Codebase scan: 7 reviewers, 2 skeptics per finding, 34 verified items; Docker web-stage fix; handover to Arnav |
 | 2026-10-25 | Anshu | Claude Code (cloud session) | Opus 5.5 | UI review item by item against PLAN §6, with fixes; followed schema #23 and identity verdict prefixes #24; checked with Playwright |
 
 The README's **AI and model usage** section summarises this for judges.
