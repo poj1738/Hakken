@@ -11,6 +11,32 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-25 — A judge's clean clone now reproduces the data exactly, and CI proves it **[judge-clone audit, 25 Oct]**
+
+A subagent walked a fresh clone through the README. The main path worked, but the
+README's own `make lexicon && make synth` **rewrote 21 committed fixtures** (real PBS
+codes became synthetic, because the PBS snapshot is gitignored) and two tests then
+failed. The scorecard's 7 tests **skipped on every clean clone and in CI**, so the
+headline numbers were never checked there.
+
+**Fix:** the generator uses `data/reference/lexicon.json` only if it carries real PBS
+codes, and otherwise the committed `Q_REF__lexicon.json` (the exact lexicon Zetaris
+serves). `build_lexicon.py` no longer overwrites the committed lexicon fixtures with
+an all-synthetic build. Verified in the clean clone: after `make lexicon && make synth`
+every committed fixture and `ground_truth.json` is byte-identical, and the full suite
+passes with nothing skipped for missing data. **CI now runs both builds and
+`git diff --exit-code`**, so the data's reproducibility and the scorecard are checked on
+every push.
+
+Also from the audit: honest `make examples` / `validate` / `conformance` (they said
+"no such file"; now "not implemented yet", exit 2); README Quickstart labels Docker as
+not working yet and documents the data build; `python3` in the docs (bare `python` does
+not exist on stock macOS); `metadata.json` marks entry points and sample mode as not
+implemented and lists the pre-existing components; a `.dockerignore`, so local data and
+`.env` cannot be baked into the image; `PIP_DEFAULT_TIMEOUT` for slow networks. The
+unmodified `docker build` could not be completed on this machine (pip timed out on a
+slow Docker network); every later step was confirmed with pre-downloaded wheels.
+
 ## 2026-10-25 — Q4 written but switched off: the TGA licence is unconfirmed **[measured + web check, 25 Oct]**
 
 **Q4 is written.** `queries.q_shortages(generics)` returns `Current` and `Anticipated`
