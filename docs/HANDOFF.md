@@ -45,8 +45,9 @@ the pack in `reconcile()` order:
   invented numbers, foreign rows and "not taking" over UNKNOWN, and a Nemotron critique
   returns a faithful/unfaithful verdict per finding.
 - **Writer** (Nemotron) writes all the explanations and the summary in one call. The
-  grounded template is used offline, and wherever the code check still fails after the
-  last round.
+  grounded template is used offline, and wherever the code check **or** the model's
+  verdict still objects after the last round. Live, the model caught "40 mg 1 bd (once
+  daily)", which every number check had passed.
 - The run is bounded by the 8-query budget, `RUN_TIMEOUT_S` and `MAX_AGENT_ITERATIONS`.
   A Nightshift failure in live mode degrades visibly: a caveat, trace status
   `degraded`, run `partial`.
