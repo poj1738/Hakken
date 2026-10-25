@@ -9,6 +9,23 @@ Before you start: `git pull origin main`, `make setup`, `make test`. Then
 `make synth` — `data/synthetic/silos/` is gitignored, and the generator tests and
 the scorecard **skip** without it. A skip there is a missing build, not a pass.
 
+> **⚠ Incoming from Arpon (25 Oct, in progress): demo data.** Until a follow-up
+> lands on `main` and this box says *landed*:
+> - **Don't record `output_examples/`, `input_examples/` or regenerate
+>   `tests/fixtures/api/` from real runs yet.** The replay set
+>   (`tests/fixtures/medtrace/`) is about to change.
+> - **Coming:** (1) a **learning-demo pair** inside the replay set: reject patient
+>   A's GP dose as outdated (`source="gp"`, `attribute="daily_dose"`, −0.20), and
+>   patient B's dose conflict resolves and surfaces a chart error. Today no patient
+>   in P0001–P0010 changes at all under one rejection, so the 2:15 demo beat would
+>   show nothing. (2) **3–4 showcase patients** with replay fixtures and
+>   `input_examples/example_{1..}.json` (rule 8). (3) **Sample-mode data shipped in
+>   the Docker image.** The Dockerfile copies `data/` but not `tests/`, and
+>   `data/reference/` is gitignored, so `SAMPLE_MODE` in Docker would have nothing
+>   to replay.
+> - Carry on with everything else (adapter, orchestrator, API, World Model). None
+>   of it depends on this.
+
 ---
 
 ## 0. Where things stand (two lines)
