@@ -81,13 +81,15 @@ the UI, see below.**
 
 ### 2026-10-25 15:12 AEDT · Anshu · anshu/ui-review (in progress)
 
-**Did:** Reviewing the merged UI (#22) against PLAN §6, one item at a time. Items 1–6 done:
+**Did:** Reviewing the merged UI (#22) against PLAN §6, one item at a time. Items 1–8 done:
 - Header shows `GET /status` only.
 - Picker handles load, empty and error states, and clears results when you switch patient.
 - Timeline survives a dropped poll.
 - Identity review runs end to end in mock mode, ending on a labelled placeholder.
 - The BPMH banner heading appears only when `bpmh_confirmable` is false.
 - The grid flags any present cell that has no cited row.
+- Flags follow #23: `detail` is rendered ("Ask first" for `conflict: confirm`), a `source_outdated` reject sends `source` + `attribute`, and there is no default reject reason. Bodies were checked against `FeedbackRequest`.
+- Each task names the finding or notice it came from; ticks are labelled screen-only.
 
 **Changed shared files:** none.
 **Broken:** nothing. Branch not on GitHub yet: Claude's push gets 403, so it goes up by bundle like #22.
@@ -97,7 +99,8 @@ the UI, see below.**
 3. Every `present` cell should cite at least one row. Warfarin's admission-chart and patient-interview cells cite none in both P0001 examples, so the grid marks them "no row".
 4. The cell inspector shows `sql_template_id`, not the SQL text. If PLAN 6.6 means the query itself, `Evidence` needs it.
 5. A real resumed-run example (after `POST /run/{id}/identity`) would replace `web/src/placeholders/resumed_run.PLACEHOLDER.json`. It can't go in `tests/fixtures/api/` without updating `test_api_fixtures.py`'s file list.
-**Next:** items 7–10 (flags, tasks, trust panel, footer).
+6. **Task order.** `RunResponse.tasks` arrives in alphabetical order, which buries the warfarin and oxycodone tasks mid-list. Ordering by the priority of the finding each task comes from would put high-risk ones first. The UI won't re-sort them itself, since that would mean the screen deciding what matters most. Each task now shows its source finding and badges.
+**Next:** items 9–10 (trust panel, footer).
 
 ### 2026-10-25 14:34 AEDT · Arpon · arpon/judge-path
 
