@@ -163,5 +163,35 @@ the demo.
   `identity.decide`, Arpon's local copy, for yours: same thresholds, 0.85 / 0.82.
 - [ ] H-MEM + feedback (section 2 makes the feedback half possible).
 
-Don't edit `app/domain/` — if the pack needs a change, write it in your
-HANDOFF entry for Arpon's session.
+Don't edit `app/domain/` except for the handed-over items in §5.
+
+---
+
+## 5. Handed over from Arpon (25 Oct): he is out of credits for the week
+
+Arpon's open items from `docs/SCAN_2026-10-25.md` are yours now. **Order: World Model +
+conformance first (rule 2), then S2, then these.** S2 (`output_examples/`) is a good one
+to hand to Anshu if she has room after the Docker fix (S3).
+
+1. **S8** `metadata.json`: mark run.py, POST /run, SAMPLE_MODE and the Zetaris adapter as
+   working (it now under-claims). Five minutes.
+2. **S7** `coverage.py:229`: a patient lay-term line ("my blue puffer") makes the patient
+   column read ABSENT for that medicine.
+3. **S19** example_3 (P0013) does not produce `bpmh_not_confirmable`: either fix
+   `coverage.bpmh_confirmable` or correct `input_examples/README.md`. Check the ACSQHC
+   two-source rule in `docs/PITCH_CLAIMS.md` first.
+4. **S22** `identity.py:448`: the "held back because" guard text is false in both demo
+   pauses (P0015, P0013), and judges see it.
+5. **S21, S20, S32, S33**: range directions, the dead safety-gate rule, zero-trust fusion,
+   anchor coverage state. Lower priority.
+
+**Guardrails for `app/domain/` (the pack is scored, so changes can regress silently):**
+- Run `.venv/bin/python scripts/eval.py --split tune` before and after, and paste both
+  `ALL` lines into your HANDOFF entry.
+- `tests/eval/test_scorecard.py` must stay green. Never lower a floor to pass.
+- **Never tune on held-out.** Look at `--split heldout` only once, at the end, and
+  report a fix found that way as post-hoc (DECISIONS 25 Oct).
+- New helpers must be private (`_name`): `test_medtrace_skeleton.py` freezes the
+  public surface.
+- If you change a generator or fixture, CI's reproducibility step diffs them, so
+  commit the regenerated fixtures in the same PR.
