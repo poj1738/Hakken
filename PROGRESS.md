@@ -59,7 +59,7 @@ feedback loop by Monday morning at the latest.
 
 ## Next up
 
-**Codebase scan, 25 Oct: `docs/SCAN_2026-10-25.md`** — 34 verified items by owner. Blockers: Meterless engine + conformance (Arnav), `output_examples/` empty (anyone), Docker web-stage build (Anshu).
+**Codebase scan, 25 Oct: `docs/SCAN_2026-10-25.md`** — 34 verified items by owner. Blockers: Meterless engine + conformance (Arnav), `output_examples/` empty (anyone), Docker web-stage build (Anshu). **Arpon is out of credits for the week; his items moved to Arnav (`docs/TODO_ARNAV.md` §5).**
 
 **Arnav's session: read `docs/TODO_ARNAV.md` first** — everything needed from Arpon's side, in order.
 
