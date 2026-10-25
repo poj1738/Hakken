@@ -228,18 +228,15 @@ class Orchestrator:
             if not problems:
                 break
             if round_no == rounds:
-                # The code checks are the hard gate; the model's critique is advisory. After the
-                # last round, only an explanation the code still rejects is replaced.
-                hard = {f.id: p for f in findings if f.id in problems and (p := evaluator.claim_problems(f))}
-                for fid, issues in hard.items():
+                # Anything still under objection after the last round -- from the code checks or the
+                # model's per-finding verdict -- is replaced with the grounded template. Live, 25 Oct:
+                # "esomeprazole 40 mg 1 bd (once daily)" passed every number check and was still
+                # wrong; the model verdict caught it. Prose loses to safety.
+                for fid, issues in problems.items():
                     ctx.tracer.emit("Evaluator", "verify", step="VERIFY", status="blocked",
-                                    message=f"Verifier blocked an unsupported claim in {fid}: {'; '.join(issues)}. "
+                                    message=f"Verifier blocked an unsupported claim in {fid}: {'; '.join(issues)[:300]}. "
                                             "Replaced with the grounded template.")
-                for fid in problems.keys() - hard.keys():
-                    ctx.tracer.emit("Evaluator", "critique", step="CRITIQUE",
-                                    message=f"Model critique still disagrees on {fid} ({'; '.join(problems[fid])[:200]}), "
-                                            "but every number and row it cites checks out; kept.")
-                findings = [f.model_copy(update={"explanation": writer.template(f)}) if f.id in hard else f
+                findings = [f.model_copy(update={"explanation": writer.template(f)}) if f.id in problems else f
                             for f in findings]
                 break
             ctx.tracer.emit("Evaluator", "critique", step="CRITIQUE",
