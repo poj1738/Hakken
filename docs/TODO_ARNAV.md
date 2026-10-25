@@ -98,7 +98,7 @@ Three things the pack leaves to you:
 
 Both are needed because of what the pack produces since 25 Oct.
 
-- [ ] **`Finding.detail: dict[str, Any] = {}`**, passed through from
+- [x] **`Finding.detail: dict[str, Any] = {}`**, passed through from
   `DiscrepancyCandidate.detail`.
   - **Without it the learning loop can't work.** Your `AcceptanceUpdate` keys on
     `(type, atc_class)`. `detect` writes `atc_class` (4-character ATC subgroup,
@@ -109,13 +109,15 @@ Both are needed because of what the pack produces since 25 Oct.
     - `bpmh_single_source` — the history rests on one source; unverified.
     - `subtype`, `statement` ("charted 150 mg/day against 75 mg/day before
       admission"), and `daily_dose_ratio`.
-- [ ] **`FeedbackRequest.source: Source | None` and `.attribute: str | None`**,
-  validated as required when `reason == "source_outdated"`.
+- [x] **`FeedbackRequest.source: Source | None` and `.attribute: str | None`**,
+  validated as required when `reason == "source_outdated"`. (Arnav, 25 Oct: both
+  are required for `source_outdated`, and `attribute` is typed `TrustAttribute`.)
   - PLAN 5.7's `-0.20` lands on *that* `(source, attribute)` H-MEM record.
   - That's the demo's "reject a GP dose as outdated → patient B resolves
     differently".
-- [ ] Update `tests/fixtures/api/*.json` in the same PR — `test_api_fixtures.py`
-  fails otherwise.
+- [x] Update `tests/fixtures/api/*.json` in the same PR — `test_api_fixtures.py`
+  fails otherwise. (Regenerated against the 25 Oct data; the review example is now
+  P0015, because P0002 no longer reaches review.)
   - While there: the fixtures were regenerated at 200 patients, so the
     hand-written row text and demographics have drifted from `Q1`/`Q2`.
     PLAN says regenerate them from real runs anyway.

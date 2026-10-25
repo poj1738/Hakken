@@ -167,8 +167,37 @@ def test_model_call_defaults_to_not_truncated() -> None:
      "not_clinically_relevant", "already_known", "other"],
 )
 def test_reject_accepts_each_of_the_six_reasons(reason: str) -> None:
-    f = FeedbackRequest(run_id="r1", target_id="F1", verdict="reject", reason=reason)
+    named = {"source": "gp", "attribute": "daily_dose"} if reason == "source_outdated" else {}
+    f = FeedbackRequest(run_id="r1", target_id="F1", verdict="reject", reason=reason, **named)
     assert f.reason == reason
+
+
+def test_source_outdated_names_the_trust_record() -> None:
+    """The learning demo's -0.20 must land on ("gp", "daily_dose"), so both are required."""
+    f = FeedbackRequest(run_id="r1", target_id="F1", verdict="reject", reason="source_outdated",
+                        source="gp", attribute="daily_dose")
+    assert (f.source, f.attribute) == ("gp", "daily_dose")
+    for missing in ({"source": "gp"}, {"attribute": "daily_dose"}, {}):
+        with pytest.raises(ValidationError, match="source and attribute"):
+            FeedbackRequest(run_id="r1", target_id="F1", verdict="reject",
+                            reason="source_outdated", **missing)
+
+
+def test_feedback_source_and_attribute_are_vocabulary_checked() -> None:
+    with pytest.raises(ValidationError):
+        FeedbackRequest(run_id="r1", target_id="F1", verdict="reject", reason="source_outdated",
+                        source="hospital", attribute="daily_dose")
+    with pytest.raises(ValidationError):
+        FeedbackRequest(run_id="r1", target_id="F1", verdict="reject", reason="source_outdated",
+                        source="gp", attribute="colour")
+
+
+def test_finding_detail_passes_through_and_round_trips() -> None:
+    detail = {"atc_class": "C09A", "conflict": "confirm", "bpmh_single_source": "gp",
+              "subtype": "dose", "statement": "charted 150 mg/day against 75 mg/day", "daily_dose_ratio": 2.0}
+    f = Finding(id="F1", type="dose", generic="irbesartan", detail=detail)
+    assert Finding.model_validate_json(f.model_dump_json()).detail == detail
+    assert Finding(id="F2", type="dose", generic="x").detail == {}
 
 
 def test_reject_without_reason_is_refused() -> None:
