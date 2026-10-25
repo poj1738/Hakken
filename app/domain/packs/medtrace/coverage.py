@@ -226,7 +226,38 @@ def evidence_state(
     if any(note.startswith(SCOPE_DISPENSING_INCOMPLETE) for note in cov.scope_notes):
         return EvidenceState.UNKNOWN
 
+    # The source may be describing it in words we could not map (scan S7).
+    if _lay_term_covers(wanted, own, stmts):
+        return EvidenceState.UNKNOWN
+
     return EvidenceState.ABSENT_IN_SCOPE
+
+
+def _lay_term_covers(wanted: str, own: list[MedStatement], stmts: list[MedStatement]) -> bool:
+    """Does an unmapped line of this source name a drug class that includes `wanted`?
+
+    "Spray under the tongue" (C01DA02), "my blue puffer" (R03AC02) and "cholesterol
+    tablet" (C10A) cannot be resolved to one medicine, so they map to nothing -- and
+    the patient column then read ABSENT_IN_SCOPE for glyceryl trinitrate,
+    salbutamol and rosuvastatin, which fusion counted as a vote against. The source
+    did not say no; it said something we could not pin down. That is UNKNOWN.
+
+    The medicine's ATC comes from any statement in the run that names it (this
+    function's signature carries no lexicon), and the classes from `LAY_TERMS`.
+    """
+    from app.domain.packs.medtrace.normalise import LAY_TERMS  # local: normalise imports this module's peers
+
+    unmapped = [_key(s.raw_text) for s in own if not s.generic and s.resolution == "unmapped"]
+    if not unmapped:
+        return False
+    atcs = {s.atc for s in stmts if s.atc and _asserts(s, wanted)}
+    if not atcs:
+        return False
+    for text in unmapped:
+        for phrase, classes in LAY_TERMS.items():
+            if phrase in text and any(atc.startswith(c) for atc in atcs for c in classes):
+                return True
+    return False
 
 
 def bpmh_confirmable(cov: dict[str, Coverage]) -> tuple[bool, str]:
