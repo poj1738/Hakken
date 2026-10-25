@@ -101,9 +101,10 @@ make lexicon    # reference tables from the committed sources, no network
 make synth      # the four synthetic silos, ground truth and fixtures
 ```
 
-Use `make data` instead of `make lexicon` only if you want the real PBS codes — it
-fetches from the PBS public API at one request per 21 s, so it takes about 8 minutes.
-Without it the lexicon still builds complete and working; the codes are just synthetic.
+You do not need `make data`. Without a PBS fetch, `make lexicon` uses the committed
+lexicon (real PBS codes), so your silos, your fixtures and what your Zetaris serves all
+match what is committed, byte for byte. `make data` (the PBS public API, one request
+per 21 s, about 8 minutes) is only for rebuilding the lexicon itself.
 
 **`make test` does not build these, and it used to.** Until 25 Oct the determinism
 test ran the generator *in place*, so running the suite quietly rewrote
@@ -115,6 +116,32 @@ had committed. The test now writes to a temp directory, so:
 - if `data/synthetic/silos/` is missing, the generator tests **skip** — that is
   correct, not a failure. Run `make synth`.
 - nothing regenerates your data behind your back any more.
+
+### Registering MedTrace on your own Zetaris (first time)
+
+Each person's Zetaris is their own, so the MedTrace tables exist only after you
+register them. Zetaris and your `.env` (`ZETARIS_*`, and `DATASVC_PUBLIC_URL`, which
+defaults to `http://host.docker.internal:8100` so the Zetaris containers can reach the
+host) must be set up first; `make preflight` checks them.
+
+```bash
+make lexicon && make synth                     # the data, if you have not built it
+.venv/bin/python -m uvicorn datasvc.main:app --host 0.0.0.0 --port 8100   # leave running
+make register                                  # dry run: prints every statement, sends nothing
+.venv/bin/python scripts/register_sources.py --apply        # creates the objects (once)
+make verify                                    # must exit 0: views, templates, fixture diffs
+```
+
+`--apply` **creates Zetaris objects**: one `medtrace` container, five Lightning
+databases, the REST tables and the views. Run it yourself, in your own terminal. Claude's
+permission check blocks it, which is correct. If a re-run complains that something
+already exists, add `--skip-exists`. `CREATE SCHEMASTORE CONTAINER` has no
+`IF NOT EXISTS`.
+
+The TGA "known shortage" overlay (Q4) is optional. It needs the TGA shortage CSV export
+saved to `data/reference/raw/tga_shortages_active_20261024.csv`, then
+`.venv/bin/python scripts/load_tga_shortages.py`, then the same `--apply --skip-exists`
+with `--with-tga`.
 
 ### If you have Zetaris registered
 
