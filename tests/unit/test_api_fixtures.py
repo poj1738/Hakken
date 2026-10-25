@@ -8,6 +8,7 @@ change must update `tests/fixtures/api/` in the same PR.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -93,4 +94,6 @@ def test_patients_are_identified_by_mrn_not_ground_truth_keys() -> None:
     ids = [p.patient_id for p in _load("patients.json").patients]
     assert len(ids) == len(set(ids))
     assert all(i.startswith("MRN") for i in ids)
-    assert "P0001" not in json.dumps([json.loads((API / n).read_text()) for n in FILES])
+    # A standalone ground-truth key ("P0001"), not the same digits inside "GPP000159".
+    blob = json.dumps([json.loads((API / n).read_text()) for n in FILES])
+    assert not re.search(r"(?<![A-Za-z0-9])P\d{4}(?![0-9])", blob)
