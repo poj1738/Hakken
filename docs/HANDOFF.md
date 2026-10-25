@@ -35,6 +35,50 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 **Needs from teammates:** Anshu — colour identity fields from the prefix (`value.split(": ", 1)[0]`, one of `identity.EVIDENCE_VERDICTS`) instead of the keyword regex in `IdentityReview.tsx`; `partial` deserves its own colour. Arnav — real runs now produce prefixed evidence, so hand-written `field_evidence` in `tests/fixtures/api/` will differ until they are regenerated from runs. Q4 is available for a `check_shortages` step; render rows as "known shortage", never "unavailable".
 **Next:** nothing on Arpon's side after the registration command.
 
+### 2026-10-25 15:06 AEDT · Arnav · arnav/schema-review
+
+**Did:** TODO_ARNAV section 2, ticked in that file.
+- **`Finding.detail`** passes `DiscrepancyCandidate.detail` through (`atc_class`,
+  `conflict`, `bpmh_single_source`, `subtype`, `statement`, `daily_dose_ratio`).
+- **`FeedbackRequest.source` / `.attribute`**, vocabulary-checked (`Source`,
+  `TrustAttribute`), **both required when `reason == "source_outdated"`**.
+- **Example API JSON regenerated** against the 25 Oct data:
+  - `detail` is on every finding.
+  - P0001's overlay rows (`PHM-000076`–`078`) no longer exist, and its interview name is now "Marj".
+  - `patients.json` now comes from the real Q0 fixture: the 13 replayable patients.
+  - The feedback example uses the learning-demo record `("gp", "daily_dose")` 0.70 → 0.50, with no acceptance update.
+- **The needs-review example is now P0015** (`input_examples/example_1`). Since the
+  25 Oct data, P0002 links straight through with no review. The file keeps its name
+  `run_P0002_needs_review.json` because `web/src/api.ts` imports it. The UI keys on
+  `patient_id`, so it picks P0015 up automatically.
+
+Order going forward, agreed with Arnav: the repo's TODO order, not the original
+5.2-first list. Meterless adapter → Zetaris adapter → orchestrator / API / `run.py` →
+World Model (in this window, no second session) → H-MEM.
+
+**Changed shared files:** **`app/schemas.py`** (`Finding.detail`, `FeedbackRequest.source`,
+`FeedbackRequest.attribute`, plus a validator).
+
+**Broken:** nothing on `main`. Unit tests 600 passed / 5 skipped. **One live-mode break is waiting in
+the UI, see below.**
+
+**Needs from teammates:**
+- **Anshu** — (1) Add `detail: Record<string, unknown>` to `Finding`, and `source?` /
+  `attribute?` to `FeedbackRequest`, in `web/src/types.ts`.
+  (2) **`Flags.tsx` defaults `reason` to `source_outdated` and `App.tsx` sends only
+  `reason`.** Against the live API that is now a 422. A `source_outdated` reject has to
+  send `source` (one of the finding's evidence sources: let the pharmacist pick) and
+  `attribute` (`daily_dose` for dose and dose_unconfirmable findings, `existence` for
+  omission and commission is a reasonable default). Mock mode is unaffected.
+  (3) Render `detail.conflict === "confirm"` as *ask first*, and `detail.statement` when
+  present.
+- **Arpon** — nothing new. The schema review asks from #12 are both done. Structured
+  `Task` is deferred: `list[str]` for the demo.
+
+**Next:** Meterless adapter (Nightshift).
+
+---
+
 ### 2026-10-25 14:34 AEDT · Arpon · arpon/judge-path
 
 **Did:** Applied the fresh-clone audit. `make lexicon && make synth` on a clean clone used to rewrite 21 committed fixtures and fail 2 tests. It now reproduces them byte for byte (the generator falls back to the committed lexicon). CI runs that build and `git diff --exit-code`, so the scorecard tests run in CI instead of skipping. Also: honest `make examples`/`validate`/`conformance`, README Quickstart (Docker labelled not working yet, data build documented), `python3` in the docs, `metadata.json` status and pre-existing components, `.dockerignore`, pip timeout in the Dockerfile, `.env.example` PBS comment.

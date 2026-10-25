@@ -37,8 +37,8 @@ queries Zetaris yet (rule 1 — though the registration itself is live and verif
 | Fixtures for `SAMPLE_MODE` | Arpon | **done** — Q0 (admissions, new), Q1–Q3 for 10 patients, Q_REF. All diffed against live Zetaris: identical |
 | `datasvc/`, Zetaris registration | Arpon | **live and verified, 25 Oct** — 8/8 views, 6/6 fixture diffs, `--verify-only` exits 0 |
 | TGA shortages loader | Arpon | parses 1,010 rows; **not registered** (Q4 optional) |
-| `app/schemas.py` (API contract) | Arnav | **done, on `main`** (#12). Additions beyond PLAN 2.8 await Arpon's sign-off |
-| API example fixtures for the UI | Arnav | **done, on `main`** (#13) — every UI state |
+| `app/schemas.py` (API contract) | Arnav | **done and signed off.** #12, plus Arpon's two asks: `Finding.detail`, and `FeedbackRequest.source`/`attribute` (required for `source_outdated`). Structured `Task` deferred |
+| API example fixtures for the UI | Arnav | **done, regenerated for the 25 Oct data.** Every UI state; the review example is now P0015 (file name unchanged for `web/`) |
 | Zetaris / Meterless adapters | Arnav | **stub** — Zetaris adapter is his next item |
 | Orchestrator, agents, API, trace | Arnav | not started |
 | **World Model + 8 conformance checks** | Arnav | **not started — a disqualification gate, due Sat 4pm.** `identity.decide` still uses Arpon's local copy |
