@@ -65,8 +65,13 @@ def _offline_plan(anchor: SourceRow, budget_left: int) -> Plan:
         f"lines from the lexicon, then verify every cited row. {budget_left} queries available."))
 
 
-def plan(ctx: AgentContext, anchor: SourceRow, catalogue: list[str], budget_left: int) -> Plan:
-    """One call. Returns the plan with the core steps guaranteed, in a safe order."""
+def plan(ctx: AgentContext, anchor: SourceRow, catalogue: list[str], budget_left: int,
+         memory_context: str = "") -> Plan:
+    """One call. Returns the plan with the core steps guaranteed, in a safe order.
+
+    `memory_context` is what H-MEM recalled for this patient: source-trust records and past
+    pharmacist verdicts (PLAN 5.5: the Planner's input includes the H-MEM trust memories).
+    """
     ctx.check_time()
     messages = [{
         "role": "user",
@@ -77,7 +82,9 @@ def plan(ctx: AgentContext, anchor: SourceRow, catalogue: list[str], budget_left
             f"DOB {anchor.dob_raw}, admitted {anchor.doc_date}.\n"
             f"Zetaris views you can draw on: {', '.join(catalogue)}.\n"
             f"Query budget left: {budget_left}.\n"
-            "Tools: find_identities (find the patient in the other systems), fetch_meds (read their "
+            + (f"What memory (H-MEM) recalls about source trust and past pharmacist verdicts:\n{memory_context}\n"
+               if memory_context else "")
+            + "Tools: find_identities (find the patient in the other systems), fetch_meds (read their "
             "medicines and dispensings), resolve_free_text (only if lines may be free text), "
             "check_shortages (optional: known supply shortages), verify (re-read cited rows).\n"
             "Return the steps you need, each as a tool plus a short 'need' saying in plain words what you "

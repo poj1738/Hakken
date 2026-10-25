@@ -233,7 +233,7 @@ def test_core_steps_are_added_when_the_model_leaves_them_out(orch, monkeypatch) 
 
     monkeypatch.setattr(planner, "_offline_plan", thin)
     r = run(orch, "MRN0000089")
-    plan_msg = next(e.message for e in r.trace if e.step == "PLAN")
+    plan_msg = next(e.message for e in r.trace if e.step == "PLAN" and e.action == "plan")
     assert "Core steps added by code: find_identities, verify" in plan_msg
     assert '"just the meds"' in plan_msg and r.status == "success"
 

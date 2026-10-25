@@ -23,6 +23,8 @@ from app.adapters.meterless import MeterlessClient, MeterlessError
 from app.adapters.zetaris import QueryBudgetExceeded, RunQueries, ZetarisClient, ZetarisError, load_lexicon
 from app.agents import evaluator, executor, identity_memory, planner, writer
 from app.agents.base import AgentContext, RunTimeout
+from app.agents.memory import RECALL_QUERY, TrustMemory
+from app.engines.hmem import HMEM
 from app.engines.world_model import WorldModel
 from app.config import Settings, get_settings
 from app.domain.packs.medtrace import coverage as cov_mod
@@ -68,6 +70,7 @@ class RunState:
     caveats: list[str] = field(default_factory=list)
     degraded: bool = False
     running: bool = False
+    memory_used: list = field(default_factory=list)
     response: RunResponse | None = None
 
 
@@ -76,7 +79,7 @@ class Orchestrator:
 
     def __init__(self, settings: Settings | None = None, *, llm: MeterlessClient | None = None,
                  zetaris: ZetarisClient | None = None, log_dir: Path | None = LOG_DIR,
-                 world: WorldModel | None = None) -> None:
+                 world: WorldModel | None = None, hmem: HMEM | None = None) -> None:
         self.settings = settings or get_settings()
         self.llm = llm or MeterlessClient(self.settings)
         self.zetaris = zetaris or ZetarisClient(self.settings)
@@ -86,12 +89,19 @@ class Orchestrator:
                                          storage="memory" if self.settings.sample_mode else "local",
                                          directory=self.settings.state_dir)
         self.log_dir = log_dir
+        # The trust the pharmacist teaches lives in H-MEM (durable live, in memory offline).
+        self.memory = TrustMemory(hmem or HMEM(persist_dir=None if self.settings.sample_mode
+                                               else self.settings.state_dir / "hmem"))
         self._lex: Lexicon | None = None
         self._anchors: dict[str, SourceRow] | None = None
         self.runs: dict[str, RunState] = {}
-        self.trust: dict[tuple[str, str], float] = dict(SOURCE_TRUST_PRIORS)
         self.acceptance: dict[tuple[str, str], float] = {}
         self.last_routed_model: str | None = None
+
+    @property
+    def trust(self) -> dict[tuple[str, str], float]:
+        """`(source, attribute) -> trust`, read from the H-MEM trust records."""
+        return self.memory.trust()
 
     # -- process-level reads (Q_REF and Q0, once) ------------------------------
 
@@ -225,8 +235,16 @@ class Orchestrator:
     def _from_start(self, state: RunState) -> RunResponse:
         ctx = state.ctx
         budget_left = ctx.zetaris.budget - ctx.zetaris.used
+        state.memory_used = self.memory.recall(RECALL_QUERY)
+        ctx.tracer.emit("Planner", "recall", step="PLAN", engine="hmem", engine_op="query",
+                        memory_ids=[m.memory_id for m in state.memory_used],
+                        message=f"H-MEM recalled {len(state.memory_used)} memories for the plan"
+                                + (": " + "; ".join(f"{m.content} ({m.score})" for m in state.memory_used[:3])
+                                   if state.memory_used else "."))
+        memory_context = "\n".join(f"- {m.content} (confidence-weighted score {m.score})" for m in state.memory_used)
         state.plan = self._llm_step(state, "planner plan",
-                                    lambda: planner.plan(ctx, state.anchor, executor.catalogue(), budget_left),
+                                    lambda: planner.plan(ctx, state.anchor, executor.catalogue(), budget_left,
+                                                         memory_context),
                                     lambda: planner._offline_plan(state.anchor, budget_left))
         self._route(state, "find_identities")
         state.links, state.candidates = executor.find_identities(ctx, state.anchor)
@@ -291,7 +309,7 @@ class Orchestrator:
                                                  sorted({m.generic for m in analysis.fused if evaluator.is_current(m)}))
             analysis.notices = [*analysis.notices, *shortages]
             analysis.tasks = list(dict.fromkeys([*analysis.tasks, *(t for n in shortages for t in n.tasks)]))
-        findings = analysis.findings
+        findings = [f.model_copy(update={"hmem_record_ids": self._hmem_ids(f)}) for f in analysis.findings]
 
         texts, summary = self._llm_step(
             state, "writer draft", lambda: writer.draft(ctx, findings, state.anchor, analysis.banner),
@@ -335,6 +353,13 @@ class Orchestrator:
                                 f"{len(analysis.tasks)} tasks.")
         return self._respond(state, status, summary=summary, analysis=analysis, findings=findings, q3_sql=q3_sql,
                              blocked=[*analysis.blocked, *blocked])
+
+    def _hmem_ids(self, f: Finding) -> list[str]:
+        """The H-MEM trust records a verdict on this finding would move (feedback, PLAN 5.7)."""
+        from app.feedback import _attribute_for
+        attribute = _attribute_for(f)
+        sources = sorted({e.source for e in f.evidence if e.source} - {"emr"})
+        return [mid for s in sources if (mid := self.memory.record_id(s, attribute))]
 
     # -- response assembly -------------------------------------------------------
 
@@ -416,8 +441,9 @@ class Orchestrator:
             banner=banner, grid=analysis.fused if analysis else [], findings=findings,
             notices=analysis.notices if analysis else [], tasks=analysis.tasks if analysis else [],
             evidence_index=evidence_index,
-            trust=[TrustEntry(source=s, attribute=a, value=v, hmem_record_id=None)
+            trust=[TrustEntry(source=s, attribute=a, value=v, hmem_record_id=self.memory.record_id(s, a))
                    for (s, a), v in sorted(self.trust.items())],
+            memory_used=list(state.memory_used),
             trace=list(ctx.tracer.events), query_count=ctx.zetaris.used, zetaris_ms=ctx.zetaris.zetaris_ms,
             model_calls=list(calls),
         )
