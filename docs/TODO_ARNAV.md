@@ -175,15 +175,16 @@ Arpon's open items from `docs/SCAN_2026-10-25.md` are yours now. **Order: World 
 conformance first (rule 2), then S2, then these.** S2 (`output_examples/`) is a good one
 to hand to Anshu if she has room after the Docker fix (S3).
 
-1. **S8** `metadata.json`: mark run.py, POST /run, SAMPLE_MODE and the Zetaris adapter as
-   working (it now under-claims). Five minutes.
-2. **S7** `coverage.py:229`: a patient lay-term line ("my blue puffer") makes the patient
-   column read ABSENT for that medicine.
-3. **S19** example_3 (P0013) does not produce `bpmh_not_confirmable`: either fix
+1. [x] **S8** `metadata.json`: mark run.py, POST /run, SAMPLE_MODE and the Zetaris adapter as
+   working (it now under-claims). Five minutes. *(Arnav, 25 Oct.)*
+2. [x] **S7** `coverage.py:229`: a patient lay-term line ("my blue puffer") makes the patient
+   column read ABSENT for that medicine. *(Arnav, 25 Oct: UNKNOWN via LAY_TERMS × ATC.)*
+3. [x] **S19** example_3 (P0013) does not produce `bpmh_not_confirmable`: either fix
    `coverage.bpmh_confirmable` or correct `input_examples/README.md`. Check the ACSQHC
-   two-source rule in `docs/PITCH_CLAIMS.md` first.
-4. **S22** `identity.py:448`: the "held back because" guard text is false in both demo
-   pauses (P0015, P0013), and judges see it.
+   two-source rule in `docs/PITCH_CLAIMS.md` first. *(Arnav, 25 Oct: fixed the code, because
+   the ground truth plants it on exactly EMR + one source. The chart no longer counts.)*
+4. [x] **S22** `identity.py:448`: the "held back because" guard text is false in both demo
+   pauses (P0015, P0013), and judges see it. *(Arnav, 25 Oct: names the real other person.)*
 5. **S21, S20, S32, S33**: range directions, the dead safety-gate rule, zero-trust fusion,
    anchor coverage state. Lower priority.
 
