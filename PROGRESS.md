@@ -44,7 +44,7 @@ queries Zetaris yet (rule 1 — though the registration itself is live and verif
 | Orchestrator, agents, API, trace | Arnav | not started |
 | **World Model + 8 conformance checks** | Arnav | **not started — a disqualification gate, due Sat 4pm.** `identity.decide` still uses Arpon's local copy |
 | H-MEM + feedback | Arnav | not started |
-| Web UI | Anshu | **all 10 PLAN §6 items built, mock mode only** (`web/`, Vite + React + TS). Replays `tests/fixtures/api/`: done run, GP-not-found (`?mock=gp_not_found`), identity review, feedback → trust before/after. `npm run build` clean. Never run against a live API. Branch `claude/modest-feynman-dc14du`, **not pushed** (GitHub 403) |
+| Web UI | Anshu | **on `main` (#22); review of all 10 PLAN §6 items done on `anshu/ui-review`**, mock mode only. Follows #23 (`detail`, `source_outdated` names its record) and #24 (identity verdict prefixes). Never run against a live API. Six open questions for Arnav in HANDOFF (dose unit, `TraceEvent.model`, task order …) |
 | Docker run path | — | not started — the Dockerfile has never been built |
 
 ## Sunday's goal
@@ -63,9 +63,9 @@ feedback loop by Monday morning at the latest.
    `run.py`; World Model and its 8 checks (then swap Arpon's local `decide`); H-MEM
    and feedback. Everything you need from Arpon is on `main`, including a Q0
    fixture (one row per chart *line* — dedupe on `source_patient_id`).
-2. **Anshu** — get the UI branch pushed (GitHub access) and merged. Then point it at
-   the live API as soon as Arnav's `POST /run` exists (`VITE_API_MODE=live`), and
-   rehearse the 30-second demo arc in mock mode.
+2. **Anshu** — merge `anshu/ui-review`. Then point the UI at the live API as soon as
+   Arnav's `POST /run` exists (`VITE_API_MODE=live`), and rehearse the 30-second demo
+   arc in mock mode.
 3. **Arpon** — section done; schema review posted on #12. World Model stays with
    Arnav. Free to pick up whatever Arnav or Anshu hand back in HANDOFF.
 

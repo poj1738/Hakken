@@ -11,19 +11,37 @@ const FIELDS: { label: string; show: keyof SourceRow; evidence: string[] }[] = [
   { label: "Date of birth", show: "dob_raw", evidence: ["dob"] },
   { label: "Sex", show: "sex", evidence: ["sex"] },
   { label: "Postcode", show: "postcode", evidence: ["postcode"] },
-  { label: "IHI (synthetic)", show: "ihi_syn", evidence: ["ihi"] },
+  { label: "IHI (synthetic)", show: "ihi_syn", evidence: ["ihi_syn", "ihi"] },
 ];
 
-// The colour follows the matcher's own sentence in `field_evidence`, never a
-// comparison done here: "M" vs "Male" or a combined name field would read as
-// "differs" to a string compare while the matcher (correctly) calls it a match.
+// The colour follows the matcher's own verdict, never a comparison done here:
+// "M" vs "Male" or a combined name field would read as "differs" to a string
+// compare while the matcher (correctly) calls it a match.
+//
+// Since 25 Oct, identity.py starts every field_evidence sentence with a verdict
+// (identity.EVIDENCE_VERDICTS: agrees / partial / differs / held), set from the
+// score itself. The keyword fallback is only for sentences without one (the
+// hand-written examples, until they are regenerated from real runs).
+type Agreement = "agree" | "partial" | "differ" | "missing";
+const PREFIX = /^(agrees|partial|differs|held):\s*/;
+const PREFIX_TO_AGREEMENT: Record<string, Agreement> = { agrees: "agree", partial: "partial", differs: "differ", held: "partial" };
 const DIFFERS = /differ|mismatch|conflict|swap|typo|transpos|does not match|no match/i;
 const AGREES = /match|same|equal|nickname/i;
 
-function agreement(sentences: string[]): "agree" | "differ" | "missing" {
-  if (!sentences.length) return "missing";
-  if (sentences.some((t) => DIFFERS.test(t))) return "differ";
-  return sentences.some((t) => AGREES.test(t)) ? "agree" : "missing";
+/** The sentence without its verdict prefix, for display. */
+const stripVerdict = (t: string) => t.replace(PREFIX, "");
+
+function agreementOf(t: string): Agreement {
+  const m = PREFIX.exec(t);
+  if (m) return PREFIX_TO_AGREEMENT[m[1]];
+  if (DIFFERS.test(t)) return "differ";
+  return AGREES.test(t) ? "agree" : "missing";
+}
+
+function agreement(sentences: string[]): Agreement {
+  const a = sentences.map(agreementOf);
+  for (const v of ["differ", "partial", "agree"] as const) if (a.includes(v)) return v;
+  return "missing";
 }
 
 interface Props {
@@ -37,6 +55,9 @@ interface Props {
 
 export function IdentityReview({ review, banner, decided, busy, error, onDecide }: Props) {
   const { anchor, candidates, records } = review;
+  // Evidence keys the table has no row for are still shown, never dropped.
+  const shownKeys = new Set(["guard", ...FIELDS.flatMap((f) => f.evidence)]);
+  const otherKeys = [...new Set(candidates.flatMap((c) => Object.keys(c.field_evidence)))].filter((k) => !shownKeys.has(k));
   return (
     <section className="card identity">
       <h2>Identity review needed</h2>
@@ -82,7 +103,7 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
                       {r ? (r[f.show] ?? <span className="muted">—</span>) : <span className="muted">record not sent</span>}
                       {ev.map((t) => (
                         <div key={t} className="why">
-                          {t}
+                          {stripVerdict(t)}
                         </div>
                       ))}
                     </td>
@@ -90,12 +111,29 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
                 })}
               </tr>
             ))}
+            {otherKeys.length > 0 && (
+              <tr>
+                <th scope="row">Other evidence</th>
+                <td className="anchor-col" />
+                {candidates.map((c) => (
+                  <td key={c.candidate_id} className="small">
+                    {otherKeys
+                      .filter((k) => c.field_evidence[k])
+                      .map((k) => (
+                        <div key={k}>
+                          <span className="muted">{k}:</span> {stripVerdict(c.field_evidence[k])}
+                        </div>
+                      ))}
+                  </td>
+                ))}
+              </tr>
+            )}
             <tr>
               <th scope="row">Held back because</th>
               <td className="anchor-col" />
               {candidates.map((c) => (
                 <td key={c.candidate_id} className="guard">
-                  {c.field_evidence.guard ?? (c.guards.join(", ") || "—")}
+                  {c.field_evidence.guard ? stripVerdict(c.field_evidence.guard) : c.guards.join(", ") || "—"}
                 </td>
               ))}
             </tr>
@@ -128,9 +166,9 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
         </table>
       </div>
       <p className="legend small">
-        <span className="swatch agree-agree" /> matcher says it agrees <span className="swatch agree-differ" /> matcher
-        says it differs <span className="swatch agree-missing" /> not compared. The sentence under each value is the
-        matcher's reason.
+        <span className="swatch agree-agree" /> agrees <span className="swatch agree-partial" /> partial match{" "}
+        <span className="swatch agree-differ" /> differs <span className="swatch agree-missing" /> not compared. Colours
+        are the matcher's own verdict; the sentence under each value is its reason.
       </p>
       {error && <p className="error">{error}</p>}
     </section>

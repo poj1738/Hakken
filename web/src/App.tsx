@@ -1,24 +1,35 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { API_MODE, MAX_POLLS, POLL_INTERVAL_MS, STATUS_REFRESH_MS, api, isTerminal } from "./api";
+import { API_MODE, MAX_POLL_FAILURES, MAX_POLLS, POLL_INTERVAL_MS, STATUS_REFRESH_MS, api, isTerminal } from "./api";
 import type {
   AcceptanceUpdate,
-  FeedbackReason,
   Finding,
   HealthResponse,
   PatientSummary,
   RunResponse,
-  TrustUpdate,
 } from "./types";
 import { Header } from "./components/Header";
-import { Picker } from "./components/Picker";
+import { Picker, type PatientsState } from "./components/Picker";
 import { Timeline } from "./components/Timeline";
 import { IdentityReview } from "./components/IdentityReview";
 import { CoverageStrip, Notices } from "./components/Coverage";
 import { Grid } from "./components/Grid";
-import { Flags, type FeedbackState } from "./components/Flags";
+import { Flags, type FeedbackChoice, type FeedbackState } from "./components/Flags";
 import { Tasks } from "./components/Tasks";
-import { TrustPanel } from "./components/TrustPanel";
-import { Footer } from "./components/Footer";
+import { TrustPanel, type AppliedTrustUpdate } from "./components/TrustPanel";
+import { DISCLAIMER, Footer } from "./components/Footer";
+
+/** The API's caveats about this result, minus the fixed disclaimer shown in the header and footer. */
+function Caveats({ caveats }: { caveats: string[] }) {
+  const shown = caveats.filter((c) => c !== DISCLAIMER);
+  if (!shown.length) return null;
+  return (
+    <ul className="caveats small">
+      {shown.map((c) => (
+        <li key={c}>{c}</li>
+      ))}
+    </ul>
+  );
+}
 
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
@@ -26,16 +37,18 @@ export default function App() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [healthError, setHealthError] = useState<string | null>(null);
   const [patients, setPatients] = useState<PatientSummary[]>([]);
+  const [patientsState, setPatientsState] = useState<PatientsState>({ kind: "loading" });
   const [selected, setSelected] = useState("");
   const [run, setRun] = useState<RunResponse | null>(null);
   const [polling, setPolling] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
+  const [pollWarning, setPollWarning] = useState<string | null>(null);
   const [decided, setDecided] = useState<Record<string, "same" | "different">>({});
   const [identityBusy, setIdentityBusy] = useState<string | null>(null);
   const [identityError, setIdentityError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Record<string, FeedbackState>>({});
   // Trust moves accumulate across runs in this session, so patient B shows what patient A taught.
-  const [trustUpdates, setTrustUpdates] = useState<TrustUpdate[]>([]);
+  const [trustUpdates, setTrustUpdates] = useState<AppliedTrustUpdate[]>([]);
   const [acceptance, setAcceptance] = useState<AcceptanceUpdate[]>([]);
   const pollToken = useRef(0);
 
@@ -61,25 +74,55 @@ export default function App() {
     if (!polling) refreshStatus();
   }, [polling, refreshStatus]);
 
-  useEffect(() => {
+  const loadPatients = useCallback(() => {
+    setPatientsState({ kind: "loading" });
     api.patients().then(
       (r) => {
         setPatients(r.patients);
+        setPatientsState({ kind: "ready" });
         setSelected((s) => s || r.patients[0]?.patient_id || "");
       },
-      (e) => setRunError(msg(e)),
+      (e) => setPatientsState({ kind: "error", message: msg(e) }),
     );
   }, []);
+
+  useEffect(loadPatients, [loadPatients]);
+
+  // A result stays on screen only while its patient is selected, so one
+  // patient's medicines can never sit under another patient's name.
+  const selectPatient = (id: string) => {
+    if (id === selected) return;
+    pollToken.current++;
+    setSelected(id);
+    setRun(null);
+    setRunError(null);
+    setDecided({});
+    setIdentityError(null);
+    setFeedback({});
+  };
 
   const poll = useCallback(async (runId: string) => {
     const token = ++pollToken.current;
     setPolling(true);
+    setPollWarning(null);
+    let failures = 0;
     try {
       for (let i = 0; i < MAX_POLLS; i++) {
         await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
         if (token !== pollToken.current) return;
-        const r = await api.getRun(runId);
+        let r: RunResponse;
+        try {
+          r = await api.getRun(runId);
+        } catch (e) {
+          // One dropped poll must not abandon a run that is still going; give up
+          // only after MAX_POLL_FAILURES in a row.
+          if (++failures >= MAX_POLL_FAILURES) throw e;
+          if (token === pollToken.current) setPollWarning(`Lost contact with the run (${failures}/${MAX_POLL_FAILURES}), retrying: ${msg(e)}`);
+          continue;
+        }
+        failures = 0;
         if (token !== pollToken.current) return;
+        setPollWarning(null);
         setRun(r);
         if (isTerminal(r.status) || r.status === "needs_review") return;
       }
@@ -87,7 +130,10 @@ export default function App() {
     } catch (e) {
       if (token === pollToken.current) setRunError(msg(e));
     } finally {
-      if (token === pollToken.current) setPolling(false);
+      if (token === pollToken.current) {
+        setPolling(false);
+        setPollWarning(null);
+      }
     }
   }, []);
 
@@ -126,13 +172,20 @@ export default function App() {
     }
   };
 
-  const sendFeedback = async (f: Finding, verdict: "confirm" | "reject", reason?: FeedbackReason) => {
+  const sendFeedback = async (f: Finding, c: FeedbackChoice) => {
     if (!run) return;
     setFeedback((s) => ({ ...s, [f.id]: { busy: true } }));
     try {
-      const r = await api.feedback({ run_id: run.run_id, target_id: f.id, verdict, reason: reason ?? null });
+      const r = await api.feedback({
+        run_id: run.run_id,
+        target_id: f.id,
+        verdict: c.verdict,
+        reason: c.reason ?? null,
+        // Only a source_outdated reject names a record; the API rejects them elsewhere.
+        ...(c.reason === "source_outdated" ? { source: c.source, attribute: c.attribute } : {}),
+      });
       setFeedback((s) => ({ ...s, [f.id]: { result: r } }));
-      setTrustUpdates((u) => [...u, ...r.trust_updates]);
+      setTrustUpdates((u) => [...u, ...r.trust_updates.map((t) => ({ ...t, runId: r.run_id, targetId: r.target_id, reason: r.reason }))]);
       setAcceptance((a) => [...a, ...r.acceptance_updates]);
     } catch (e) {
       setFeedback((s) => ({ ...s, [f.id]: { error: msg(e) } }));
@@ -154,13 +207,15 @@ export default function App() {
         <div className="side">
           <Picker
             patients={patients}
+            patientsState={patientsState}
+            onRetryPatients={loadPatients}
             selected={selected}
-            onSelect={setSelected}
+            onSelect={selectPatient}
             onRun={startRun}
             running={polling}
             error={runError}
           />
-          <Timeline run={run} polling={polling} />
+          <Timeline run={run} polling={polling} warning={pollWarning} />
         </div>
         <div className="main">
           {run?.status === "needs_review" && run.identity_review && (
@@ -173,6 +228,16 @@ export default function App() {
               onDecide={decideIdentity}
             />
           )}
+          {run?.status === "needs_review" && <Caveats caveats={run.output.caveats} />}
+          {run?.status === "needs_review" && !run.identity_review && (
+            <section className="card">
+              <h2>Identity review needed</h2>
+              <p className="error">
+                The run paused for identity review, but the API sent no <code>identity_review</code> to show. Nothing can be
+                decided from this screen.
+              </p>
+            </section>
+          )}
           {run?.status === "error" && (
             <section className="card">
               <h2>Run failed</h2>
@@ -184,16 +249,26 @@ export default function App() {
               <section className="card summary">
                 <h2>Summary</h2>
                 <p>{run.output.summary}</p>
-                {run.status === "partial" && <p className="banner small">Partial result: read the banner and notices below before relying on it.</p>}
+                {/* The API's caveats qualify this result, so they sit with it. The
+                    fixed disclaimer is already in the header and footer. */}
+                <Caveats caveats={run.output.caveats} />
+                {run.status === "partial" && <p className="banner small">Status: partial. Read every caveat before relying on it.</p>}
               </section>
-              <CoverageStrip coverage={run.coverage} banner={run.banner} bpmhConfirmable={run.bpmh_confirmable} />
-              <Grid grid={run.grid} evidenceIndex={run.evidence_index} coverage={run.coverage} />
-              <Flags findings={run.findings} feedback={feedback} onFeedback={sendFeedback} />
-              <div className="two-col">
-                <Tasks tasks={run.tasks} />
-                <Notices notices={run.notices} />
-              </div>
-              <TrustPanel trust={run.trust} updates={trustUpdates} acceptance={acceptance} />
+              {/* A result with no coverage and no grid (an early stop, or the mock
+                  placeholder) shows only its summary: an empty grid and "No
+                  discrepancies found" would read as a clean bill of health. */}
+              {(Object.keys(run.coverage).length > 0 || run.grid.length > 0) && (
+                <>
+                  <CoverageStrip coverage={run.coverage} banner={run.banner} bpmhConfirmable={run.bpmh_confirmable} />
+                  <Grid grid={run.grid} evidenceIndex={run.evidence_index} coverage={run.coverage} />
+                  <Flags findings={run.findings} feedback={feedback} onFeedback={sendFeedback} />
+                  <div className="two-col">
+                    <Tasks tasks={run.tasks} findings={run.findings} notices={run.notices} />
+                    <Notices notices={run.notices} />
+                  </div>
+                  <TrustPanel trust={run.trust} runId={run.run_id} updates={trustUpdates} acceptance={acceptance} />
+                </>
+              )}
             </>
           )}
           {!run && !polling && (
@@ -207,7 +282,7 @@ export default function App() {
           )}
         </div>
       </main>
-      <Footer caveats={run?.output.caveats ?? []} />
+      <Footer />
     </div>
   );
 }

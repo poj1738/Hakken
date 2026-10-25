@@ -21,6 +21,11 @@ function rowsFor(med: FusedMed, source: string, idx: Record<string, Evidence>): 
   return med.row_ids.map((id) => idx[id]).filter((e): e is Evidence => !!e && e.source === source);
 }
 
+/** Row ids the med cites that the API sent no evidence for. Shown, never dropped. */
+function uncitedIds(med: FusedMed, idx: Record<string, Evidence>): string[] {
+  return med.row_ids.filter((id) => !idx[id]);
+}
+
 /** Sources the API recorded as disagreeing with a resolved or abstained attribute. */
 function dissentingSources(med: FusedMed): Set<string> {
   const s = new Set<string>();
@@ -83,7 +88,20 @@ function Inspector({ cell, idx, coverage, pinned, onClose }: { cell: Cell; idx: 
         <p className="small">The source was found and the part of it that would list this medicine does not.</p>
       )}
       {cov?.scope_notes.length ? <p className="small muted">Scope: {cov.scope_notes.join("; ")}</p> : null}
-      {rows.length ? rows.map((e) => <RowText key={e.row_id} e={e} />) : <p className="small muted">No cited row from this source.</p>}
+      {rows.map((e) => (
+        <RowText key={e.row_id} e={e} />
+      ))}
+      {!rows.length && state === "present" && (
+        <p className="small warn-text">
+          Present, but the API cited no row from this source, so there is no provenance to show.
+        </p>
+      )}
+      {!rows.length && state !== "present" && <p className="small muted">No cited row from this source.</p>}
+      {uncitedIds(med, idx).length > 0 && (
+        <p className="small warn-text">
+          Cited but not in <code>evidence_index</code>: {uncitedIds(med, idx).join(", ")}
+        </p>
+      )}
     </aside>
   );
 }
@@ -144,6 +162,12 @@ export function Grid({ grid, evidenceIndex, coverage }: Props) {
                         onKeyDown={(e) => e.key === "Enter" && setPinned(same(pinned, cell) ? null : cell)}
                       >
                         <span className="glyph">{GLYPH[st]}</span> {STATE_LABEL[st]}
+                        {st === "present" && !rowsFor(med, s, evidenceIndex).length && (
+                          <span className="no-row" title="No cited row from this source">
+                            {" "}
+                            · no row
+                          </span>
+                        )}
                         {dissent.has(s) && (
                           <div className="small dissent-val">
                             {Object.values(med.attributes)
@@ -157,11 +181,14 @@ export function Grid({ grid, evidenceIndex, coverage }: Props) {
                   })}
                   <td className="resolved">
                     {Object.values(med.attributes)
-                      .filter((v) => v.attribute !== "existence")
+                      .filter((v) => v.attribute !== "existence" || v.abstained)
                       .map((v) => (
                         <div key={v.attribute} className={v.abstained ? "abstained" : ""}>
                           <span className="muted">{attributeLabel(v.attribute)}:</span>{" "}
                           {v.abstained ? <strong>Conflict: ask patient</strong> : fmtValue(v.value)}
+                          {!v.abstained && v.supporting.length > 0 && (
+                            <span className="muted small"> ({v.supporting.map(sourceLabel).join(", ")})</span>
+                          )}
                         </div>
                       ))}
                     {med.abstained

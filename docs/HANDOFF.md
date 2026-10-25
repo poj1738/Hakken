@@ -125,6 +125,33 @@ the UI, see below.**
 
 ---
 
+### 2026-10-25 15:28 AEDT · Anshu · anshu/ui-review
+
+**Did:** Reviewed the merged UI (#22) against PLAN §6, one item at a time. All 10 items done:
+- Header shows `GET /status` only.
+- Picker handles load, empty and error states, and clears results when you switch patient.
+- Timeline survives a dropped poll.
+- Identity review runs end to end in mock mode, ending on a labelled placeholder.
+- The BPMH banner heading appears only when `bpmh_confirmable` is false.
+- The grid flags any present cell that has no cited row.
+- Flags follow #23: `detail` is rendered ("Ask first" for `conflict: confirm`), a `source_outdated` reject sends `source` + `attribute`, and there is no default reject reason. Bodies were checked against `FeedbackRequest`.
+- Each task names the finding or notice it came from; ticks are labelled screen-only.
+- Trust panel: a feedback "after" value only overrides `run.trust` in the run it was given on, so patient B shows its own trust (learning demo). A "What your feedback changed" box sits at the top.
+- Disclaimer pill in the header; the API's caveats sit with the result, not in the footer.
+- Identity colours come from Arpon's `agrees`/`partial`/`differs`/`held` prefix (#24), with the keyword guess kept only for the unprefixed examples.
+- Followed #23: `types.ts` has `Finding.detail` and `FeedbackRequest.source`/`attribute`; the mock placeholder was regenerated for MRN0000015.
+
+**Changed shared files:** none.
+**Broken:** nothing. Branch not on GitHub yet: Claude's push gets 403, so it goes up by bundle like #22.
+**Open questions for Arnav** (none blocking):
+1. Confirm `TraceEvent.model` is always the routed (answering) model, not the requested route. The timeline labels it "answered by". If it can hold the route, send the `meterless` receipt, which the UI prefers.
+2. **Resolved doses need a unit.** `FusedValue.value` is a bare number ("Daily dose: 40"); `types.py` says "canonical units" but no field names them. The UI will not print "mg" itself (insulin is in units). Add a unit, e.g. `unit` on `FusedValue`, or send the value as text with its unit. Until then the grid shows the bare number.
+3. Every `present` cell should cite at least one row. Warfarin's admission-chart and patient-interview cells cite none in both P0001 examples, so the grid marks them "no row".
+4. The cell inspector shows `sql_template_id`, not the SQL text. If PLAN 6.6 means the query itself, `Evidence` needs it.
+5. A real resumed-run example (after `POST /run/{id}/identity`) would replace `web/src/placeholders/resumed_run.PLACEHOLDER.json`. It can't go in `tests/fixtures/api/` without updating `test_api_fixtures.py`'s file list.
+6. **Task order.** `RunResponse.tasks` arrives in alphabetical order, which buries the warfarin and oxycodone tasks mid-list. Ordering by the priority of the finding each task comes from would put high-risk ones first. The UI won't re-sort them itself, since that would mean the screen deciding what matters most. Each task now shows its source finding and badges.
+**Next:** push via bundle and open the PR. Then `VITE_API_MODE=live` as soon as Arnav's `POST /run` lands, and rehearse the 30-second demo arc in mock mode.
+
 ### 2026-10-25 14:34 AEDT · Arpon · arpon/judge-path
 
 **Did:** Applied the fresh-clone audit. `make lexicon && make synth` on a clean clone used to rewrite 21 committed fixtures and fail 2 tests. It now reproduces them byte for byte (the generator falls back to the committed lexicon). CI runs that build and `git diff --exit-code`, so the scorecard tests run in CI instead of skipping. Also: honest `make examples`/`validate`/`conformance`, README Quickstart (Docker labelled not working yet, data build documented), `python3` in the docs, `metadata.json` status and pre-existing components, `.dockerignore`, pip timeout in the Dockerfile, `.env.example` PBS comment.

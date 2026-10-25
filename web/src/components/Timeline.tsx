@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import type { ModelCall, RunResponse, TraceEvent } from "../types";
 import { fmtTime } from "../format";
 
+// The model that answered: the Meterless receipt's routed_model when the event
+// carries one, else `model`, which the API examples fill with the routed model.
 function routedModel(e: TraceEvent): string | null {
   const m = e.meterless?.["routed_model"];
   return typeof m === "string" ? m : e.model ?? null;
@@ -16,19 +18,21 @@ function Event({ e }: { e: TraceEvent }) {
       <div className="event-head">
         <span className="step">{e.step ?? e.action}</span>
         <span className="agent">{e.agent_name}</span>
+        {blocked && <span className="badge blocked-badge">Blocked</span>}
+        {failed && <span className="badge failed-badge">Error</span>}
+        {e.retry_count > 0 && <span className="badge warn">retry {e.retry_count}</span>}
         <time>{fmtTime(e.timestamp)}</time>
       </div>
       <p className="event-msg">
-        {blocked && <strong className="blocked-tag">Blocked · </strong>}
         {e.message ?? e.output_summary ?? e.action}
       </p>
       {e.error && <p className="event-err">{e.error}</p>}
       {(model || e.engine || e.row_count != null || e.latency_ms != null) && (
         <div className="event-meta">
           {model && (
-            <span title={e.route ? `requested ${e.route}` : undefined}>
-              🧠 <code>{model}</code>
-              {e.route && <span className="muted"> via {e.route}</span>}
+            <span>
+              answered by <code>{model}</code>
+              {e.route && <span className="muted"> · asked for {e.route}</span>}
             </span>
           )}
           {e.engine && (
@@ -87,7 +91,7 @@ function ModelCalls({ calls }: { calls: ModelCall[] }) {
   );
 }
 
-export function Timeline({ run, polling }: { run: RunResponse | null; polling: boolean }) {
+export function Timeline({ run, polling, warning }: { run: RunResponse | null; polling: boolean; warning: string | null }) {
   const end = useRef<HTMLLIElement>(null);
   const n = run?.trace.length ?? 0;
   useEffect(() => {
@@ -109,6 +113,7 @@ export function Timeline({ run, polling }: { run: RunResponse | null; polling: b
             {polling && (
               <li className="event pending" ref={end}>
                 <p className="muted">Working…</p>
+                {warning && <p className="event-err">{warning}</p>}
               </li>
             )}
           </ol>
