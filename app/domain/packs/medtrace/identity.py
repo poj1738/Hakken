@@ -22,11 +22,14 @@ import jellyfish
 
 from app.domain.packs.medtrace.parse import normalise_text
 from app.domain.packs.medtrace.types import IdentityBand, IdentityLink, Lexicon, SourceRow
+from app.engines.world_model import resolve as _world_model
 
-#: Fellegi-Sunter posterior at or above this merges without asking.
-AUTO_MERGE_THRESHOLD = 0.85
+#: Fellegi-Sunter posterior at or above this merges without asking. The World
+#: Model engine owns the band (conformance band-001); these names stay because
+#: the guards below compare against them.
+AUTO_MERGE_THRESHOLD = _world_model.AUTO_MERGE_AT
 #: Between this and `AUTO_MERGE_THRESHOLD`, a human decides.
-REVIEW_THRESHOLD = 0.82
+REVIEW_THRESHOLD = _world_model.REVIEW_LOWER
 
 #: Prior odds that two arbitrary records are the same person. Deliberately low:
 #: most pairs in a candidate set are strangers who share a birth year. Hand-set
@@ -78,22 +81,16 @@ _DIGITS = re.compile(r"\d")
 def decide(probability: float) -> IdentityBand:
     """Band a posterior: `>=0.85` auto-merge, `>=0.82` review, else new.
 
-    **TODO (Arpon, 4pm): replace with `app.engines.world_model.decide`.** This is
-    a deliberate three-line duplicate so `identity.py` is importable before
-    Arnav's World Model port lands (PLAN 5.9, 7). The thresholds are the same
-    numbers; when the engine lands this body becomes a delegation and the
-    constants above are deleted.
+    Delegates to the World Model engine's `decide` (Arnav, 25 Oct: the port has
+    landed and passes its conformance suite, so the temporary duplicate is gone;
+    PLAN 5.9). The thresholds live in `app.engines.world_model.resolve`.
 
     The 0.82-0.85 review band is narrow on purpose. It is the only part of the
     pipeline that stops the run and asks a human (`needs_review`), so widening it
     costs a pharmacist's attention on every patient and narrowing it converts
     near-misses into silent merges.
     """
-    if probability >= AUTO_MERGE_THRESHOLD:
-        return "auto-merge"
-    if probability >= REVIEW_THRESHOLD:
-        return "review"
-    return "new"
+    return _world_model.decide(probability)
 
 
 def _posterior(weight: float) -> float:
