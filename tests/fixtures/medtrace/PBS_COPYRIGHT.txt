@@ -1,0 +1,15 @@
+Some values in this folder's files are copied, unmodified, from the PBS public API v3
+(https://data-api.health.gov.au/pbs/api/v3, schedule 4751, fetched 2026-10-24):
+pbs_code, pack_qty, repeats and atc_primary where pbs_code is a real PBS item code.
+Codes beginning SYN- are ours and synthetic. The PBS content is redistributed under
+the statement the publisher ships with it, reproduced verbatim:
+
+Copyright (c) 2024 Department of Health, Commonwealth of Australia
+
+Permission is granted to use and redistribute this content, as long as all copyright
+statements are retained. Permission is not granted to modify this content.
+
+For further copyright information of this content, please refer to:
+https://www.health.gov.au/using-our-websites/copyright
+
+See docs/DATA_LICENCES.md section 1.

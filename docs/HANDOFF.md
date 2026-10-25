@@ -27,6 +27,14 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 14:24 AEDT · Arpon · arpon/background-1-4
+
+**Did:** (2) `scripts/eval.py --json` and a false-merge count (0/286 held-out, 0/280 tune). A scorecard dashboard was built from that run's JSON (link in chat), for the pitch. (3) Data docs audited: `DATA_SOURCES.md` rewritten (it still said "none registered yet"). `DATA_LICENCES.md` corrected: 108 products; the desvenlafaxine ATC exception; the committed PBS values in `Q_REF__lexicon.json` now have `PBS_COPYRIGHT.txt` beside them. `PREEXISTING.md` TGA row updated. (4) Q4 `q_shortages` written, tested in SQLite, and its dialect checked live, read-only. **Switched off**: TGA licence unconfirmed (`DECISIONS.md`).
+**Changed shared files:** none on the list.
+**Broken:** nothing. Fresh-clone audit (item 1) is still running; its fixes follow in a separate PR.
+**Needs from teammates:** Arnav — Q4 exists if you want a `check_shortages` tool step, but it returns nothing live until the licence is confirmed. Don't register it yourself.
+**Next:** apply the fresh-clone audit's fixes; get the TGA licence answered.
+
 ### 2026-10-25 13:47 AEDT · Arpon · arpon/track-1
 
 **Did:** Recorded the team's **Track 1** choice in `metadata.json` (track, one-liner, Zetaris status, data sources), `README.md`, `TODO.md` (track and data decisions ticked, Phase 3 ticked) and `PROGRESS.md`, plus a superseded note on `docs/AGENT_KICKOFF.md`. Rewrote the README's stale status sections ("only two things are built") to state honestly what works and what does not.

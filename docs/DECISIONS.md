@@ -11,6 +11,35 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-25 — Q4 written but switched off: the TGA licence is unconfirmed **[measured + web check, 25 Oct]**
+
+**Q4 is written.** `queries.q_shortages(generics)` returns `Current` and `Anticipated`
+TGA reports whose active ingredients are **exactly** one of our medicines, with a
+computed `generic` column. Exactly matters: the export lists salts, and a shortage of
+Caduet (amlodipine + atorvastatin) is not an amlodipine shortage, so a single agent
+matches only one-ingredient reports, and a combination only reports with exactly its
+ingredients, by counting `|` separators with `LIKE`. Tested by running the generated SQL
+in SQLite against hand-made TGA-shaped rows (`tests/unit/test_shortages.py`), and the
+dialect checked live, read-only, against `medtrace.med_lexicon`: Zetaris accepted the
+`CASE`/`lower`/`LIKE` shape in 2.6 s. 36 of our medicines have a current or anticipated
+report in the 24 Oct export.
+
+**It is switched off.** We could not confirm a licence: TGA's copyright page timed out
+twice, and the only TGA notice found permits unaltered, personal or internal,
+non-commercial reproduction, which parsing breaks. `register_sources.py --with-tga` is
+off by default, `datasvc` keeps refusing `/ref/tga` (its test is unchanged), and the
+switch-on steps are in `docs/DATA_LICENCES.md` §4. Open question for the consultant.
+
+**Also found and fixed: committed PBS values without their copyright statement.** The
+replay fixture `Q_REF__lexicon.json` holds the whole served lexicon (224 rows, 203 real
+PBS codes), more than DATA_LICENCES' "≤200-row sample", and neither it nor
+`lexicon_sample.csv` carried the statement the PBS licence requires for redistribution.
+Values are unmodified, so redistribution is permitted; `PBS_COPYRIGHT.txt` now sits
+beside both, and the Docker image copies it with the fixtures.
+
+**Scorecard as data:** `scripts/eval.py --json` writes the scorecard, including a direct
+false-merge count: 0 among 286 held-out and 280 tune auto-merged records.
+
 ## 2026-10-25 — Track 1, recorded **[team decision, 25 Oct]**
 
 The team chose **Track 1**. The product is MedTrace, as already built. Recorded in
