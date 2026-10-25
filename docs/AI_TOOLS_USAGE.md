@@ -37,5 +37,6 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Loose ends: `coverage` staleness off the wall clock, core vs extended high-risk recall in the scorecard, stale PROGRESS decisions struck |
 | 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Demo data: staged learning-demo pair with CI test, showcase replay fixtures, five `input_examples/`, replay set in the Docker image |
 | 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Recorded Track 1 across metadata, README, TODO and PROGRESS; README status rewritten to match the code |
+| 2026-10-25 | Anshu | Claude Code (cloud session) | Opus 5.5 | Web UI in `web/`: all ten PLAN §6 items in mock mode against `tests/fixtures/api/`, checked with Playwright screenshots |
 
 The README's **AI and model usage** section summarises this for judges.
