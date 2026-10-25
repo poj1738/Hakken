@@ -1,34 +1,69 @@
 #!/usr/bin/env python3
 """Programmatic entry point.
 
-    python3 run.py --input input_examples/example_1.json   # one run, JSON to stdout
-    python3 run.py serve                                  # uvicorn on 0.0.0.0:$PORT
+    python3 run.py --input input_examples/example_2.json   # one run, RunResponse JSON to stdout
+    python3 run.py --input input_examples/example_1.json --confirm patient:INT00015
+    python3 run.py serve                                   # the API on 0.0.0.0:$PORT
 
-PHASE 5 STUB: the CLI shape is fixed so judges and scripts can rely on it, but
-the orchestrator behind it is not written yet. It exits non-zero and says so
-rather than printing a plausible-looking fake result.
+`SAMPLE_MODE=true` runs the real agent logic on the recorded Zetaris data with offline
+agents: no Zetaris, no Nightshift, no network.
+
+A run that stops at `needs_review` is printed as such: a human decides identity. Pass
+`--confirm <candidate_id>` (or `--reject`) to record that decision and continue -- the
+same call as `POST /run/{id}/identity`.
+
+Exit codes: 0 success / partial / needs_review, 1 error, 2 bad usage.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import sys
+from pathlib import Path
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Hakken agent")
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="MedTrace (Team Hakken)")
     parser.add_argument("command", nargs="?", choices=["serve"], help="start the API server")
-    parser.add_argument("--input", help="path to a JSON run request")
-    args = parser.parse_args()
+    parser.add_argument("--input", help="path to a JSON RunRequest, e.g. input_examples/example_2.json")
+    parser.add_argument("--confirm", action="append", default=[], metavar="CANDIDATE",
+                        help="identity near-miss to confirm as the same person (repeatable)")
+    parser.add_argument("--reject", action="append", default=[], metavar="CANDIDATE",
+                        help="identity near-miss to reject as a different person (repeatable)")
+    args = parser.parse_args(argv)
 
     if args.command == "serve":
-        print("not implemented yet: `serve` arrives in Phase 5", file=sys.stderr)
+        import uvicorn
+
+        from app.config import get_settings
+        uvicorn.run("app.main:app", host="0.0.0.0", port=get_settings().port)
+        return 0
+    if not args.input:
+        parser.print_help()
         return 2
-    if args.input:
-        print("not implemented yet: the agent loop arrives in Phase 4", file=sys.stderr)
+
+    from app.orchestrator import Orchestrator, UnknownPatient
+    from app.schemas import IdentityDecisionRequest, RunRequest
+
+    try:
+        request = RunRequest.model_validate_json(Path(args.input).read_text())
+    except (OSError, ValueError) as exc:
+        print(f"bad input {args.input}: {exc}", file=sys.stderr)
         return 2
-    parser.print_help()
-    return 2
+    orch = Orchestrator()
+    try:
+        response = orch.start(request)
+    except UnknownPatient as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    decisions = [(c, True) for c in args.confirm] + [(c, False) for c in args.reject]
+    for candidate, same in decisions:
+        if response.status != "needs_review":
+            break
+        response = orch.resume(response.run_id, IdentityDecisionRequest(candidate_id=candidate, same_person=same))
+    print(json.dumps(response.model_dump(mode="json"), indent=2))
+    return 1 if response.status == "error" else 0
 
 
 if __name__ == "__main__":
