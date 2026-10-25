@@ -129,6 +129,39 @@ LAY_TERMS = {
 #: All insulins, not one (consultant brief 12.3: APINCH covers "all insulins",
 #: and bolus doses are titrated without new scripts just as basal ones are).
 PHONE_DOSE_GENERICS = ("warfarin", "insulin glargine", "insulin aspart", "prednisolone")
+_ID_COLUMN = {"emr": "mrn", "gp": "gp_pid", "pharmacy": "cust_no", "patient": "intake_id"}
+#: Mirrors detect.SPLIT_SENSITIVE: a split-sensitive medicine adds a regimen
+#: finding to the demo that has nothing to do with learning.
+SPLIT_SENSITIVE_PREFIXES = ("levodopa", "lithium", "carbamazepine", "valpro", "phenytoin",
+                            "hydrocortisone", "prednisolone", "insulin", "gliclazide",
+                            "glibenclamide")
+
+#: The learning demo (PLAN, the 2:15 beat): a pharmacist rejects patient A's GP
+#: dose as outdated, and patient B -- run afterwards -- resolves differently.
+#: Nothing in the random population does that: at 200 patients only 3 change
+#: their resolved dose under one rejection, none of them in the replay set and
+#: none visibly. So the pair is staged, deterministically, on two replay-set
+#: patients that had no planted findings, and the staging is recorded in the
+#: ground truth (`learning_demo`) rather than passed off as chance.
+#:
+#: The shape, both patients: a GP list a year old still carrying the dose from
+#: before a reduction, against a pharmacy fill at the current dose six days ago.
+#: At the trust priors neither source wins by the 0.2 margin, so the dose
+#: abstains. One `source_outdated` rejection takes GP `daily_dose` 0.70 -> 0.50
+#: (PLAN 5.7) and the pharmacy wins. B's admission chart copied the old GP dose,
+#: so once B's dose resolves it surfaces a real chart error that the abstention
+#: was hiding. `tests/unit/test_learning_demo.py` pins both halves on the replay fixtures.
+LEARNING_PAIR = {"P0003": "teach", "P0007": "learn"}
+#: Showcase patients outside the first `--fixtures`, also given replay fixtures so
+#: `SAMPLE_MODE` and `input_examples/` can run them. Chosen 25 Oct from the tune
+#: split because each tells one story cleanly, with no false positive and no miss:
+#: P0015 -- an identity near-miss for a human, then warfarin and insulin dose
+#: conflicts, an insulin omission and an antiplatelet duplication; P0089 -- an
+#: opioid duplication and frequency error, straight through; P0013 -- two of four
+#: sources found, so the history is declared unconfirmable rather than guessed.
+SHOWCASE = ("P0013", "P0015", "P0089")
+LEARNING_GP_AGE_DAYS = 380
+LEARNING_FILL_AGE_DAYS = 6
 
 
 def phone_dose_gp_directions(med: "Med", rng: random.Random, usual: str) -> str:
@@ -991,6 +1024,74 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
     return planted, notices, corruptions
 
 
+def stage_learning_demo(p: Patient, rows: Rows, planted: list[dict[str, object]],
+                        notices: list[dict[str, object]], role: str) -> dict[str, object] | None:
+    """Stage `LEARNING_PAIR` on one patient's rendered rows. No rng, no new rows.
+
+    Mutates rows in place, so no other patient's row ids or random draws move.
+    Returns what was staged, for the ground truth, or None if the patient has no
+    medicine the shape fits (the generator then says so loudly).
+    """
+    if not (p.present["gp"] and p.present["pharmacy"]):
+        return None
+    mine = {s: [r for r in rows.data[s] if r.get(_ID_COLUMN[s]) == p.ids[s]]
+            for s in ("emr", "gp", "pharmacy")}
+    discharged = {r["med_name"] for r in mine["emr"] if r["record_kind"] == "prior_discharge"}
+    charted = {r["med_name"]: r for r in mine["emr"] if r["record_kind"] == "admission_chart"}
+
+    def fits(med: Med) -> bool:
+        higher = [x for x in med.product.strengths
+                  if (strength_mg(x) or 0) > (strength_mg(med.strength) or 0)]
+        return bool(med.current and med.gp_listing == "active" and not med.private
+                    and not med.hidden_at_second_pharmacy and med.dispensings
+                    and not med.changed_by_phone and not med.is_device
+                    and not med.high_risk and "prn" not in med.regimen
+                    and len(med.ingredients) == 1 and higher
+                    and med.generic in charted and med.generic not in discharged
+                    and not med.generic.startswith(SPLIT_SENSITIVE_PREFIXES))
+
+    med = next((m for m in sorted(p.meds, key=lambda m: m.generic) if fits(m)), None)
+    if med is None:
+        return None
+    old = next(x for x in med.product.strengths
+               if (strength_mg(x) or 0) > (strength_mg(med.strength) or 0))
+
+    def names(row: dict[str, str], field: str) -> bool:
+        text = row.get(field, "").lower()
+        return text.startswith(med.generic.lower()) or bool(med.brand) and text.startswith(med.brand.lower())
+
+    listed = ddmmyyyy(AS_OF - dt.timedelta(days=LEARNING_GP_AGE_DAYS))
+    for row in mine["gp"]:
+        row["list_last_updated"] = row["last_reviewed"] = listed
+    if not any(n["type"] == "stale_document" for n in notices):
+        notices.append({"type": "stale_document", "source": "gp",
+                        "detail": f"GP list updated {iso(AS_OF - dt.timedelta(days=LEARNING_GP_AGE_DAYS))}"})
+    gp_row = next(r for r in mine["gp"] if names(r, "drug_text"))
+    gp_row["drug_text"] = gp_row["drug_text"].replace(med.strength, old)
+    gp_row["strength"] = old
+
+    fills = sorted((r for r in mine["pharmacy"] if names(r, "brand")), key=lambda r: r["dispensed_on"])
+    fills[-1]["dispensed_on"] = iso(AS_OF - dt.timedelta(days=LEARNING_FILL_AGE_DAYS))
+
+    staged: dict[str, object] = {"role": role, "generic": med.generic, "gp_dose": old,
+                                 "current_dose": med.strength, "gp_row": gp_row["row_id"],
+                                 "pharmacy_row": fills[-1]["row_id"]}
+    if role == "learn":
+        chart = charted[med.generic]
+        chart["strength"] = old
+        chart["dose"] = f"{strength_mg(old) or ''}"
+        planted.append({
+            "id": f"F{p.key[1:]}-{len(planted) + 1:02d}", "type": "dose", "generic": med.generic,
+            "sources_involved": ["emr", "pharmacy"],
+            "row_ids": [chart["row_id"], fills[-1]["row_id"], gp_row["row_id"]],
+            "detail": {"charted": old, "truth": med.strength, "learning_demo": True,
+                       "mechanism": "chart copied a GP list that predates a dose reduction"},
+            "high_risk_class": None, "intent": "likely_unintentional",
+        })
+        staged["chart_row"] = chart["row_id"]
+    return staged
+
+
 def apply_identity_traps(patients: list[Patient], split: dict[str, list[str]],
                          rng: random.Random) -> dict[str, list[dict[str, object]]]:
     """DATA_SPEC 7's deliberate linkage traps. Applied after building, before rendering.
@@ -1351,6 +1452,11 @@ def main() -> int:
         rng = p.rng
         planted, notices, corruptions = render(p, rows, codes, rng)
         resolve_row_ids(p, rows, planted)
+        learning = None
+        if p.key in LEARNING_PAIR and p.key in split["tune"]:
+            learning = stage_learning_demo(p, rows, planted, notices, LEARNING_PAIR[p.key])
+            if learning is None:
+                log(f"  WARNING: {p.key} has no medicine that fits the learning demo")
         # A planted finding with no citable row cannot be matched by DATA_SPEC
         # 11.2's row_id-overlap rule, so leaving it in the truth would cap that
         # type's recall below 1.0 for a reason that has nothing to do with the
@@ -1375,6 +1481,7 @@ def main() -> int:
                           "changed_by_phone": m.changed_by_phone} for m in p.meds],
             "planted": planted,
             "notices": notices,
+            **({"learning_demo": learning} if learning else {}),
         })
 
     # -- write silos --------------------------------------------------------
@@ -1398,7 +1505,8 @@ def main() -> int:
         harmonised.extend(harmonise(source, r) for r in rows.data[source])
 
     written = 0
-    for p in patients[:args.fixtures]:
+    replay = patients[:args.fixtures] + [p for p in patients[args.fixtures:] if p.key in SHOWCASE]
+    for p in replay:
         anchor = next((h for h in harmonised
                        if h["source"] == "emr" and h["source_patient_id"] == p.ids["emr"]), None)
         if anchor is None:
@@ -1415,7 +1523,7 @@ def main() -> int:
             (fixtures_dir / f"{name}__{p.key}.json").write_text(
                 json.dumps(envelope(cols, data), indent=1), encoding="utf-8")
             written += 1
-    log(f"  fixtures: {written} envelopes for {min(args.fixtures, len(patients))} patients")
+    log(f"  fixtures: {written} envelopes for {len(replay)} patients")
 
     # Q0: the admissions list, which is how a run finds its anchor. One envelope
     # for the whole population, exactly as queries.q_admissions() returns it --

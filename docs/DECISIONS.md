@@ -11,6 +11,44 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-25 — The learning demo is staged, and says so **[measured, 25 Oct]**
+
+**Problem.** PLAN's 2:15 beat ("reject a GP dose as outdated, then patient B
+resolves differently") had no patient B. I lowered GP `daily_dose` by one
+`source_outdated` rejection (−0.20, PLAN 5.7) and re-fused all 200 patients:
+3 changed their resolved dose (P0012, P0116, P0134), none in the replay set,
+and none gained or lost a finding. The beat would have shown nothing.
+
+**Decision.** Stage one pair, deterministically, on two replay-set patients
+that had no planted findings (`LEARNING_PAIR` in the generator): P0003 teaches,
+P0007 learns. The shape: a GP list 380 days old still carrying the pre-reduction
+dose, against a pharmacy fill at the current dose six days ago. At the priors,
+GP 0.70 × e^(−380/730) ≈ 0.42 against pharmacy 0.55 × e^(−6/180) ≈ 0.53, a
+margin of 0.12, so the dose abstains. After one rejection GP falls to about 0.30,
+the margin is 0.28, and the pharmacy wins. P0007's chart copied the stale GP dose,
+so resolving it surfaces a real chart error.
+
+**Why staged, not searched for or tuned.** Changing trust priors or the margin
+to make a random patient flip would move every score to serve a demo. Staging
+moves no prior, uses no rng, and adds no rows, so every other patient's rows and
+ids are byte-identical. It is recorded in the ground truth (`learning_demo`, and
+`detail.learning_demo` on P0007's planted dose finding), so nobody can present it
+as chance.
+
+**Cost, stated.** Without feedback the detector abstains on P0007's dose, so the
+tune scorecard carries one more miss: 145 TP / 17 FP / 5 FN (it was 4), F1 still
+0.93. Held-out is untouched (P0003 and P0007 are tune). That miss is the point:
+it is what the system cannot see until it learns.
+
+Pinned by `tests/unit/test_learning_demo.py` on the committed replay fixtures,
+so it runs in CI and is exactly what `SAMPLE_MODE` replays. Live Zetaris was
+re-cached and serves the staged rows (checked by `row_id`, since `make verify`
+compares row counts and a value change keeps them).
+
+Also: showcase replay fixtures for P0013, P0015 and P0089 (`SHOWCASE`), five
+`input_examples/`, and the Dockerfile now copies `tests/fixtures/medtrace/`.
+Without that, `SAMPLE_MODE` in the image had nothing to replay.
+
 ## 2026-10-25 — Consultant rulings on the detector applied; population back to 200 **[consultant review + measured, 25 Oct]**
 
 The consultant pharmacist's review of briefs 11–14 is
