@@ -24,6 +24,9 @@ export function Header({ health, error }: Props) {
         </div>
       </div>
       <div className="pills" aria-live="polite">
+        <span className="pill tone-disclaimer" title="A pharmacist must confirm every item.">
+          Synthetic data · Not medical advice
+        </span>
         {API_MODE === "mock" && (
           <span className="pill tone-mock" title="Replaying tests/fixtures/api/*.json — hand-written examples, not real runs">
             Mock data

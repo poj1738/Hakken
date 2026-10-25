@@ -69,6 +69,8 @@ select { font: inherit; padding: 0.35rem; border-radius: 6px; border: 1px solid 
 .tone-bad .dot { color: #f87171; }
 .tone-mock { background: #fbbf24; color: #3b2a00; border-color: #fbbf24; font-weight: 600; }
 .tone-info { background: rgba(31, 111, 235, 0.45); }
+.tone-disclaimer { background: #fff; color: #0d2538; border-color: #fff; font-weight: 600; }
+.caveats { margin: 0.4rem 0 0; padding-left: 1.1rem; color: var(--warn); }
 .mock-note { background: var(--warn-bg); color: var(--warn); padding: 0.4rem 1.2rem; font-size: 0.82rem; border-bottom: 1px solid #f0d58c; }
 
 /* Layout */

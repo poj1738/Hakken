@@ -16,7 +16,20 @@ import { Grid } from "./components/Grid";
 import { Flags, type FeedbackChoice, type FeedbackState } from "./components/Flags";
 import { Tasks } from "./components/Tasks";
 import { TrustPanel, type AppliedTrustUpdate } from "./components/TrustPanel";
-import { Footer } from "./components/Footer";
+import { DISCLAIMER, Footer } from "./components/Footer";
+
+/** The API's caveats about this result, minus the fixed disclaimer shown in the header and footer. */
+function Caveats({ caveats }: { caveats: string[] }) {
+  const shown = caveats.filter((c) => c !== DISCLAIMER);
+  if (!shown.length) return null;
+  return (
+    <ul className="caveats small">
+      {shown.map((c) => (
+        <li key={c}>{c}</li>
+      ))}
+    </ul>
+  );
+}
 
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
@@ -215,6 +228,7 @@ export default function App() {
               onDecide={decideIdentity}
             />
           )}
+          {run?.status === "needs_review" && <Caveats caveats={run.output.caveats} />}
           {run?.status === "needs_review" && !run.identity_review && (
             <section className="card">
               <h2>Identity review needed</h2>
@@ -235,6 +249,9 @@ export default function App() {
               <section className="card summary">
                 <h2>Summary</h2>
                 <p>{run.output.summary}</p>
+                {/* The API's caveats qualify this result, so they sit with it. The
+                    fixed disclaimer is already in the header and footer. */}
+                <Caveats caveats={run.output.caveats} />
                 {run.status === "partial" && <p className="banner small">Status: partial. Read every caveat before relying on it.</p>}
               </section>
               {/* A result with no coverage and no grid (an early stop, or the mock
@@ -265,7 +282,7 @@ export default function App() {
           )}
         </div>
       </main>
-      <Footer caveats={run?.output.caveats ?? []} />
+      <Footer />
     </div>
   );
 }
