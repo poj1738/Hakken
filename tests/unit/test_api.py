@@ -87,8 +87,10 @@ def test_learning_demo_over_http(api) -> None:
     fb = api.post("/feedback", json={"run_id": teach["run_id"], "target_id": "grid:candesartan:daily_dose",
                                      "verdict": "reject", "reason": "source_outdated",
                                      "source": "gp", "attribute": "daily_dose"}).json()
-    assert fb["trust_updates"] == [{"source": "gp", "attribute": "daily_dose", "hmem_record_id": "trust:gp:daily_dose",
-                                    "kind": "wrong", "before": 0.7, "after": 0.5, "delta": -0.2}]
+    [update] = fb["trust_updates"]
+    assert update["hmem_record_id"].startswith("mem-")  # a real H-MEM record
+    assert {k: v for k, v in update.items() if k != "hmem_record_id"} == {
+        "source": "gp", "attribute": "daily_dose", "kind": "wrong", "before": 0.7, "after": 0.5, "delta": -0.2}
     after = api.post("/run?wait=true", json={"patient_id": "MRN0000007"}).json()
     assert any(f["type"] == "dose" and f["generic"] == "rosuvastatin" for f in after["findings"])
 

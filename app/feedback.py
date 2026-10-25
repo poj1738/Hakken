@@ -1,7 +1,9 @@
-"""Feedback to learning (PLAN 5.7). In-process today; H-MEM makes it durable later.
+"""Feedback to learning (PLAN 5.7), through the H-MEM engine.
 
-A pharmacist's verdict on a finding becomes a trust delta on the `(source, attribute)`
-records behind it, and the next run's `fuse()` reads that trust:
+A pharmacist's verdict on a finding becomes `HMEM.feedback()` on the `(source, attribute)`
+trust records behind it -- the engine's exact deltas and clamps, a `review` tag on
+`wrong`, and a ledger entry -- and the next run's `fuse()` reads that trust. The verdict
+itself is also remembered, so the Planner can recall it:
 
   confirm                                    -> helpful      +0.05
   reject: source_outdated | wrong_patient    -> wrong        -0.20  on THAT (source, attribute)
@@ -24,7 +26,6 @@ from app.schemas import AcceptanceUpdate, FeedbackRequest, FeedbackResponse, Fin
 if TYPE_CHECKING:
     from app.orchestrator import Orchestrator
 
-DELTA = {"helpful": 0.05, "wrong": -0.20, "not_helpful": -0.03}
 ACCEPTANCE_STEP = 0.10
 ACCEPTANCE_FLOOR = 0.10
 _DOSE_TYPES = {DT.DOSE, DT.DOSE_UNCONFIRMABLE, DT.FREQUENCY}
@@ -63,6 +64,7 @@ def apply_feedback(orch: Orchestrator, req: FeedbackRequest) -> FeedbackResponse
         sources = sorted({e.source for e in finding.evidence if e.source} - {"emr"})
     # A pair with no prior is skipped: nothing to learn into, and nothing is invented.
     updates = [u for s in sources if (u := _move(orch, s, attribute, kind))]
+    _remember(orch, req, response, f"{finding.type.value} finding on {finding.generic}", attribute, sources)
 
     acceptance: list[AcceptanceUpdate] = []
     if req.reason in ("intentional_change", "not_clinically_relevant"):
@@ -84,13 +86,21 @@ def _kind(req: FeedbackRequest) -> str:
 
 
 def _move(orch: Orchestrator, source: str, attribute: str, kind: str) -> TrustUpdate | None:
-    before = orch.trust.get((source, attribute))
-    if before is None:
+    moved = orch.memory.feedback(source, attribute, kind)
+    if moved is None:
         return None
-    after = round(min(1.0, max(0.0, before + DELTA[kind])), 4)
-    orch.trust[(source, attribute)] = after
-    return TrustUpdate(source=source, attribute=attribute, hmem_record_id=f"trust:{source}:{attribute}",
+    record_id, before, after = moved
+    return TrustUpdate(source=source, attribute=attribute, hmem_record_id=record_id,
                        kind=kind, before=before, after=after, delta=round(after - before, 4))
+
+
+def _remember(orch: Orchestrator, req: FeedbackRequest, response, target: str, attribute: str,
+              sources: list[str]) -> None:
+    verdict = "confirmed" if req.verdict == "confirm" else f"rejected ({req.reason})"
+    where = ", ".join(sources) or "no source"
+    orch.memory.remember_verdict(
+        f"Pharmacist {verdict} the {target} for patient {response.patient_id}; {where} {attribute.replace('_', ' ')}",
+        source=sources[0] if len(sources) == 1 else None, reason=req.reason)
 
 
 def _grid_feedback(orch: Orchestrator, req: FeedbackRequest, response) -> FeedbackResponse:
@@ -114,5 +124,6 @@ def _grid_feedback(orch: Orchestrator, req: FeedbackRequest, response) -> Feedba
         sources = sorted(set(cell.supporting if cell else []) - {"emr"})
     kind = _kind(req)
     updates = [u for s in sources if (u := _move(orch, s, attribute, kind))]
+    _remember(orch, req, response, f"{generic} {attribute.replace('_', ' ')} in the grid", attribute, sources)
     return FeedbackResponse(run_id=req.run_id, target_id=req.target_id, verdict=req.verdict, reason=req.reason,
                             trust_updates=updates)

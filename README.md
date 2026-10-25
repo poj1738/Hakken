@@ -37,9 +37,6 @@ source to trust.
 
 ### Not finished
 
-- **The H-MEM engine** and its conformance tests. Feedback already moves trust between
-  runs (the learning demo works), but only in-process; it is not durable until H-MEM
-  lands. (The World Model engine is done; see "Engines used".)
 - **The Docker run path.** The API exists now, but the image has not been built and
   run end to end.
 - **The web UI** (`web/`) is built but has only run in mock mode, against hand-written
@@ -157,8 +154,26 @@ replay saved model text.
   so the next run for that patient doesn't ask again. The trace shows the decision
   and its audit `seq`.
 
-**H-MEM:** planned (memory across runs, feeding the Planner and the trust ledger).
-**Not yet implemented.** See `docs/REFERENCE_NOTES.md` §3–4 for the exact contracts.
+**H-MEM: implemented, 13/13 official conformance vectors green** (`make conformance`).
+`app/engines/hmem/` is a Python port of the Meterless reference:
+- the deterministic embedder
+- a store that rejects records without a source
+- the append-only ledger with 17 actions
+- the exact hybrid retrieval formula (threshold 0.35, top 5)
+- feedback deltas +0.05 / −0.03 / −0.20, clamped, with a `review` tag on `wrong`
+- conflicts with the 0.70 auto-resolve gate
+- preview-first sleep with guardrails
+- dreaming behind an approval gate
+
+**Where it works in the product:**
+- **The trust the pharmacist teaches lives in H-MEM.** Each `(source, attribute)` prior
+  is a long-term H-MEM record, and fusion reads trust from it. A verdict is H-MEM
+  feedback on that record, with a ledger entry, and it **persists across restarts**:
+  the learning demo (reject P0003's GP dose, and P0007 resolves differently) survives
+  one.
+- **The verdict itself is remembered**, and the Planner recalls such memories before it
+  plans. They're returned in `RunResponse.memory_used`.
+- **Findings cite their trust records** (`hmem_record_ids`).
 
 ## AI and model usage
 
@@ -176,11 +191,12 @@ replay saved model text.
 - **AI coding tools used:** **Claude Code**, logged per session in
   `docs/AI_TOOLS_USAGE.md`. `CLAUDE.md` holds the working rules. Cursor is not used —
   see that log for why.
-- **Open-source code materially adapted:** the **World Model reference implementation
-  and conformance runner** from the Meterless repo (Apache-2.0, commit `1742dec`),
-  ported to Python. Every ported file carries an Apache-2.0 attribution header. The
-  H-MEM specification and vectors will be adapted the same way. The Zetaris REST call shape in our adapter follows that project's reference
-  client. Real Zetaris and Nightshift responses are recorded as test fixtures.
+- **Open-source code materially adapted:** the **World Model and H-MEM reference
+  implementations and conformance runners** from the Meterless repo (Apache-2.0,
+  commit `1742dec`), ported to Python. Every ported file carries an Apache-2.0
+  attribution header, and the official H-MEM `vectors.json` is copied verbatim
+  (`tests/engines/vectors/NOTICE.md`). The Zetaris REST call shape in our adapter
+  follows that project's reference client. Real Zetaris and Nightshift responses are recorded as test fixtures.
 - **Data:** synthetic only, seeded and deterministic: `make lexicon && make synth`
   reproduces the committed data exactly, and CI checks that on every push. Real PBS
   codes come from the committed lexicon; rebuilding them needs `make data` (a

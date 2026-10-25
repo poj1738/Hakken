@@ -27,6 +27,42 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 · Arnav · arnav/hmem
+
+**Did:** H-MEM (TODO_ARNAV §4, last item, ticked). **Both Meterless engines are now
+implemented, conformance-green and used in the product.**
+- **`app/engines/hmem/`** is a Python port of the Meterless reference. **13/13 official
+  vectors pass**: `vectors.json` is copied verbatim, with the attribution in
+  `tests/engines/vectors/NOTICE.md`. `make conformance` runs 22 checks across both
+  engines.
+- **The trust the pharmacist teaches lives in H-MEM** (`app/agents/memory.py`).
+  - Each `(source, attribute)` prior is an H-MEM record, and fusion reads trust from them.
+  - A verdict is `HMEM.feedback()`: exact deltas, a `review` tag on `wrong`, and a ledger entry.
+  - **The learning demo now survives a restart.**
+  - The verdict itself is remembered; the Planner recalls such memories (`memory_used`),
+    and findings cite `hmem_record_ids`.
+  - Persisted under `STATE_DIR/hmem` live, in memory in SAMPLE_MODE.
+- **Recall threshold is 0.15, not the spec's 0.35**, measured and justified in
+  `docs/DECISIONS.md`: absolute scores depend on the mock embedder.
+- **Live check:** World Model through the API on my machine. Run 2 of P0015 skipped the
+  review because the World Model remembered the decision.
+
+6 feature tests. `make test`: 758 passed.
+
+**Changed shared files:** none on the list. In `app/feedback.py`, trust updates now
+return real H-MEM record IDs (`mem-…`) in `hmem_record_id`.
+
+**Broken:** nothing.
+
+**Needs from teammates:**
+- **Anshu:** `RunResponse.memory_used` is now populated once a pharmacist has given
+  feedback. A small "what memory was used" panel (PLAN 6) would show judges H-MEM working.
+
+**Next:** Arpon's handed-over items (TODO_ARNAV §5): S8 metadata.json, S19 example_3,
+S7, S22. Then `output_examples/` from real runs (S2).
+
+---
+
 ### 2026-10-25 · Arnav · arnav/world-model
 
 **Did:** World Model (TODO_ARNAV §4, ticked). **Sponsor rule 2's engine half is now real.**
