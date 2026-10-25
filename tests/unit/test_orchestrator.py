@@ -135,6 +135,19 @@ def test_p0015_confirmed_shows_example_1(orch) -> None:
     assert any(e.message and "same person" in e.message for e in r.trace)
 
 
+def test_example_3_is_not_confirmable_and_invents_nothing(orch) -> None:
+    """example_3 (P0013): once the interview is confirmed, only EMR + patient exist. The chart
+    is not a pre-admission source, so the BPMH is not confirmable (scan S19)."""
+    first = run(orch, "MRN0000013")
+    assert first.status == "needs_review"
+    r = orch.resume(first.run_id, IdentityDecisionRequest(candidate_id="patient:INT00013", same_person=True))
+    assert r.status == "success" and r.findings == []
+    assert r.bpmh_confirmable is False and r.banner and "pre-admission" in r.banner
+    assert "bpmh_not_confirmable" in {n.type.value for n in r.notices}
+    assert {k: v.state for k, v in r.coverage.items()} == {
+        "emr": "found", "gp": "not_found", "pharmacy": "not_found", "patient": "found"}
+
+
 def test_p0015_rejected_reads_no_interview_rows(orch) -> None:
     first = run(orch, "MRN0000015")
     r = orch.resume(first.run_id, IdentityDecisionRequest(candidate_id="patient:INT00015", same_person=False))

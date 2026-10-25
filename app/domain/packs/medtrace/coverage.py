@@ -239,19 +239,27 @@ def bpmh_confirmable(cov: dict[str, Coverage]) -> tuple[bool, str]:
 
     Independence matters: the EMR admission chart and a prior discharge summary
     from the same EMR are one source, not two -- which is why this counts the
-    four systems and never the records inside one.
+    systems and never the records inside one.
+
+    **The admission chart is not one of the two.** A BPMH is the *pre-admission*
+    history the chart is reconciled against, so only GP, pharmacy and the patient
+    interview count (Arnav, 25 Oct, scan S19). The generator's ground truth plants
+    `bpmh_not_confirmable` on exactly the patients with the chart plus one such
+    source (P0013: patient only; P0056: pharmacy only), so this is the rule the data
+    was built to; counting the chart had made both read as confirmable.
     """
-    found = sorted(s for s in SOURCES if cov.get(s) and cov[s].state == "found")
-    pending = sorted(s for s in SOURCES if cov.get(s) and cov[s].state == "near_miss_pending")
+    pre_admission = [s for s in SOURCES if s != "emr"]
+    found = sorted(s for s in pre_admission if cov.get(s) and cov[s].state == "found")
+    pending = sorted(s for s in pre_admission if cov.get(s) and cov[s].state == "near_miss_pending")
     if len(found) >= 2:
         return True, ""
 
-    missing = sorted(set(SOURCES) - set(found) - set(pending))
+    missing = sorted(set(pre_admission) - set(found) - set(pending))
     parts = [
-        f"Only {len(found)} of {len(SOURCES)} sources found"
+        f"Only {len(found)} of {len(pre_admission)} pre-admission sources found"
         f"{' (' + ', '.join(found) + ')' if found else ''}.",
-        "ACSQHC Standard 4 expects at least two independent sources, so this is a draft "
-        "medication history and is not confirmable.",
+        "ACSQHC Standard 4 expects at least two independent sources besides the admission "
+        "chart, so this is a draft medication history and is not confirmable.",
     ]
     if pending:
         parts.append(
