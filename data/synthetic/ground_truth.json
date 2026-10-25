@@ -663,8 +663,21 @@
       "PAT-000031"
      ],
      "detail": "OTC or complementary"
+    },
+    {
+     "type": "stale_document",
+     "source": "gp",
+     "detail": "GP list updated 2025-10-09"
     }
-   ]
+   ],
+   "learning_demo": {
+    "role": "teach",
+    "generic": "candesartan",
+    "gp_dose": "16 mg",
+    "current_dose": "8 mg",
+    "gp_row": "GP-000023",
+    "pharmacy_row": "PHM-000156"
+   }
   },
   {
    "patient_key": "P0004",
@@ -1233,8 +1246,46 @@
      "changed_by_phone": false
     }
    ],
-   "planted": [],
-   "notices": []
+   "planted": [
+    {
+     "id": "F0007-01",
+     "type": "dose",
+     "generic": "rosuvastatin",
+     "sources_involved": [
+      "emr",
+      "pharmacy"
+     ],
+     "row_ids": [
+      "EMR-000060",
+      "PHM-000404",
+      "GP-000050"
+     ],
+     "detail": {
+      "charted": "20 mg",
+      "truth": "10 mg",
+      "learning_demo": true,
+      "mechanism": "chart copied a GP list that predates a dose reduction"
+     },
+     "high_risk_class": null,
+     "intent": "likely_unintentional"
+    }
+   ],
+   "notices": [
+    {
+     "type": "stale_document",
+     "source": "gp",
+     "detail": "GP list updated 2025-10-09"
+    }
+   ],
+   "learning_demo": {
+    "role": "learn",
+    "generic": "rosuvastatin",
+    "gp_dose": "20 mg",
+    "current_dose": "10 mg",
+    "gp_row": "GP-000050",
+    "pharmacy_row": "PHM-000404",
+    "chart_row": "EMR-000060"
+   }
   },
   {
    "patient_key": "P0008",

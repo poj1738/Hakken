@@ -24,6 +24,9 @@ COPY datasvc/ ./datasvc/
 COPY data/ ./data/
 COPY scripts/ ./scripts/
 COPY input_examples/ ./input_examples/
+# SAMPLE_MODE's replay set. It lives under tests/ because the contract tests read it
+# too; data/reference/ and data/synthetic/ are gitignored, so a clean clone has nothing else.
+COPY tests/fixtures/medtrace/ ./tests/fixtures/medtrace/
 COPY run.py ./
 COPY --from=web /web/dist ./web/dist
 

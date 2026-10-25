@@ -5,7 +5,7 @@ One file, current state only. Overwrite it as things change — the history live
 
 **Last updated:** 2026-10-25 by Arpon
 
-> **On `main`:** consultant rulings applied, population 200, held-out F1 0.95, high-risk 35/37 (core APINCHS 30/32, extended 5/5). **Arpon's section is done** — everything left is in Arnav's and Anshu's layers.
+> **On `main`:** consultant rulings applied, population 200, held-out F1 0.95, high-risk 35/37 (core APINCHS 30/32, extended 5/5). **Arpon's section is done**, including demo data: 5 `input_examples/` with replay fixtures, a staged learning-demo pair (P0003 → P0007, `docs/DECISIONS.md`), and sample data in the Docker image. Everything left is in Arnav's and Anshu's layers.
 
 ## Status
 
@@ -30,7 +30,7 @@ queries Zetaris yet (rule 1 — though the registration itself is live and verif
 | **MedTrace contract** (`types.py`) | Arpon | **frozen, on `main`.** Shared file — changes need sign-off, a HANDOFF entry and a PR line |
 | SQL templates (`queries.py`) | Arpon | **done, run live.** Q0–Q3 and Q_REF; `q_shortages` (Q4) deliberately unwritten |
 | Clinical logic — all 11 modules | Arpon | **done.** `fuse` (trust-weighted BPMH), `detect` (9 of 11 types emitted; 2 deliberately not — see `docs/DECISIONS.md` 25 Oct), `triage` (ranking with an absolute APINCHS floor) |
-| **Detector scorecard** (`scripts/eval.py`) | Arpon | **200 patients, held-out: precision 0.95, recall 0.95, F1 0.95, high-risk 35/37 — core APINCHS 30/32 [0.80, 0.98], extended 5/5** (simulated review); 0.93 F1 with no human review. Tune 0.93, high-risk 34/34. Consultant rulings 11–14 applied. Pinned by `tests/eval/test_scorecard.py` |
+| **Detector scorecard** (`scripts/eval.py`) | Arpon | **200 patients, held-out: precision 0.95, recall 0.95, F1 0.95, high-risk 35/37 — core APINCHS 30/32 [0.80, 0.98], extended 5/5** (simulated review); 0.93 F1 with no human review. Tune 0.93 (one deliberate miss: the learning-demo chart error, visible only after feedback), high-risk 34/34. Consultant rulings 11–14 applied. Pinned by `tests/eval/test_scorecard.py` |
 | Identity linkage | Arpon | 200 patients: 0 false merges; 535 true links auto-merge, 31 go to review, 2 lost |
 | Reference data | Arpon | **done** — 224 lexicon rows, 203 with a real PBS code |
 | Synthetic generator, ground truth | Arpon | **done** — 40 patients, 60 planted findings, identity traps. Ground truth now cites only the patient's own rows (9 of 20 omissions used to cite someone else's) |

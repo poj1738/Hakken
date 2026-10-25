@@ -9,22 +9,35 @@ Before you start: `git pull origin main`, `make setup`, `make test`. Then
 `make synth` — `data/synthetic/silos/` is gitignored, and the generator tests and
 the scorecard **skip** without it. A skip there is a missing build, not a pass.
 
-> **⚠ Incoming from Arpon (25 Oct, in progress): demo data.** Until a follow-up
-> lands on `main` and this box says *landed*:
-> - **Don't record `output_examples/`, `input_examples/` or regenerate
->   `tests/fixtures/api/` from real runs yet.** The replay set
->   (`tests/fixtures/medtrace/`) is about to change.
-> - **Coming:** (1) a **learning-demo pair** inside the replay set: reject patient
->   A's GP dose as outdated (`source="gp"`, `attribute="daily_dose"`, −0.20), and
->   patient B's dose conflict resolves and surfaces a chart error. Today no patient
->   in P0001–P0010 changes at all under one rejection, so the 2:15 demo beat would
->   show nothing. (2) **3–4 showcase patients** with replay fixtures and
->   `input_examples/example_{1..}.json` (rule 8). (3) **Sample-mode data shipped in
->   the Docker image.** The Dockerfile copies `data/` but not `tests/`, and
->   `data/reference/` is gitignored, so `SAMPLE_MODE` in Docker would have nothing
->   to replay.
-> - Carry on with everything else (adapter, orchestrator, API, World Model). None
->   of it depends on this.
+> **✅ Landed 25 Oct: demo data.** `git pull`, then `make synth` (and `make refresh`
+> if you use live Zetaris). Recording outputs is unblocked.
+> - **Five sample inputs** in `input_examples/` (rule 8), each with a row in
+>   `input_examples/README.md` saying what a correct run shows. All have replay
+>   fixtures, so all run under `SAMPLE_MODE`:
+>   - `example_1`: P0015, **needs_review** first, then warfarin and insulin
+>     findings.
+>   - `example_2`: P0089, straight through, opioid duplication.
+>   - `example_3`: P0013, **needs_review**, then only 2 of 4 sources, so nothing
+>     invented.
+>   - `example_4`/`example_5`: the learning pair below.
+> - **Learning demo:**
+>   1. Run P0003 (`MRN0000003`): its candesartan dose **abstains** (GP 16 mg vs
+>      pharmacy 8 mg). The pharmacist rejects the GP value: `reason="source_outdated"`,
+>      `source="gp"`, `attribute="daily_dose"`. PLAN 5.7 −0.20 takes GP
+>      `daily_dose` 0.70 → 0.50.
+>   2. Run P0007 (`MRN0000007`) with the updated trust: rosuvastatin resolves to
+>      10 mg, and a new **dose finding** appears (the chart says 20 mg, copied from
+>      the stale GP list).
+>   3. Run P0007 at the priors and it abstains with no finding. That before/after
+>      is the demo.
+>
+>   **The −0.20 must reach `fuse`'s `trust` dict as `("gp", "daily_dose")`.**
+>   `tests/unit/test_learning_demo.py` shows the exact call. Use it as the
+>   acceptance test for your H-MEM wiring.
+> - **Docker:** the image now copies `tests/fixtures/medtrace/` (the replay set).
+>   Read sample-mode fixtures from that path.
+> - New replay fixtures: `Q1/Q2/Q3__P0013`, `__P0015`, `__P0089`. P0003 and P0007's
+>   changed; nothing else did, and Q0 is identical.
 
 ---
 

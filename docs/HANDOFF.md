@@ -27,6 +27,14 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 13:39 AEDT · Arpon · arpon/demo-data
+
+**Did:** Demo data. (1) **The learning demo had no patient B.** Under one GP-dose rejection, no replay-set patient changed. Staged a pair (`LEARNING_PAIR`: P0003 teaches, P0007 learns). Both abstain at the priors. After −0.20 on GP `daily_dose`, both resolve to the pharmacy dose, and P0007 gains a dose finding (its chart copied the stale GP dose). No rng, no new rows: every other patient is byte-identical. Recorded in the ground truth as `learning_demo`. Pinned by `tests/unit/test_learning_demo.py` on the replay fixtures (runs in CI). (2) **Showcase replay fixtures** for P0013, P0015 and P0089, plus **5 `input_examples/`** with a README saying what each correct run shows (rule 8). (3) **Dockerfile copies `tests/fixtures/medtrace/`**: `SAMPLE_MODE` in the image had nothing to replay. Live Zetaris re-cached (`make refresh`, `make verify` green), and the staged values confirmed by `row_id`.
+**Changed shared files:** none on the list. `Dockerfile` changed (one `COPY` line) — called out here and in the PR.
+**Broken:** nothing. Tune now 145 TP / 17 FP / 5 FN, F1 0.93: the extra miss is P0007's staged chart error, which the system can only see after feedback. That is the demo. Held-out untouched.
+**Needs from teammates:** Arnav — the box at the top of `docs/TODO_ARNAV.md` now says **landed**. Recording outputs is unblocked. Your H-MEM `source_outdated` delta must reach `fuse` as `trust[("gp", "daily_dose")]`; `test_learning_demo.py` is the acceptance test. Anshu — the demo order is example_4 then example_5 (`input_examples/README.md`).
+**Next:** nothing on Arpon's side. Pick up whatever is handed back here.
+
 ### 2026-10-25 13:14 AEDT · Arpon · arpon/loose-ends
 
 **Did:** Closed Arpon's last loose ends. (1) `coverage()` measured GP-list staleness against `date.today()`, so a fixed dataset changed its answer as the calendar moved; it now measures from the admission chart, the newest document (frozen signature has no `as_of`). Test added. (2) `scripts/eval.py` reports high-risk recall **split core APINCHS vs extended**, as the 24 Oct consultant ruling asked — pooled, a weak extension row moves a number that reads as ACSQHC compliance. Held-out: **core 30/32 [0.80, 0.98], extended 5/5**; tune core 27/27, extended 7/7. Scores otherwise unchanged. (3) PROGRESS "Waiting on Arpon" was stale: sotalol, bundle 6 and the formulation pairs were all decided and applied 24 Oct — verified in `medicines.csv` and struck off.
