@@ -25,7 +25,9 @@ from app.domain.packs.medtrace.types import (
     IntentStatus,
     Notice,
     Severity,
+    Source,
     SourceRow,
+    TrustAttribute,
 )
 
 # `success` / `partial` / `error` are the official values and the only ones a
@@ -174,6 +176,12 @@ class Finding(BaseModel):
     priority: float = 0.0
     # The Writer's 1-2 sentences, citing row_ids. Never says "not taking" for UNKNOWN.
     explanation: str = ""
+    # Passed through from `DiscrepancyCandidate.detail`. Carries `atc_class` (the
+    # 4-character ATC subgroup that keys feedback acceptance and `prioritise`),
+    # and what the UI must render: `conflict: "confirm"` (ask first, never "stop
+    # this medicine"), `bpmh_single_source`, `subtype`, `statement`,
+    # `daily_dose_ratio`.
+    detail: dict[str, Any] = Field(default_factory=dict)
     evidence: list[Evidence] = Field(default_factory=list)
     evidence_states: dict[str, EvidenceState] = Field(default_factory=dict)
     tasks: list[str] = Field(default_factory=list)
@@ -341,7 +349,9 @@ class FeedbackRequest(BaseModel):
     """`POST /feedback`: a pharmacist's verdict on a finding or fused attribute.
 
     A reject must say why, because the reason decides the H-MEM delta
-    (PLAN 5.7); a confirm carries no reason.
+    (PLAN 5.7); a confirm carries no reason. `source_outdated` must also name
+    the outdated `(source, attribute)`, because the -0.20 lands on exactly that
+    H-MEM record -- e.g. `("gp", "daily_dose")` in the learning demo.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -350,6 +360,8 @@ class FeedbackRequest(BaseModel):
     target_id: str = Field(min_length=1, max_length=256)
     verdict: FeedbackVerdict
     reason: FeedbackReason | None = None
+    source: Source | None = None
+    attribute: TrustAttribute | None = None
 
     @model_validator(mode="after")
     def _reason_matches_verdict(self) -> FeedbackRequest:
@@ -357,6 +369,8 @@ class FeedbackRequest(BaseModel):
             raise ValueError("a reject needs a reason")
         if self.verdict == "confirm" and self.reason is not None:
             raise ValueError("a confirm carries no reason")
+        if self.reason == "source_outdated" and (self.source is None or self.attribute is None):
+            raise ValueError("source_outdated needs the outdated source and attribute")
         return self
 
 

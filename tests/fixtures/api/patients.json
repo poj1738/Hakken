@@ -30,28 +30,28 @@
     {
       "patient_id": "MRN0000004",
       "record_key": "emr:MRN0000004",
-      "name_given": "Veronica",
-      "name_family": "Chen",
-      "dob": "1942-04-29",
+      "name_given": "Caroline",
+      "name_family": "Wilson",
+      "dob": "1962-01-27",
       "sex": "F",
       "admission_date": "2026-10-24"
     },
     {
       "patient_id": "MRN0000005",
       "record_key": "emr:MRN0000005",
-      "name_given": "Clifford",
-      "name_family": "Singh",
-      "dob": "1948-05-16",
+      "name_given": "Reginald",
+      "name_family": "Patel",
+      "dob": "1965-03-21",
       "sex": "M",
       "admission_date": "2026-10-24"
     },
     {
       "patient_id": "MRN0000006",
       "record_key": "emr:MRN0000006",
-      "name_given": "Thomas",
-      "name_family": "Papadopoulos",
-      "dob": "1942-03-08",
-      "sex": "M",
+      "name_given": "Deborah",
+      "name_family": "Nguyen",
+      "dob": "1948-05-20",
+      "sex": "F",
       "admission_date": "2026-10-24"
     },
     {
@@ -87,6 +87,33 @@
       "name_given": "Janet",
       "name_family": "Harris",
       "dob": "1945-02-19",
+      "sex": "F",
+      "admission_date": "2026-10-24"
+    },
+    {
+      "patient_id": "MRN0000013",
+      "record_key": "emr:MRN0000013",
+      "name_given": "Jennifer",
+      "name_family": "Young",
+      "dob": "1956-02-13",
+      "sex": "F",
+      "admission_date": "2026-10-24"
+    },
+    {
+      "patient_id": "MRN0000015",
+      "record_key": "emr:MRN0000015",
+      "name_given": "Nichoolas",
+      "name_family": "Walker",
+      "dob": "1965-06-18",
+      "sex": "M",
+      "admission_date": "2026-10-24"
+    },
+    {
+      "patient_id": "MRN0000089",
+      "record_key": "emr:MRN0000089",
+      "name_given": "Dorothy",
+      "name_family": "Nguyen",
+      "dob": "1938-01-27",
       "sex": "F",
       "admission_date": "2026-10-24"
     }

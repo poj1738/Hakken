@@ -65,9 +65,7 @@
     "pharmacy": {
       "source": "pharmacy",
       "state": "found",
-      "scope_notes": [
-        "3 dispensings excluded pending identity review (PHM-000076 to PHM-000078)"
-      ],
+      "scope_notes": [],
       "record_key": "pharmacy:C000001",
       "doc_date": null
     },
@@ -75,7 +73,7 @@
       "source": "patient",
       "state": "found",
       "scope_notes": [
-        "given name typo 'Marjjorie' -- linked on DOB and surname"
+        "interview gives the name as 'Marj' -- linked as a nickname of Marjorie"
       ],
       "record_key": "patient:INT00001",
       "doc_date": null
@@ -129,7 +127,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "Found Marjorie Lee in all four sources; patient interview spells it 'Marjjorie' (one-letter typo), linked.",
+      "message": "Found Marjorie Lee in all four sources; the interview says 'Marj' (nickname), linked.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -154,7 +152,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "COVERAGE",
-      "message": "Found in 4 of 4 sources. 3 pharmacy dispensings held back: they may belong to another person.",
+      "message": "Found in 4 of 4 sources.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
