@@ -34,8 +34,10 @@ source to trust.
 
 The Zetaris and Meterless **adapters**, the agent loop (Planner → Executor →
 Evaluator → Writer), the H-MEM and World Model engines, `POST /run`, `run.py`,
-`SAMPLE_MODE`, the web UI, and the Docker run path. `run.py` exits non-zero and says
-so. No model call goes through Nightshift in the product yet. Nothing here fakes a
+`SAMPLE_MODE`, and the Docker run path. `run.py` exits non-zero and says
+so. The **web UI** (`web/`) is built but runs only in mock mode, against hand-written
+example responses in `tests/fixtures/api/`. It has not been run against a live API,
+because none exists yet. No model call goes through Nightshift in the product yet. Nothing here fakes a
 result: the stubs raise `NotImplementedError` or exit non-zero.
 
 ## Quickstart
@@ -161,12 +163,12 @@ human before any of that record is read; a missing source is shown as *unknown*,
 never as "not taking"; high-risk (APINCHS) medicines are ranked first; a dose that
 can't be confirmed (warfarin, insulin, prednisolone, methotrexate) becomes a task to
 confirm with the patient, not a guess; and every finding must cite the source rows
-it rests on, or the safety gate blocks it. The disclaimer in the UI is not built yet.
+it rests on, or the safety gate blocks it. The UI shows the disclaimer on every screen.
 
 ## Limitations
 
 - **The product is not finished.** The data layer and clinical logic work and are
-  measured; the agent loop, engines, API and UI are unbuilt.
+  measured; the agent loop, engines and API are unbuilt, and the UI has only run against example responses.
 - Scores come from synthetic patients and a simulated pharmacist review. They show the
   logic does what it was designed to do, not how it performs on real records. 32 core
   high-risk cases cannot support a "100% recall" claim, and we don't make one.

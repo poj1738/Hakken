@@ -43,6 +43,34 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 **Needs from teammates:** Arnav — Q4 exists if you want a `check_shortages` tool step, but it returns nothing live until the licence is confirmed. Don't register it yourself.
 **Next:** apply the fresh-clone audit's fixes; get the TGA licence answered.
 
+### 2026-10-25 14:11 AEDT · Anshu · claude/modest-feynman-dc14du
+
+**Did:** Built the web UI in `web/` (Vite 5 + React 18 + TypeScript, plain CSS): all ten PLAN §6 items in mock mode.
+- Header pill (Zetaris, Nightshift, last routed model, MOCK/SAMPLE_MODE).
+- Picker + Run.
+- Polled live timeline. A blocked verifier claim is shown in red, and each model step shows its routed model; there is also a model-calls table (requested route → answered by).
+- Identity review side by side, with Same person / Different people.
+- Coverage strip + BPMH banner.
+- BPMH grid, where unknown is hatched purple "?" and absent is grey "○". Dissenting cells are outlined, and abstained attributes read "Conflict: ask patient". Hover or click a cell to see its rows from `evidence_index` (source, `row_id`, original text, template, query id).
+- Flags: Must review first (high-risk first), then the rest and documented-intentional items collapsed. Confirm / Reject + six reasons go to `POST /feedback`.
+- Tasks, notices, a trust panel showing before → after with the delta, and the footer disclaimer.
+
+`VITE_API_MODE=mock|live`. Mock mode replays `tests/fixtures/api/` and never invents data: there is no example for a resumed identity run or other patients, and it says so on screen. `web/README.md` documents the mock scenarios. Checked with Playwright screenshots of every state; no console errors.
+**Changed shared files:** none on the list. `README.md` "Not finished" and Limitations now say the UI exists but has only run against example responses. `PROGRESS.md` UI row updated.
+**Broken:** **the branch is not on GitHub.** Push failed with 403 (Claude has no access to `poj1738/Hakken` from this session), so the claim and the UI exist only in this cloud session until access is fixed. `npm run build` is not in CI (CI is Python-only; adding a Node job means editing `.github/workflows/ci.yml`, a shared file, so I left it).
+**Needs from teammates:**
+- Arnav — (1) `POST /run` should return a `RunResponse` with `run_id` and `status: running`; the UI then polls `GET /run/{id}`. (2) A resumed-run example after `POST /run/{id}/identity` would let mock mode show the second half of the identity scene. (3) `run_P0001_gp_not_found.json` shows warfarin GP = `unknown` but still lists `gp: "5 mg"` under `dissenting`; the UI shows both as given. Worth fixing in the fixture.
+- Arpon — `IdentityLink.field_evidence` is free text, so the UI colours agree/differ by keywords in the matcher's sentence ("differs", "swap", "typo" → differs; "match" → agrees). A structured per-field verdict would be sturdier, but `types.py` is frozen, so this is only a suggestion.
+**Next:** push once GitHub access works, open the PR, then switch to `VITE_API_MODE=live` when the API lands.
+
+### 2026-10-25 14:02 AEDT · Anshu · claude/modest-feynman-dc14du (claim)
+
+**Did:** Claiming the **web UI** (PLAN §6, items 1–10): Vite + React + TypeScript in `web/`, `VITE_API_MODE=mock|live`, mock mode replaying `tests/fixtures/api/*.json`. Nobody else should start on `web/`.
+**Changed shared files:** none.
+**Broken:** nothing yet — claim only.
+**Needs from teammates:** nothing yet.
+**Next:** header + status pill, picker + Run, timeline, then the grid, flags, tasks, trust panel.
+
 ### 2026-10-25 13:47 AEDT · Arpon · arpon/track-1
 
 **Did:** Recorded the team's **Track 1** choice in `metadata.json` (track, one-liner, Zetaris status, data sources), `README.md`, `TODO.md` (track and data decisions ticked, Phase 3 ticked) and `PROGRESS.md`, plus a superseded note on `docs/AGENT_KICKOFF.md`. Rewrote the README's stale status sections ("only two things are built") to state honestly what works and what does not.

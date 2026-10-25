@@ -3,7 +3,7 @@
 One file, current state only. Overwrite it as things change — the history lives in
 `docs/HANDOFF.md` and in git. Read this first at session start.
 
-**Last updated:** 2026-10-25 by Arpon
+**Last updated:** 2026-10-25 by Anshu
 
 > **On `main`:** consultant rulings applied, population 200, held-out F1 0.95, high-risk 35/37 (core APINCHS 30/32, extended 5/5). **Arpon's section is done**, including demo data: 5 `input_examples/` with replay fixtures, a staged learning-demo pair (P0003 → P0007, `docs/DECISIONS.md`), and sample data in the Docker image. Everything left is in Arnav's and Anshu's layers.
 
@@ -43,7 +43,7 @@ queries Zetaris yet (rule 1 — though the registration itself is live and verif
 | Orchestrator, agents, API, trace | Arnav | not started |
 | **World Model + 8 conformance checks** | Arnav | **not started — a disqualification gate, due Sat 4pm.** `identity.decide` still uses Arpon's local copy |
 | H-MEM + feedback | Arnav | not started |
-| Web UI | Anshu | **not started** — no commits or branches; `web/` holds only `.gitkeep` |
+| Web UI | Anshu | **all 10 PLAN §6 items built, mock mode only** (`web/`, Vite + React + TS). Replays `tests/fixtures/api/`: done run, GP-not-found (`?mock=gp_not_found`), identity review, feedback → trust before/after. `npm run build` clean. Never run against a live API. Branch `claude/modest-feynman-dc14du`, **not pushed** (GitHub 403) |
 | Docker run path | — | not started — the Dockerfile has never been built |
 
 ## Sunday's goal
@@ -62,8 +62,9 @@ feedback loop by Monday morning at the latest.
    `run.py`; World Model and its 8 checks (then swap Arpon's local `decide`); H-MEM
    and feedback. Everything you need from Arpon is on `main`, including a Q0
    fixture (one row per chart *line* — dedupe on `source_patient_id`).
-2. **Anshu** — PLAN §6 items 1–10 in mock mode against `tests/fixtures/api/`. First:
-   picker, timeline, grid and flags rendering `run_P0001_done.json`.
+2. **Anshu** — get the UI branch pushed (GitHub access) and merged. Then point it at
+   the live API as soon as Arnav's `POST /run` exists (`VITE_API_MODE=live`), and
+   rehearse the 30-second demo arc in mock mode.
 3. **Arpon** — section done; schema review posted on #12. World Model stays with
    Arnav. Free to pick up whatever Arnav or Anshu hand back in HANDOFF.
 
