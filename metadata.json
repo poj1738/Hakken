@@ -55,12 +55,14 @@
   },
   "entry_points": {
     "http": "POST /run",
-    "cli": "python run.py --input input_examples/example_1.json",
-    "docker": "docker compose up"
+    "cli": "python3 run.py --input input_examples/example_1.json",
+    "docker": "docker compose up",
+    "status": "not implemented yet: run.py and POST /run exit with 'not implemented'"
   },
   "sample_mode": {
     "env": "SAMPLE_MODE=true",
-    "description": "runs real agent logic with no Zetaris, no Nightshift and no network"
+    "description": "runs real agent logic with no Zetaris, no Nightshift and no network",
+    "status": "not implemented yet; replay fixtures for five sample inputs are committed"
   },
   "data_sources": [
     {
@@ -82,5 +84,38 @@
       "regenerate": "make lexicon"
     }
   ],
-  "preexisting_components": []
+  "preexisting_components": [
+    {
+      "name": "H-MEM specification and conformance vectors",
+      "origin": "github.com/Meterless/Meterless",
+      "licence": "Apache-2.0",
+      "use": "reference for our Python port (not yet built)"
+    },
+    {
+      "name": "World Model specification and conformance runner",
+      "origin": "github.com/Meterless/Meterless",
+      "licence": "Apache-2.0",
+      "use": "reference for our Python port (not yet built)"
+    },
+    {
+      "name": "Zetaris getting-started repo",
+      "origin": "github.com/zetaris/getting-started",
+      "use": "read-only reference for the REST call shape; not shipped"
+    },
+    {
+      "name": "zetaris-platform Docker install",
+      "origin": "sponsor-provided",
+      "use": "local Zetaris instance; infrastructure, not part of the submission"
+    },
+    {
+      "name": "NY_TAXI and TPCDS_DB sample databases",
+      "origin": "shipped with the sponsor's Zetaris install",
+      "use": "declared, not used"
+    },
+    {
+      "name": "PBS schedule (public API v3), PBS Item Report, TGA shortage export",
+      "origin": "Department of Health; data.gov.au; TGA",
+      "use": "external public data, see docs/PREEXISTING.md and docs/DATA_LICENCES.md (TGA not used)"
+    }
+  ]
 }

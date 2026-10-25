@@ -1356,6 +1356,35 @@ def q1_matches(anchor: dict[str, str | None], row: dict[str, str | None]) -> boo
 PACKS: dict[tuple[str, str, str], tuple[int, int]] = {}
 
 
+def _real_codes(records: list[dict[str, str]]) -> int:
+    return sum(1 for r in records if r.get("pbs_code") and not r["pbs_code"].startswith("SYN"))
+
+
+def _lexicon_records() -> list[dict[str, str]]:
+    """The built lexicon if it carries real PBS codes, else the committed one.
+
+    `data/reference/lexicon.json` is gitignored, and on a fresh clone without a
+    PBS fetch `make lexicon` builds it with synthetic codes only. Generating from
+    that silently rewrote 21 committed fixtures and broke two tests (judge-clone
+    audit, 25 Oct). The committed replay fixture `Q_REF__lexicon.json` is the
+    exact lexicon Zetaris serves, so falling back to it makes `make synth` on a
+    clean clone reproduce the committed data byte for byte.
+    """
+    built = pathlib.Path("data/reference/lexicon.json")
+    committed = FIXTURES / "Q_REF__lexicon.json"
+    built_rows = json.loads(built.read_text())["records"] if built.exists() else []
+    if built_rows and _real_codes(built_rows):
+        log(f"  lexicon: {built} ({_real_codes(built_rows)} real PBS codes)")
+        return built_rows
+    if committed.exists():
+        env = json.loads(committed.read_text())
+        rows = [dict(zip(env["headers"], row)) for row in env["data"]]
+        log(f"  lexicon: {committed} (committed, {_real_codes(rows)} real PBS codes)"
+            + (f"; ignoring {built}, which has none" if built_rows else ""))
+        return rows
+    return built_rows
+
+
 def load_codes() -> dict[tuple[str, str, str], dict[str, str]]:
     """(generic, brand, strength) -> its codes, from the built lexicon.
 
@@ -1365,11 +1394,10 @@ def load_codes() -> dict[tuple[str, str, str], dict[str, str]]:
     MR look like a 10-day supply and let it be dispensed 37 times a year.
     Med is constructed after this runs, so it can read the real number.
     """
-    path = pathlib.Path("data/reference/lexicon.json")
-    if not path.exists():
-        log("  (no lexicon.json -- run `make lexicon` first; codes will be blank)")
+    records = _lexicon_records()
+    if not records:
+        log("  (no lexicon -- codes will be blank)")
         return {}
-    records = json.loads(path.read_text())["records"]
     codes = {(r["generic"], r["brand"], r["strength"]): r for r in records}
     for key, r in codes.items():
         try:
