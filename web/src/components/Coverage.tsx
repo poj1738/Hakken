@@ -17,40 +17,51 @@ export function CoverageStrip({
   banner?: string | null;
   bpmhConfirmable: boolean;
 }) {
-  const shown = SOURCES.filter((s) => coverage[s]);
-  const found = shown.filter((s) => coverage[s]?.state === "found");
-  const missing = shown.filter((s) => coverage[s]?.state !== "found");
+  // All four sources are always listed: one the API left out is "not reported",
+  // never silently missing from the strip.
+  const found = SOURCES.filter((s) => coverage[s]?.state === "found");
+  const missing = SOURCES.filter((s) => coverage[s]?.state !== "found");
+  const stateText = (s: string) => (coverage[s] ? STATE_TEXT[coverage[s]!.state] ?? coverage[s]!.state : "not reported");
   return (
     <section className="coverage-wrap">
-      {(banner || !bpmhConfirmable) && (
+      {/* The BPMH heading follows bpmh_confirmable; `banner` is also used for
+          other messages (e.g. identity review), which show without it. */}
+      {!bpmhConfirmable ? (
         <div className="banner" role="alert">
           <strong>BPMH cannot be confirmed.</strong> {banner ?? "Fewer than 2 pre-admission sources were found."}
         </div>
+      ) : (
+        banner && (
+          <div className="banner banner-warn" role="status">
+            {banner}
+          </div>
+        )
       )}
       <div className="card coverage">
         <p className="coverage-line">
-          Found in <strong>{found.length}</strong> of {shown.length} sources.
+          Found in <strong>{found.length}</strong> of {SOURCES.length} sources
+          {coverage.emr?.state === "found" ? ", including the admission chart" : ""}.
           {missing.map((s) => (
             <span key={s}>
               {" "}
-              {sourceLabel(s)}: {STATE_TEXT[coverage[s]!.state] ?? coverage[s]!.state}.
+              {sourceLabel(s)}: {stateText(s)}.
             </span>
           ))}
         </p>
         <ul className="coverage-chips">
-          {shown.map((s) => {
-            const c = coverage[s]!;
+          {SOURCES.map((s) => {
+            const c = coverage[s];
             return (
-              <li key={s} className={`cov cov-${c.state}`}>
+              <li key={s} className={`cov cov-${c?.state ?? "unreported"}`}>
                 <div className="cov-head">
                   <span className="dot" /> {sourceLabel(s)}
-                  <span className="muted small"> {c.record_key ?? ""}</span>
+                  <span className="muted small"> {c?.record_key ?? ""}</span>
                 </div>
                 <div className="small">
-                  {STATE_TEXT[c.state] ?? c.state}
-                  {c.doc_date ? ` · dated ${c.doc_date}` : ""}
+                  {stateText(s)}
+                  {c?.doc_date ? ` · dated ${c.doc_date}` : ""}
                 </div>
-                {c.scope_notes.map((n) => (
+                {c?.scope_notes.map((n) => (
                   <div key={n} className="small muted">
                     {n}
                   </div>
