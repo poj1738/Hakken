@@ -20,11 +20,12 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from app.adapters.zetaris import QueryBudgetExceeded, ReplayMiss, ZetarisError
 from app.agents.base import AgentContext
 from app.domain.packs.medtrace import identity, queries
 from app.domain.packs.medtrace.normalise import llm_candidates, normalise_med
-from app.domain.packs.medtrace.parse import rows_from_sql
-from app.domain.packs.medtrace.types import IdentityLink, MedStatement, SourceRow, SqlResult
+from app.domain.packs.medtrace.parse import dicts_from_sql, rows_from_sql
+from app.domain.packs.medtrace.types import IdentityLink, MedStatement, Notice, NoticeType, SourceRow, SqlResult
 
 
 def raw_rows(result: SqlResult) -> dict[str, dict[str, str | None]]:
@@ -160,9 +161,52 @@ def resolve_free_text(ctx: AgentContext, stmts: list[MedStatement]) -> tuple[lis
     return out, tasks
 
 
+def check_shortages(ctx: AgentContext, anchor: SourceRow, current_generics: list[str]) -> list[Notice]:
+    """Q4: known TGA shortages for the medicines the patient is on. Optional (the Planner's call).
+
+    A row is a `known_shortage` notice -- never "unavailable": the TGA database is
+    incomplete, and a medicine absent from it says nothing. If the data is not there
+    (SAMPLE_MODE has no recording; the view may not be registered), the run says so
+    and continues.
+    """
+    ctx.check_time()
+    if not current_generics:
+        ctx.tracer.emit("Executor", "check_shortages", step="CHECK_SHORTAGES", message="No current medicines to check.")
+        return []
+    sql = queries.q_shortages(current_generics)
+    try:
+        result, record = ctx.zetaris.run(sql, template_id="Q4", replay_key=anchor.source_patient_id)
+    except QueryBudgetExceeded:
+        raise
+    except ReplayMiss:
+        ctx.tracer.emit("Executor", "check_shortages", step="CHECK_SHORTAGES", status="skipped",
+                        message="SAMPLE_MODE has no recorded shortage data; shortage check skipped.")
+        return []
+    except ZetarisError as exc:
+        ctx.tracer.emit("Executor", "check_shortages", step="CHECK_SHORTAGES", status="skipped", error=str(exc),
+                        message="Shortage overlay unavailable on this Zetaris (the TGA view may not be "
+                                "registered); continuing without it.")
+        return []
+    notices: list[Notice] = []
+    for rec in dicts_from_sql(result):
+        when = f", expected to resolve {rec['expected_resolution']}" if rec.get("expected_resolution") else ""
+        notices.append(Notice(
+            type=NoticeType.KNOWN_SHORTAGE, generic=rec.get("generic") or None,
+            detail=f"Known shortage listed for {rec.get('medicine_name') or rec.get('generic')} "
+                   f"({rec.get('status')}{when}). The TGA shortage database is incomplete: this is not a "
+                   "statement that it is unavailable.",
+            tasks=[f"Check supply of {rec.get('generic')} before discharge"] if rec.get("generic") else []))
+    ctx.tracer.emit("Executor", "check_shortages", step="CHECK_SHORTAGES",
+                    message=f"Checked {len(current_generics)} medicines for known shortages: {len(notices)} listed.",
+                    **record.trace_fields())
+    return notices
+
+
 def catalogue() -> list[str]:
     """The views the templates read -- what the Planner is told it can query."""
-    return [queries.ALL_SOURCES_VIEW, *queries.SOURCE_VIEWS.values(), *queries.REFERENCE_VIEWS.values()]
+    return [queries.ALL_SOURCES_VIEW, *queries.SOURCE_VIEWS.values(), *queries.REFERENCE_VIEWS.values(),
+            queries.TGA_VIEW]
 
 
-__all__: list[Any] = ["catalogue", "fetch_meds", "find_identities", "normalise", "raw_rows", "resolve_free_text"]
+__all__: list[Any] = ["catalogue", "check_shortages", "fetch_meds", "find_identities", "normalise", "raw_rows",
+                      "resolve_free_text"]
