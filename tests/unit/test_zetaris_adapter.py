@@ -55,8 +55,9 @@ SQL = "SELECT source FROM medtrace.all_sources"
 
 def test_request_follows_the_binding_call_shape(make_settings) -> None:
     rec = Recorder(httpx.Response(200, json=ENVELOPE))
-    client(make_settings, rec, zetaris_org_id="1").run(SQL, template_id="Q2", limit=500)
+    _, record = client(make_settings, rec, zetaris_org_id="1").run(SQL, template_id="Q2", limit=500)
     req = rec.requests[0]
+    assert record.request_id == req.headers["X-Request-ID"]  # the trace names the request Zetaris saw
     body = json.loads(req.content)
     assert str(req.url) == "http://localhost:8888/api/v1.0/sql-editor/sqls/run"
     assert req.headers["Authorization"] == f"Bearer {KEY}" and req.headers["X-Org-ID"] == "1"
