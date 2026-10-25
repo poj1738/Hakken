@@ -27,6 +27,14 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 14:02 AEDT · Anshu · claude/modest-feynman-dc14du (claim)
+
+**Did:** Claiming the **web UI** (PLAN §6, items 1–10): Vite + React + TypeScript in `web/`, `VITE_API_MODE=mock|live`, mock mode replaying `tests/fixtures/api/*.json`. Nobody else should start on `web/`.
+**Changed shared files:** none.
+**Broken:** nothing yet — claim only.
+**Needs from teammates:** nothing yet.
+**Next:** header + status pill, picker + Run, timeline, then the grid, flags, tasks, trust panel.
+
 ### 2026-10-25 13:47 AEDT · Arpon · arpon/track-1
 
 **Did:** Recorded the team's **Track 1** choice in `metadata.json` (track, one-liner, Zetaris status, data sources), `README.md`, `TODO.md` (track and data decisions ticked, Phase 3 ticked) and `PROGRESS.md`, plus a superseded note on `docs/AGENT_KICKOFF.md`. Rewrote the README's stale status sections ("only two things are built") to state honestly what works and what does not.
