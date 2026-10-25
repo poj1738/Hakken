@@ -209,6 +209,35 @@ def test_verifier_blocks_an_invented_number_a_foreign_row_and_not_taking() -> No
     assert any("not taking" in p for p in claim_problems(_finding("Patient is not taking it (GP-000001).")))
 
 
+def _critique_with(make_settings, verdicts: list[dict]) -> dict[str, list[str]]:
+    import time
+    from datetime import date
+
+    from app.agents.base import AgentContext
+    from app.agents.evaluator import critique
+    from app.domain.packs.medtrace.types import Lexicon
+
+    body = {"model": "nvidia/x", "usage": {"completion_tokens": 100},
+            "choices": [{"message": {"content": json.dumps({"verdicts": verdicts})}}]}
+    s = make_settings(meterless_runtime_token="example-runtime-token")
+    llm = MeterlessClient(s, transport=httpx.MockTransport(lambda _r: httpx.Response(200, json=body)))
+    ctx = AgentContext(llm=llm, zetaris=RunQueries(ZetarisClient(make_settings(sample_mode=True))), lex=Lexicon(),
+                       tracer=Tracer("r1", settings=s, log_dir=None), as_of=date(2026, 10, 24),
+                       deadline=time.monotonic() + 60)
+    return critique(ctx, [_finding("GP lists bisoprolol 5 mg daily (GP-000001).")])
+
+
+def test_a_faithful_verdict_with_commentary_is_not_a_problem(make_settings) -> None:
+    """Live, 25 Oct: asked for 'problems', the model listed the clinical findings themselves."""
+    assert _critique_with(make_settings, [{"id": "F1", "faithful": True,
+                                           "issue": "Potential dose discrepancy; prescriber should confirm."}]) == {}
+
+
+def test_an_unfaithful_verdict_is_a_problem(make_settings) -> None:
+    got = _critique_with(make_settings, [{"id": "F1", "faithful": False, "issue": "'daily' is not in the rows"}])
+    assert got == {"F1": ["'daily' is not in the rows"]}
+
+
 def test_tracer_masks_secrets(make_settings, tmp_path) -> None:
     s = make_settings(meterless_runtime_token="example-secret-value-123")
     t = Tracer("r1", settings=s, log_dir=tmp_path)

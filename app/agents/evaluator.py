@@ -225,13 +225,17 @@ def verify(ctx: AgentContext, findings: list[Finding], anchor: SourceRow) -> tup
     return kept, blocked, sql
 
 
-class Problem(BaseModel):
+class Verdict(BaseModel):
     id: str
-    issue: str = Field(min_length=1, max_length=400)
+    faithful: bool
+    issue: str = Field(default="", max_length=400)
 
 
 class Critique(BaseModel):
-    problems: list[Problem] = Field(default_factory=list)
+    """A verdict for EVERY finding. Asking for "problems" alone made the model list the
+    clinical findings themselves as problems (live, 25 Oct); a forced boolean does not."""
+
+    verdicts: list[Verdict] = Field(default_factory=list)
 
 
 def critique(ctx: AgentContext, findings: list[Finding]) -> dict[str, list[str]]:
@@ -247,17 +251,21 @@ def critique(ctx: AgentContext, findings: list[Finding]) -> dict[str, list[str]]
                              for e in f.evidence},
               "source_states": {k: v.value for k, v in f.evidence_states.items()}} for f in findings]
     messages = [{"role": "user", "content": (
-        "You are a strict clinical verifier. For each finding, check that every sentence of its explanation is "
-        "supported by its own cited rows, that it never says a patient is 'not taking' a medicine where a source "
-        "state is 'unknown', and that it does not instruct anyone to stop a medicine. List only real problems.\n"
-        + json.dumps(brief, default=str))}]
+        "You check TEXT against DATA. You are not assessing the patient, and a clinical concern is not a "
+        "problem: every finding below is already a confirmed discrepancy. For EACH finding return a verdict: "
+        "faithful=true if every statement in its 'explanation' is supported by its own 'cited_rows' or is a "
+        "neutral request to confirm something; faithful=false only if the text states a fact, number, date or "
+        "source that its rows do not show, says the patient is 'not taking' or has 'stopped' a medicine where a "
+        "source state is 'unknown', or tells someone to stop a medicine. When false, 'issue' names the "
+        "unsupported words.\n" + json.dumps(brief, default=str))}]
     # 4k ran out live: three `<model>_empty_response` 502s (trace, 25 Oct).
-    result, calls = ctx.llm.chat_json("Evaluator", messages, Critique, max_tokens=8192,
-                                      offline=lambda: Critique(problems=[]))
+    result, calls = ctx.llm.chat_json(
+        "Evaluator", messages, Critique, max_tokens=8192,
+        offline=lambda: Critique(verdicts=[Verdict(id=f.id, faithful=True) for f in findings]))
     ids = {f.id for f in findings}
-    for p in result.problems:
-        if p.id in ids:
-            problems.setdefault(p.id, []).append(p.issue)
+    for v in result.verdicts:
+        if v.id in ids and not v.faithful:
+            problems.setdefault(v.id, []).append(v.issue or "model verifier: unfaithful")
     ctx.record("Evaluator", "critique", "CRITIQUE", calls,
                f"Critique: {len(problems)} of {len(findings)} explanations need revision"
                if problems else "Critique: every sentence maps to a finding with evidence.")

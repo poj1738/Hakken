@@ -228,11 +228,18 @@ class Orchestrator:
             if not problems:
                 break
             if round_no == rounds:
-                for fid, issues in problems.items():
+                # The code checks are the hard gate; the model's critique is advisory. After the
+                # last round, only an explanation the code still rejects is replaced.
+                hard = {f.id: p for f in findings if f.id in problems and (p := evaluator.claim_problems(f))}
+                for fid, issues in hard.items():
                     ctx.tracer.emit("Evaluator", "verify", step="VERIFY", status="blocked",
                                     message=f"Verifier blocked an unsupported claim in {fid}: {'; '.join(issues)}. "
                                             "Replaced with the grounded template.")
-                findings = [f.model_copy(update={"explanation": writer.template(f)}) if f.id in problems else f
+                for fid in problems.keys() - hard.keys():
+                    ctx.tracer.emit("Evaluator", "critique", step="CRITIQUE",
+                                    message=f"Model critique still disagrees on {fid} ({'; '.join(problems[fid])[:200]}), "
+                                            "but every number and row it cites checks out; kept.")
+                findings = [f.model_copy(update={"explanation": writer.template(f)}) if f.id in hard else f
                             for f in findings]
                 break
             ctx.tracer.emit("Evaluator", "critique", step="CRITIQUE",
