@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Programmatic entry point.
 
-    python run.py --input input_examples/example_1.json   # one run, JSON to stdout
-    python run.py serve                                   # uvicorn on 0.0.0.0:$PORT
+    python3 run.py --input input_examples/example_1.json   # one run, JSON to stdout
+    python3 run.py serve                                  # uvicorn on 0.0.0.0:$PORT
 
 PHASE 5 STUB: the CLI shape is fixed so judges and scripts can rely on it, but
 the orchestrator behind it is not written yet. It exits non-zero and says so

@@ -55,6 +55,8 @@ from app.domain.packs.medtrace.queries import (
     HARMONISED_COLUMNS,
     REFERENCE_VIEWS,
     SOURCE_VIEWS,
+    TGA_COLUMNS,
+    TGA_VIEW,
     sql_literal,
 )
 
@@ -88,6 +90,16 @@ REFERENCES = [
     ("MT_REF", "nicknames_raw", "/ref/nicknames", REFERENCE_VIEWS["nicknames"],
      ("canonical", "variant", "sex")),
 ]
+
+#: Q4's TGA shortage table (PLAN 2.1), registered only with `--with-tga`. Kept out
+#: of REFERENCES so verify/refresh/drift never touch a table that is not there.
+#: Off by default: the TGA licence is not yet recorded in docs/DATA_LICENCES.md,
+#: and registering a view over unlicensed data is worse than shipping without it.
+#: `datasvc` does not serve `/ref/tga` either (`test_tga_is_deliberately_not_served`).
+#: Once the licence is recorded: add `"tga": "tga_shortages.json"` to datasvc's
+#: REFERENCES, update that test, then `--apply --skip-exists --with-tga`.
+TGA = ("MT_TGA", "tga_raw", "/ref/tga", TGA_VIEW, TGA_COLUMNS)
+
 
 try:
     import certifi
@@ -212,8 +224,8 @@ def create_all_sources() -> str:
     )
 
 
-def plan_statements() -> list[tuple[str, str]]:
-    """Every statement, in order. `(label, sql)`."""
+def plan_statements(with_tga: bool = False) -> list[tuple[str, str]]:
+    """Every statement, in order. `(label, sql)`. Q4's TGA table only if asked."""
     settings = get_settings()
     base = settings.datasvc_public_url.rstrip("/")
     out: list[tuple[str, str]] = [("container", f"CREATE SCHEMASTORE CONTAINER {CONTAINER}")]
@@ -228,6 +240,12 @@ def plan_statements() -> list[tuple[str, str]]:
         out.append((f"{view} view", create_reference_view(db, table, view, columns)))
         out.append((f"CACHE {db}.{table}", f"CACHE TABLE {db}.{table}"))
     out.append((f"{ALL_SOURCES_VIEW} view", create_all_sources()))
+    if with_tga:
+        db, table, path, view, columns = TGA
+        out.append((f"{db} database", create_database(db, "MedTrace TGA known shortages")))
+        out.append((f"{db}.{table} REST table", create_rest_table(db, table, base + path)))
+        out.append((f"{view} view", create_reference_view(db, table, view, columns)))
+        out.append((f"CACHE {db}.{table}", f"CACHE TABLE {db}.{table}"))
     return out
 
 
@@ -530,10 +548,13 @@ def main() -> int:
     ap.add_argument("--refresh", action="store_true",
                     help="re-cache the raw tables after regenerating the data; "
                          "creates and drops nothing")
+    ap.add_argument("--with-tga", action="store_true",
+                    help="also register Q4's TGA shortage table. Only once its licence "
+                         "is recorded in docs/DATA_LICENCES.md")
     args = ap.parse_args()
 
     settings = get_settings()
-    statements = plan_statements()
+    statements = plan_statements(with_tga=args.with_tga)
 
     log(f"Zetaris     {settings.zetaris_rest_url}")
     log(f"datasvc     {settings.datasvc_public_url}   <- goes into the REST tables verbatim")

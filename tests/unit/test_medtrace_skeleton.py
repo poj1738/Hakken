@@ -70,6 +70,7 @@ IMPLEMENTED: set[tuple[str, str]] = {
     ("queries", "q_identity_candidates"),
     ("queries", "q_meds_for"),
     ("queries", "q_verify_rows"),
+    ("queries", "q_shortages"),
     ("queries", "sql_literal"),
     ("queries", "dob_match_literals"),
     ("parse", "normalise_text"),

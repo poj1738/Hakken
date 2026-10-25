@@ -58,9 +58,21 @@ SOURCE_VIEWS: dict[str, str] = {
 
 ALL_SOURCES_VIEW = "medtrace.all_sources"
 
-#: Q4's view (PLAN 2.1). Declared now so Monday's optional TGA work adds a body,
-#: not a name. Not registered yet -- `q_shortages` raises.
+#: Q4's view (PLAN 2.1) over `scripts/load_tga_shortages.py`'s output. Registered
+#: only with `register_sources.py --with-tga`, which is off until the TGA licence
+#: is recorded in `docs/DATA_LICENCES.md`.
 TGA_VIEW = "medtrace.tga_shortages"
+
+#: The columns of `TGA_VIEW`, exactly as the loader writes them. `ingredients` is
+#: the export's active ingredients as salt names, sorted and joined with `|`.
+TGA_COLUMNS: tuple[str, ...] = (
+    "artg_id", "medicine_name", "sponsor", "ingredients", "salt_quantity", "dosage_form",
+    "status", "shortage_start", "expected_resolution", "impact_rating", "availability",
+    "reason",
+)
+
+#: Only these statuses mean a pharmacist might care now (the loader's docstring).
+TGA_NOTIFIABLE_STATUSES = ("Current", "Anticipated")
 
 #: Q_REF name -> its reference view.
 REFERENCE_VIEWS: dict[str, str] = {
@@ -501,10 +513,50 @@ def q_verify_rows(row_ids: list[str]) -> str:
 def q_shortages(generics: list[str]) -> str:
     """Q4: known TGA shortages for the drafted medicines. Optional overlay.
 
-    Deliberately unwritten. `medtrace.tga_shortages` is not registered, its
-    source CSV has not been read, and PLAN 11 lists the shortage database as
-    incomplete -- so it is never ground truth and must be labelled "known
-    shortages" wherever it is shown. Writing SQL against a view whose columns
-    nobody has seen would be inventing an endpoint, which `CLAUDE.md` forbids.
+    Returns the `Current` and `Anticipated` reports whose active ingredients are
+    **exactly** one of `generics`, with a computed `generic` column naming which,
+    so the caller can attach each row to a grid line without matching again.
+
+    **Exactly** is the point. The export lists salts ("amlodipine besilate"), so a
+    single-ingredient medicine matches by prefix -- but only a report with one
+    ingredient. A shortage of Caduet (amlodipine + atorvastatin) says nothing
+    about plain amlodipine, and calling it one would send a pharmacist hunting
+    for a substitute the patient does not need. A combination such as
+    `perindopril/amlodipine` matches only a report with exactly those
+    ingredients, in any order. The count is checked by `|` separators, so the
+    SQL needs nothing beyond `LIKE`, `lower` and `CASE`.
+
+    **The shortage database is incomplete, so it is never ground truth.** A row
+    here becomes `NoticeType.KNOWN_SHORTAGE` -- "known shortage" -- never
+    "unavailable", and a medicine absent from the result says nothing at all.
+    `salt_quantity` is salt mass, not strength: never compare it with a dose.
+
+    Raises:
+        QueryBuildError: on an empty list. An empty result must mean "no known
+            shortage", never "we asked about nothing".
     """
-    raise NotImplementedError("Arpon: queries.py Q4, Monday")
+    wanted = list(dict.fromkeys(g.strip().casefold() for g in generics if g and g.strip()))
+    if not wanted:
+        raise QueryBuildError("q_shortages needs at least one generic")
+
+    def exactly(generic: str) -> str:
+        parts = [p.strip() for p in generic.split("/") if p.strip()]
+        each = [
+            f"(lower(ingredients) LIKE {sql_literal(p + '%')} "
+            f"OR lower(ingredients) LIKE {sql_literal('%|' + p + '%')})"
+            for p in parts
+        ]
+        separators = "%" + "|%" * (len(parts) - 1)
+        count = (f"lower(ingredients) LIKE {sql_literal(separators)} AND "
+                 if len(parts) > 1 else "")
+        count += f"lower(ingredients) NOT LIKE {sql_literal(separators + '|%')}"
+        return "(" + " AND ".join(each + [count]) + ")"
+
+    conditions = {g: exactly(g) for g in wanted}
+    case = " ".join(f"WHEN {cond} THEN {sql_literal(g)}" for g, cond in conditions.items())
+    columns = ", ".join(c for c in TGA_COLUMNS if c != "sponsor")
+    return _one_statement(
+        f"SELECT CASE {case} END AS generic, {columns} FROM {TGA_VIEW} "
+        f"WHERE status IN ({_in_list(list(TGA_NOTIFIABLE_STATUSES))}) "
+        f"AND ({' OR '.join(conditions.values())})"
+    )

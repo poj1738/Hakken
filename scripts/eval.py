@@ -244,6 +244,9 @@ class Score:
     high_risk_found_by_list: collections.Counter = field(default_factory=collections.Counter)
     patients: int = 0
     findings: int = 0
+    # Linkage: every auto-merged record, and those that are not this patient's.
+    auto_merged: int = 0
+    false_merges: int = 0
     needed_review: int = 0
 
 
@@ -258,6 +261,10 @@ def score(world: World, keys: list[str], review: str) -> Score:
         result.patients += 1
         result.findings += len(rec.findings)
         result.needed_review += rec.needed_review
+        truly_mine = {f"{src}:{rid}" for src, ids in patient["true_links"].items() for rid in ids}
+        merged = {l.candidate_id for l in rec.links if l.band == "auto-merge"}
+        result.auto_merged += len(merged)
+        result.false_merges += len(merged - truly_mine)
         tps, fps, misses = match(rec.findings, patient["planted"])
         for pred, plant in tps:
             result.tp[plant["type"]] += 1
@@ -278,6 +285,34 @@ def score(world: World, keys: list[str], review: str) -> Score:
 
 def _risk_list(plant: dict) -> str:
     return "extended" if plant["high_risk_class"] == "ext" else "core"
+
+
+def as_json(result: Score, split: str, review: str) -> dict:
+    """The scorecard as data, for `scripts/scorecard_page.py` and the pitch.
+
+    Every number here comes from this run; nothing is typed in by hand.
+    """
+    def rate(k: int, n: int) -> dict:
+        lo, hi = wilson(k, n)
+        return {"k": k, "n": n, "value": k / n if n else None, "lo": lo, "hi": hi}
+
+    tp, fp, fn = (sum(c.values()) for c in (result.tp, result.fp, result.fn))
+    p = tp / (tp + fp) if tp + fp else 0.0
+    r = tp / (tp + fn) if tp + fn else 0.0
+    return {
+        "split": split, "review": review, "patients": result.patients,
+        "links_needing_review": result.needed_review,
+        "overall": {"tp": tp, "fp": fp, "fn": fn, "precision": rate(tp, tp + fp),
+                    "recall": rate(tp, tp + fn), "f1": 2 * p * r / (p + r) if p + r else 0.0},
+        "by_type": {kind: {"tp": result.tp[kind], "fp": result.fp[kind], "fn": result.fn[kind],
+                           "precision": rate(result.tp[kind], result.tp[kind] + result.fp[kind]),
+                           "recall": rate(result.tp[kind], result.tp[kind] + result.fn[kind])}
+                    for kind in sorted(set(result.tp) | set(result.fp) | set(result.fn))},
+        "high_risk": {name: rate(result.high_risk_found_by_list[name], result.high_risk_by_list[name])
+                      for name in ("core", "extended")},
+        "linkage": {"auto_merged": result.auto_merged, "false_merges": result.false_merges},
+        "findings_per_patient": result.findings / max(result.patients, 1),
+    }
 
 
 def report(result: Score, split: str, review: str, misses: bool) -> None:
@@ -306,6 +341,7 @@ def report(result: Score, split: str, review: str, misses: bool) -> None:
                 log(f"  {name:8} {found}/{planted}  [{lo:.2f},{hi:.2f}]")
     log(f"findings per patient: {result.findings / max(result.patients, 1):.2f} (target <= 4, "
         f"before notices)")
+    log(f"linkage: {result.auto_merged} records auto-merged, {result.false_merges} false merge(s)")
     if misses:
         log("\nMISSED")
         for key, plant in result.fn_items:
@@ -356,13 +392,19 @@ def main() -> int:
                     help="who resolves review-band identity links (default: a simulated "
                          "pharmacist who confirms only true links)")
     ap.add_argument("--misses", action="store_true", help="list misses and false positives")
+    ap.add_argument("--json", type=pathlib.Path, metavar="PATH",
+                    help="also write the scorecard as JSON (see scripts/scorecard_page.py)")
     args = ap.parse_args()
     world = load_world()
     if args.patient:
         return show(world, args.patient, args.review)
     split = world.truth["split"]
     keys = split["tune"] + split["heldout"] if args.split == "all" else split[args.split]
-    report(score(world, keys, args.review), args.split, args.review, args.misses)
+    result = score(world, keys, args.review)
+    report(result, args.split, args.review, args.misses)
+    if args.json:
+        args.json.write_text(json.dumps(as_json(result, args.split, args.review), indent=1))
+        log(f"wrote {args.json}")
     return 0
 
 

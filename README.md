@@ -26,7 +26,7 @@ source to trust.
 | **Synthetic data** (`scripts/generate_synthetic.py`, `make synth`) | **works.** 200 seeded patients across four silos, ~13,900 rows, with planted discrepancies and identity traps, and a ground-truth answer key. Real Australian medicine reference data (PBS, ATC, APINCHS). See `docs/DATA_SPEC.md`. |
 | **Zetaris data layer** (`scripts/register_sources.py`) | **works on Arpon's machine.** Four silos registered as REST tables, a harmonised `medtrace.all_sources` view, and every query template verified live against committed fixtures. Each query takes about 2–3 s at 200 patients. |
 | **Clinical domain pack** (`app/domain/packs/medtrace/`) | **works.** Identity linkage, normalisation, coverage, trust-weighted fusion, discrepancy detection, the safety gate and triage. Real code, no model calls. |
-| **Detector scorecard** (`scripts/eval.py`) | **works.** Scores the real chain against the answer key. Held-out, with simulated pharmacist review: **precision 0.95, recall 0.95, F1 0.95**; core APINCHS high-risk recall **30/32** (95% CI 0.80–0.98); **0 false merges** across 200 patients. Pinned by tests. |
+| **Detector scorecard** (`scripts/eval.py`) | **works.** Scores the real chain against the answer key. Held-out, with simulated pharmacist review: **precision 0.95, recall 0.95, F1 0.95** (today's code prints recall 0.97 / F1 0.96, which includes one fix found while studying held-out misses; 0.95 is the clean figure, `docs/DECISIONS.md`); core APINCHS high-risk recall **30/32** (95% CI 0.80–0.98); **0 false merges** across 200 patients. Pinned by tests. |
 | **Sample inputs** (`input_examples/`) | **five**, each with replay fixtures and a written expected outcome, including a staged learning-demo pair (see `docs/DECISIONS.md`). |
 | `scripts/preflight.py`, `app/config.py`, `scripts/secret_scan.py` | **work.** Preflight, validated settings with secrets as `SecretStr`, and a pre-commit secret scan. |
 
@@ -46,10 +46,21 @@ result: the stubs raise `NotImplementedError` or exit non-zero.
 make setup                      # .venv, pinned deps, pre-commit hook
 cp .env.example .env            # then fill it in yourself
 make preflight                  # read-only: what is reachable and what is missing
-make test
+make test                       # passes; ~43 tests skip until you build the data below
 ```
 
-Docker (Phase 5, not yet verified):
+Build the data (no network needed) and run the full suite, scorecard included:
+
+```bash
+make lexicon                    # reference tables; PBS codes stay synthetic without `make data`
+make synth                      # 200 synthetic patients; uses the committed lexicon, so the
+                                # committed fixtures come out byte-identical
+make test                       # now nothing skips for missing data
+.venv/bin/python scripts/eval.py --split heldout   # the scorecard
+```
+
+Docker: **not working yet.** The image builds, but `run.py serve` exits 2 with "not
+implemented yet" until the API lands. The intended commands, once it does:
 
 ```bash
 docker compose up --build
@@ -136,8 +147,11 @@ and its conformance runner disagree.
   is ported yet; when it is, each ported test file will carry an Apache-2.0 attribution
   header. The Zetaris REST call shape in our (stubbed) adapter follows that project's
   reference client, and four real Zetaris responses are recorded as test fixtures.
-- **Data:** synthetic only, seeded and deterministic, so any reviewer can reproduce
-  it (`make lexicon && make synth`). The Zetaris instance carries the sponsor's own
+- **Data:** synthetic only, seeded and deterministic: `make lexicon && make synth`
+  reproduces the committed data exactly, and CI checks that on every push. Real PBS
+  codes come from the committed lexicon; rebuilding them needs `make data` (a
+  rate-limited PBS API fetch) plus a manual download of the data.gov.au PBS Item
+  Report (`docs/DATA_LICENCES.md` §5). The Zetaris instance carries the sponsor's own
   pre-existing sample databases, declared in `docs/PREEXISTING.md` and unused.
 
 ## Responsible use

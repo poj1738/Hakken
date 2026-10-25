@@ -27,6 +27,22 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 14:34 AEDT · Arpon · arpon/judge-path
+
+**Did:** Applied the fresh-clone audit. `make lexicon && make synth` on a clean clone used to rewrite 21 committed fixtures and fail 2 tests. It now reproduces them byte for byte (the generator falls back to the committed lexicon). CI runs that build and `git diff --exit-code`, so the scorecard tests run in CI instead of skipping. Also: honest `make examples`/`validate`/`conformance`, README Quickstart (Docker labelled not working yet, data build documented), `python3` in the docs, `metadata.json` status and pre-existing components, `.dockerignore`, pip timeout in the Dockerfile, `.env.example` PBS comment.
+**Changed shared files:** **`Makefile`** (`test` drops the duplicate `-q` so the summary prints; `conformance`/`examples`/`validate` print "not implemented yet" and exit 2 until their scripts/tests exist — they run normally once they do), **`.github/workflows/ci.yml`** (new data-build + reproducibility step before tests), **`.env.example`** (comment only). Also `Dockerfile` (env var) and a new `.dockerignore`.
+**Broken:** nothing. CI is slower now, because the scorecard actually runs.
+**Needs from teammates:** Arnav — `make examples` and `make conformance` start working automatically once `scripts/generate_examples.py` and `tests/engines/test_*.py` exist. The `.dockerignore` excludes `data/reference/` and `data/synthetic/silos/`, so the image relies on `tests/fixtures/medtrace/` for sample mode, as planned.
+**Next:** nothing pending on Arpon's side except the TGA licence answer.
+
+### 2026-10-25 14:24 AEDT · Arpon · arpon/background-1-4
+
+**Did:** (2) `scripts/eval.py --json` and a false-merge count (0/286 held-out, 0/280 tune). A scorecard dashboard was built from that run's JSON (link in chat), for the pitch. (3) Data docs audited: `DATA_SOURCES.md` rewritten (it still said "none registered yet"). `DATA_LICENCES.md` corrected: 108 products; the desvenlafaxine ATC exception; the committed PBS values in `Q_REF__lexicon.json` now have `PBS_COPYRIGHT.txt` beside them. `PREEXISTING.md` TGA row updated. (4) Q4 `q_shortages` written, tested in SQLite, and its dialect checked live, read-only. **Switched off**: TGA licence unconfirmed (`DECISIONS.md`).
+**Changed shared files:** none on the list.
+**Broken:** nothing. Fresh-clone audit (item 1) is still running; its fixes follow in a separate PR.
+**Needs from teammates:** Arnav — Q4 exists if you want a `check_shortages` tool step, but it returns nothing live until the licence is confirmed. Don't register it yourself.
+**Next:** apply the fresh-clone audit's fixes; get the TGA licence answered.
+
 ### 2026-10-25 14:11 AEDT · Anshu · claude/modest-feynman-dc14du
 
 **Did:** Built the web UI in `web/` (Vite 5 + React 18 + TypeScript, plain CSS): all ten PLAN §6 items in mock mode.
