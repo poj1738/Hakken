@@ -12,11 +12,11 @@ which is deliberately not the 16-digit IHI format and never carries the real
 
 Two documented deviations from `docs/DATA_SPEC.md`:
 
-1. **Population is 40 by default (20 tune / 20 held-out), not 200.** Decided
-   24 Oct: the rates, splits and operators are all per spec, and the count is a
-   single `--patients` flag, so scaling up is a flag rather than a rewrite.
-   Smaller silos also query faster, which matters -- Zetaris latency tracks
-   bytes scanned (`docs/DECISIONS.md`, 24 Oct).
+1. **Population is 200 (100 tune / 100 held-out), as specified** -- restored
+   25 Oct. It was 40 from 24 Oct, which left several finding types with 1-4
+   instances per split and hid the largest error source entirely (21 of 32
+   false positives appeared only at 200). Silos are ~6 MB; Zetaris latency
+   tracks bytes scanned, so re-time the live queries after `make refresh`.
 2. **`random.Random` rather than `numpy.random.Generator(PCG64(...))`.** The
    spec names numpy; using it would add a dependency to `requirements.txt`, a
    shared file, for the RNG alone. Determinism is what actually matters and is
@@ -124,6 +124,79 @@ LAY_TERMS = {
     "glyceryl trinitrate": "spray under the tongue", "temazepam": "sleeping tablet",
     "paracetamol": "arthritis Panadol", "tamsulosin": "prostate tablet",
 }
+#: DATA_SPEC 9.5: regimens whose dose changes by phone, with no new script, so
+#: the dispensing record cannot reconstruct it.
+#: All insulins, not one (consultant brief 12.3: APINCH covers "all insulins",
+#: and bolus doses are titrated without new scripts just as basal ones are).
+PHONE_DOSE_GENERICS = ("warfarin", "insulin glargine", "insulin aspart", "prednisolone")
+_ID_COLUMN = {"emr": "mrn", "gp": "gp_pid", "pharmacy": "cust_no", "patient": "intake_id"}
+#: Mirrors detect.SPLIT_SENSITIVE: a split-sensitive medicine adds a regimen
+#: finding to the demo that has nothing to do with learning.
+SPLIT_SENSITIVE_PREFIXES = ("levodopa", "lithium", "carbamazepine", "valpro", "phenytoin",
+                            "hydrocortisone", "prednisolone", "insulin", "gliclazide",
+                            "glibenclamide")
+
+#: The learning demo (PLAN, the 2:15 beat): a pharmacist rejects patient A's GP
+#: dose as outdated, and patient B -- run afterwards -- resolves differently.
+#: Nothing in the random population does that: at 200 patients only 3 change
+#: their resolved dose under one rejection, none of them in the replay set and
+#: none visibly. So the pair is staged, deterministically, on two replay-set
+#: patients that had no planted findings, and the staging is recorded in the
+#: ground truth (`learning_demo`) rather than passed off as chance.
+#:
+#: The shape, both patients: a GP list a year old still carrying the dose from
+#: before a reduction, against a pharmacy fill at the current dose six days ago.
+#: At the trust priors neither source wins by the 0.2 margin, so the dose
+#: abstains. One `source_outdated` rejection takes GP `daily_dose` 0.70 -> 0.50
+#: (PLAN 5.7) and the pharmacy wins. B's admission chart copied the old GP dose,
+#: so once B's dose resolves it surfaces a real chart error that the abstention
+#: was hiding. `tests/unit/test_learning_demo.py` pins both halves on the replay fixtures.
+LEARNING_PAIR = {"P0003": "teach", "P0007": "learn"}
+#: Showcase patients outside the first `--fixtures`, also given replay fixtures so
+#: `SAMPLE_MODE` and `input_examples/` can run them. Chosen 25 Oct from the tune
+#: split because each tells one story cleanly, with no false positive and no miss:
+#: P0015 -- an identity near-miss for a human, then warfarin and insulin dose
+#: conflicts, an insulin omission and an antiplatelet duplication; P0089 -- an
+#: opioid duplication and frequency error, straight through; P0013 -- two of four
+#: sources found, so the history is declared unconfirmable rather than guessed.
+SHOWCASE = ("P0013", "P0015", "P0089")
+LEARNING_GP_AGE_DAYS = 380
+LEARNING_FILL_AGE_DAYS = 6
+
+
+def phone_dose_gp_directions(med: "Med", rng: random.Random, usual: str) -> str:
+    """What the GP list says once the dose has moved by phone (DATA_SPEC 9.5).
+
+    Warfarin: half "as directed per INR", half the stale fixed dose. Insulin: "as
+    directed" 60% of the time. Prednisolone: the stale dose -- the GP list is
+    where the original prescription lives, not the taper step.
+    """
+    if med.generic == "warfarin":
+        return "as directed per INR" if rng.random() < 0.5 else usual
+    if med.generic.startswith("insulin"):
+        return "as directed" if rng.random() < 0.6 else usual
+    return usual
+
+
+def phone_dose_patient_words(med: "Med", rng: random.Random) -> str:
+    """What the patient says about a dose that moved by phone (DATA_SPEC 9.5).
+
+    Warfarin: 60% describe the current alternating regimen, 40% are unsure.
+    Insulin titration and the current prednisolone step exist **only** here,
+    which is exactly why no structured source can confirm them.
+    """
+    mg = strength_mg(med.strength) or 0.0
+    if med.generic == "warfarin":
+        if rng.random() < 0.6 and mg > 1:
+            return f"{mg - 1:g} mg Mon Wed Fri, {mg:g} mg the other days"
+        return "not sure how much now, the clinic changes it"
+    if med.generic.startswith("insulin"):
+        return rng.choice(["up 2 units every three days", "they told me to go up a bit",
+                           "changes with my sugars"])
+    return rng.choice(["down to the next step this week", "cutting down each week",
+                       "on the lower dose now"])
+
+
 FREQ_WORDS = {"1 mane": "one in the morning", "1 nocte": "one at night",
               "1 daily": "one a day", "1 bd": "morning and night", "2 tds": "two three times a day",
               "1 tds": "one three times a day", "prn": "only when I need it"}
@@ -227,6 +300,29 @@ class Product(dict):
     @property
     def is_addon(self) -> bool:
         return self["is_addon"] == "1"
+
+    def override_for(self, column: str, strength: str) -> int:
+        """A per-strength override from `column`, or 0 if none.
+
+        The column is either one value for every strength, or a ";"-separated
+        list aligned with `strengths` -- the same convention as brands and
+        strengths. One value per product gave every prednisolone strength the
+        200-tablet pack that is right only for 5 mg, which made a finished
+        25 mg course look like 200 days of supply.
+        """
+        raw = (self.get(column) or "").strip()
+        if not raw:
+            return 0
+        values = raw.split(";")
+        if len(values) > 1:
+            try:
+                raw = values[self.strengths.index(strength)]
+            except (ValueError, IndexError):
+                return 0
+        try:
+            return int(raw or 0)
+        except ValueError:
+            return 0
 
 
 def doses_per_day(regimen: str) -> float:
@@ -375,6 +471,10 @@ class Med:
         self.start = AS_OF - dt.timedelta(days=rng.randint(60, 3650))
         self.stop: dt.date | None = None
         self.changed_by_phone = False
+        # Whether the phone change shows in any rendered row, and the intent
+        # drawn for it. A dose_unconfirmable is planted only if it shows.
+        self.phone_visible = False
+        self.phone_intent = "possibly_intentional"
         self.private = rng.random() < PRIVATE_SCRIPT_RATE
         self.hidden_at_second_pharmacy = False
         self.dispensings: list[dt.date] = []
@@ -386,12 +486,10 @@ class Med:
         # only applies to items with no PBS listing (OTC, and the few
         # private-script products).
         real_qty, real_repeats = PACKS.get((self.generic, self.brand, self.strength), (0, 0))
-        self.pbs_repeats = real_repeats
-        try:
-            self.pack_qty = (int(product["pack_qty_override"] or 0) or real_qty
-                             or (60 if per_day >= 2 else 30))
-        except ValueError:
-            self.pack_qty = real_qty or 30
+        override_repeats = product.override_for("repeats_override", self.strength)
+        self.pbs_repeats = override_repeats or real_repeats
+        self.pack_qty = (product.override_for("pack_qty_override", self.strength) or real_qty
+                         or (60 if per_day >= 2 else 30))
         # A device pack is ONE unit that lasts about a month, so dividing it by
         # doses-per-day collapsed days_supply to the 7-day floor and let an
         # inhaler or insulin pen be dispensed 50+ times a year. Pack size says
@@ -656,6 +754,18 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
             "high_risk_class": med.high_risk or None, "intent": intent,
         })
 
+    # -- dose_unconfirmable (DATA_SPEC 9.5) ---------------------------------
+    # Decided BEFORE any silo is written, because the mechanism has to show up
+    # in the GP and patient rows. It used to be decided after rendering and
+    # changed nothing, so the ground truth said "dose changed by phone" while
+    # every source agreed on the old dose: a finding with no visible reason.
+    for med in p.meds:
+        if med.generic in PHONE_DOSE_GENERICS and med.current:
+            if rng.random() < 0.85:
+                med.changed_by_phone = True
+                med.phone_intent = ("possibly_intentional" if rng.random() < 0.6
+                                    else "likely_unintentional")
+
     # -- EMR ----------------------------------------------------------------
     given, family, dob_text = render_name_for("emr", p, rng, corruptions)
     emr_base = {"mrn": p.ids["emr"], "ihi_syn": ihi_for("emr", p, rng), "given_name": given,
@@ -667,9 +777,14 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
             continue
         # omission (DATA_SPEC 5.2): supported pre-admission, absent from the chart
         if rng.random() < HIDDEN_ERROR_RATES["emr"]["existence_omission"] * 1.5:
-            evidence = [r["row_id"] for r in rows.data["gp"] + rows.data["pharmacy"]
-                        if r.get("drug_text", "").startswith(med.brand)]
-            plant("omission", med, ["gp", "pharmacy"], evidence,
+            # Row ids left empty on purpose: resolve_row_ids fills them once this
+            # patient's GP and pharmacy rows exist. This used to scan
+            # rows.data["gp"] here -- but the EMR is rendered first, so at this
+            # point that list held only EARLIER patients' rows. Any brand match
+            # was another person's record, and because resolve_row_ids skips a
+            # finding that already has ids, 9 of 20 omissions ended up citing
+            # someone else's rows and could never be matched by row overlap.
+            plant("omission", med, ["gp", "pharmacy"], [],
                   {"reason": "not charted at admission"},
                   "documented_intentional" if rng.random() < 0.30 else "likely_unintentional")
             continue
@@ -694,7 +809,16 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
         # dose / frequency discrepancies
         charted_strength = med.strength
         charted_freq = med.regimen
-        if rng.random() < HIDDEN_ERROR_RATES["emr"]["dose"]:
+        # A chart dose or frequency error is planted citing the GP line as the
+        # truth, so it is only plantable where that line states the dose. A GP
+        # list that says "as directed" (a phone-changed dose), or no GP line at
+        # all, leaves nothing to contradict the chart: the finding would exist
+        # only in the answer key. Same rule as the stale listings.
+        comparable = (p.present["gp"] and med.gp_listing != "deleted"
+                      and not med.changed_by_phone)
+        if not comparable:
+            pass
+        elif rng.random() < HIDDEN_ERROR_RATES["emr"]["dose"]:
             halved = (dose or 0) / 2
             charted_strength = f"{halved:g} mg" if halved else med.strength
             plant("dose", med, ["emr", "gp"], [], {"charted": charted_strength,
@@ -730,7 +854,16 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
     if p.prior_discharge:
         d_date = AS_OF - dt.timedelta(days=rng.randint(14, 180))
         for med in rng.sample(p.meds, min(len(p.meds), rng.randint(2, 4))):
-            action = pick(rng, (("start", 0.58), ("cease", 0.27), ("change", 0.15)))
+            # The action has to agree with what actually happened. These were
+            # drawn at random, so a discharge summary would "cease" a medicine
+            # the patient carried on taking -- incoherent history that made a
+            # current salbutamol inhaler and a current statin look like
+            # commissions. A stopped medicine is ceased; a current one was
+            # started or changed.
+            if not med.current:
+                action = "cease"
+            else:
+                action = pick(rng, (("start", 0.79), ("change", 0.21)))
             reason = "" if rng.random() > 0.81 else rng.choice(
                 ["dose reduced: eGFR 28", "ceased: dizziness", "started: new AF"])
             rows.add("emr", dict(emr_base, record_kind="prior_discharge", record_date=iso(d_date),
@@ -760,12 +893,22 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
             drug_text = (f"{med.brand} {med.strength}" if rng.random() < 0.35
                          else f"{med.generic} {med.strength}")
             directions = FREQ_WORDS.get(med.regimen, med.regimen)
+            if med.changed_by_phone:
+                usual = directions
+                directions = phone_dose_gp_directions(med, rng, directions)
+                med.phone_visible = med.phone_visible or directions != usual
             status = "active" if med.gp_listing == "active" else "ceased"
             row_id = rows.add("gp", dict(gp_base, drug_text=drug_text,
                                          amt_code=code_for(med, "amt_mpp"),
                                          strength=med.strength, directions=directions,
                                          status=status))
-            if status == "active" and not med.current and med.possibly_ceased():
+            # Only plantable when there is a pharmacy record to show the lapse.
+            # possibly_ceased() reads the generator's own dispensing history,
+            # which exists even for a patient with no pharmacy silo -- so a stale
+            # listing was planted on evidence no silo contained, and no detector
+            # could ever find it.
+            if (status == "active" and not med.current and p.present["pharmacy"]
+                    and med.possibly_ceased()):
                 plant("stale_listing", med, ["gp", "pharmacy"], [row_id],
                       {"last_dispensed": iso(med.dispensings[-1]) if med.dispensings else None},
                       "likely_unintentional")
@@ -837,9 +980,12 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
                 described = "a little white one"
             still = ("yes" if med.current else
                      ("no" if rng.random() < 0.6 else "unsure"))
+            how_often = FREQ_WORDS.get(med.regimen, med.regimen)
+            if med.changed_by_phone:
+                how_often = phone_dose_patient_words(med, rng)
+                med.phone_visible = True
             rows.add("patient", dict(pat_base, med_described=described,
-                                     how_often=FREQ_WORDS.get(med.regimen, med.regimen),
-                                     still_taking=still))
+                                     how_often=how_often, still_taking=still))
         for med in p.otc:
             row_id = rows.add("patient", dict(pat_base, med_described=med.generic,
                                               how_often="one a day", still_taking="yes"))
@@ -855,14 +1001,15 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
         notices.append({"type": "bpmh_not_confirmable", "detail":
                         f"only {found + 1} of 4 sources found"})
 
-    # -- dose_unconfirmable (DATA_SPEC 9.5) ---------------------------------
+    # -- dose_unconfirmable, planted only where it SHOWS ---------------------
+    # Consultant brief 12.2: the routine "confirm this dose" is a task, not a
+    # finding; a finding is a visible conflict. So a phone change that every
+    # rendered source hides -- the GP repeating the old dose, no interview --
+    # is a task for the pharmacist, not a planted finding for the detector.
     for med in p.meds:
-        if med.generic in ("warfarin", "insulin glargine", "prednisolone") and med.current:
-            if rng.random() < 0.85:
-                med.changed_by_phone = True
-                plant("dose_unconfirmable", med, ["gp", "pharmacy", "patient"], [],
-                      {"mechanism": "dose changed without a new script"},
-                      "possibly_intentional" if rng.random() < 0.6 else "likely_unintentional")
+        if med.changed_by_phone and med.phone_visible:
+            plant("dose_unconfirmable", med, ["gp", "pharmacy", "patient"], [],
+                  {"mechanism": "dose changed without a new script"}, med.phone_intent)
 
     # -- duplication (DATA_SPEC 4.3) ----------------------------------------
     for med in p.meds:
@@ -875,6 +1022,74 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
                        "shared": sorted(set(overlap[0].ingredients) & set(med.ingredients))},
                       "likely_unintentional")
     return planted, notices, corruptions
+
+
+def stage_learning_demo(p: Patient, rows: Rows, planted: list[dict[str, object]],
+                        notices: list[dict[str, object]], role: str) -> dict[str, object] | None:
+    """Stage `LEARNING_PAIR` on one patient's rendered rows. No rng, no new rows.
+
+    Mutates rows in place, so no other patient's row ids or random draws move.
+    Returns what was staged, for the ground truth, or None if the patient has no
+    medicine the shape fits (the generator then says so loudly).
+    """
+    if not (p.present["gp"] and p.present["pharmacy"]):
+        return None
+    mine = {s: [r for r in rows.data[s] if r.get(_ID_COLUMN[s]) == p.ids[s]]
+            for s in ("emr", "gp", "pharmacy")}
+    discharged = {r["med_name"] for r in mine["emr"] if r["record_kind"] == "prior_discharge"}
+    charted = {r["med_name"]: r for r in mine["emr"] if r["record_kind"] == "admission_chart"}
+
+    def fits(med: Med) -> bool:
+        higher = [x for x in med.product.strengths
+                  if (strength_mg(x) or 0) > (strength_mg(med.strength) or 0)]
+        return bool(med.current and med.gp_listing == "active" and not med.private
+                    and not med.hidden_at_second_pharmacy and med.dispensings
+                    and not med.changed_by_phone and not med.is_device
+                    and not med.high_risk and "prn" not in med.regimen
+                    and len(med.ingredients) == 1 and higher
+                    and med.generic in charted and med.generic not in discharged
+                    and not med.generic.startswith(SPLIT_SENSITIVE_PREFIXES))
+
+    med = next((m for m in sorted(p.meds, key=lambda m: m.generic) if fits(m)), None)
+    if med is None:
+        return None
+    old = next(x for x in med.product.strengths
+               if (strength_mg(x) or 0) > (strength_mg(med.strength) or 0))
+
+    def names(row: dict[str, str], field: str) -> bool:
+        text = row.get(field, "").lower()
+        return text.startswith(med.generic.lower()) or bool(med.brand) and text.startswith(med.brand.lower())
+
+    listed = ddmmyyyy(AS_OF - dt.timedelta(days=LEARNING_GP_AGE_DAYS))
+    for row in mine["gp"]:
+        row["list_last_updated"] = row["last_reviewed"] = listed
+    if not any(n["type"] == "stale_document" for n in notices):
+        notices.append({"type": "stale_document", "source": "gp",
+                        "detail": f"GP list updated {iso(AS_OF - dt.timedelta(days=LEARNING_GP_AGE_DAYS))}"})
+    gp_row = next(r for r in mine["gp"] if names(r, "drug_text"))
+    gp_row["drug_text"] = gp_row["drug_text"].replace(med.strength, old)
+    gp_row["strength"] = old
+
+    fills = sorted((r for r in mine["pharmacy"] if names(r, "brand")), key=lambda r: r["dispensed_on"])
+    fills[-1]["dispensed_on"] = iso(AS_OF - dt.timedelta(days=LEARNING_FILL_AGE_DAYS))
+
+    staged: dict[str, object] = {"role": role, "generic": med.generic, "gp_dose": old,
+                                 "current_dose": med.strength, "gp_row": gp_row["row_id"],
+                                 "pharmacy_row": fills[-1]["row_id"]}
+    if role == "learn":
+        chart = charted[med.generic]
+        chart["strength"] = old
+        chart["dose"] = f"{strength_mg(old) or ''}"
+        planted.append({
+            "id": f"F{p.key[1:]}-{len(planted) + 1:02d}", "type": "dose", "generic": med.generic,
+            "sources_involved": ["emr", "pharmacy"],
+            "row_ids": [chart["row_id"], fills[-1]["row_id"], gp_row["row_id"]],
+            "detail": {"charted": old, "truth": med.strength, "learning_demo": True,
+                       "mechanism": "chart copied a GP list that predates a dose reduction"},
+            "high_risk_class": None, "intent": "likely_unintentional",
+        })
+        staged["chart_row"] = chart["row_id"]
+    return staged
 
 
 def apply_identity_traps(patients: list[Patient], split: dict[str, list[str]],
@@ -984,13 +1199,23 @@ def resolve_row_ids(patient: Patient, rows: Rows, planted: list[dict[str, object
                         "patient": "intake_id"}[source]
             text_field = {"emr": "med_name", "gp": "drug_text", "pharmacy": "brand",
                           "patient": "med_described"}[source]
-            for row in rows.data[source]:
-                if row.get(id_field) != pid:
-                    continue
+            mine = [row for row in rows.data[source] if row.get(id_field) == pid]
+
+            def exact(row: dict[str, str]) -> bool:
+                # The term, then anything but "/": "amlodipine 5 mg" is the
+                # single agent, "amlodipine/atorvastatin" is a different product.
                 text = (row.get(text_field) or "").lower()
-                if any(text.startswith(w) or w in text for w in wanted):
-                    found.append(row["row_id"])
-                    break
+                return any(text.startswith(w) and text[len(w):len(w) + 1] != "/"
+                           for w in wanted)
+
+            def loose(row: dict[str, str]) -> bool:
+                text = (row.get(text_field) or "").lower()
+                return any(text.startswith(w) or w in text for w in wanted)
+
+            match = next((r for r in mine if exact(r)), None) or next(
+                (r for r in mine if loose(r)), None)
+            if match is not None:
+                found.append(match["row_id"])
         entry["row_ids"] = found
 
 
@@ -1131,6 +1356,35 @@ def q1_matches(anchor: dict[str, str | None], row: dict[str, str | None]) -> boo
 PACKS: dict[tuple[str, str, str], tuple[int, int]] = {}
 
 
+def _real_codes(records: list[dict[str, str]]) -> int:
+    return sum(1 for r in records if r.get("pbs_code") and not r["pbs_code"].startswith("SYN"))
+
+
+def _lexicon_records() -> list[dict[str, str]]:
+    """The built lexicon if it carries real PBS codes, else the committed one.
+
+    `data/reference/lexicon.json` is gitignored, and on a fresh clone without a
+    PBS fetch `make lexicon` builds it with synthetic codes only. Generating from
+    that silently rewrote 21 committed fixtures and broke two tests (judge-clone
+    audit, 25 Oct). The committed replay fixture `Q_REF__lexicon.json` is the
+    exact lexicon Zetaris serves, so falling back to it makes `make synth` on a
+    clean clone reproduce the committed data byte for byte.
+    """
+    built = pathlib.Path("data/reference/lexicon.json")
+    committed = FIXTURES / "Q_REF__lexicon.json"
+    built_rows = json.loads(built.read_text())["records"] if built.exists() else []
+    if built_rows and _real_codes(built_rows):
+        log(f"  lexicon: {built} ({_real_codes(built_rows)} real PBS codes)")
+        return built_rows
+    if committed.exists():
+        env = json.loads(committed.read_text())
+        rows = [dict(zip(env["headers"], row)) for row in env["data"]]
+        log(f"  lexicon: {committed} (committed, {_real_codes(rows)} real PBS codes)"
+            + (f"; ignoring {built}, which has none" if built_rows else ""))
+        return rows
+    return built_rows
+
+
 def load_codes() -> dict[tuple[str, str, str], dict[str, str]]:
     """(generic, brand, strength) -> its codes, from the built lexicon.
 
@@ -1140,11 +1394,10 @@ def load_codes() -> dict[tuple[str, str, str], dict[str, str]]:
     MR look like a 10-day supply and let it be dispensed 37 times a year.
     Med is constructed after this runs, so it can read the real number.
     """
-    path = pathlib.Path("data/reference/lexicon.json")
-    if not path.exists():
-        log("  (no lexicon.json -- run `make lexicon` first; codes will be blank)")
+    records = _lexicon_records()
+    if not records:
+        log("  (no lexicon -- codes will be blank)")
         return {}
-    records = json.loads(path.read_text())["records"]
     codes = {(r["generic"], r["brand"], r["strength"]): r for r in records}
     for key, r in codes.items():
         try:
@@ -1168,8 +1421,8 @@ def load_nicknames() -> dict[str, tuple[list[str], str]]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--patients", type=int, default=40,
-                    help="total patients, split evenly tune/held-out (default 40)")
+    ap.add_argument("--patients", type=int, default=200,
+                    help="total patients, split evenly tune/held-out (default 200)")
     ap.add_argument("--fixtures", type=int, default=10,
                     help="how many tune patients get Q1/Q2/Q3 fixtures")
     ap.add_argument("--seed", type=int, default=SEED)
@@ -1227,6 +1480,11 @@ def main() -> int:
         rng = p.rng
         planted, notices, corruptions = render(p, rows, codes, rng)
         resolve_row_ids(p, rows, planted)
+        learning = None
+        if p.key in LEARNING_PAIR and p.key in split["tune"]:
+            learning = stage_learning_demo(p, rows, planted, notices, LEARNING_PAIR[p.key])
+            if learning is None:
+                log(f"  WARNING: {p.key} has no medicine that fits the learning demo")
         # A planted finding with no citable row cannot be matched by DATA_SPEC
         # 11.2's row_id-overlap rule, so leaving it in the truth would cap that
         # type's recall below 1.0 for a reason that has nothing to do with the
@@ -1251,6 +1509,7 @@ def main() -> int:
                           "changed_by_phone": m.changed_by_phone} for m in p.meds],
             "planted": planted,
             "notices": notices,
+            **({"learning_demo": learning} if learning else {}),
         })
 
     # -- write silos --------------------------------------------------------
@@ -1274,7 +1533,8 @@ def main() -> int:
         harmonised.extend(harmonise(source, r) for r in rows.data[source])
 
     written = 0
-    for p in patients[:args.fixtures]:
+    replay = patients[:args.fixtures] + [p for p in patients[args.fixtures:] if p.key in SHOWCASE]
+    for p in replay:
         anchor = next((h for h in harmonised
                        if h["source"] == "emr" and h["source_patient_id"] == p.ids["emr"]), None)
         if anchor is None:
@@ -1291,7 +1551,18 @@ def main() -> int:
             (fixtures_dir / f"{name}__{p.key}.json").write_text(
                 json.dumps(envelope(cols, data), indent=1), encoding="utf-8")
             written += 1
-    log(f"  fixtures: {written} envelopes for {min(args.fixtures, len(patients))} patients")
+    log(f"  fixtures: {written} envelopes for {len(replay)} patients")
+
+    # Q0: the admissions list, which is how a run finds its anchor. One envelope
+    # for the whole population, exactly as queries.q_admissions() returns it --
+    # one row per admission-chart LINE, so a caller dedupes on
+    # source_patient_id. Without it, SAMPLE_MODE has nothing to replay for the
+    # first query a run makes.
+    q0 = [h for h in harmonised if h["source"] == "emr" and h["record_kind"] == "admission_chart"]
+    (fixtures_dir / "Q0__admissions.json").write_text(
+        json.dumps(envelope(IDENTITY_COLUMNS, q0), indent=1), encoding="utf-8")
+    log(f"  fixtures: Q0__admissions.json, {len(q0)} rows, "
+        f"{len({h['source_patient_id'] for h in q0})} admissions")
 
     # -- report ------------------------------------------------------------
     counts: collections.Counter = collections.Counter()

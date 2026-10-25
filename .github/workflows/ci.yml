@@ -37,6 +37,17 @@ jobs:
           fi
           echo "no .env present, as expected"
 
+      - name: Build the data a judge would build, and prove it matches what is committed
+        # data/reference/ and data/synthetic/silos/ are gitignored. Without this
+        # step the generator and scorecard tests skip, so the headline numbers were
+        # never checked in CI (judge-clone audit, 25 Oct). With no PBS fetch the
+        # generator uses the committed lexicon, so every committed fixture must come
+        # out byte-identical: a diff here means the data no longer reproduces.
+        run: |
+          python scripts/build_lexicon.py
+          python scripts/generate_synthetic.py
+          git diff --exit-code -- tests/fixtures data/synthetic/ground_truth.json
+
       - name: Run tests
         # SAMPLE_MODE=true, no .env, no Zetaris, no Nightshift, no network calls.
         run: python -m pytest

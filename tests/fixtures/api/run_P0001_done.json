@@ -1,0 +1,2461 @@
+{
+  "run_id": "run-ex-p0001",
+  "status": "success",
+  "output": {
+    "summary": "12 findings for Marjorie Lee (MRN0000001): 3 must-review -- warfarin dose cannot be confirmed, oxycodone IR vs CR, and 3 dispensings that may be another person's.",
+    "recommendations": [
+      {
+        "text": "Confirm current warfarin dose with patient or INR book",
+        "rationale": "F-003",
+        "confidence": 0.9,
+        "requires_human_review": true
+      }
+    ],
+    "evidence": [
+      {
+        "claim": "famotidine on GP list and dispensed, not charted",
+        "value": null,
+        "unit": null,
+        "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE row_id IN ('GP-000003', 'PHM-000007')",
+        "source": "medtrace.all_sources",
+        "row_count": 2,
+        "verified": true,
+        "world_model_entity_id": null
+      }
+    ],
+    "caveats": [
+      "Hand-written example for UI development (PLAN 5.8); not the output of a real run. Regenerated from real runs once the pipeline works.",
+      "Synthetic data. Not medical advice. A pharmacist must confirm every item."
+    ],
+    "artifacts": []
+  },
+  "agents": [
+    {
+      "name": "Planner",
+      "role": "plan the investigation",
+      "iterations": 1,
+      "models_used": [
+        "nvidia/nemotron-3.5-lightning-30b-a3b"
+      ],
+      "routes_requested": [
+        "meterless/fast"
+      ],
+      "status": "ok"
+    },
+    {
+      "name": "Executor",
+      "role": "fetch, link, normalise",
+      "iterations": 1,
+      "models_used": [
+        "nvidia/nemotron-3.5-lightning-30b-a3b"
+      ],
+      "routes_requested": [
+        "meterless/fast"
+      ],
+      "status": "ok"
+    },
+    {
+      "name": "Evaluator",
+      "role": "fuse, detect, verify, critique",
+      "iterations": 2,
+      "models_used": [
+        "nvidia/nemotron-3.5-super-vl-120b-a12b"
+      ],
+      "routes_requested": [
+        "meterless/deep"
+      ],
+      "status": "ok"
+    },
+    {
+      "name": "Writer",
+      "role": "explain and rank",
+      "iterations": 2,
+      "models_used": [
+        "nvidia/nemotron-3.5-super-vl-120b-a12b"
+      ],
+      "routes_requested": [
+        "meterless/deep"
+      ],
+      "status": "ok"
+    }
+  ],
+  "trace_id": "run-ex-p0001",
+  "log_file": "logs/trace-run-ex-p0001.jsonl",
+  "execution_time_seconds": 74.2,
+  "error": null,
+  "memory_used": [],
+  "sample_mode": true,
+  "provider_state": "online",
+  "patient_id": "MRN0000001",
+  "coverage": {
+    "emr": {
+      "source": "emr",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "emr:MRN0000001",
+      "doc_date": "2026-10-24"
+    },
+    "gp": {
+      "source": "gp",
+      "state": "found",
+      "scope_notes": [
+        "GP list updated 2 months ago"
+      ],
+      "record_key": "gp:GPP000001",
+      "doc_date": "2026-08-23"
+    },
+    "pharmacy": {
+      "source": "pharmacy",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "pharmacy:C000001",
+      "doc_date": null
+    },
+    "patient": {
+      "source": "patient",
+      "state": "found",
+      "scope_notes": [
+        "interview gives the name as 'Marj' -- linked as a nickname of Marjorie"
+      ],
+      "record_key": "patient:INT00001",
+      "doc_date": null
+    }
+  },
+  "bpmh_confirmable": true,
+  "banner": null,
+  "grid": [
+    {
+      "generic": "famotidine",
+      "atc": "A02BA03",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "absent_in_scope",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 0.8,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 0.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000003",
+            "PHM-000007"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 40.0,
+          "score": 0.8,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 0.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000003",
+            "PHM-000007"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "GP-000003",
+        "PHM-000007"
+      ]
+    },
+    {
+      "generic": "warfarin",
+      "atc": "B01AA03",
+      "high_risk_class": "H",
+      "per_source": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "present"
+      },
+      "attributes": {
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": null,
+          "score": 0.41,
+          "runner_up": 5.0,
+          "runner_up_score": 0.38,
+          "margin": 0.03,
+          "abstained": true,
+          "supporting": [],
+          "dissenting": {
+            "gp": "5 mg",
+            "pharmacy": "1 mg + 5 mg tablets"
+          },
+          "row_ids": [
+            "GP-EX0001",
+            "PHM-EX0001",
+            "PHM-EX0002"
+          ]
+        }
+      },
+      "abstained": [
+        "daily_dose"
+      ],
+      "row_ids": [
+        "GP-EX0001",
+        "PHM-EX0001",
+        "PHM-EX0002"
+      ]
+    },
+    {
+      "generic": "amlodipine",
+      "atc": "C08CA01",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "attributes": {
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 5.0,
+          "score": 0.8,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 0.0,
+          "abstained": false,
+          "supporting": [
+            "emr",
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000002",
+            "GP-000002",
+            "PHM-000005"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000002",
+        "GP-000002",
+        "PHM-000005"
+      ]
+    },
+    {
+      "generic": "pregabalin",
+      "atc": "N03AX16",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "attributes": {
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 150.0,
+          "score": 0.8,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 0.0,
+          "abstained": false,
+          "supporting": [
+            "emr",
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000003",
+            "GP-000004",
+            "PHM-000014"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000003",
+        "GP-000004",
+        "PHM-000014"
+      ]
+    },
+    {
+      "generic": "rosuvastatin",
+      "atc": "C10AA07",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "absent_in_scope",
+        "patient": "unknown"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 0.8,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 0.0,
+          "abstained": false,
+          "supporting": [
+            "emr",
+            "gp"
+          ],
+          "dissenting": {
+            "emr": "withheld: hypotension"
+          },
+          "row_ids": [
+            "EMR-000004",
+            "GP-000005"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000004",
+        "GP-000005"
+      ]
+    },
+    {
+      "generic": "fish oil",
+      "atc": null,
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "absent_in_scope",
+        "gp": "unknown",
+        "pharmacy": "unknown",
+        "patient": "present"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 0.8,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 0.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-EX0001"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "PAT-EX0001"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-001",
+      "type": "omission",
+      "generic": "famotidine",
+      "high_risk_class": null,
+      "severity": "medium",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 0.71,
+      "explanation": "Famotidine 20 mg twice daily is on the GP list as Pepcidine (GP-000003) and has been dispensed every two months since Oct 2025 (PHM-000007), but it is not on the admission chart.",
+      "detail": {
+        "atc_class": "A02B"
+      },
+      "evidence": [
+        {
+          "source": "gp",
+          "row_id": "GP-000003",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-000003",
+            "source_patient_id": "GPP000001",
+            "ihi_syn": "SYN-166926809857",
+            "name_given": "Marjorie",
+            "name_family": "Lee",
+            "name_previous": "",
+            "dob_text": "24/02/1951",
+            "sex": "Female",
+            "postcode": "2319",
+            "record_kind": "gp_list",
+            "doc_date": "23/08/2026",
+            "med_text": "Pepcidine 20 mg",
+            "med_code": "SYN-AMT-MPP-0048",
+            "code_system": "amt",
+            "strength_text": "20 mg",
+            "dose_text": null,
+            "route_text": null,
+            "freq_text": "morning and night",
+            "status_text": "active",
+            "note_text": null,
+            "qty": null,
+            "days_supply": null,
+            "pharmacy_id": null,
+            "script_type": null
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-000007",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-000007",
+            "source_patient_id": "C000001",
+            "ihi_syn": "SYN-166926809857",
+            "name_given": "LEE, Marjorie",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1951-02-24",
+            "sex": null,
+            "postcode": "2319",
+            "record_kind": "dispense",
+            "doc_date": "2025-10-24",
+            "med_text": "Pepcidine",
+            "med_code": "15047Y",
+            "code_system": "pbs",
+            "strength_text": "20 mg",
+            "dose_text": null,
+            "route_text": "tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "120",
+            "days_supply": "60",
+            "pharmacy_id": "PHX07",
+            "script_type": "PBS"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "absent_in_scope",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "tasks": [
+        "Ask the patient whether they still take famotidine",
+        "Chart famotidine or document why not"
+      ],
+      "needs_pharmacist": false,
+      "trust_explanation": [
+        "pharmacy existence trust 0.85",
+        "gp existence trust 0.60"
+      ],
+      "hmem_record_ids": [
+        "hm-pharmacy-existence",
+        "hm-gp-existence"
+      ]
+    },
+    {
+      "id": "F-002",
+      "type": "omission",
+      "generic": "empagliflozin/metformin",
+      "high_risk_class": null,
+      "severity": "medium",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 0.69,
+      "explanation": "Jardiamet 12.5/1000 mg twice daily is listed by the GP (GP-000006) and dispensed (PHM-000032), but neither component is on the admission chart.",
+      "detail": {
+        "atc_class": "A10B"
+      },
+      "evidence": [
+        {
+          "source": "gp",
+          "row_id": "GP-000006",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-000006",
+            "source_patient_id": "GPP000001",
+            "ihi_syn": "SYN-166926809857",
+            "name_given": "Marjorie",
+            "name_family": "Lee",
+            "name_previous": "",
+            "dob_text": "24/02/1951",
+            "sex": "Female",
+            "postcode": "2319",
+            "record_kind": "gp_list",
+            "doc_date": "23/08/2026",
+            "med_text": "Jardiamet 12.5/1000 mg",
+            "med_code": "SYN-AMT-MPP-0074",
+            "code_system": "amt",
+            "strength_text": "12.5/1000 mg",
+            "dose_text": null,
+            "route_text": null,
+            "freq_text": "morning and night",
+            "status_text": "active",
+            "note_text": null,
+            "qty": null,
+            "days_supply": null,
+            "pharmacy_id": null,
+            "script_type": null
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-000032",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-000032",
+            "source_patient_id": "C000001",
+            "ihi_syn": "SYN-166926809857",
+            "name_given": "LEE, Marjorie",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1951-02-24",
+            "sex": null,
+            "postcode": "2319",
+            "record_kind": "dispense",
+            "doc_date": "2025-10-24",
+            "med_text": "Jardiamet",
+            "med_code": "10633P",
+            "code_system": "pbs",
+            "strength_text": "12.5/1000 mg",
+            "dose_text": null,
+            "route_text": "tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "60",
+            "days_supply": "30",
+            "pharmacy_id": "PHX07",
+            "script_type": "PBS"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "absent_in_scope",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "tasks": [
+        "Confirm whether Jardiamet is withheld deliberately (e.g. fasting, contrast)"
+      ],
+      "needs_pharmacist": false,
+      "trust_explanation": [],
+      "hmem_record_ids": [
+        "hm-pharmacy-existence",
+        "hm-gp-existence"
+      ]
+    },
+    {
+      "id": "F-003",
+      "type": "dose_unconfirmable",
+      "generic": "warfarin",
+      "high_risk_class": "H",
+      "severity": "high",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 0.98,
+      "explanation": "The GP lists warfarin 5 mg daily (GP-EX0001), but the pharmacy dispenses both 1 mg and 5 mg tablets (PHM-EX0001, PHM-EX0002), so the current dose cannot be confirmed from records.",
+      "detail": {
+        "atc_class": "B01A"
+      },
+      "evidence": [
+        {
+          "source": "gp",
+          "row_id": "GP-EX0001",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-EX0001",
+            "med_text": "warfarin 5 mg",
+            "freq_text": "one at night",
+            "status_text": "active"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-EX0001",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-EX0001",
+            "med_text": "Marevan",
+            "strength_text": "1 mg",
+            "qty": "50",
+            "days_supply": null
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-EX0002",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-EX0002",
+            "med_text": "Marevan",
+            "strength_text": "5 mg",
+            "qty": "50",
+            "days_supply": null
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "present"
+      },
+      "tasks": [
+        "Confirm current warfarin dose with patient or INR book",
+        "Check the latest INR"
+      ],
+      "needs_pharmacist": true,
+      "trust_explanation": [
+        "dose conflict: gp intended_dose 0.75 vs pharmacy daily_dose 0.55 -- within margin, abstained"
+      ],
+      "hmem_record_ids": [
+        "hm-gp-intended_dose",
+        "hm-pharmacy-daily_dose"
+      ]
+    },
+    {
+      "id": "F-004",
+      "type": "formulation",
+      "generic": "oxycodone",
+      "high_risk_class": "N",
+      "severity": "high",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 0.93,
+      "explanation": "The admission chart has immediate-release oxycodone (EMR-EX0001); the pharmacy dispenses controlled-release OxyContin (PHM-EX0003).",
+      "detail": {},
+      "evidence": [
+        {
+          "source": "emr",
+          "row_id": "EMR-EX0001",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "emr",
+            "row_id": "EMR-EX0001",
+            "med_text": "oxycodone",
+            "strength_text": "10 mg",
+            "freq_text": "1 bd"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-EX0003",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-EX0003",
+            "med_text": "OxyContin",
+            "strength_text": "10 mg",
+            "qty": "28",
+            "days_supply": "14"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "tasks": [
+        "Confirm IR vs CR with the patient and prescriber"
+      ],
+      "needs_pharmacist": true,
+      "trust_explanation": [],
+      "hmem_record_ids": []
+    },
+    {
+      "id": "F-005",
+      "type": "identity_uncertain",
+      "generic": "atorvastatin",
+      "high_risk_class": null,
+      "severity": "high",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 0.9,
+      "explanation": "Atorvastatin 80 mg appears only in dispensings from a second pharmacy record (PHM-EX0007) whose link to this patient is in the review band.",
+      "detail": {
+        "atc_class": "C10A",
+        "bpmh_single_source": "pharmacy"
+      },
+      "evidence": [
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-EX0007",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-EX0007",
+            "med_text": "Lipitor",
+            "strength_text": "80 mg",
+            "qty": "30",
+            "days_supply": "30"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "absent_in_scope",
+        "gp": "absent_in_scope",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "tasks": [
+        "Confirm the second pharmacy record is this patient"
+      ],
+      "needs_pharmacist": true,
+      "trust_explanation": [],
+      "hmem_record_ids": []
+    },
+    {
+      "id": "F-006",
+      "type": "dose",
+      "generic": "escitalopram",
+      "high_risk_class": null,
+      "severity": "medium",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 0.62,
+      "explanation": "Charted at 10 mg daily (EMR-000005); the GP's most recent letter says 20 mg daily (GP-EX0002).",
+      "detail": {
+        "atc_class": "N06A",
+        "subtype": "dose",
+        "daily_dose_ratio": 0.5,
+        "statement": "charted 10 mg/day against 20 mg/day before admission"
+      },
+      "evidence": [
+        {
+          "source": "emr",
+          "row_id": "EMR-000005",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "emr",
+            "row_id": "EMR-000005",
+            "source_patient_id": "MRN0000001",
+            "ihi_syn": "SYN-166926809857",
+            "name_given": "Marjorie",
+            "name_family": "Lee",
+            "name_previous": null,
+            "dob_text": "1951-02-24",
+            "sex": "F",
+            "postcode": "2319",
+            "record_kind": "admission_chart",
+            "doc_date": "2026-10-24",
+            "med_text": "escitalopram",
+            "med_code": "SYN-AMT-MP-0032",
+            "code_system": "amt",
+            "strength_text": "10 mg",
+            "dose_text": "10.0",
+            "route_text": "PO",
+            "freq_text": "1 daily",
+            "status_text": "",
+            "note_text": "",
+            "qty": null,
+            "days_supply": null,
+            "pharmacy_id": null,
+            "script_type": null
+          }
+        },
+        {
+          "source": "gp",
+          "row_id": "GP-EX0002",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-EX0002",
+            "med_text": "escitalopram 20 mg",
+            "freq_text": "one a day",
+            "status_text": "active"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "tasks": [
+        "Confirm the current escitalopram dose"
+      ],
+      "needs_pharmacist": false,
+      "trust_explanation": [],
+      "hmem_record_ids": []
+    },
+    {
+      "id": "F-007",
+      "type": "duplication",
+      "generic": "perindopril",
+      "high_risk_class": null,
+      "severity": "medium",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 0.6,
+      "explanation": "Coversyl Plus already contains perindopril (PHM-000001); a separate perindopril 5 mg is also listed (GP-EX0003).",
+      "detail": {},
+      "evidence": [
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-000001",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-000001",
+            "source_patient_id": "C000001",
+            "ihi_syn": "SYN-166926809857",
+            "name_given": "LEE, Marjorie",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1951-02-24",
+            "sex": null,
+            "postcode": "2319",
+            "record_kind": "dispense",
+            "doc_date": "2025-10-24",
+            "med_text": "Coversyl Plus",
+            "med_code": "13413Y",
+            "code_system": "pbs",
+            "strength_text": "5/1.25 mg",
+            "dose_text": null,
+            "route_text": "tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "60",
+            "days_supply": "60",
+            "pharmacy_id": "PHX07",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "gp",
+          "row_id": "GP-EX0003",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-EX0003",
+            "med_text": "perindopril 5 mg",
+            "freq_text": "one a day",
+            "status_text": "active"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "tasks": [
+        "Check for double ACE-inhibitor dosing"
+      ],
+      "needs_pharmacist": false,
+      "trust_explanation": [],
+      "hmem_record_ids": []
+    },
+    {
+      "id": "F-008",
+      "type": "commission",
+      "generic": "pantoprazole",
+      "high_risk_class": null,
+      "severity": "low",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 0.4,
+      "explanation": "Pantoprazole is on the admission chart (EMR-EX0002) but no pre-admission source lists it.",
+      "detail": {
+        "atc_class": "A02B",
+        "conflict": "confirm"
+      },
+      "evidence": [
+        {
+          "source": "emr",
+          "row_id": "EMR-EX0002",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "emr",
+            "row_id": "EMR-EX0002",
+            "med_text": "pantoprazole",
+            "strength_text": "40 mg",
+            "freq_text": "1 daily"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "present",
+        "gp": "absent_in_scope",
+        "pharmacy": "absent_in_scope",
+        "patient": "unknown"
+      },
+      "tasks": [
+        "Confirm whether pantoprazole was started in hospital"
+      ],
+      "needs_pharmacist": false,
+      "trust_explanation": [],
+      "hmem_record_ids": []
+    },
+    {
+      "id": "F-009",
+      "type": "stale_listing",
+      "generic": "diclofenac",
+      "high_risk_class": null,
+      "severity": "low",
+      "intent_status": "possibly_intentional",
+      "intent_reason": null,
+      "priority": 0.35,
+      "explanation": "The GP lists diclofenac as active (GP-EX0004) but it was last dispensed 11 months ago for 30 days (PHM-EX0004); it may have been stopped.",
+      "detail": {},
+      "evidence": [
+        {
+          "source": "gp",
+          "row_id": "GP-EX0004",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-EX0004",
+            "med_text": "diclofenac 50 mg",
+            "status_text": "active"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-EX0004",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-EX0004",
+            "med_text": "Voltaren",
+            "strength_text": "50 mg",
+            "qty": "30",
+            "days_supply": "30"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "absent_in_scope",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "tasks": [
+        "Ask the patient about diclofenac"
+      ],
+      "needs_pharmacist": false,
+      "trust_explanation": [],
+      "hmem_record_ids": []
+    },
+    {
+      "id": "F-010",
+      "type": "frequency",
+      "generic": "metformin",
+      "high_risk_class": null,
+      "severity": "low",
+      "intent_status": "documented_intentional",
+      "intent_reason": "Chart note: changed to three times daily on admission for GI tolerance.",
+      "priority": 0.3,
+      "explanation": "Same 1.5 g total daily dose, split three times daily on the chart (EMR-EX0003) versus twice daily on the GP list (GP-EX0005).",
+      "detail": {
+        "atc_class": "A10B",
+        "subtype": "regimen_split_differs",
+        "daily_dose_ratio": 1.0
+      },
+      "evidence": [
+        {
+          "source": "emr",
+          "row_id": "EMR-EX0003",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "emr",
+            "row_id": "EMR-EX0003",
+            "med_text": "metformin",
+            "strength_text": "500 mg",
+            "freq_text": "1 tds",
+            "note_text": "changed to tds for GI tolerance"
+          }
+        },
+        {
+          "source": "gp",
+          "row_id": "GP-EX0005",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-EX0005",
+            "med_text": "metformin 750 mg",
+            "freq_text": "morning and night"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "tasks": [],
+      "needs_pharmacist": false,
+      "trust_explanation": [],
+      "hmem_record_ids": []
+    },
+    {
+      "id": "F-011",
+      "type": "route",
+      "generic": "methotrexate",
+      "high_risk_class": null,
+      "severity": "low",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 0.28,
+      "explanation": "Charted as oral (EMR-EX0004); dispensed as a subcutaneous pre-filled pen (PHM-EX0005).",
+      "detail": {},
+      "evidence": [
+        {
+          "source": "emr",
+          "row_id": "EMR-EX0004",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "emr",
+            "row_id": "EMR-EX0004",
+            "med_text": "methotrexate",
+            "route_text": "oral",
+            "freq_text": "weekly"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-EX0005",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-EX0005",
+            "med_text": "Metoject",
+            "route_text": "subcut",
+            "qty": "4",
+            "days_supply": "28"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "present",
+        "gp": "absent_in_scope",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "tasks": [
+        "Confirm the route with the patient"
+      ],
+      "needs_pharmacist": false,
+      "trust_explanation": [],
+      "hmem_record_ids": []
+    },
+    {
+      "id": "F-012",
+      "type": "unpropagated_discharge_change",
+      "generic": "metoprolol",
+      "high_risk_class": null,
+      "severity": "low",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 0.25,
+      "explanation": "The last discharge summary changed metoprolol to bisoprolol (EMR-EX0005), but the pharmacy still dispensed metoprolol last month (PHM-EX0006).",
+      "detail": {},
+      "evidence": [
+        {
+          "source": "emr",
+          "row_id": "EMR-EX0005",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "emr",
+            "row_id": "EMR-EX0005",
+            "record_kind": "discharge_summary",
+            "med_text": "metoprolol",
+            "status_text": "ceased",
+            "note_text": "switched to bisoprolol 2.5 mg"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-EX0006",
+          "sql_template_id": "Q2",
+          "query_id": "q-0003",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-EX0006",
+            "med_text": "Betaloc",
+            "strength_text": "50 mg",
+            "qty": "60",
+            "days_supply": "30"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "present",
+        "gp": "absent_in_scope",
+        "pharmacy": "present",
+        "patient": "unknown"
+      },
+      "tasks": [
+        "Tell the community pharmacy about the discharge change"
+      ],
+      "needs_pharmacist": false,
+      "trust_explanation": [],
+      "hmem_record_ids": []
+    }
+  ],
+  "notices": [
+    {
+      "type": "possible_second_pharmacy",
+      "detail": "Denosumab is on the GP list but never dispensed here; a second pharmacy or clinic may supply it.",
+      "source": "pharmacy",
+      "generic": "denosumab",
+      "row_ids": [],
+      "tasks": [
+        "Ask the patient about other pharmacies"
+      ]
+    },
+    {
+      "type": "patient_only_item",
+      "detail": "Over-the-counter item reported only by the patient; kept, verify the dose.",
+      "source": "patient",
+      "generic": "fish oil",
+      "row_ids": [
+        "PAT-EX0001"
+      ],
+      "tasks": [
+        "Verify the fish oil dose"
+      ]
+    },
+    {
+      "type": "conflict_abstained",
+      "detail": "Warfarin daily dose: sources disagree within the margin. Conflict: ask patient.",
+      "source": null,
+      "generic": "warfarin",
+      "row_ids": [
+        "GP-EX0001",
+        "PHM-EX0001",
+        "PHM-EX0002"
+      ],
+      "tasks": []
+    },
+    {
+      "type": "stale_document",
+      "detail": "GP medication list last updated 2 months ago (23/08/2026).",
+      "source": "gp",
+      "generic": null,
+      "row_ids": [],
+      "tasks": []
+    },
+    {
+      "type": "known_shortage",
+      "detail": "Known shortage listed for some famotidine products (TGA database is incomplete).",
+      "source": null,
+      "generic": "famotidine",
+      "row_ids": [],
+      "tasks": []
+    }
+  ],
+  "tasks": [
+    "Ask the patient about diclofenac",
+    "Ask the patient about other pharmacies",
+    "Ask the patient whether they still take famotidine",
+    "Chart famotidine or document why not",
+    "Check for double ACE-inhibitor dosing",
+    "Check the latest INR",
+    "Confirm IR vs CR with the patient and prescriber",
+    "Confirm current warfarin dose with patient or INR book",
+    "Confirm the current escitalopram dose",
+    "Confirm the route with the patient",
+    "Confirm the second pharmacy record is this patient",
+    "Confirm whether Jardiamet is withheld deliberately (e.g. fasting, contrast)",
+    "Confirm whether pantoprazole was started in hospital",
+    "Tell the community pharmacy about the discharge change",
+    "Verify the fish oil dose"
+  ],
+  "identity_review": null,
+  "evidence_index": {
+    "GP-000003": {
+      "source": "gp",
+      "row_id": "GP-000003",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-000003",
+        "source_patient_id": "GPP000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "Marjorie",
+        "name_family": "Lee",
+        "name_previous": "",
+        "dob_text": "24/02/1951",
+        "sex": "Female",
+        "postcode": "2319",
+        "record_kind": "gp_list",
+        "doc_date": "23/08/2026",
+        "med_text": "Pepcidine 20 mg",
+        "med_code": "SYN-AMT-MPP-0048",
+        "code_system": "amt",
+        "strength_text": "20 mg",
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "morning and night",
+        "status_text": "active",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PHM-000007": {
+      "source": "pharmacy",
+      "row_id": "PHM-000007",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-000007",
+        "source_patient_id": "C000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "LEE, Marjorie",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1951-02-24",
+        "sex": null,
+        "postcode": "2319",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": "Pepcidine",
+        "med_code": "15047Y",
+        "code_system": "pbs",
+        "strength_text": "20 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "120",
+        "days_supply": "60",
+        "pharmacy_id": "PHX07",
+        "script_type": "PBS"
+      }
+    },
+    "GP-000006": {
+      "source": "gp",
+      "row_id": "GP-000006",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-000006",
+        "source_patient_id": "GPP000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "Marjorie",
+        "name_family": "Lee",
+        "name_previous": "",
+        "dob_text": "24/02/1951",
+        "sex": "Female",
+        "postcode": "2319",
+        "record_kind": "gp_list",
+        "doc_date": "23/08/2026",
+        "med_text": "Jardiamet 12.5/1000 mg",
+        "med_code": "SYN-AMT-MPP-0074",
+        "code_system": "amt",
+        "strength_text": "12.5/1000 mg",
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "morning and night",
+        "status_text": "active",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PHM-000032": {
+      "source": "pharmacy",
+      "row_id": "PHM-000032",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-000032",
+        "source_patient_id": "C000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "LEE, Marjorie",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1951-02-24",
+        "sex": null,
+        "postcode": "2319",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": "Jardiamet",
+        "med_code": "10633P",
+        "code_system": "pbs",
+        "strength_text": "12.5/1000 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "60",
+        "days_supply": "30",
+        "pharmacy_id": "PHX07",
+        "script_type": "PBS"
+      }
+    },
+    "GP-EX0001": {
+      "source": "gp",
+      "row_id": "GP-EX0001",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-EX0001",
+        "med_text": "warfarin 5 mg",
+        "freq_text": "one at night",
+        "status_text": "active"
+      }
+    },
+    "PHM-EX0001": {
+      "source": "pharmacy",
+      "row_id": "PHM-EX0001",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-EX0001",
+        "med_text": "Marevan",
+        "strength_text": "1 mg",
+        "qty": "50",
+        "days_supply": null
+      }
+    },
+    "PHM-EX0002": {
+      "source": "pharmacy",
+      "row_id": "PHM-EX0002",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-EX0002",
+        "med_text": "Marevan",
+        "strength_text": "5 mg",
+        "qty": "50",
+        "days_supply": null
+      }
+    },
+    "EMR-EX0001": {
+      "source": "emr",
+      "row_id": "EMR-EX0001",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-EX0001",
+        "med_text": "oxycodone",
+        "strength_text": "10 mg",
+        "freq_text": "1 bd"
+      }
+    },
+    "PHM-EX0003": {
+      "source": "pharmacy",
+      "row_id": "PHM-EX0003",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-EX0003",
+        "med_text": "OxyContin",
+        "strength_text": "10 mg",
+        "qty": "28",
+        "days_supply": "14"
+      }
+    },
+    "PHM-EX0007": {
+      "source": "pharmacy",
+      "row_id": "PHM-EX0007",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-EX0007",
+        "med_text": "Lipitor",
+        "strength_text": "80 mg",
+        "qty": "30",
+        "days_supply": "30"
+      }
+    },
+    "EMR-000005": {
+      "source": "emr",
+      "row_id": "EMR-000005",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000005",
+        "source_patient_id": "MRN0000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "Marjorie",
+        "name_family": "Lee",
+        "name_previous": null,
+        "dob_text": "1951-02-24",
+        "sex": "F",
+        "postcode": "2319",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": "escitalopram",
+        "med_code": "SYN-AMT-MP-0032",
+        "code_system": "amt",
+        "strength_text": "10 mg",
+        "dose_text": "10.0",
+        "route_text": "PO",
+        "freq_text": "1 daily",
+        "status_text": "",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "GP-EX0002": {
+      "source": "gp",
+      "row_id": "GP-EX0002",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-EX0002",
+        "med_text": "escitalopram 20 mg",
+        "freq_text": "one a day",
+        "status_text": "active"
+      }
+    },
+    "PHM-000001": {
+      "source": "pharmacy",
+      "row_id": "PHM-000001",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-000001",
+        "source_patient_id": "C000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "LEE, Marjorie",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1951-02-24",
+        "sex": null,
+        "postcode": "2319",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": "Coversyl Plus",
+        "med_code": "13413Y",
+        "code_system": "pbs",
+        "strength_text": "5/1.25 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "60",
+        "days_supply": "60",
+        "pharmacy_id": "PHX07",
+        "script_type": "PBS"
+      }
+    },
+    "GP-EX0003": {
+      "source": "gp",
+      "row_id": "GP-EX0003",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-EX0003",
+        "med_text": "perindopril 5 mg",
+        "freq_text": "one a day",
+        "status_text": "active"
+      }
+    },
+    "EMR-EX0002": {
+      "source": "emr",
+      "row_id": "EMR-EX0002",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-EX0002",
+        "med_text": "pantoprazole",
+        "strength_text": "40 mg",
+        "freq_text": "1 daily"
+      }
+    },
+    "GP-EX0004": {
+      "source": "gp",
+      "row_id": "GP-EX0004",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-EX0004",
+        "med_text": "diclofenac 50 mg",
+        "status_text": "active"
+      }
+    },
+    "PHM-EX0004": {
+      "source": "pharmacy",
+      "row_id": "PHM-EX0004",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-EX0004",
+        "med_text": "Voltaren",
+        "strength_text": "50 mg",
+        "qty": "30",
+        "days_supply": "30"
+      }
+    },
+    "EMR-EX0003": {
+      "source": "emr",
+      "row_id": "EMR-EX0003",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-EX0003",
+        "med_text": "metformin",
+        "strength_text": "500 mg",
+        "freq_text": "1 tds",
+        "note_text": "changed to tds for GI tolerance"
+      }
+    },
+    "GP-EX0005": {
+      "source": "gp",
+      "row_id": "GP-EX0005",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-EX0005",
+        "med_text": "metformin 750 mg",
+        "freq_text": "morning and night"
+      }
+    },
+    "EMR-EX0004": {
+      "source": "emr",
+      "row_id": "EMR-EX0004",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-EX0004",
+        "med_text": "methotrexate",
+        "route_text": "oral",
+        "freq_text": "weekly"
+      }
+    },
+    "PHM-EX0005": {
+      "source": "pharmacy",
+      "row_id": "PHM-EX0005",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-EX0005",
+        "med_text": "Metoject",
+        "route_text": "subcut",
+        "qty": "4",
+        "days_supply": "28"
+      }
+    },
+    "EMR-EX0005": {
+      "source": "emr",
+      "row_id": "EMR-EX0005",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-EX0005",
+        "record_kind": "discharge_summary",
+        "med_text": "metoprolol",
+        "status_text": "ceased",
+        "note_text": "switched to bisoprolol 2.5 mg"
+      }
+    },
+    "PHM-EX0006": {
+      "source": "pharmacy",
+      "row_id": "PHM-EX0006",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-EX0006",
+        "med_text": "Betaloc",
+        "strength_text": "50 mg",
+        "qty": "60",
+        "days_supply": "30"
+      }
+    },
+    "EMR-000002": {
+      "source": "emr",
+      "row_id": "EMR-000002",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000002",
+        "source_patient_id": "MRN0000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "Marjorie",
+        "name_family": "Lee",
+        "name_previous": null,
+        "dob_text": "1951-02-24",
+        "sex": "F",
+        "postcode": "2319",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": "amlodipine",
+        "med_code": "SYN-AMT-MP-0004",
+        "code_system": "amt",
+        "strength_text": "5 mg",
+        "dose_text": "5.0",
+        "route_text": "PO",
+        "freq_text": "1 daily",
+        "status_text": "",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "GP-000002": {
+      "source": "gp",
+      "row_id": "GP-000002",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-000002",
+        "source_patient_id": "GPP000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "Marjorie",
+        "name_family": "Lee",
+        "name_previous": "",
+        "dob_text": "24/02/1951",
+        "sex": "Female",
+        "postcode": "2319",
+        "record_kind": "gp_list",
+        "doc_date": "23/08/2026",
+        "med_text": "amlodipine 5 mg",
+        "med_code": "SYN-AMT-MPP-0026",
+        "code_system": "amt",
+        "strength_text": "5 mg",
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "active",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PHM-000005": {
+      "source": "pharmacy",
+      "row_id": "PHM-000005",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-000005",
+        "source_patient_id": "C000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "LEE, Marjorie",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1951-02-24",
+        "sex": null,
+        "postcode": "2319",
+        "record_kind": "dispense",
+        "doc_date": "2025-12-20",
+        "med_text": "Norvasc",
+        "med_code": "13532F",
+        "code_system": "pbs",
+        "strength_text": "5 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "60",
+        "days_supply": "60",
+        "pharmacy_id": "PHX07",
+        "script_type": "PBS"
+      }
+    },
+    "EMR-000003": {
+      "source": "emr",
+      "row_id": "EMR-000003",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000003",
+        "source_patient_id": "MRN0000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "Marjorie",
+        "name_family": "Lee",
+        "name_previous": null,
+        "dob_text": "1951-02-24",
+        "sex": "F",
+        "postcode": "2319",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": "pregabalin",
+        "med_code": "SYN-AMT-MP-0072",
+        "code_system": "amt",
+        "strength_text": "75 mg",
+        "dose_text": "75.0",
+        "route_text": "PO",
+        "freq_text": "1 bd",
+        "status_text": "",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "GP-000004": {
+      "source": "gp",
+      "row_id": "GP-000004",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-000004",
+        "source_patient_id": "GPP000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "Marjorie",
+        "name_family": "Lee",
+        "name_previous": "",
+        "dob_text": "24/02/1951",
+        "sex": "Female",
+        "postcode": "2319",
+        "record_kind": "gp_list",
+        "doc_date": "23/08/2026",
+        "med_text": "Lyrica 75 mg",
+        "med_code": "SYN-AMT-MPP-0059",
+        "code_system": "amt",
+        "strength_text": "75 mg",
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "morning and night",
+        "status_text": "active",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PHM-000014": {
+      "source": "pharmacy",
+      "row_id": "PHM-000014",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-000014",
+        "source_patient_id": "C000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "LEE, Marjorie",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1951-02-24",
+        "sex": null,
+        "postcode": "2319",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": "Lyrica",
+        "med_code": "2335X",
+        "code_system": "pbs",
+        "strength_text": "75 mg",
+        "dose_text": null,
+        "route_text": "capsule",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "56",
+        "days_supply": "28",
+        "pharmacy_id": "PHX07",
+        "script_type": "PBS"
+      }
+    },
+    "EMR-000004": {
+      "source": "emr",
+      "row_id": "EMR-000004",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000004",
+        "source_patient_id": "MRN0000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "Marjorie",
+        "name_family": "Lee",
+        "name_previous": null,
+        "dob_text": "1951-02-24",
+        "sex": "F",
+        "postcode": "2319",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": "rosuvastatin",
+        "med_code": "SYN-AMT-MP-0077",
+        "code_system": "amt",
+        "strength_text": "20 mg",
+        "dose_text": "20.0",
+        "route_text": "PO",
+        "freq_text": "1 daily",
+        "status_text": "",
+        "note_text": "withheld: hypotension",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "GP-000005": {
+      "source": "gp",
+      "row_id": "GP-000005",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-000005",
+        "source_patient_id": "GPP000001",
+        "ihi_syn": "SYN-166926809857",
+        "name_given": "Marjorie",
+        "name_family": "Lee",
+        "name_previous": "",
+        "dob_text": "24/02/1951",
+        "sex": "Female",
+        "postcode": "2319",
+        "record_kind": "gp_list",
+        "doc_date": "23/08/2026",
+        "med_text": "rosuvastatin 20 mg",
+        "med_code": "SYN-AMT-MPP-0029",
+        "code_system": "amt",
+        "strength_text": "20 mg",
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "active",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-EX0001": {
+      "source": "patient",
+      "row_id": "PAT-EX0001",
+      "sql_template_id": "Q2",
+      "query_id": "q-0003",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-EX0001",
+        "med_text": "fish oil 1000 mg"
+      }
+    }
+  },
+  "trust": [
+    {
+      "source": "emr",
+      "attribute": "actually_taking",
+      "value": 0.4,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-emr-actually_taking"
+    },
+    {
+      "source": "emr",
+      "attribute": "daily_dose",
+      "value": 0.7,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-emr-daily_dose"
+    },
+    {
+      "source": "emr",
+      "attribute": "existence",
+      "value": 0.65,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-emr-existence"
+    },
+    {
+      "source": "emr",
+      "attribute": "intended_dose",
+      "value": 0.7,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-emr-intended_dose"
+    },
+    {
+      "source": "emr",
+      "attribute": "strength",
+      "value": 0.75,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-emr-strength"
+    },
+    {
+      "source": "gp",
+      "attribute": "actually_taking",
+      "value": 0.45,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-gp-actually_taking"
+    },
+    {
+      "source": "gp",
+      "attribute": "daily_dose",
+      "value": 0.7,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-gp-daily_dose"
+    },
+    {
+      "source": "gp",
+      "attribute": "existence",
+      "value": 0.6,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-gp-existence"
+    },
+    {
+      "source": "gp",
+      "attribute": "intended_dose",
+      "value": 0.75,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-gp-intended_dose"
+    },
+    {
+      "source": "gp",
+      "attribute": "strength",
+      "value": 0.75,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-gp-strength"
+    },
+    {
+      "source": "patient",
+      "attribute": "actually_taking",
+      "value": 0.8,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-patient-actually_taking"
+    },
+    {
+      "source": "patient",
+      "attribute": "daily_dose",
+      "value": 0.4,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-patient-daily_dose"
+    },
+    {
+      "source": "patient",
+      "attribute": "existence",
+      "value": 0.8,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-patient-existence"
+    },
+    {
+      "source": "patient",
+      "attribute": "intended_dose",
+      "value": 0.35,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-patient-intended_dose"
+    },
+    {
+      "source": "patient",
+      "attribute": "strength",
+      "value": 0.3,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-patient-strength"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "actually_taking",
+      "value": 0.7,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-pharmacy-actually_taking"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "daily_dose",
+      "value": 0.55,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-pharmacy-daily_dose"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "existence",
+      "value": 0.85,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-pharmacy-existence"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "intended_dose",
+      "value": 0.5,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-pharmacy-intended_dose"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "strength",
+      "value": 0.9,
+      "uncertainty": 0.15,
+      "hmem_record_id": "hm-pharmacy-strength"
+    }
+  ],
+  "trace": [
+    {
+      "timestamp": "2026-10-24T22:00:00+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Planner",
+      "action": "plan",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PLAN",
+      "message": "Plan: find the patient in GP, pharmacy and interview records, then compare medicines.",
+      "route": "meterless/fast",
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:04+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Executor",
+      "action": "find_identities",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "Found Marjorie Lee in all four sources; the interview says 'Marj' (nickname), linked.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:08+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Executor",
+      "action": "coverage",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "COVERAGE",
+      "message": "Found in 4 of 4 sources.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:12+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Executor",
+      "action": "fetch_meds",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FETCH_MEDS",
+      "message": "Fetched 96 medication rows across 4 sources in one query.",
+      "route": null,
+      "latency_ms": 2600,
+      "tokens": null,
+      "sql": "<Q2: medtrace.all_sources for 4 linked records>",
+      "row_count": 96,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:16+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Executor",
+      "action": "normalise",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "NORMALISE",
+      "message": "Normalised 96 rows: 88 by code or lexicon, 6 fuzzy, 2 left for the model.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:20+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Executor",
+      "action": "resolve_free_text",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "RESOLVE_FREE_TEXT",
+      "message": "Resolved 2 free-text lines in one model call, choosing only from lexicon candidates.",
+      "route": "meterless/fast",
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:24+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Evaluator",
+      "action": "fuse",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FUSE",
+      "message": "Built the BPMH grid: 18 medicines; warfarin dose abstained (sources disagree).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:28+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Evaluator",
+      "action": "detect",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "DETECT",
+      "message": "12 candidate discrepancies; 3 brand-only differences suppressed.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:32+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Evaluator",
+      "action": "prioritise",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PRIORITISE",
+      "message": "Ranked findings: 3 must-review (warfarin, oxycodone, identity).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:36+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Writer",
+      "action": "draft",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "DRAFT",
+      "message": "Drafted explanations for 12 findings.",
+      "route": "meterless/deep",
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:40+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Evaluator",
+      "action": "verify",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "VERIFY",
+      "message": "Re-checked every cited number against the rows in one query (Q3).",
+      "route": null,
+      "latency_ms": 1900,
+      "tokens": null,
+      "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE row_id IN ('GP-000003', 'PHM-000007')",
+      "row_count": 22,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:44+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Evaluator",
+      "action": "verify",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "blocked",
+      "step": "VERIFY",
+      "message": "Verifier blocked an unsupported claim: 'patient stopped aspirin' (no row says so).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:48+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Evaluator",
+      "action": "critique",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "CRITIQUE",
+      "message": "Critique: every sentence now maps to a finding with evidence.",
+      "route": "meterless/deep",
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-24T22:00:52+00:00",
+      "run_id": "run-ex-p0001",
+      "agent_name": "Writer",
+      "action": "done",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "DONE",
+      "message": "Done: 12 findings, 6 notices, 9 tasks.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    }
+  ],
+  "query_count": 3,
+  "zetaris_ms": 6800,
+  "model_calls": [
+    {
+      "role": "Planner",
+      "requested_route": "meterless/fast",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "request_id": "req-ex-0001",
+      "tokens": {
+        "prompt_tokens": 1450,
+        "completion_tokens": 410
+      },
+      "truncated": false
+    },
+    {
+      "role": "Executor",
+      "requested_route": "meterless/fast",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "request_id": "req-ex-0002",
+      "tokens": {
+        "prompt_tokens": 980,
+        "completion_tokens": 260
+      },
+      "truncated": false
+    },
+    {
+      "role": "Writer",
+      "requested_route": "meterless/deep",
+      "routed_model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+      "request_id": "req-ex-0003",
+      "tokens": {
+        "prompt_tokens": 5200,
+        "completion_tokens": 2300
+      },
+      "truncated": false
+    },
+    {
+      "role": "Evaluator",
+      "requested_route": "meterless/deep",
+      "routed_model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+      "request_id": "req-ex-0004",
+      "tokens": {
+        "prompt_tokens": 4100,
+        "completion_tokens": 900
+      },
+      "truncated": false
+    }
+  ]
+}

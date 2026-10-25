@@ -49,7 +49,12 @@ SOURCE_TRUST_PRIORS: dict[tuple[str, str], float] = {
     ("emr", "name"): 0.90,        # registration-grade demographics
     ("emr", "admission_chart"): 0.60,   # [PLAN 2.5] where omissions live
     # -- GP practice summary ---------------------------------------------------
-    ("gp", "existence"): 0.60,    # [PLAN 2.5] stale listings
+    # [PLAN 2.5] stale listings. An ASSUMPTION, not a sourced figure: Elliott
+    # 2023's 16.9% is the commission rate of histories built from a prescription
+    # exchange (MedView), not of GP lists (consultant brief 13.2). Boyce 2013 and
+    # Chen 2018 support "GP lists retain stopped medicines" without giving a
+    # rate. Calibrate against a local audit.
+    ("gp", "existence"): 0.60,
     ("gp", "daily_dose"): 0.70,
     ("gp", "frequency"): 0.70,
     ("gp", "release"): 0.60,
@@ -69,7 +74,12 @@ SOURCE_TRUST_PRIORS: dict[tuple[str, str], float] = {
     ("pharmacy", "actually_taking"): 0.70,   # collecting it is behaviour, not ingestion
     ("pharmacy", "name"): 0.60,         # one free-text "SMITH, Margaret" field
     # -- Patient or carer interview -------------------------------------------
-    ("patient", "existence"): 0.65,     # the only source for OTC and complementary
+    # The BPMH is by definition what the patient ACTUALLY took (High 5s SOP
+    # step 2; SHPA ch.1 p.S7), so "I stopped it" must outrank an active GP
+    # listing (consultant brief 13.2). Was 0.65, below the GP's 0.60 once the
+    # GP's recency was counted. Silence is still discounted separately
+    # (fuse.SILENCE_WEIGHT).
+    ("patient", "existence"): 0.80,
     ("patient", "daily_dose"): 0.40,
     ("patient", "frequency"): 0.45,
     ("patient", "release"): 0.20,       # nobody knows if their oxycodone is CR

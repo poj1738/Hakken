@@ -1,53 +1,44 @@
-# Hakken Agent
+# MedTrace — Hakken Agent
 
-> **Work in progress: Open Agent Hackathon 2026, team Hakken.**
+> **Work in progress: Open Agent Hackathon 2026, team Hakken. Track 1.**
 >
-> **Only two things are built: the preflight script and the config layer.** There is no
-> agent, no data pipeline, no UI. The track is not chosen yet. Everything else in this
-> repo is scaffolding with honest stubs, and the sections marked **TBD** are deliberately
-> empty rather than aspirational. `TODO.md` lists what is left.
+> **The data pipeline and the clinical logic are built and measured. The agent loop,
+> API and UI are not finished yet.** Everything below says which is which. The
+> sections marked **TBD** are deliberately empty rather than aspirational.
 
 Team Hakken (Anshuman, Arpon, Arnav).
 
-The intent is a track-agnostic template, so that choosing a track later means writing a
-*domain pack* (data sources, prompts, output schema) rather than rewriting plumbing.
-That is the plan, not yet an achievement.
+**100% synthetic data. Not medical advice.** No real patient record is used anywhere.
 
 ## One-line pitch
 
-TBD — set when the track is chosen.
+MedTrace reconciles an admitted patient's pre-admission medicines across four
+systems that don't talk to each other: the hospital EMR, the GP, the community
+pharmacy and the bedside interview. It queries every source through Zetaris, says
+"unknown" rather than "not taking" when a source is missing, ranks discrepancies so
+high-risk ones reach the pharmacist first, and learns from the pharmacist which
+source to trust.
 
 ## What actually works today
 
-Two pieces of working code:
-
 | Piece | State |
 |---|---|
-| `scripts/preflight.py` (`make preflight`) | **works.** Read-only. Checks tooling, which env-var *names* are set, Zetaris REST reachability, and the Meterless Nightshift provider contract. Last run **22 pass / 0 fail on Arpon's machine, 23 Oct**; run it on your own. |
-| `app/config.py` | **works.** Validated settings; secrets held as `SecretStr` so they cannot leak through `repr`/`str`/`model_dump`; `safe_dump()` reports presence only. |
-| `scripts/secret_scan.py` (`make scan`) | **works.** 8 patterns, installed as a pre-commit hook, verified to block a commit. Supporting, not a product feature. |
+| **Synthetic data** (`scripts/generate_synthetic.py`, `make synth`) | **works.** 200 seeded patients across four silos, ~13,900 rows, with planted discrepancies and identity traps, and a ground-truth answer key. Real Australian medicine reference data (PBS, ATC, APINCHS). See `docs/DATA_SPEC.md`. |
+| **Zetaris data layer** (`scripts/register_sources.py`) | **works on Arpon's machine.** Four silos registered as REST tables, a harmonised `medtrace.all_sources` view, and every query template verified live against committed fixtures. Each query takes about 2–3 s at 200 patients. |
+| **Clinical domain pack** (`app/domain/packs/medtrace/`) | **works.** Identity linkage, normalisation, coverage, trust-weighted fusion, discrepancy detection, the safety gate and triage. Real code, no model calls. |
+| **Detector scorecard** (`scripts/eval.py`) | **works.** Scores the real chain against the answer key. Held-out, with simulated pharmacist review: **precision 0.95, recall 0.95, F1 0.95** (today's code prints recall 0.97 / F1 0.96, which includes one fix found while studying held-out misses; 0.95 is the clean figure, `docs/DECISIONS.md`); core APINCHS high-risk recall **30/32** (95% CI 0.80–0.98); **0 false merges** across 200 patients. Pinned by tests. |
+| **Sample inputs** (`input_examples/`) | **five**, each with replay fixtures and a written expected outcome, including a staged learning-demo pair (see `docs/DECISIONS.md`). |
+| `scripts/preflight.py`, `app/config.py`, `scripts/secret_scan.py` | **work.** Preflight, validated settings with secrets as `SecretStr`, and a pre-commit secret scan. |
 
-### What is verified but *not* built
+### Not finished
 
-Reachability is not a feature. The preflight proved these services answered **on one
-machine on one day**; **no application code uses either one yet**, and no other
-teammate has run them (see `docs/ENVIRONMENTS.md`).
-
-| | Observed on Arpon's machine, 23 Oct 2026 | Built? |
-|---|---|---|
-| Meterless Nightshift | state `online`; a request on `meterless/auto` was answered by `nvidia/nemotron-3.5-super-vl-120b-a12b`, returning a plain string | **no** — `app/adapters/meterless.py` is a stub |
-| Zetaris | `SELECT 1` → `1`; catalogue discovery worked; the response envelope is recorded from that instance in `tests/fixtures/zetaris/` | **no** — `app/adapters/zetaris.py` is a stub |
-
-### Not started
-
-Agents, the orchestrator and its critique loop, H-MEM, World Model, tracing, the
-synthetic data pipeline, `datasvc`, sample mode, the web UI, and the Docker run path.
-`run.py` exits non-zero and says so. The Dockerfile and `docker-compose.yml` are
-written but **have never been built or run**.
-
-Nothing here fakes a result: the stubs raise `NotImplementedError` or exit non-zero
-rather than returning plausible-looking output. 52 tests cover the config layer and the
-secret scanner — nothing else, because nothing else exists.
+The Zetaris and Meterless **adapters**, the agent loop (Planner → Executor →
+Evaluator → Writer), the H-MEM and World Model engines, `POST /run`, `run.py`,
+`SAMPLE_MODE`, and the Docker run path. `run.py` exits non-zero and says
+so. The **web UI** (`web/`) is built but runs only in mock mode, against hand-written
+example responses in `tests/fixtures/api/`. It has not been run against a live API,
+because none exists yet. No model call goes through Nightshift in the product yet. Nothing here fakes a
+result: the stubs raise `NotImplementedError` or exit non-zero.
 
 ## Quickstart
 
@@ -55,10 +46,21 @@ secret scanner — nothing else, because nothing else exists.
 make setup                      # .venv, pinned deps, pre-commit hook
 cp .env.example .env            # then fill it in yourself
 make preflight                  # read-only: what is reachable and what is missing
-make test
+make test                       # passes; ~43 tests skip until you build the data below
 ```
 
-Docker (Phase 5, not yet verified):
+Build the data (no network needed) and run the full suite, scorecard included:
+
+```bash
+make lexicon                    # reference tables; PBS codes stay synthetic without `make data`
+make synth                      # 200 synthetic patients; uses the committed lexicon, so the
+                                # committed fixtures come out byte-identical
+make test                       # now nothing skips for missing data
+.venv/bin/python scripts/eval.py --split heldout   # the scorecard
+```
+
+Docker: **not working yet.** The image builds, but `run.py serve` exits 2 with "not
+implemented yet" until the API lands. The intended commands, once it does:
 
 ```bash
 docker compose up --build
@@ -100,9 +102,13 @@ least one critique → revise loop, all bounded.
 
 ## Data sources
 
-TBD — synthetic only, three fragmented "silos" with deliberate inconsistencies to
-reconcile. Documented in `docs/DATA_SOURCES.md` with origin, licence and how to
-regenerate. See `docs/DECISIONS.md` for why each silo is served whole at one URL.
+Synthetic patients only, in four silos (hospital EMR, GP, pharmacy, patient
+interview), generated by `scripts/generate_synthetic.py` with a fixed seed. The
+medicine reference data is real and public: PBS items, WHO ATC codes and the ACSQHC
+APINCHS high-risk classes. Origin, licence and how to regenerate are in
+`docs/DATA_SOURCES.md` and `docs/DATA_LICENCES.md`; the data model is in
+`docs/DATA_SPEC.md`. The sponsor's pre-existing `NY_TAXI` and `TPCDS_DB` databases
+are not used.
 
 ## Sample mode
 
@@ -141,21 +147,31 @@ and its conformance runner disagree.
   is ported yet; when it is, each ported test file will carry an Apache-2.0 attribution
   header. The Zetaris REST call shape in our (stubbed) adapter follows that project's
   reference client, and four real Zetaris responses are recorded as test fixtures.
-- **Data:** none generated yet. The plan is synthetic only, seeded and deterministic
-  so any reviewer can reproduce it. The Zetaris instance carries the sponsor's own
-  pre-existing sample databases, declared in `docs/PREEXISTING.md` and currently unused.
+- **Data:** synthetic only, seeded and deterministic: `make lexicon && make synth`
+  reproduces the committed data exactly, and CI checks that on every push. Real PBS
+  codes come from the committed lexicon; rebuilding them needs `make data` (a
+  rate-limited PBS API fetch) plus a manual download of the data.gov.au PBS Item
+  Report (`docs/DATA_LICENCES.md` §5). The Zetaris instance carries the sponsor's own
+  pre-existing sample databases, declared in `docs/PREEXISTING.md` and unused.
 
 ## Responsible use
 
-Synthetic data only. No real personal, clinical or financial records — and at present
-no data at all. If a medical domain pack is chosen, the safety layer *to be built* is:
-small-cell suppression, causal-language caveats, a human-review flag on high-risk
-outputs, and a clear **not medical advice** disclaimer. None of it is implemented yet.
+Synthetic data only; no real personal, clinical or financial records. **Not medical
+advice:** MedTrace drafts a reconciliation for a pharmacist to review and never
+changes a chart itself. Built in the domain pack: an identity near-miss stops for a
+human before any of that record is read; a missing source is shown as *unknown*,
+never as "not taking"; high-risk (APINCHS) medicines are ranked first; a dose that
+can't be confirmed (warfarin, insulin, prednisolone, methotrexate) becomes a task to
+confirm with the patient, not a guess; and every finding must cite the source rows
+it rests on, or the safety gate blocks it. The UI shows the disclaimer on every screen.
 
 ## Limitations
 
-- **The product does not exist yet.** Two scripts and a config layer work; the agent,
-  data layer, engines and UI are unbuilt.
+- **The product is not finished.** The data layer and clinical logic work and are
+  measured; the agent loop, engines and API are unbuilt, and the UI has only run against example responses.
+- Scores come from synthetic patients and a simulated pharmacist review. They show the
+  logic does what it was designed to do, not how it performs on real records. 32 core
+  high-risk cases cannot support a "100% recall" claim, and we don't make one.
 - The Zetaris and Meterless *adapters* are stubs. Both services and the Zetaris
   response envelope were verified on **one machine on one day** (Arpon's, 23 Oct) and
   on no other; see `docs/ENVIRONMENTS.md` for who can currently run what.

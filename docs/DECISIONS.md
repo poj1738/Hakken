@@ -11,6 +11,281 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-25 — SAMPLE_MODE never replays model text; recorded Nightshift responses are parser fixtures only
+
+**Decision.** When `SAMPLE_MODE=true`, `MeterlessClient` never contacts Nightshift.
+Each call site passes a deterministic `offline` function. Its output is
+schema-validated like a real answer and recorded with the model id `offline-heuristic`,
+in `ModelCall.routed_model` and in the trace. With no `offline` function, the call
+refuses (`MeterlessError("sample_mode")`) rather than inventing text.
+`tests/fixtures/meterless/` holds real recorded responses, used only to test the
+adapter's parsing.
+
+**Why.** Arnav's session brief said to replay recorded responses in SAMPLE_MODE. The
+README ("Sample mode") and `TODO.md` already commit, in front of judges, to an offline
+reasoner that "does not replay saved model text". Replaying saved text would make an
+output that doesn't change with its input (CLAUDE.md rule 6) for any prompt not
+recorded verbatim. The repo wins, and the brief is noted in HANDOFF.
+
+## 2026-10-25 — Arnav's Nightshift: routes still coerced, local models listed, reasoning tokens high **[live — Arnav's machine, 25 Oct, Windows build]**
+
+These are observations through the new adapter. Five calls, so take them as indications, not a distribution.
+- **`meterless/deep` was answered by `nvidia/nemotron-3.5-lightning-30b-a3b`**, and so
+  were `meterless/auto` and `meterless/fast`. This matches Arpon's 24 Oct finding:
+  the route is intent, not selection.
+- **This runtime also lists `local-runtime/*` models** (qwen3.6-35b, gpt-oss-20b,
+  llama-3.2-3b, phi-4-mini). `meterless/auto` *can* therefore route to a non-NVIDIA
+  model, so the NVIDIA evidence must come from `routed_model` per call, never from
+  configuration. Every call so far went to Nemotron.
+- **Hidden reasoning is expensive.** "In one sentence…" cost 502 completion tokens on
+  one call and 1,494 on another, which took 12.5 s. `DEFAULT_MAX_TOKENS` is 8192, and
+  the adapter refuses anything below 512.
+- **The receipt shape differs from Arpon's build.** There is no `routing` block. It adds
+  `job`, `lineage`, `mcp` and a non-null `receipt_envelope`, which carries build hashes
+  (redacted in the fixtures; they're secret-shaped). `receipt_summary()` reads every
+  field as optional.
+
+## 2026-10-25 — TGA use cleared and Q4 switched on; identity evidence carries a verdict **[consultant + team decision, 25 Oct]**
+
+**TGA.** The team's consultant confirmed that using the TGA Medicine Shortage Reports
+export in this hackathon is unrestricted because the use is non-commercial. So
+`datasvc` now serves `/ref/tga`, its guard test changed from "not served" to "served
+only now it is cleared", and `register_sources.py --with-tga` (and `--refresh
+--with-tga`) is the documented path. The export stays gitignored and is never committed;
+anything beyond local, non-commercial demo use needs the question asked again
+(`docs/DATA_LICENCES.md` §4). Registering the table in Zetaris needs a human to run the
+command (the agent's permission check blocks creating Zetaris objects).
+
+**The repo stays public.** The team chose this on 25 Oct; it had been public before the
+question came up.
+
+**Identity evidence.** Every `IdentityLink.field_evidence` sentence now starts with
+`agrees:`, `partial:`, `differs:` or `held:` (`identity.EVIDENCE_VERDICTS`), taken from the
+score itself: full agreement weight, part credit (nickname, sound-alike surname,
+day/month swap) or disagreement weight. The UI was colouring fields by keywords in the
+prose, and "surname sounds the same" contains none. `types.py` stays frozen; the
+contract is in the string, and pinned by
+`test_every_evidence_sentence_starts_with_a_verdict_the_ui_can_read`.
+
+## 2026-10-25 — A judge's clean clone now reproduces the data exactly, and CI proves it **[judge-clone audit, 25 Oct]**
+
+A subagent walked a fresh clone through the README. The main path worked, but the
+README's own `make lexicon && make synth` **rewrote 21 committed fixtures** (real PBS
+codes became synthetic, because the PBS snapshot is gitignored) and two tests then
+failed. The scorecard's 7 tests **skipped on every clean clone and in CI**, so the
+headline numbers were never checked there.
+
+**Fix:** the generator uses `data/reference/lexicon.json` only if it carries real PBS
+codes, and otherwise the committed `Q_REF__lexicon.json` (the exact lexicon Zetaris
+serves). `build_lexicon.py` no longer overwrites the committed lexicon fixtures with
+an all-synthetic build. Verified in the clean clone: after `make lexicon && make synth`
+every committed fixture and `ground_truth.json` is byte-identical, and the full suite
+passes with nothing skipped for missing data. **CI now runs both builds and
+`git diff --exit-code`**, so the data's reproducibility and the scorecard are checked on
+every push.
+
+Also from the audit: honest `make examples` / `validate` / `conformance` (they said
+"no such file"; now "not implemented yet", exit 2); README Quickstart labels Docker as
+not working yet and documents the data build; `python3` in the docs (bare `python` does
+not exist on stock macOS); `metadata.json` marks entry points and sample mode as not
+implemented and lists the pre-existing components; a `.dockerignore`, so local data and
+`.env` cannot be baked into the image; `PIP_DEFAULT_TIMEOUT` for slow networks. The
+unmodified `docker build` could not be completed on this machine (pip timed out on a
+slow Docker network); every later step was confirmed with pre-downloaded wheels.
+
+## 2026-10-25 — Q4 written but switched off: the TGA licence is unconfirmed **[measured + web check, 25 Oct]**
+
+**Q4 is written.** `queries.q_shortages(generics)` returns `Current` and `Anticipated`
+TGA reports whose active ingredients are **exactly** one of our medicines, with a
+computed `generic` column. Exactly matters: the export lists salts, and a shortage of
+Caduet (amlodipine + atorvastatin) is not an amlodipine shortage, so a single agent
+matches only one-ingredient reports, and a combination only reports with exactly its
+ingredients, by counting `|` separators with `LIKE`. Tested by running the generated SQL
+in SQLite against hand-made TGA-shaped rows (`tests/unit/test_shortages.py`), and the
+dialect checked live, read-only, against `medtrace.med_lexicon`: Zetaris accepted the
+`CASE`/`lower`/`LIKE` shape in 2.6 s. 36 of our medicines have a current or anticipated
+report in the 24 Oct export.
+
+**It is switched off.** We could not confirm a licence: TGA's copyright page timed out
+twice, and the only TGA notice found permits unaltered, personal or internal,
+non-commercial reproduction, which parsing breaks. `register_sources.py --with-tga` is
+off by default, `datasvc` keeps refusing `/ref/tga` (its test is unchanged), and the
+switch-on steps are in `docs/DATA_LICENCES.md` §4. Open question for the consultant.
+
+**Also found and fixed: committed PBS values without their copyright statement.** The
+replay fixture `Q_REF__lexicon.json` holds the whole served lexicon (224 rows, 203 real
+PBS codes), more than DATA_LICENCES' "≤200-row sample", and neither it nor
+`lexicon_sample.csv` carried the statement the PBS licence requires for redistribution.
+Values are unmodified, so redistribution is permitted; `PBS_COPYRIGHT.txt` now sits
+beside both, and the Docker image copies it with the fixtures.
+
+**Scorecard as data:** `scripts/eval.py --json` writes the scorecard, including a direct
+false-merge count: 0 among 286 held-out and 280 tune auto-merged records.
+
+## 2026-10-25 — Track 1, recorded **[team decision, 25 Oct]**
+
+The team chose **Track 1**. The product is MedTrace, as already built. Recorded in
+`metadata.json`, `README.md`, `TODO.md` and `PROGRESS.md`, which still said "track not
+chosen". The README status sections, which still claimed only a preflight script and a
+config layer existed, were rewritten to say what is built and measured (data,
+Zetaris registration, domain pack, scorecard) and what is not (adapters, agent loop,
+engines, API, UI). The official Track 1 title is not written anywhere in the repo, so
+it is recorded as "Track 1" rather than guessed.
+
+## 2026-10-25 — The learning demo is staged, and says so **[measured, 25 Oct]**
+
+**Problem.** PLAN's 2:15 beat ("reject a GP dose as outdated, then patient B
+resolves differently") had no patient B. I lowered GP `daily_dose` by one
+`source_outdated` rejection (−0.20, PLAN 5.7) and re-fused all 200 patients:
+3 changed their resolved dose (P0012, P0116, P0134), none in the replay set,
+and none gained or lost a finding. The beat would have shown nothing.
+
+**Decision.** Stage one pair, deterministically, on two replay-set patients
+that had no planted findings (`LEARNING_PAIR` in the generator): P0003 teaches,
+P0007 learns. The shape: a GP list 380 days old still carrying the pre-reduction
+dose, against a pharmacy fill at the current dose six days ago. At the priors,
+GP 0.70 × e^(−380/730) ≈ 0.42 against pharmacy 0.55 × e^(−6/180) ≈ 0.53, a
+margin of 0.12, so the dose abstains. After one rejection GP falls to about 0.30,
+the margin is 0.28, and the pharmacy wins. P0007's chart copied the stale GP dose,
+so resolving it surfaces a real chart error.
+
+**Why staged, not searched for or tuned.** Changing trust priors or the margin
+to make a random patient flip would move every score to serve a demo. Staging
+moves no prior, uses no rng, and adds no rows, so every other patient's rows and
+ids are byte-identical. It is recorded in the ground truth (`learning_demo`, and
+`detail.learning_demo` on P0007's planted dose finding), so nobody can present it
+as chance.
+
+**Cost, stated.** Without feedback the detector abstains on P0007's dose, so the
+tune scorecard carries one more miss: 145 TP / 17 FP / 5 FN (it was 4), F1 still
+0.93. Held-out is untouched (P0003 and P0007 are tune). That miss is the point:
+it is what the system cannot see until it learns.
+
+Pinned by `tests/unit/test_learning_demo.py` on the committed replay fixtures,
+so it runs in CI and is exactly what `SAMPLE_MODE` replays. Live Zetaris was
+re-cached and serves the staged rows (checked by `row_id`, since `make verify`
+compares row counts and a value change keeps them).
+
+Also: showcase replay fixtures for P0013, P0015 and P0089 (`SHOWCASE`), five
+`input_examples/`, and the Dockerfile now copies `tests/fixtures/medtrace/`.
+Without that, `SAMPLE_MODE` in the image had nothing to replay.
+
+## 2026-10-25 — Consultant rulings on the detector applied; population back to 200 **[consultant review + measured, 25 Oct]**
+
+The consultant pharmacist's review of briefs 11–14 is
+`docs/research/MedTrace detect.py_ Consultant Pharmacist Review of Medication
+Reconciliation Rules 11 to 14.md`. Three of the four rules stood, each with a
+change; this entry supersedes the matching points in the entry below.
+
+| Brief | Ruling | What changed |
+|---|---|---|
+| 11 | Label fine; severity must follow the dose change and the drug | Dose vs frequency judged **per administration** ("2 tablets daily" for 1 is dose). Severity from the daily-dose ratio and APINCHS class. `subtype`, ratios and a plain-English `statement` in `detail`. Equal-daily-dose split changes flagged (low) only for `detect.SPLIT_SENSITIVE` |
+| 12 | Confirming a phone-changed dose is a **task**, not a ranked finding | `dose_unconfirmable` fires only on a **visible conflict**. The routine confirmation is `safety.forced_confirm`, emitted by the orchestrator for every current one. All insulins in scope; methotrexate added; DOACs excluded (fixed-dose) |
+| 13 | The patient's "I stopped" outranks an active GP list; supply evidence is asymmetric; **a lapse alone is never a commission** | Patient existence prior 0.65 → **0.80**. Lapse weighs 0.75 of a running supply (≈0.64). Lapse-only → a low-severity commission marked `conflict: confirm` with an ask-first task. GP 0.60 relabelled an **assumption**: Elliott 2023's 16.9% is a prescription-exchange rate, not a GP-list one |
+| 14 | Excluding the chart from the BPMH is correct | Unchanged. A finding resting on one BPMH source is marked `bpmh_single_source` with a second-source task |
+
+**Ground truth followed the same definitions.** The generator now plants
+`dose_unconfirmable` only where the change shows in a rendered row, and treats
+insulin aspart as a phone-dose medicine. That is the rule used all day: a planted
+finding must be supported by evidence some silo actually contains.
+
+**Population restored to 200** (DATA_SPEC's number). At 40 the largest error
+source was invisible: `dose_unconfirmable` was 21 of 32 false positives only once
+there were enough patients to see it. **Zetaris costs nothing extra at 200**: Q1
+1.99 s, Q2 1.92 s, Q3 2.95 s, the same as at 40, because the tables are cached.
+
+**Scores** (200 patients, simulated review):
+
+| split | precision | recall | F1 | high-risk recall |
+|---|---|---|---|---|
+| tune | 0.90 | 0.97 | 0.93 | 34/34 |
+| **held-out** | **0.95** | **0.95** | **0.95** | **35/37** |
+| held-out, after a post-hoc fix | 0.95 | 0.97 | 0.96 | 35/37 |
+| held-out, no human review | 0.94 | 0.93 | 0.93 | 35/37 |
+
+The post-hoc row: the first held-out run showed commission recall of 0.53,
+because a lapse-only case produced nothing at all, contrary to the consultant's
+"conflict: confirm". The fix implements the ruling, but it was *noticed* on
+held-out, so the clean figure to quote is 0.95. **DATA_SPEC's 100% high-risk
+recall is not met on held-out.** The two misses are commissions (P0123 insulin
+aspart, P0174 temazepam). They are recorded here and deliberately not tuned
+against; `test_scorecard` pins 35/37 as a regression floor, not as the target.
+
+Also fixed: the interview silo's "Given Family" field was fuzzy-matched whole
+against a given name, so a one-letter typo lost a patient's record (P0076).
+Linkage at 200: 535 auto-merged, 31 review, 2 lost, 0 false merges.
+
+---
+
+## 2026-10-25 — How the detector decides what is a finding **[built and scored against ground truth, 25 Oct]**
+
+Six decisions made while implementing `fuse`, `detect` and `triage`. Each was
+forced by a specific failure on real synthetic patients, and four are out with the
+consultant as briefs 11–14 (`docs/RESEARCH_QUESTIONS.md`) — overturn any of them
+there, not by editing the code quietly.
+
+**1. The current admission chart does not vote in the BPMH.** The BPMH is the
+pre-admission history; the chart is what gets reconciled against it (ACSQHC Action
+4.06). With the chart voting, P0002's planted error (chart 2.5 mg, pharmacy 5 mg)
+resolved to 2.5 mg — the chart outweighed a six-week-old dispensing — and the error
+disappeared. The chart stays visible in the grid; older EMR documents (prior
+discharge summaries) are history and do vote. *(Brief 14.)*
+
+**2. Silence counts half, and a commission needs someone to say it stopped.** A
+source that is in scope but never mentions a medicine gets `SILENCE_WEIGHT = 0.5`
+of the weight of one that says it was stopped, and `commission` requires a positive
+assertion — a ceased listing, a patient's "no", a discharge "cease" or a lapsed
+regular supply. Counting silence fully made a current GTN spray a commission:
+outvoted by a patient and pharmacy that had simply never mentioned it. *(Brief 13.)*
+
+**3. PRN medicines: the pharmacy has no say on existence.** A year-old GTN fill does
+not prove current use and no fill does not prove stopping. The PRN signal has to
+come from the chart, GP or patient, because dispensing rows carry no directions.
+
+**4. Frequency vs dose is classified by what changed.** Same strength per unit at a
+different number of doses a day is `frequency` (clopidogrel charted bd instead of
+daily, which doubles the daily dose); anything else is `dose`; an equal total daily
+dose is never a finding (brief 8 §2). This matches the generator and overturns the
+skeleton docstring, which had said "frequency = same daily dose, different split".
+*(Brief 11.)*
+
+**5. `dose_unconfirmable` for every current warfarin, insulin and prednisolone.**
+Agreement between sources that cannot see a phone instruction is not confirmation
+(DATA_SPEC 9.5). Uses `safety.DOSE_CHANGES_WITHOUT_A_SCRIPT` as the single list,
+which includes insulin aspart; the generator plants only glargine, so aspart
+currently scores as a false positive (6 of the 12 across both splits). *(Brief 12.)*
+
+**6. Learned acceptance is keyed `(type, atc_class)`**, where `atc_class` is the
+first 4 characters of the ATC code (e.g. `C09A`), written by `detect` into every
+candidate's `detail["atc_class"]`. Matches `schemas.AcceptanceUpdate`, so the
+ranking and the feedback endpoint read one value. Core APINCHS is floored at
+`triage.MUST_REVIEW_FLOOR`, above anything a non-high-risk finding can score.
+
+**Also decided:**
+- **Identity sends a lookalike's un-identified records to review, not rejection**,
+  even when the patient's own IHI is absent from the cluster. Review never merges,
+  so false merges stay 0; P0008 had lost three findings to rejection.
+- **`eval.py` reports two review modes.** `oracle` simulates a pharmacist confirming
+  exactly the true review-band links (the designed workflow); `none` is the system
+  alone. Both are reported; neither is presented as the other.
+- **Not emitted yet:** `unpropagated_discharge_change` (not planted; the generator
+  only now makes discharge actions coherent) and `identity_uncertain` (review-band
+  rows are not read until confirmed, so nothing can rest on one).
+
+**Scores** (40 patients, `scripts/eval.py`, simulated review):
+
+| split | precision | recall | F1 | high-risk recall |
+|---|---|---|---|---|
+| tune | 0.83 | 1.00 | 0.91 | 8/8 |
+| **held-out** | **0.83** | **0.94** | **0.88** | 2/2 |
+| held-out, no human review | 0.80 | 0.77 | 0.79 | 2/2 |
+
+Held-out is within 0.03 F1 of tune and no change was made by looking at it. The
+Wilson intervals are wide — several types have 1–4 instances per split — which is
+the population-size decision still open (raise `--patients`).
+
+---
+
 ## 2026-10-24 — Research briefs answered, and one of my own bugs manufactured most of a finding **[consultant research + live verification, 24 Oct]**
 
 A consultant worked the five briefs in `docs/RESEARCH_QUESTIONS.md`. Two closed from

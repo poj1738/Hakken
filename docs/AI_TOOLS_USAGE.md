@@ -32,5 +32,15 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-24 | Arpon | Claude Code | Opus 5 | Zetaris registration applied live + verified; step 7 began: `parse.py` and `safety.py` |
 | 2026-10-24 | Arpon | Claude Code | Opus 5 | Step 7: `identity.py` (0 false merges) and `normalise.py`; research briefs for an outside consultant |
 | 2026-10-25 | Arpon | Claude Code | Opus 5 | Applied consultant briefs 6-10: real PBS pack sizes in the generator, TGA field mapping, brief 8 suppression rules, vetted pitch claims; fixed two silent-staleness bugs in `datasvc` and the registration verifier |
+| 2026-10-25 | Arpon | Claude Code | Opus 5.5 | `fuse`, `detect`, `triage` and `scripts/eval.py` (detector scorecard against ground truth); 11 defects fixed across the generator, `normalise`, `coverage` and `identity`; consultant briefs 11-14 |
+| 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Applied consultant briefs 11-14 to the detector; population to 200; identity fix for combined names; schema review for Arnav (#12) |
+| 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Loose ends: `coverage` staleness off the wall clock, core vs extended high-risk recall in the scorecard, stale PROGRESS decisions struck |
+| 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Demo data: staged learning-demo pair with CI test, showcase replay fixtures, five `input_examples/`, replay set in the Docker image |
+| 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Recorded Track 1 across metadata, README, TODO and PROGRESS; README status rewritten to match the code |
+| 2026-10-25 | Anshu | Claude Code (cloud session) | Opus 5.5 | Web UI in `web/`: all ten PLAN §6 items in mock mode against `tests/fixtures/api/`, checked with Playwright screenshots |
+| 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Q4 shortages query (gated on licence), scorecard JSON and dashboard, data-licence audit (PBS copyright notices), fresh-clone audit via a subagent |
+| 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Applied the fresh-clone audit: reproducible data build checked in CI, honest make targets, README/metadata/Docker fixes |
+| 2026-10-25 | Arpon | Claude Code | Opus 5.5 | TGA cleared and Q4 switched on (registration left to Arpon); identity evidence verdict prefix for the UI |
+| 2026-10-25 | Anshu | Claude Code (cloud session) | Opus 5.5 | UI review item by item against PLAN §6, with fixes; followed schema #23 and identity verdict prefixes #24; checked with Playwright |
 
 The README's **AI and model usage** section summarises this for judges.

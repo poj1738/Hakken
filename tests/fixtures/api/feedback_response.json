@@ -1,0 +1,18 @@
+{
+  "run_id": "run-ex-p0001",
+  "target_id": "F-006",
+  "verdict": "reject",
+  "reason": "source_outdated",
+  "trust_updates": [
+    {
+      "source": "gp",
+      "attribute": "daily_dose",
+      "hmem_record_id": "hm-gp-daily_dose",
+      "kind": "wrong",
+      "before": 0.7,
+      "after": 0.5,
+      "delta": -0.2
+    }
+  ],
+  "acceptance_updates": []
+}

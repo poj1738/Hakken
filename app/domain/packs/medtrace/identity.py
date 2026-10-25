@@ -45,6 +45,12 @@ WEIGHTS: dict[str, tuple[float, float]] = {
     "postcode": (5.13, -1.71),   # m .70 / u .02 -- see the note below
 }
 
+#: Every `field_evidence` sentence starts with one of these and ": ", so the UI
+#: colours a field from the verdict instead of guessing from the wording (Anshu,
+#: 25 Oct). `partial` is a near-miss the score gave part credit for: a nickname, a
+#: sound-alike surname, a day/month swap. `held` prefixes a guard's explanation.
+EVIDENCE_VERDICTS = ("agrees", "partial", "differs", "held")
+
 #: Partial-credit weights for the near-misses the generator plants (DATA_SPEC 7).
 #: Each is worth less than an exact match and far more than a disagreement.
 PARTIAL: dict[str, float] = {
@@ -124,7 +130,10 @@ def _compare_given(a: SourceRow, b: SourceRow, lex: Lexicon) -> tuple[float, str
             label = "ambiguous nickname" if ambiguous else "nickname"
             return PARTIAL[key], f"{label} {a.name_given} ~ {b.name_given}"
 
-    score = jellyfish.jaro_winkler_similarity(left, right)
+    # Compare GIVEN names only -- not a given name against a whole combined
+    # "Given Family" or "SURNAME, Given" field.
+    left_given, right_given = _split_name(a)[0] or left, _split_name(b)[0] or right
+    score = jellyfish.jaro_winkler_similarity(left_given, right_given)
     if score >= FUZZY_THRESHOLD:
         return PARTIAL["given_fuzzy"], f"given name differs slightly ({score:.2f})"
     return WEIGHTS["given"][1], f"given name differs ({a.name_given} vs {b.name_given})"
@@ -144,19 +153,50 @@ def _is_ambiguous(name: str, lex: Lexicon) -> bool:
                for member in family for other in family)
 
 
+def _split_name(row: SourceRow) -> tuple[str, str]:
+    """(given, family), normalised, from separate fields or a combined one.
+
+    Two silos write the whole name in `name_given`: the pharmacy as
+    "SURNAME, Given", the patient interview as "Given Family". Comparing the
+    combined string as if it were a given name made a one-letter typo fatal --
+    "Marjorie" against "Marorie Kaur" scored as a different given name, the
+    surname was never compared at all, and P0076's interview record was lost.
+    """
+    if row.name_family:
+        return normalise_text(row.name_given), normalise_text(row.name_family)
+    combined = normalise_text(row.name_given)
+    if "," in (row.name_given or ""):
+        family, _, given = (row.name_given or "").partition(",")
+        return normalise_text(given), normalise_text(family)
+    parts = combined.split()
+    if len(parts) >= 2:
+        return parts[0], parts[-1]
+    return combined, ""
+
+
+def _current_surname(row: SourceRow) -> str:
+    """`name_family`, or the surname inside a combined name field."""
+    return _split_name(row)[1]
+
+
 def _compare_surname(a: SourceRow, b: SourceRow) -> tuple[float, str | None]:
     """Surnames, against both the current and any recorded previous surname."""
     lefts = {normalise_text(a.name_family), normalise_text(a.name_previous)} - {""}
     rights = {normalise_text(b.name_family), normalise_text(b.name_previous)} - {""}
-    # The pharmacy silo has no surname column; its surname is the first part of
-    # the combined name field.
+    # The pharmacy and interview silos have no surname column; the surname is
+    # inside the combined name field (see _split_name).
     for row, bucket in ((a, lefts), (b, rights)):
-        if not row.name_family and row.name_given and "," in (row.name_given or ""):
-            bucket.add(normalise_text(row.name_given.split(",", 1)[0]))
+        if not row.name_family and _current_surname(row):
+            bucket.add(_current_surname(row))
     if not lefts or not rights:
         return 0.0, None
 
-    current = {normalise_text(a.name_family)} & {normalise_text(b.name_family)} - {""}
+    # The current surname includes the one parsed from a combined name field.
+    # Comparing only `name_family` here meant a pharmacy record -- whose surname
+    # exists only inside "PAPADOPOULOS, Thomas" -- could never match exactly, so
+    # an exact match fell through to the previous-surname branch below and was
+    # labelled AND weighted as a maiden-name match (spotted by Arnav on P0002).
+    current = {_current_surname(a)} & {_current_surname(b)} - {""}
     if current:
         return WEIGHTS["surname"][0], "surname matches exactly"
     if lefts & rights:
@@ -239,11 +279,11 @@ def score_pair(a: SourceRow, b: SourceRow, lex: Lexicon) -> IdentityLink:
                 anchor_id=a.record_key, candidate_id=b.record_key,
                 match_weight=float("inf") if False else 99.0, probability=1.0,
                 band="auto-merge", tier="ihi_exact",
-                field_evidence={"ihi_syn": "same synthetic IHI"}, guards=[])
+                field_evidence={"ihi_syn": "agrees: same synthetic IHI"}, guards=[])
         return IdentityLink(
             anchor_id=a.record_key, candidate_id=b.record_key,
             match_weight=-99.0, probability=0.0, band="new", tier="ihi_conflict",
-            field_evidence={"ihi_syn": f"different synthetic IHI ({left_ihi} vs {right_ihi})"},
+            field_evidence={"ihi_syn": f"differs: different synthetic IHI ({left_ihi} vs {right_ihi})"},
             guards=["ihi_conflict"])
 
     weight = 0.0
@@ -255,13 +295,16 @@ def score_pair(a: SourceRow, b: SourceRow, lex: Lexicon) -> IdentityLink:
         contribution, note = compare()
         weight += contribution
         if note:
-            evidence[field] = note
+            agree, disagree = WEIGHTS[field]
+            verdict = ("agrees" if contribution == agree else
+                       "differs" if contribution == disagree else "partial")
+            evidence[field] = f"{verdict}: {note}"
 
     left_sex, right_sex = normalise_text(a.sex)[:1], normalise_text(b.sex)[:1]
     if left_sex and right_sex:
         agree = left_sex == right_sex
         weight += WEIGHTS["sex"][0 if agree else 1]
-        evidence["sex"] = "sex matches" if agree else "sex differs"
+        evidence["sex"] = "agrees: sex matches" if agree else "differs: sex differs"
 
     left_pc, right_pc = (a.postcode or "").strip(), (b.postcode or "").strip()
     if left_pc and right_pc:
@@ -269,7 +312,8 @@ def score_pair(a: SourceRow, b: SourceRow, lex: Lexicon) -> IdentityLink:
         # Weak positive only. Agreement is common by chance in an age-skewed
         # cohort, and disagreement usually just means someone moved.
         weight += WEIGHTS["postcode"][0 if agree else 1]
-        evidence["postcode"] = "postcode matches" if agree else "postcode differs (a move?)"
+        evidence["postcode"] = ("agrees: postcode matches" if agree
+                                else "differs: postcode differs (a move?)")
 
     probability = _posterior(weight)
     return IdentityLink(
@@ -369,19 +413,23 @@ def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) 
             conflicting = ihis - {anchor_ihi}
             if not conflicting:
                 continue
-            if anchor_ihi in ihis:
-                # The cluster holds BOTH the patient's IHI and someone else's.
-                # A lookalike makes this unavoidable: the records are identical
-                # on name and date of birth, so a member carrying no IHI is
-                # equally consistent with either person. We cannot tell, and
-                # pretending otherwise is how a false merge happens -- so the
-                # un-identified members go to a human. This is the demo's
-                # "a lookalike refused auto-link, one review click".
-                ambiguous.update(m for m in members if not (records[m].ihi_syn or "").strip())
-            else:
-                # No member carries the patient's IHI and at least one carries
-                # someone else's: the whole cluster is a different person.
-                rejected.update(members)
+            # The cluster holds someone else's IHI. Members carrying it are that
+            # person. Members carrying NO IHI are not known to be: a lookalike
+            # is identical on name and date of birth, so an un-identified record
+            # is equally consistent with either person. We cannot tell, and
+            # pretending otherwise either way is wrong -- so they go to a human.
+            # This is the demo's "a lookalike refused auto-link, one review
+            # click".
+            #
+            # That used to apply only when the patient's own IHI also appeared
+            # in the cluster. When it did not -- P0008, whose GP, pharmacy and
+            # interview records all lack an IHI while the lookalike's carry
+            # one -- the whole cluster was rejected, the patient's own records
+            # with it, and every finding resting on them was lost. Review never
+            # merges anything, so this cannot raise the false-merge rate.
+            ambiguous.update(m for m in members if not (records[m].ihi_syn or "").strip())
+            if anchor_ihi not in ihis:
+                rejected.update(m for m in members if (records[m].ihi_syn or "").strip())
 
         for link in links:
             if link.tier == "ihi_conflict":
@@ -389,7 +437,7 @@ def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) 
             if link.candidate_id in rejected:
                 link.guards.append("ihi_conflict_in_cluster")
                 link.field_evidence["guard"] = (
-                    "another record that is clearly the same person as this one carries an "
+                    "held: another record that is clearly the same person as this one carries an "
                     "IHI that conflicts with the patient's, so this belongs to someone else"
                 )
                 link.probability = 0.0
@@ -397,7 +445,7 @@ def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) 
             elif link.candidate_id in ambiguous:
                 link.guards.append("ihi_ambiguous_in_cluster")
                 link.field_evidence["guard"] = (
-                    "this record carries no IHI and is an equally good match for two "
+                    "held: this record carries no IHI and is an equally good match for two "
                     "different people with the same name and date of birth — confirm which"
                 )
                 link.probability = min(link.probability, GUARD_CEILING)
@@ -414,7 +462,7 @@ def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) 
         for link in group:
             link.guards.append("lookalike_cluster")
             link.field_evidence["guard"] = (
-                f"{len(group)} records in {source} score as this patient; a distinguishing "
+                f"held: {len(group)} records in {source} score as this patient; a distinguishing "
                 f"field or a human decision is needed before merging either"
             )
 
@@ -428,7 +476,7 @@ def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) 
                     if "transitivity_suspect" not in link.guards:
                         link.guards.append("transitivity_suspect")
                         link.field_evidence["guard"] = (
-                            "both records match this patient but not each other, so at most "
+                            "held: both records match this patient but not each other, so at most "
                             "one of them can be right"
                         )
 

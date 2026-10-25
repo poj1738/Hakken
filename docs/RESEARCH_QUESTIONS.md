@@ -637,3 +637,134 @@ whether anything works.
 Whatever age-stratified figures exist, with sources. "No age-stratified agent-level data
 is published" is a perfectly good answer — we will say so in the submission rather than
 implying a precision we do not have.
+
+---
+
+# Round three — the discrepancy detector (25 Oct)
+
+**For the consultant.** These four come from building `detect.py`, the module that
+decides what counts as a finding a pharmacist must act on. Each is a judgement call
+we have already made so that work could continue; we want to know whether a
+practising hospital pharmacist would agree, and what to cite if they would.
+
+Background you need for all four: MedTrace compares the **admission medication
+chart** (the hospital's orders) against a **draft best possible medication history**
+assembled from three pre-admission sources — the GP's medication list, community
+pharmacy dispensing records, and the patient interview — weighted by how reliable
+each source is for each attribute. A finding is shown to the pharmacist ranked, with
+the rows it came from. Over-flagging is a real cost: a list padded with
+non-problems trains people to stop reading it.
+
+## 11. When a frequency error changes the daily dose, is it a dose or a frequency discrepancy?
+
+### Context
+
+The chart says clopidogrel 75 mg **twice daily**; the GP list and pharmacy say 75 mg
+**once daily**. The strength is right, the frequency is wrong, and the daily dose has
+doubled (150 mg vs 75 mg).
+
+Our rule: if the **strength per unit is the same** and **doses per day differ**, it is
+a *frequency* discrepancy; if the strength differs, it is a *dose* discrepancy; if the
+**total daily dose is equal** however it is written (500 mg bd vs 1 g daily), it is
+**not flagged at all** (your brief 8, section 2). Our own docstring had previously
+said "frequency = same daily dose, different split", which contradicts brief 8.
+
+### What we need you to find out
+
+1. How do Australian medication reconciliation taxonomies classify this — ACSQHC's
+   MATH guide, SHPA's Standards of Practice, the WHO High 5s SOP, or the
+   discrepancy classifications used in Australian studies (e.g. Stark et al., or the
+   NSW TAG classification)? Is there a published convention?
+2. If the convention is "classify by what the prescriber got wrong", is our rule
+   (same strength + different frequency → frequency) the right reading?
+3. Is there any case where the **same total daily dose** at a different split *should*
+   be flagged for an immediate-release product? (Brief 8 covered MR halving.) We are
+   thinking of drugs with narrow peak/trough concerns.
+4. Does the classification matter for severity? Should a frequency error that doubles
+   the daily dose rank the same as a dose error that doubles it?
+
+## 12. Should every current warfarin, insulin glargine and prednisolone generate a "dose cannot be confirmed" finding?
+
+### Context
+
+For these three, the dose changes **without a new script** — an INR-driven phone
+instruction, insulin titration, a steroid taper step. So no structured source can
+establish the current dose: the pharmacy dispenses the same tablets, and the GP list
+often says "as directed". DATA_SPEC §9.5 says the expected output is a
+`dose_unconfirmable` finding with a confirmation task, "never auto-resolved to one
+source".
+
+We intend to emit it for **every** patient currently on one of the three, whether or
+not the sources visibly disagree — on the reasoning that agreement between sources
+that cannot see the dose change is not confirmation. That makes it a near-certain
+finding for every warfarin patient.
+
+### What we need you to find out
+
+1. Is "always confirm the current warfarin dose at admission" standard Australian
+   practice, and is it written down anywhere citable (ACSQHC, SHPA, the Australian
+   anticoagulant guidelines, state health warfarin policies)?
+2. Is it reasonable to present this as a *finding* in the ranked list, or should it be
+   a **task** separate from the findings (it carries no discrepancy, only uncertainty)?
+   Which would a pharmacist find less noisy?
+3. Should **all insulins** be included (we currently include glargine and aspart in the
+   safety layer but only glargine in the detector), and what about other titrated or
+   tapered regimens — methotrexate, levothyroxine changes, opioid tapers, DOACs
+   (fixed-dose, so presumably not)?
+4. For prednisolone, is the right task "confirm which step of the taper" — and does it
+   matter whether the taper was started in hospital (prior discharge) or by the GP?
+
+## 13. When the GP still lists a medicine as active but everything else says it stopped, is charting it a commission error?
+
+### Context
+
+A *commission* is a medicine on the admission chart that the patient was not taking.
+In our data, the GP list retains about 30% of ceased medicines as "active" (anchored
+to Elliott 2023's 16.9% and Boyce 2013). So a charted, actually-ceased medicine often
+has: GP list "active"; no dispensing for many months; patient says "no, I stopped
+that".
+
+Our rule weighs the sources: pharmacy supply lapse (weight 0.85), the patient's "no"
+(0.65) and GP listing (0.60, decayed by the list's age). If the weighted vote resolves
+to "not current", we flag commission. If it is too close to call, we **do not** flag
+commission; we show "conflict — ask patient" instead. A patient who answers
+"unsure" counts as no evidence either way.
+
+### What we need you to find out
+
+1. In practice, which source does a hospital pharmacist believe when the GP list says
+   active, dispensing stopped months ago, and the patient says they stopped? Is there
+   published evidence on the relative reliability of these three for *existence*?
+2. Is ~0.60 a defensible prior for GP-list existence given Elliott's 16.9% non-current
+   rate, and ~0.85 for dispensing records? Are there better Australian figures?
+3. Is a lapsed supply alone (no patient answer, GP active) enough to flag commission,
+   or should that only ever be a "conflict — confirm" item?
+4. Is treating "unsure" as no evidence right, or does an unsure answer from an older
+   patient carry information (e.g. it tends to mean still taking)?
+
+## 14. Should the admission chart itself count as evidence in the best possible medication history?
+
+### Context
+
+We build the draft BPMH from GP, pharmacy, patient, and **older** hospital documents
+(prior discharge summaries). We **exclude the current admission chart** from that
+vote, because it is the thing being reconciled against the BPMH — ACSQHC Action 4.06
+is "review current medication orders against the BPMH". When we let the chart vote, a
+charted dose error of 2.5 mg against a pharmacy supply of 5 mg resolved to 2.5 mg
+(the chart outweighed a six-week-old dispensing) and the error disappeared.
+
+The chart still appears in the grid, so the pharmacist sees what it says; it simply
+does not get a vote on what is true.
+
+### What we need you to find out
+
+1. Is this consistent with how ACSQHC, SHPA and the WHO High 5s SOP define the BPMH —
+   i.e. the BPMH is independent of the admission orders? Please cite the definition.
+2. Are there circumstances where admission orders *are* legitimately a BPMH source —
+   for example when they were written from a medication list the patient brought in,
+   or a residential aged care facility chart?
+3. Should a **prior discharge summary** be treated as a BPMH source, and how should it
+   be weighted relative to a GP list updated after that discharge?
+4. One consequence: if only the chart and the GP list are available and they disagree,
+   we show a conflict rather than a finding. Is that the right default, or should a
+   chart/GP disagreement always be a finding?

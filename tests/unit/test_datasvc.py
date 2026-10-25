@@ -67,11 +67,12 @@ def test_an_unknown_name_is_a_404_naming_the_valid_ones(client: TestClient) -> N
         assert "known" in response.json()["detail"]
 
 
-def test_tga_is_deliberately_not_served(client: TestClient) -> None:
-    """Q4 is Monday and optional. Serving a view over data we have not licensed
-    would be worse than shipping without it."""
-    assert "tga" not in REFERENCES
-    assert client.get("/ref/tga").status_code == 404
+def test_tga_is_served_only_now_its_use_is_cleared(client: TestClient) -> None:
+    """Held back until the consultant cleared non-commercial hackathon use (25 Oct,
+    docs/DATA_LICENCES.md section 4). Gitignored, so a fresh clone gets a 503 that
+    names the fix rather than a 404 that hides the table."""
+    assert REFERENCES["tga"] == "tga_shortages.json"
+    assert client.get("/ref/tga").status_code in (200, 503)
 
 
 def test_a_missing_file_is_503_with_the_command_to_fix_it(client: TestClient, tmp_path) -> None:

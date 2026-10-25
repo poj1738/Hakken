@@ -11,7 +11,8 @@ RUN if [ -f package.json ]; then npm run build; else mkdir -p dist; fi
 FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DEFAULT_TIMEOUT=120
 
 WORKDIR /app
 
@@ -24,6 +25,9 @@ COPY datasvc/ ./datasvc/
 COPY data/ ./data/
 COPY scripts/ ./scripts/
 COPY input_examples/ ./input_examples/
+# SAMPLE_MODE's replay set. It lives under tests/ because the contract tests read it
+# too; data/reference/ and data/synthetic/ are gitignored, so a clean clone has nothing else.
+COPY tests/fixtures/medtrace/ ./tests/fixtures/medtrace/
 COPY run.py ./
 COPY --from=web /web/dist ./web/dist
 

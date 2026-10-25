@@ -409,6 +409,14 @@ def test_fixtures_distinguish_an_absent_column_from_a_blank_value() -> None:
     assert pharmacy, "no pharmacy rows to check"
     # The pharmacy silo has no family-name column -- only a combined "name".
     assert all(r[family] is None for r in pharmacy)
-    # A missing IHI is a blank value in a column that does exist.
-    assert all(r[ihi] is None or isinstance(r[ihi], str) for r in doc["data"])
-    assert any(r[ihi] == "" for r in doc["data"]), "expected at least one blank IHI"
+    # A missing IHI is a blank value in a column that does exist. Demonstrated
+    # across all the Q2 fixtures, not in P0001 alone: whether P0001's own
+    # records happen to lack an IHI is down to the dice, and at 200 patients
+    # they do not -- which says nothing about the fixture format.
+    blanks = 0
+    for path in sorted(FIXTURES.glob("Q2__*.json")):
+        other = json.loads(path.read_text())
+        col = other["headers"].index("ihi_syn")
+        assert all(r[col] is None or isinstance(r[col], str) for r in other["data"])
+        blanks += sum(1 for r in other["data"] if r[col] == "")
+    assert blanks, "expected at least one blank IHI across the Q2 fixtures"

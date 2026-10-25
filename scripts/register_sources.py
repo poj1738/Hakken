@@ -55,6 +55,8 @@ from app.domain.packs.medtrace.queries import (
     HARMONISED_COLUMNS,
     REFERENCE_VIEWS,
     SOURCE_VIEWS,
+    TGA_COLUMNS,
+    TGA_VIEW,
     sql_literal,
 )
 
@@ -88,6 +90,12 @@ REFERENCES = [
     ("MT_REF", "nicknames_raw", "/ref/nicknames", REFERENCE_VIEWS["nicknames"],
      ("canonical", "variant", "sex")),
 ]
+
+#: Q4's TGA shortage table (PLAN 2.1), registered with `--with-tga`. Kept out of
+#: REFERENCES so verify/refresh/drift never touch a table someone did not choose to
+#: register. Use cleared by the team's consultant on 25 Oct (docs/DATA_LICENCES.md).
+TGA = ("MT_TGA", "tga_raw", "/ref/tga", TGA_VIEW, TGA_COLUMNS)
+
 
 try:
     import certifi
@@ -212,8 +220,8 @@ def create_all_sources() -> str:
     )
 
 
-def plan_statements() -> list[tuple[str, str]]:
-    """Every statement, in order. `(label, sql)`."""
+def plan_statements(with_tga: bool = False) -> list[tuple[str, str]]:
+    """Every statement, in order. `(label, sql)`. Q4's TGA table only if asked."""
     settings = get_settings()
     base = settings.datasvc_public_url.rstrip("/")
     out: list[tuple[str, str]] = [("container", f"CREATE SCHEMASTORE CONTAINER {CONTAINER}")]
@@ -228,6 +236,12 @@ def plan_statements() -> list[tuple[str, str]]:
         out.append((f"{view} view", create_reference_view(db, table, view, columns)))
         out.append((f"CACHE {db}.{table}", f"CACHE TABLE {db}.{table}"))
     out.append((f"{ALL_SOURCES_VIEW} view", create_all_sources()))
+    if with_tga:
+        db, table, path, view, columns = TGA
+        out.append((f"{db} database", create_database(db, "MedTrace TGA known shortages")))
+        out.append((f"{db}.{table} REST table", create_rest_table(db, table, base + path)))
+        out.append((f"{view} view", create_reference_view(db, table, view, columns)))
+        out.append((f"CACHE {db}.{table}", f"CACHE TABLE {db}.{table}"))
     return out
 
 
@@ -329,7 +343,7 @@ def schema_drift(client: Zetaris) -> list[tuple[str, str, str, list[str], list[s
     return drifted
 
 
-def refresh_statements() -> list[tuple[str, str]]:
+def refresh_statements(with_tga: bool = False) -> list[tuple[str, str]]:
     """UNCACHE then CACHE every raw table. Creates and drops nothing.
 
     `CACHE TABLE` on an already-cached table is a no-op, so re-running --apply
@@ -345,7 +359,7 @@ def refresh_statements() -> list[tuple[str, str]]:
     for db, table, _path, _view, _source in SILOS:
         out.append((f"UNCACHE {db}.{table}", f"UNCACHE TABLE {db}.{table}"))
         out.append((f"CACHE {db}.{table}", f"CACHE TABLE {db}.{table}"))
-    for db, table, _path, _view, _columns in REFERENCES:
+    for db, table, _path, _view, _columns in REFERENCES + ([TGA] if with_tga else []):
         out.append((f"UNCACHE {db}.{table}", f"UNCACHE TABLE {db}.{table}"))
         out.append((f"CACHE {db}.{table}", f"CACHE TABLE {db}.{table}"))
     return out
@@ -530,10 +544,13 @@ def main() -> int:
     ap.add_argument("--refresh", action="store_true",
                     help="re-cache the raw tables after regenerating the data; "
                          "creates and drops nothing")
+    ap.add_argument("--with-tga", action="store_true",
+                    help="also register Q4's TGA shortage table (needs the gitignored "
+                         "data/reference/tga_shortages.json: scripts/load_tga_shortages.py)")
     args = ap.parse_args()
 
     settings = get_settings()
-    statements = plan_statements()
+    statements = plan_statements(with_tga=args.with_tga)
 
     log(f"Zetaris     {settings.zetaris_rest_url}")
     log(f"datasvc     {settings.datasvc_public_url}   <- goes into the REST tables verbatim")
@@ -604,7 +621,7 @@ def main() -> int:
         client = Zetaris()
         log("\n--- refreshing cached tables (no object is created or dropped) ---")
         failures = 0
-        for label, sql in refresh_statements():
+        for label, sql in refresh_statements(with_tga=args.with_tga):
             _result, secs, error = client.run(sql)
             # UNCACHE on a table that was never cached is not a problem.
             if error and label.startswith("UNCACHE"):

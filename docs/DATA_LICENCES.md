@@ -50,9 +50,15 @@ What that means in practice:
 - **The raw snapshot is not committed.** `data/reference/raw/` is gitignored, exactly as
   PLAN section 3 directed while the licence was unconfirmed. Resolving the licence did
   not loosen that; it confirmed it.
-- **Only a ≤200-row attributed sample is committed**, at
-  `tests/fixtures/reference/lexicon_sample.csv`, so tests and a judge's fresh clone work
-  without a fetch.
+- **Two committed files carry PBS values, unmodified, with the copyright statement
+  beside them** (`PBS_COPYRIGHT.txt` in each folder, added 25 Oct):
+  `tests/fixtures/reference/lexicon_sample.csv` (≤200 rows), and the `SAMPLE_MODE`
+  replay fixture `tests/fixtures/medtrace/Q_REF__lexicon.json` (the whole served
+  lexicon: 224 rows, 203 with a real PBS code). The second exceeds the ≤200-row sample
+  this section first described, and until 25 Oct neither carried the statement the
+  licence requires. Redistribution of unmodified content with the statement retained is
+  what the licence permits; `build_lexicon.py` copies PBS values verbatim and uses a
+  fallback only where PBS has no value, so nothing PBS published is altered.
 - The copyright block itself is written to `data/reference/raw/pbs_copyright.txt` on
   every fetch, so it travels with the data it governs.
 
@@ -96,14 +102,17 @@ All three are **our own work**, written during the build window, licensed with t
 
 | File | Rows | Derived from | Notes |
 |---|---|---|---|
-| `data/reference_src/medicines.csv` | 104 products | `docs/DATA_SPEC.md` §4.2 (16 condition bundles) and §4.3 (combination traps), plus §6/§10.3 for the OTC and complementary items | Generics, Australian brands, strengths, regimens, within-bundle shares and **ATC codes are transcribed from the spec**, never invented. |
+| `data/reference_src/medicines.csv` | 108 products | `docs/DATA_SPEC.md` §4.2 (16 condition bundles) and §4.3 (combination traps), plus §6/§10.3 for the OTC and complementary items | Generics, Australian brands, strengths, regimens, within-bundle shares and **ATC codes are transcribed from the spec**, never invented. |
 | `data/reference_src/apinchs_atc.csv` | **40**, verbatim | `docs/DATA_SPEC.md` §10.1 | The **concept** is ACSQHC's APINCHS, with extensions from SA Health (APINCHEN) and WA Health. The ATC-prefix *table* is our own construction. Two rows carry two prefixes each, so the built view has 42. |
 | `data/reference_src/nicknames.csv` | 167 pairs | `docs/DATA_SPEC.md` §10.2 | Hand-selected for Australians born 1936–1966. **Not** copied from any dataset — see below. |
 
 ### ATC codes
 
 **Every ATC code comes from `docs/DATA_SPEC.md`, not from general knowledge and not from
-the PBS join.** The PBS `item-atc-relationships` table is read purely as a *cross-check*:
+the PBS join**, with one recorded exception: **desvenlafaxine `N06AX23`**, added on 24 Oct
+to complete DATA_SPEC §4.2 bundle 6, takes its code from our PBS snapshot because the spec
+did not list the medicine (`docs/DECISIONS.md`, 24 Oct). The IR/MR pairs added that day
+(metoprolol MR, gliclazide IR, diltiazem IR) share their medicine's spec code. The PBS `item-atc-relationships` table is read purely as a *cross-check*:
 `build_lexicon.py` reports any disagreement between the spec and the API for a human to
 resolve, and never applies one silently. The spec is the clinical contract; the API is
 evidence about it.
@@ -129,14 +138,29 @@ recorded here because the spec cites it, not because we used it.
 | TGA ARTG bulk export | Not used. |
 | Any real patient data | Rule 7, and the whole point of the project. |
 
-### TGA Medicine Shortage Reports — parsed, **not wired up**
+### TGA Medicine Shortage Reports — **used, cleared for non-commercial hackathon use**
 
-`scripts/load_tga_shortages.py` exists and is unit-tested, but nothing imports it,
-nothing registers its output, and `queries.q_shortages` still raises. Q4 is **Monday and
-optional**, sixth in PLAN section 4's cut order. If it is used, the licence and
-attribution must be added here first. **The shortage database is incomplete, so it is
-never ground truth** — anything derived from it renders as
-`NoticeType.KNOWN_SHORTAGE` ("known shortage"), never as "unavailable".
+| | |
+|---|---|
+| Source | TGA Medicine Shortage Reports Database, CSV export (`tga.gov.au`) |
+| Publisher | Therapeutic Goods Administration, Commonwealth of Australia |
+| Accessed | 2026-10-24 (`data/reference/raw/tga_shortages_active_20261024.csv`) |
+| Use cleared | **25 Oct, by the team's consultant**: use in this hackathon is unrestricted because it is non-commercial |
+| Attribution | Source: TGA Medicine Shortage Reports Database, Therapeutic Goods Administration |
+| Parsed by | `scripts/load_tga_shortages.py` (drops the `Phone` column, reformats dates) |
+| Stored at | `data/reference/` — **gitignored, never committed**, served locally by `datasvc` at `/ref/tga` |
+| Queried by | `queries.q_shortages` (Q4) against `medtrace.tga_shortages` |
+
+**What we checked before asking.** TGA's copyright page did not load on 25 Oct, and the
+one TGA notice we found, on shortage publications, permits unaltered reproduction for
+personal or internal non-commercial use. The consultant's ruling covers our use: local,
+non-commercial, shown as labels in a demo, with the file itself never redistributed.
+Anything beyond that, such as commercial use or committing the export, needs the
+question asked again.
+
+**The shortage database is incomplete, so it is never ground truth.** Anything derived
+from it renders as `NoticeType.KNOWN_SHORTAGE` ("known shortage"), never "unavailable",
+and a medicine absent from it says nothing.
 
 ---
 

@@ -155,206 +155,10 @@
    "2026-10-24"
   ],
   [
-   "emr",
-   "EMR-000019",
-   "MRN0000002",
-   "SYN-320504145476",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2641",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000020",
-   "MRN0000002",
-   "SYN-320504145476",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2641",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000049",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2777",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000050",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2777",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000051",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2777",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000052",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2777",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000053",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2777",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000054",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2777",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000055",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2777",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000056",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2777",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000057",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2777",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000058",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2777",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000059",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2777",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
-   "emr",
-   "EMR-000060",
-   "MRN0000006",
-   "SYN-932392202599",
-   "Thomas",
-   "Papadopoulos",
-   null,
-   "1942-03-08",
-   "M",
-   "2777",
-   "admission_chart",
-   "2026-10-24"
-  ],
-  [
    "gp",
    "GP-000011",
    "GPP000002",
-   "",
+   "SYN-320504145476",
    "Thomas",
    "Papadopoulos",
    "",
@@ -362,13 +166,13 @@
    "Male",
    "2641",
    "gp_list",
-   "29/08/2026"
+   "26/09/2026"
   ],
   [
    "gp",
    "GP-000012",
    "GPP000002",
-   "",
+   "SYN-320504145476",
    "Thomas",
    "Papadopoulos",
    "",
@@ -376,13 +180,13 @@
    "Male",
    "2641",
    "gp_list",
-   "29/08/2026"
+   "26/09/2026"
   ],
   [
    "gp",
    "GP-000013",
    "GPP000002",
-   "",
+   "SYN-320504145476",
    "Thomas",
    "Papadopoulos",
    "",
@@ -390,13 +194,13 @@
    "Male",
    "2641",
    "gp_list",
-   "29/08/2026"
+   "26/09/2026"
   ],
   [
    "gp",
    "GP-000014",
    "GPP000002",
-   "",
+   "SYN-320504145476",
    "Thomas",
    "Papadopoulos",
    "",
@@ -404,13 +208,13 @@
    "Male",
    "2641",
    "gp_list",
-   "29/08/2026"
+   "26/09/2026"
   ],
   [
    "gp",
    "GP-000015",
    "GPP000002",
-   "",
+   "SYN-320504145476",
    "Thomas",
    "Papadopoulos",
    "",
@@ -418,13 +222,13 @@
    "Male",
    "2641",
    "gp_list",
-   "29/08/2026"
+   "26/09/2026"
   ],
   [
    "gp",
    "GP-000016",
    "GPP000002",
-   "",
+   "SYN-320504145476",
    "Thomas",
    "Papadopoulos",
    "",
@@ -432,13 +236,13 @@
    "Male",
    "2641",
    "gp_list",
-   "29/08/2026"
+   "26/09/2026"
   ],
   [
    "gp",
    "GP-000017",
    "GPP000002",
-   "",
+   "SYN-320504145476",
    "Thomas",
    "Papadopoulos",
    "",
@@ -446,13 +250,13 @@
    "Male",
    "2641",
    "gp_list",
-   "29/08/2026"
+   "26/09/2026"
   ],
   [
    "gp",
    "GP-000018",
    "GPP000002",
-   "",
+   "SYN-320504145476",
    "Thomas",
    "Papadopoulos",
    "",
@@ -460,13 +264,13 @@
    "Male",
    "2641",
    "gp_list",
-   "29/08/2026"
+   "26/09/2026"
   ],
   [
    "gp",
    "GP-000019",
    "GPP000002",
-   "",
+   "SYN-320504145476",
    "Thomas",
    "Papadopoulos",
    "",
@@ -474,13 +278,13 @@
    "Male",
    "2641",
    "gp_list",
-   "29/08/2026"
+   "26/09/2026"
   ],
   [
    "gp",
    "GP-000020",
    "GPP000002",
-   "",
+   "SYN-320504145476",
    "Thomas",
    "Papadopoulos",
    "",
@@ -488,13 +292,13 @@
    "Male",
    "2641",
    "gp_list",
-   "29/08/2026"
+   "26/09/2026"
   ],
   [
    "gp",
    "GP-000021",
    "GPP000002",
-   "",
+   "SYN-320504145476",
    "Thomas",
    "Papadopoulos",
    "",
@@ -502,13 +306,13 @@
    "Male",
    "2641",
    "gp_list",
-   "29/08/2026"
+   "26/09/2026"
   ],
   [
    "gp",
    "GP-000022",
    "GPP000002",
-   "",
+   "SYN-320504145476",
    "Thomas",
    "Papadopoulos",
    "",
@@ -516,7 +320,49 @@
    "Male",
    "2641",
    "gp_list",
-   "29/08/2026"
+   "26/09/2026"
+  ],
+  [
+   "pharmacy",
+   "PHM-000076",
+   "C000002",
+   "SYN-320504145476",
+   "PAPADOPOULOS, Thomas",
+   null,
+   null,
+   "1942-03-08",
+   null,
+   "2641",
+   "dispense",
+   "2025-10-24"
+  ],
+  [
+   "pharmacy",
+   "PHM-000077",
+   "C000002",
+   "SYN-320504145476",
+   "PAPADOPOULOS, Thomas",
+   null,
+   null,
+   "1942-03-08",
+   null,
+   "2641",
+   "dispense",
+   "2025-12-31"
+  ],
+  [
+   "pharmacy",
+   "PHM-000078",
+   "C000002",
+   "SYN-320504145476",
+   "PAPADOPOULOS, Thomas",
+   null,
+   null,
+   "1942-03-08",
+   null,
+   "2641",
+   "dispense",
+   "2026-03-15"
   ],
   [
    "pharmacy",
@@ -528,9 +374,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-10-24"
+   "2026-05-28"
   ],
   [
    "pharmacy",
@@ -542,9 +388,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-12-31"
+   "2026-08-10"
   ],
   [
    "pharmacy",
@@ -556,9 +402,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-03-15"
+   "2026-10-21"
   ],
   [
    "pharmacy",
@@ -570,9 +416,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-05-28"
+   "2025-10-24"
   ],
   [
    "pharmacy",
@@ -584,9 +430,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-08-10"
+   "2026-01-10"
   ],
   [
    "pharmacy",
@@ -598,9 +444,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-10-21"
+   "2026-03-30"
   ],
   [
    "pharmacy",
@@ -612,9 +458,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-10-24"
+   "2026-06-21"
   ],
   [
    "pharmacy",
@@ -626,9 +472,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-01-10"
+   "2026-09-11"
   ],
   [
    "pharmacy",
@@ -640,9 +486,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-03-30"
+   "2025-10-24"
   ],
   [
    "pharmacy",
@@ -654,9 +500,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-06-21"
+   "2026-01-21"
   ],
   [
    "pharmacy",
@@ -668,9 +514,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-09-11"
+   "2026-04-20"
   ],
   [
    "pharmacy",
@@ -682,9 +528,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-10-24"
+   "2026-07-21"
   ],
   [
    "pharmacy",
@@ -696,9 +542,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-01-21"
+   "2026-10-16"
   ],
   [
    "pharmacy",
@@ -710,9 +556,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-04-20"
+   "2025-10-24"
   ],
   [
    "pharmacy",
@@ -724,9 +570,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-07-21"
+   "2025-12-11"
   ],
   [
    "pharmacy",
@@ -738,9 +584,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-10-16"
+   "2026-01-26"
   ],
   [
    "pharmacy",
@@ -752,9 +598,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-10-24"
+   "2026-03-07"
   ],
   [
    "pharmacy",
@@ -766,9 +612,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-01-25"
+   "2026-04-26"
   ],
   [
    "pharmacy",
@@ -780,9 +626,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-04-27"
+   "2026-06-06"
   ],
   [
    "pharmacy",
@@ -794,7 +640,7 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
    "2026-07-22"
   ],
@@ -808,9 +654,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-10-24"
+   "2026-09-06"
   ],
   [
    "pharmacy",
@@ -822,9 +668,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-01-21"
+   "2026-10-23"
   ],
   [
    "pharmacy",
@@ -836,9 +682,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-04-13"
+   "2025-10-24"
   ],
   [
    "pharmacy",
@@ -850,9 +696,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-07-07"
+   "2026-02-01"
   ],
   [
    "pharmacy",
@@ -864,9 +710,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-10-04"
+   "2026-05-18"
   ],
   [
    "pharmacy",
@@ -878,9 +724,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-10-24"
+   "2026-08-28"
   ],
   [
    "pharmacy",
@@ -892,9 +738,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-03-09"
+   "2025-10-24"
   ],
   [
    "pharmacy",
@@ -906,9 +752,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-07-24"
+   "2026-03-10"
   ],
   [
    "pharmacy",
@@ -920,9 +766,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-10-24"
+   "2026-08-02"
   ],
   [
    "pharmacy",
@@ -934,9 +780,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-02-18"
+   "2025-10-24"
   ],
   [
    "pharmacy",
@@ -948,9 +794,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-06-14"
+   "2026-01-20"
   ],
   [
    "pharmacy",
@@ -962,9 +808,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-10-09"
+   "2026-04-21"
   ],
   [
    "pharmacy",
@@ -976,9 +822,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-10-24"
+   "2026-07-22"
   ],
   [
    "pharmacy",
@@ -990,9 +836,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-10-24"
+   "2026-10-19"
   ],
   [
    "pharmacy",
@@ -1004,9 +850,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-12-01"
+   "2025-10-24"
   ],
   [
    "pharmacy",
@@ -1018,9 +864,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-01-09"
+   "2025-10-24"
   ],
   [
    "pharmacy",
@@ -1032,9 +878,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-02-13"
+   "2025-12-01"
   ],
   [
    "pharmacy",
@@ -1046,9 +892,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-03-25"
+   "2026-01-03"
   ],
   [
    "pharmacy",
@@ -1060,9 +906,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-04-30"
+   "2026-02-10"
   ],
   [
    "pharmacy",
@@ -1074,9 +920,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-06-10"
+   "2026-03-18"
   ],
   [
    "pharmacy",
@@ -1088,9 +934,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-07-19"
+   "2026-04-26"
   ],
   [
    "pharmacy",
@@ -1102,9 +948,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-08-30"
+   "2026-05-25"
   ],
   [
    "pharmacy",
@@ -1116,9 +962,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-10-01"
+   "2026-07-04"
   ],
   [
    "pharmacy",
@@ -1130,9 +976,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-10-24"
+   "2026-08-07"
   ],
   [
    "pharmacy",
@@ -1144,9 +990,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-12-05"
+   "2026-09-14"
   ],
   [
    "pharmacy",
@@ -1158,9 +1004,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-01-16"
+   "2026-10-17"
   ],
   [
    "pharmacy",
@@ -1172,9 +1018,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-03-01"
+   "2025-10-24"
   ],
   [
    "pharmacy",
@@ -1186,9 +1032,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-04-14"
+   "2025-12-02"
   ],
   [
    "pharmacy",
@@ -1200,9 +1046,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-05-25"
+   "2026-01-11"
   ],
   [
    "pharmacy",
@@ -1214,9 +1060,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-07-06"
+   "2026-02-25"
   ],
   [
    "pharmacy",
@@ -1228,9 +1074,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-08-19"
+   "2026-04-06"
   ],
   [
    "pharmacy",
@@ -1242,9 +1088,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-09-29"
+   "2026-05-13"
   ],
   [
    "pharmacy",
@@ -1256,9 +1102,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-10-24"
+   "2026-06-25"
   ],
   [
    "pharmacy",
@@ -1270,9 +1116,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-12-26"
+   "2026-08-04"
   ],
   [
    "pharmacy",
@@ -1284,9 +1130,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-02-21"
+   "2026-09-11"
   ],
   [
    "pharmacy",
@@ -1298,9 +1144,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-04-25"
+   "2026-10-18"
   ],
   [
    "pharmacy",
@@ -1312,9 +1158,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-06-24"
+   "2025-10-24"
   ],
   [
    "pharmacy",
@@ -1326,9 +1172,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-08-21"
+   "2025-12-29"
   ],
   [
    "pharmacy",
@@ -1340,9 +1186,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-10-17"
+   "2026-03-04"
   ],
   [
    "pharmacy",
@@ -1354,9 +1200,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-10-24"
+   "2026-05-07"
   ],
   [
    "pharmacy",
@@ -1368,9 +1214,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2025-12-25"
+   "2026-07-15"
   ],
   [
    "pharmacy",
@@ -1382,9 +1228,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-02-23"
+   "2026-09-22"
   ],
   [
    "pharmacy",
@@ -1396,9 +1242,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-04-24"
+   "2025-10-24"
   ],
   [
    "pharmacy",
@@ -1410,9 +1256,9 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-06-27"
+   "2025-11-22"
   ],
   [
    "pharmacy",
@@ -1424,947 +1270,149 @@
    null,
    "1942-03-08",
    null,
-   "3546",
+   "2641",
    "dispense",
-   "2026-08-30"
+   "2025-12-24"
   ],
   [
    "pharmacy",
-   "PHM-000309",
-   "C000006",
-   "",
+   "PHM-000144",
+   "C000002",
+   "SYN-320504145476",
    "PAPADOPOULOS, Thomas",
    null,
    null,
    "1942-03-08",
    null,
-   "2777",
-   "dispense",
-   "2025-10-24"
-  ],
-  [
-   "pharmacy",
-   "PHM-000310",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-01-03"
-  ],
-  [
-   "pharmacy",
-   "PHM-000311",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-03-22"
-  ],
-  [
-   "pharmacy",
-   "PHM-000312",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-05-29"
-  ],
-  [
-   "pharmacy",
-   "PHM-000313",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-08-05"
-  ],
-  [
-   "pharmacy",
-   "PHM-000314",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-10-13"
-  ],
-  [
-   "pharmacy",
-   "PHM-000315",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-04-15"
-  ],
-  [
-   "pharmacy",
-   "PHM-000316",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-05-11"
-  ],
-  [
-   "pharmacy",
-   "PHM-000317",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-06-08"
-  ],
-  [
-   "pharmacy",
-   "PHM-000318",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-07-09"
-  ],
-  [
-   "pharmacy",
-   "PHM-000319",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-08-10"
-  ],
-  [
-   "pharmacy",
-   "PHM-000320",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-09-08"
-  ],
-  [
-   "pharmacy",
-   "PHM-000321",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-10-10"
-  ],
-  [
-   "pharmacy",
-   "PHM-000322",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2025-10-24"
-  ],
-  [
-   "pharmacy",
-   "PHM-000323",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-01-16"
-  ],
-  [
-   "pharmacy",
-   "PHM-000324",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-04-16"
-  ],
-  [
-   "pharmacy",
-   "PHM-000325",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-07-05"
-  ],
-  [
-   "pharmacy",
-   "PHM-000326",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-09-29"
-  ],
-  [
-   "pharmacy",
-   "PHM-000327",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2025-10-24"
-  ],
-  [
-   "pharmacy",
-   "PHM-000328",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-01-20"
-  ],
-  [
-   "pharmacy",
-   "PHM-000329",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-04-25"
-  ],
-  [
-   "pharmacy",
-   "PHM-000330",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-07-26"
-  ],
-  [
-   "pharmacy",
-   "PHM-000331",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-10-22"
-  ],
-  [
-   "pharmacy",
-   "PHM-000332",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-05-17"
-  ],
-  [
-   "pharmacy",
-   "PHM-000333",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-06-17"
-  ],
-  [
-   "pharmacy",
-   "PHM-000334",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-07-25"
-  ],
-  [
-   "pharmacy",
-   "PHM-000335",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-08-27"
-  ],
-  [
-   "pharmacy",
-   "PHM-000336",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-09-28"
-  ],
-  [
-   "pharmacy",
-   "PHM-000337",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2025-10-24"
-  ],
-  [
-   "pharmacy",
-   "PHM-000338",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-02-19"
-  ],
-  [
-   "pharmacy",
-   "PHM-000339",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-06-21"
-  ],
-  [
-   "pharmacy",
-   "PHM-000340",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2025-10-24"
-  ],
-  [
-   "pharmacy",
-   "PHM-000341",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2025-11-22"
-  ],
-  [
-   "pharmacy",
-   "PHM-000342",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2025-12-19"
-  ],
-  [
-   "pharmacy",
-   "PHM-000343",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
+   "2641",
    "dispense",
    "2026-01-21"
   ],
   [
    "pharmacy",
-   "PHM-000344",
-   "C000006",
-   "",
+   "PHM-000145",
+   "C000002",
+   "SYN-320504145476",
    "PAPADOPOULOS, Thomas",
    null,
    null,
    "1942-03-08",
    null,
-   "2777",
+   "2641",
    "dispense",
-   "2026-02-19"
+   "2026-02-22"
   ],
   [
    "pharmacy",
-   "PHM-000345",
-   "C000006",
-   "",
+   "PHM-000146",
+   "C000002",
+   "SYN-320504145476",
    "PAPADOPOULOS, Thomas",
    null,
    null,
    "1942-03-08",
    null,
-   "2777",
+   "2641",
    "dispense",
-   "2026-03-22"
+   "2026-03-25"
   ],
   [
    "pharmacy",
-   "PHM-000346",
-   "C000006",
-   "",
+   "PHM-000147",
+   "C000002",
+   "SYN-320504145476",
    "PAPADOPOULOS, Thomas",
    null,
    null,
    "1942-03-08",
    null,
-   "2777",
+   "2641",
    "dispense",
-   "2026-04-20"
+   "2026-04-22"
   ],
   [
    "pharmacy",
-   "PHM-000347",
-   "C000006",
-   "",
+   "PHM-000148",
+   "C000002",
+   "SYN-320504145476",
    "PAPADOPOULOS, Thomas",
    null,
    null,
    "1942-03-08",
    null,
-   "2777",
+   "2641",
    "dispense",
-   "2026-05-20"
+   "2026-05-14"
   ],
   [
    "pharmacy",
-   "PHM-000348",
-   "C000006",
-   "",
+   "PHM-000149",
+   "C000002",
+   "SYN-320504145476",
    "PAPADOPOULOS, Thomas",
    null,
    null,
    "1942-03-08",
    null,
-   "2777",
+   "2641",
    "dispense",
-   "2026-06-21"
+   "2026-06-13"
   ],
   [
    "pharmacy",
-   "PHM-000349",
-   "C000006",
-   "",
+   "PHM-000150",
+   "C000002",
+   "SYN-320504145476",
    "PAPADOPOULOS, Thomas",
    null,
    null,
    "1942-03-08",
    null,
-   "2777",
+   "2641",
    "dispense",
-   "2026-07-25"
+   "2026-07-13"
   ],
   [
    "pharmacy",
-   "PHM-000350",
-   "C000006",
-   "",
+   "PHM-000151",
+   "C000002",
+   "SYN-320504145476",
    "PAPADOPOULOS, Thomas",
    null,
    null,
    "1942-03-08",
    null,
-   "2777",
-   "dispense",
-   "2026-08-26"
-  ],
-  [
-   "pharmacy",
-   "PHM-000351",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-09-26"
-  ],
-  [
-   "pharmacy",
-   "PHM-000352",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2025-10-24"
-  ],
-  [
-   "pharmacy",
-   "PHM-000353",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-01-10"
-  ],
-  [
-   "pharmacy",
-   "PHM-000354",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-03-29"
-  ],
-  [
-   "pharmacy",
-   "PHM-000355",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-06-17"
-  ],
-  [
-   "pharmacy",
-   "PHM-000356",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-09-02"
-  ],
-  [
-   "pharmacy",
-   "PHM-000357",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2025-12-13"
-  ],
-  [
-   "pharmacy",
-   "PHM-000358",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-03-30"
-  ],
-  [
-   "pharmacy",
-   "PHM-000359",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-07-14"
-  ],
-  [
-   "pharmacy",
-   "PHM-000360",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-05-11"
-  ],
-  [
-   "pharmacy",
-   "PHM-000361",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-06-11"
-  ],
-  [
-   "pharmacy",
-   "PHM-000362",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-07-12"
-  ],
-  [
-   "pharmacy",
-   "PHM-000363",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-08-11"
-  ],
-  [
-   "pharmacy",
-   "PHM-000364",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-09-09"
-  ],
-  [
-   "pharmacy",
-   "PHM-000365",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-10-09"
-  ],
-  [
-   "pharmacy",
-   "PHM-000366",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2025-10-24"
-  ],
-  [
-   "pharmacy",
-   "PHM-000367",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2025-12-22"
-  ],
-  [
-   "pharmacy",
-   "PHM-000368",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-02-25"
-  ],
-  [
-   "pharmacy",
-   "PHM-000369",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-04-21"
-  ],
-  [
-   "pharmacy",
-   "PHM-000370",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-06-19"
-  ],
-  [
-   "pharmacy",
-   "PHM-000371",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
+   "2641",
    "dispense",
    "2026-08-12"
   ],
   [
    "pharmacy",
-   "PHM-000372",
-   "C000006",
-   "",
+   "PHM-000152",
+   "C000002",
+   "SYN-320504145476",
    "PAPADOPOULOS, Thomas",
    null,
    null,
    "1942-03-08",
    null,
-   "2777",
+   "2641",
    "dispense",
-   "2026-10-09"
+   "2026-09-10"
   ],
   [
    "pharmacy",
-   "PHM-000373",
-   "C000006",
-   "",
+   "PHM-000153",
+   "C000002",
+   "SYN-320504145476",
    "PAPADOPOULOS, Thomas",
    null,
    null,
    "1942-03-08",
    null,
-   "2777",
+   "2641",
    "dispense",
-   "2025-10-24"
-  ],
-  [
-   "pharmacy",
-   "PHM-000374",
-   "C000006",
-   "",
-   "PAPADOPOULOS, Thomas",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   "2777",
-   "dispense",
-   "2026-05-23"
-  ],
-  [
-   "patient",
-   "PAT-000009",
-   "INT00002",
-   "",
-   "Thomas Papadopoulos",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   null,
-   "interview",
-   null
+   "2026-10-10"
   ],
   [
    "patient",
@@ -2522,9 +1570,9 @@
   ],
   [
    "patient",
-   "PAT-000049",
-   "INT00006",
-   "SYN-932392202599",
+   "PAT-000021",
+   "INT00002",
+   "",
    "Thomas Papadopoulos",
    null,
    null,
@@ -2536,121 +1584,9 @@
   ],
   [
    "patient",
-   "PAT-000050",
-   "INT00006",
-   "SYN-932392202599",
-   "Thomas Papadopoulos",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   null,
-   "interview",
-   null
-  ],
-  [
-   "patient",
-   "PAT-000051",
-   "INT00006",
-   "SYN-932392202599",
-   "Thomas Papadopoulos",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   null,
-   "interview",
-   null
-  ],
-  [
-   "patient",
-   "PAT-000052",
-   "INT00006",
-   "SYN-932392202599",
-   "Thomas Papadopoulos",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   null,
-   "interview",
-   null
-  ],
-  [
-   "patient",
-   "PAT-000053",
-   "INT00006",
-   "SYN-932392202599",
-   "Thomas Papadopoulos",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   null,
-   "interview",
-   null
-  ],
-  [
-   "patient",
-   "PAT-000054",
-   "INT00006",
-   "SYN-932392202599",
-   "Thomas Papadopoulos",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   null,
-   "interview",
-   null
-  ],
-  [
-   "patient",
-   "PAT-000055",
-   "INT00006",
-   "SYN-932392202599",
-   "Thomas Papadopoulos",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   null,
-   "interview",
-   null
-  ],
-  [
-   "patient",
-   "PAT-000056",
-   "INT00006",
-   "SYN-932392202599",
-   "Thomas Papadopoulos",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   null,
-   "interview",
-   null
-  ],
-  [
-   "patient",
-   "PAT-000057",
-   "INT00006",
-   "SYN-932392202599",
-   "Thomas Papadopoulos",
-   null,
-   null,
-   "1942-03-08",
-   null,
-   null,
-   "interview",
-   null
-  ],
-  [
-   "patient",
-   "PAT-000058",
-   "INT00006",
-   "SYN-932392202599",
+   "PAT-000022",
+   "INT00002",
+   "",
    "Thomas Papadopoulos",
    null,
    null,
@@ -2661,5 +1597,5 @@
    null
   ]
  ],
- "total": 189
+ "total": 113
 }

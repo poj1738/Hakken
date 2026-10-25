@@ -319,6 +319,24 @@ def build() -> int:
          "sex": r.get("sex", "")} for r in nicknames]
 
     # -- write ---------------------------------------------------------------
+    # A build with no PBS snapshot has only synthetic codes. It must not replace
+    # committed fixtures that carry real ones: on a fresh clone that turned the
+    # README's own `make lexicon && make synth` into 21 rewritten fixtures and two
+    # failing tests (judge-clone audit, 25 Oct). data/reference/ is still written.
+    committed = FIXTURES / "Q_REF__lexicon.json"
+    keep_committed = False
+    if real_codes == 0 and committed.exists():
+        env = json.loads(committed.read_text())
+        i = env["headers"].index("pbs_code")
+        keep_committed = any(r[i] and not r[i].startswith("SYN") for r in env["data"])
+        if keep_committed:
+            # Serve the committed lexicon too. datasvc hands data/reference/lexicon.json
+            # to Zetaris, and the silos carry the committed real PBS codes, so an
+            # all-synthetic lexicon here left a teammate's live Zetaris unable to
+            # match pharmacy rows by code. Same rows, same values, PBS content unmodified.
+            records = [dict(zip(env["headers"], r)) for r in env["data"]]
+            log(f"  no PBS snapshot: using the committed lexicon ({committed}) so live "
+                f"Zetaris and the silos agree on codes")
     OUT.mkdir(parents=True, exist_ok=True)
     FIXTURES.mkdir(parents=True, exist_ok=True)
     SAMPLE.mkdir(parents=True, exist_ok=True)
@@ -333,15 +351,19 @@ def build() -> int:
             "data": [[str(r.get(c, "")) for c in cols] for r in rows],
             "total": len(rows),
         }
+        if name == "lexicon" and keep_committed:
+            log(f"  wrote {name}: {len(rows)} rows (committed fixture left alone)")
+            continue
         (FIXTURES / f"Q_REF__{name}.json").write_text(json.dumps(envelope, indent=1), encoding="utf-8")
         log(f"  wrote {name}: {len(rows)} rows")
 
     # Committed attributed sample, <=200 rows (PLAN 4.2).
-    with (SAMPLE / "lexicon_sample.csv").open("w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=list(LEXICON_COLUMNS))
-        w.writeheader()
-        for rec in records[:200]:
-            w.writerow(rec)
+    if not keep_committed:
+        with (SAMPLE / "lexicon_sample.csv").open("w", newline="", encoding="utf-8") as fh:
+            w = csv.DictWriter(fh, fieldnames=list(LEXICON_COLUMNS))
+            w.writeheader()
+            for rec in records[:200]:
+                w.writerow(rec)
 
     # -- report --------------------------------------------------------------
     log(f"\nlexicon: {len(records)} rows from {len(medicines)} products")

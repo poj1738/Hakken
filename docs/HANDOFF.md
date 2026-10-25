@@ -27,6 +27,490 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 15:55 AEDT · Arnav · arnav/zetaris-adapter
+
+**Did:** The Zetaris adapter, `app/adapters/zetaris.py`.
+- **`ZetarisClient.run(sql, template_id, replay_key)`** follows the binding call shape
+  (REFERENCE_NOTES 1.1) and **passes the envelope on untouched**: strings stay
+  strings, NULL stays `None`.
+- **Read-only guard:** SELECT, SHOW, DESCRIBE or WITH, one statement. Quoted text is
+  ignored, so `'stop; then DROP'` in a literal is data. Every real template passes it.
+- **A result that reaches its row limit is refused rather than silently truncated.**
+- **Retries:** bounded, on connection errors and 5xx only. Never on 4xx or a timeout.
+- **`RunQueries`** is one run's budget: `MAX_ZETARIS_QUERIES_PER_RUN` = 8, then
+  `QueryBudgetExceeded`. It records template, SQL, ms and rows for every query, failed
+  ones included.
+- **`load_lexicon(client)`** reads Q_REF through the adapter, once per process, not
+  counted against any run.
+- **SAMPLE_MODE replays `tests/fixtures/medtrace/`** by EMR MRN. The MRN → `P00nn` index is
+  built from the fixtures themselves: a file is indexed only if its own rows contain that
+  MRN. No ground truth is read, because it's gitignored and absent in Docker. A missing
+  fixture raises `ReplayMiss` and never guesses. This is cached Zetaris *data* (diffed
+  identical to live), not model text, so it's consistent with the README.
+
+41 tests. Live on my machine: `SELECT 1` and `SHOW LIGHTNING DATABASES` through the
+adapter. The MedTrace views are **not** registered on my Zetaris, so I'm staying on
+fixtures as agreed.
+
+**Note for the orchestrator (me, next):** a SAMPLE_MODE Q2 replay returns the recorded
+rows for that patient whatever links were confirmed. Filter rows to the confirmed
+`record_key`s after `rows_from_sql`, and filter Q3 to the requested `row_id`s. Otherwise
+a rejected identity link would still contribute medicines in sample mode.
+
+**Changed shared files:** none on the list.
+
+**Broken:** nothing. Unit tests green, secret scan clean.
+
+**Needs from teammates:**
+- **Arpon:** when you want me live on MedTrace data, say so and I'll run
+  `register_sources.py` (dry run first, with your go-ahead) on my own Zetaris.
+
+**Next:** the orchestrator, wired to the pack in `scripts/eval.py:reconcile()` order,
+with the Writer as the first real Nemotron call.
+
+---
+
+### 2026-10-25 15:30 AEDT · Arnav · arnav/meterless-adapter
+
+**Did:** The Nightshift adapter, `app/adapters/meterless.py` (TODO_ARNAV §4, first item, ticked).
+- **`status()`** decides from `GET /v1/models`: unauthorized ≠ offline.
+- **`chat()`**:
+  - `DEFAULT_MAX_TOKENS` 8192, and refuses anything below 512.
+  - **Truncation is caught by the token count** (`completion_tokens >= max_tokens`
+    raises `TruncatedResponse`), never by `finish_reason`.
+  - The receipt is captured defensively. `routed_model` comes from `receipt.routed_model`,
+    then `winning_route.model`, then `response.model`, never from `provider_model`.
+  - Bounded retries on connection errors and 502/503/504 only; a 401 or a timeout is never retried.
+- **`chat_json()`**: schema instruction, pydantic validation, exactly one repair retry.
+- **`auto_detect()`**.
+- `ChatResult.model_call()` and `.trace_fields()` give the orchestrator its `ModelCall`
+  and `TraceEvent` fields.
+
+**Verified live on my machine:** status online with 18 routes; plain text and
+schema-validated JSON both answered by `nvidia/nemotron-3.5-lightning-30b-a3b`.
+Real responses are recorded in `tests/fixtures/meterless/`: bodies only, no token, and
+two secret-shaped build hashes redacted after the pre-commit scan caught them. 33 tests,
+all on a mock transport.
+
+**Plan vs repo:** my brief said SAMPLE_MODE should *replay recorded responses*. The
+README and TODO.md promise judges an `offline-heuristic` that **never replays saved
+model text**, so I followed the repo:
+- In SAMPLE_MODE the adapter never touches the network. Each call site supplies an
+  `offline` function, and the result is recorded as `offline-heuristic`.
+- The recordings are parser fixtures only.
+
+Logged in `docs/DECISIONS.md` with the live observations: routes are still coerced, this
+runtime also lists `local-runtime/*` models (so `meterless/auto` *could* answer with a
+non-Nemotron), and a one-sentence answer cost up to 1,494 completion tokens.
+
+**Changed shared files:** none on the list.
+
+**Broken:** nothing. 641 passed / 6 skipped, secret scan clean.
+
+**Needs from teammates:** nothing blocking.
+- **Arpon:** on your runtime, does `meterless/auto` ever route to a local model? Mine
+  lists `local-runtime/*`. If yours does, the NVIDIA story needs a pinned Nemotron route.
+
+**Next:** Zetaris adapter, then the orchestrator with the Writer as the first real
+Nemotron call.
+
+---
+
+### 2026-10-25 15:10 AEDT · Arpon · arpon/tga-on
+
+**Did:** (1) **TGA cleared** by the consultant for non-commercial hackathon use. `datasvc` serves `/ref/tga`, the docs record the ruling, and `register_sources.py --with-tga` also works with `--refresh`. Restarted Arpon's local `datasvc` so it serves the route. (2) **Identity evidence has a verdict prefix** for Anshu's UI: `agrees:` / `partial:` / `differs:` / `held:` at the start of every `field_evidence` sentence, from the score itself. (3) Repo stays public (team decision).
+**Changed shared files:** none on the list.
+**Broken:** **Q4 is not registered in Arpon's Zetaris yet.** The agent's permission check blocked creating Zetaris objects, so Arpon runs `.venv/bin/python scripts/register_sources.py --apply --skip-exists --with-tga` himself. Until then a live `q_shortages` call fails with an unknown view.
+**Needs from teammates:** Anshu — colour identity fields from the prefix (`value.split(": ", 1)[0]`, one of `identity.EVIDENCE_VERDICTS`) instead of the keyword regex in `IdentityReview.tsx`; `partial` deserves its own colour. Arnav — real runs now produce prefixed evidence, so hand-written `field_evidence` in `tests/fixtures/api/` will differ until they are regenerated from runs. Q4 is available for a `check_shortages` step; render rows as "known shortage", never "unavailable".
+**Next:** nothing on Arpon's side after the registration command.
+
+### 2026-10-25 15:06 AEDT · Arnav · arnav/schema-review
+
+**Did:** TODO_ARNAV section 2, ticked in that file.
+- **`Finding.detail`** passes `DiscrepancyCandidate.detail` through (`atc_class`,
+  `conflict`, `bpmh_single_source`, `subtype`, `statement`, `daily_dose_ratio`).
+- **`FeedbackRequest.source` / `.attribute`**, vocabulary-checked (`Source`,
+  `TrustAttribute`), **both required when `reason == "source_outdated"`**.
+- **Example API JSON regenerated** against the 25 Oct data:
+  - `detail` is on every finding.
+  - P0001's overlay rows (`PHM-000076`–`078`) no longer exist, and its interview name is now "Marj".
+  - `patients.json` now comes from the real Q0 fixture: the 13 replayable patients.
+  - The feedback example uses the learning-demo record `("gp", "daily_dose")` 0.70 → 0.50, with no acceptance update.
+- **The needs-review example is now P0015** (`input_examples/example_1`). Since the
+  25 Oct data, P0002 links straight through with no review. The file keeps its name
+  `run_P0002_needs_review.json` because `web/src/api.ts` imports it. The UI keys on
+  `patient_id`, so it picks P0015 up automatically.
+
+Order going forward, agreed with Arnav: the repo's TODO order, not the original
+5.2-first list. Meterless adapter → Zetaris adapter → orchestrator / API / `run.py` →
+World Model (in this window, no second session) → H-MEM.
+
+**Changed shared files:** **`app/schemas.py`** (`Finding.detail`, `FeedbackRequest.source`,
+`FeedbackRequest.attribute`, plus a validator).
+
+**Broken:** nothing on `main`. Unit tests 600 passed / 5 skipped. **One live-mode break is waiting in
+the UI, see below.**
+
+**Needs from teammates:**
+- **Anshu** — (1) Add `detail: Record<string, unknown>` to `Finding`, and `source?` /
+  `attribute?` to `FeedbackRequest`, in `web/src/types.ts`.
+  (2) **`Flags.tsx` defaults `reason` to `source_outdated` and `App.tsx` sends only
+  `reason`.** Against the live API that is now a 422. A `source_outdated` reject has to
+  send `source` (one of the finding's evidence sources: let the pharmacist pick) and
+  `attribute` (`daily_dose` for dose and dose_unconfirmable findings, `existence` for
+  omission and commission is a reasonable default). Mock mode is unaffected.
+  (3) Render `detail.conflict === "confirm"` as *ask first*, and `detail.statement` when
+  present.
+- **Arpon** — nothing new. The schema review asks from #12 are both done. Structured
+  `Task` is deferred: `list[str]` for the demo.
+
+**Next:** Meterless adapter (Nightshift).
+
+---
+
+### 2026-10-25 15:28 AEDT · Anshu · anshu/ui-review
+
+**Did:** Reviewed the merged UI (#22) against PLAN §6, one item at a time. All 10 items done:
+- Header shows `GET /status` only.
+- Picker handles load, empty and error states, and clears results when you switch patient.
+- Timeline survives a dropped poll.
+- Identity review runs end to end in mock mode, ending on a labelled placeholder.
+- The BPMH banner heading appears only when `bpmh_confirmable` is false.
+- The grid flags any present cell that has no cited row.
+- Flags follow #23: `detail` is rendered ("Ask first" for `conflict: confirm`), a `source_outdated` reject sends `source` + `attribute`, and there is no default reject reason. Bodies were checked against `FeedbackRequest`.
+- Each task names the finding or notice it came from; ticks are labelled screen-only.
+- Trust panel: a feedback "after" value only overrides `run.trust` in the run it was given on, so patient B shows its own trust (learning demo). A "What your feedback changed" box sits at the top.
+- Disclaimer pill in the header; the API's caveats sit with the result, not in the footer.
+- Identity colours come from Arpon's `agrees`/`partial`/`differs`/`held` prefix (#24), with the keyword guess kept only for the unprefixed examples.
+- Followed #23: `types.ts` has `Finding.detail` and `FeedbackRequest.source`/`attribute`; the mock placeholder was regenerated for MRN0000015.
+
+**Changed shared files:** none.
+**Broken:** nothing. Branch not on GitHub yet: Claude's push gets 403, so it goes up by bundle like #22.
+**Open questions for Arnav** (none blocking):
+1. Confirm `TraceEvent.model` is always the routed (answering) model, not the requested route. The timeline labels it "answered by". If it can hold the route, send the `meterless` receipt, which the UI prefers.
+2. **Resolved doses need a unit.** `FusedValue.value` is a bare number ("Daily dose: 40"); `types.py` says "canonical units" but no field names them. The UI will not print "mg" itself (insulin is in units). Add a unit, e.g. `unit` on `FusedValue`, or send the value as text with its unit. Until then the grid shows the bare number.
+3. Every `present` cell should cite at least one row. Warfarin's admission-chart and patient-interview cells cite none in both P0001 examples, so the grid marks them "no row".
+4. The cell inspector shows `sql_template_id`, not the SQL text. If PLAN 6.6 means the query itself, `Evidence` needs it.
+5. A real resumed-run example (after `POST /run/{id}/identity`) would replace `web/src/placeholders/resumed_run.PLACEHOLDER.json`. It can't go in `tests/fixtures/api/` without updating `test_api_fixtures.py`'s file list.
+6. **Task order.** `RunResponse.tasks` arrives in alphabetical order, which buries the warfarin and oxycodone tasks mid-list. Ordering by the priority of the finding each task comes from would put high-risk ones first. The UI won't re-sort them itself, since that would mean the screen deciding what matters most. Each task now shows its source finding and badges.
+**Next:** push via bundle and open the PR. Then `VITE_API_MODE=live` as soon as Arnav's `POST /run` lands, and rehearse the 30-second demo arc in mock mode.
+
+### 2026-10-25 14:34 AEDT · Arpon · arpon/judge-path
+
+**Did:** Applied the fresh-clone audit. `make lexicon && make synth` on a clean clone used to rewrite 21 committed fixtures and fail 2 tests. It now reproduces them byte for byte (the generator falls back to the committed lexicon). CI runs that build and `git diff --exit-code`, so the scorecard tests run in CI instead of skipping. Also: honest `make examples`/`validate`/`conformance`, README Quickstart (Docker labelled not working yet, data build documented), `python3` in the docs, `metadata.json` status and pre-existing components, `.dockerignore`, pip timeout in the Dockerfile, `.env.example` PBS comment.
+**Changed shared files:** **`Makefile`** (`test` drops the duplicate `-q` so the summary prints; `conformance`/`examples`/`validate` print "not implemented yet" and exit 2 until their scripts/tests exist — they run normally once they do), **`.github/workflows/ci.yml`** (new data-build + reproducibility step before tests), **`.env.example`** (comment only). Also `Dockerfile` (env var) and a new `.dockerignore`.
+**Broken:** nothing. CI is slower now, because the scorecard actually runs.
+**Needs from teammates:** Arnav — `make examples` and `make conformance` start working automatically once `scripts/generate_examples.py` and `tests/engines/test_*.py` exist. The `.dockerignore` excludes `data/reference/` and `data/synthetic/silos/`, so the image relies on `tests/fixtures/medtrace/` for sample mode, as planned.
+**Next:** nothing pending on Arpon's side except the TGA licence answer.
+
+### 2026-10-25 14:24 AEDT · Arpon · arpon/background-1-4
+
+**Did:** (2) `scripts/eval.py --json` and a false-merge count (0/286 held-out, 0/280 tune). A scorecard dashboard was built from that run's JSON (link in chat), for the pitch. (3) Data docs audited: `DATA_SOURCES.md` rewritten (it still said "none registered yet"). `DATA_LICENCES.md` corrected: 108 products; the desvenlafaxine ATC exception; the committed PBS values in `Q_REF__lexicon.json` now have `PBS_COPYRIGHT.txt` beside them. `PREEXISTING.md` TGA row updated. (4) Q4 `q_shortages` written, tested in SQLite, and its dialect checked live, read-only. **Switched off**: TGA licence unconfirmed (`DECISIONS.md`).
+**Changed shared files:** none on the list.
+**Broken:** nothing. Fresh-clone audit (item 1) is still running; its fixes follow in a separate PR.
+**Needs from teammates:** Arnav — Q4 exists if you want a `check_shortages` tool step, but it returns nothing live until the licence is confirmed. Don't register it yourself.
+**Next:** apply the fresh-clone audit's fixes; get the TGA licence answered.
+
+### 2026-10-25 14:11 AEDT · Anshu · claude/modest-feynman-dc14du
+
+**Did:** Built the web UI in `web/` (Vite 5 + React 18 + TypeScript, plain CSS): all ten PLAN §6 items in mock mode.
+- Header pill (Zetaris, Nightshift, last routed model, MOCK/SAMPLE_MODE).
+- Picker + Run.
+- Polled live timeline. A blocked verifier claim is shown in red, and each model step shows its routed model; there is also a model-calls table (requested route → answered by).
+- Identity review side by side, with Same person / Different people.
+- Coverage strip + BPMH banner.
+- BPMH grid, where unknown is hatched purple "?" and absent is grey "○". Dissenting cells are outlined, and abstained attributes read "Conflict: ask patient". Hover or click a cell to see its rows from `evidence_index` (source, `row_id`, original text, template, query id).
+- Flags: Must review first (high-risk first), then the rest and documented-intentional items collapsed. Confirm / Reject + six reasons go to `POST /feedback`.
+- Tasks, notices, a trust panel showing before → after with the delta, and the footer disclaimer.
+
+`VITE_API_MODE=mock|live`. Mock mode replays `tests/fixtures/api/` and never invents data: there is no example for a resumed identity run or other patients, and it says so on screen. `web/README.md` documents the mock scenarios. Checked with Playwright screenshots of every state; no console errors.
+**Changed shared files:** none on the list. `README.md` "Not finished" and Limitations now say the UI exists but has only run against example responses. `PROGRESS.md` UI row updated.
+**Broken:** **the branch is not on GitHub.** Push failed with 403 (Claude has no access to `poj1738/Hakken` from this session), so the claim and the UI exist only in this cloud session until access is fixed. `npm run build` is not in CI (CI is Python-only; adding a Node job means editing `.github/workflows/ci.yml`, a shared file, so I left it).
+**Needs from teammates:**
+- Arnav — (1) `POST /run` should return a `RunResponse` with `run_id` and `status: running`; the UI then polls `GET /run/{id}`. (2) A resumed-run example after `POST /run/{id}/identity` would let mock mode show the second half of the identity scene. (3) `run_P0001_gp_not_found.json` shows warfarin GP = `unknown` but still lists `gp: "5 mg"` under `dissenting`; the UI shows both as given. Worth fixing in the fixture.
+- Arpon — `IdentityLink.field_evidence` is free text, so the UI colours agree/differ by keywords in the matcher's sentence ("differs", "swap", "typo" → differs; "match" → agrees). A structured per-field verdict would be sturdier, but `types.py` is frozen, so this is only a suggestion.
+**Next:** push once GitHub access works, open the PR, then switch to `VITE_API_MODE=live` when the API lands.
+
+### 2026-10-25 14:02 AEDT · Anshu · claude/modest-feynman-dc14du (claim)
+
+**Did:** Claiming the **web UI** (PLAN §6, items 1–10): Vite + React + TypeScript in `web/`, `VITE_API_MODE=mock|live`, mock mode replaying `tests/fixtures/api/*.json`. Nobody else should start on `web/`.
+**Changed shared files:** none.
+**Broken:** nothing yet — claim only.
+**Needs from teammates:** nothing yet.
+**Next:** header + status pill, picker + Run, timeline, then the grid, flags, tasks, trust panel.
+
+### 2026-10-25 13:47 AEDT · Arpon · arpon/track-1
+
+**Did:** Recorded the team's **Track 1** choice in `metadata.json` (track, one-liner, Zetaris status, data sources), `README.md`, `TODO.md` (track and data decisions ticked, Phase 3 ticked) and `PROGRESS.md`, plus a superseded note on `docs/AGENT_KICKOFF.md`. Rewrote the README's stale status sections ("only two things are built") to state honestly what works and what does not.
+**Changed shared files:** none on the list.
+**Broken:** nothing.
+**Needs from teammates:** Arnav and Anshu — the README's "Not finished" list is your layers. Tick items off there as they land, so the README never claims more than the code shows.
+**Next:** Arpon waiting on Arnav's answer about which of his pieces to take.
+
+### 2026-10-25 13:39 AEDT · Arpon · arpon/demo-data
+
+**Did:** Demo data. (1) **The learning demo had no patient B.** Under one GP-dose rejection, no replay-set patient changed. Staged a pair (`LEARNING_PAIR`: P0003 teaches, P0007 learns). Both abstain at the priors. After −0.20 on GP `daily_dose`, both resolve to the pharmacy dose, and P0007 gains a dose finding (its chart copied the stale GP dose). No rng, no new rows: every other patient is byte-identical. Recorded in the ground truth as `learning_demo`. Pinned by `tests/unit/test_learning_demo.py` on the replay fixtures (runs in CI). (2) **Showcase replay fixtures** for P0013, P0015 and P0089, plus **5 `input_examples/`** with a README saying what each correct run shows (rule 8). (3) **Dockerfile copies `tests/fixtures/medtrace/`**: `SAMPLE_MODE` in the image had nothing to replay. Live Zetaris re-cached (`make refresh`, `make verify` green), and the staged values confirmed by `row_id`.
+**Changed shared files:** none on the list. `Dockerfile` changed (one `COPY` line) — called out here and in the PR.
+**Broken:** nothing. Tune now 145 TP / 17 FP / 5 FN, F1 0.93: the extra miss is P0007's staged chart error, which the system can only see after feedback. That is the demo. Held-out untouched.
+**Needs from teammates:** Arnav — the box at the top of `docs/TODO_ARNAV.md` now says **landed**. Recording outputs is unblocked. Your H-MEM `source_outdated` delta must reach `fuse` as `trust[("gp", "daily_dose")]`; `test_learning_demo.py` is the acceptance test. Anshu — the demo order is example_4 then example_5 (`input_examples/README.md`).
+**Next:** nothing on Arpon's side. Pick up whatever is handed back here.
+
+### 2026-10-25 13:14 AEDT · Arpon · arpon/loose-ends
+
+**Did:** Closed Arpon's last loose ends. (1) `coverage()` measured GP-list staleness against `date.today()`, so a fixed dataset changed its answer as the calendar moved; it now measures from the admission chart, the newest document (frozen signature has no `as_of`). Test added. (2) `scripts/eval.py` reports high-risk recall **split core APINCHS vs extended**, as the 24 Oct consultant ruling asked — pooled, a weak extension row moves a number that reads as ACSQHC compliance. Held-out: **core 30/32 [0.80, 0.98], extended 5/5**; tune core 27/27, extended 7/7. Scores otherwise unchanged. (3) PROGRESS "Waiting on Arpon" was stale: sotalol, bundle 6 and the formulation pairs were all decided and applied 24 Oct — verified in `medicines.csv` and struck off.
+**Changed shared files:** none.
+**Broken:** nothing. Both held-out high-risk misses (P0123 insulin aspart, P0174 temazepam commissions) are core APINCHS — still recorded, still not tuned against.
+**Needs from teammates:** Arnav — `docs/TODO_ARNAV.md`, unchanged. Quote core-APINCHS recall (30/32), not the pooled 35/37, anywhere it reads as ACSQHC compliance.
+**Next:** Arpon's section is done. Pick up whatever Arnav or Anshu hand back here.
+
+### 2026-10-25 12:30 AEDT · Arpon · arpon/population (green — supersedes the entry below)
+
+**Did:** The entry below is resolved. Then applied the consultant's review of the
+detector (briefs 11–14), restored the population to 200, refreshed Zetaris and
+reviewed Arnav's schema. Every test green, secret scan clean.
+
+**Held-out (200 patients): precision 0.95, recall 0.95, F1 0.95, high-risk 35/37.**
+The full table and what changed per brief are in `docs/DECISIONS.md` (25 Oct,
+"Consultant rulings…"). Three things matter most:
+- `dose_unconfirmable` is now a finding only on visible conflict. Routine dose
+  confirmation is the `safety.forced_confirm` task lane.
+- A lapse alone is a `conflict: confirm` item, never an asserted commission.
+- **DATA_SPEC's 100% high-risk recall is not met on held-out.** The two missed
+  commissions are recorded, not tuned against.
+
+**The two red tests** were sample-sensitive, not regressions. Each now tests its
+real property exactly, with no floor lowered:
+- 82 of 82 resolvable patient descriptions resolved.
+- The blank-IHI format check now looks across all fixtures.
+- The population-level free-text figure (0.847) moved to the scorecard.
+
+**Zetaris is current at 200 patients and no slower**: Q1–Q3 run in 2–3 s,
+`all_sources` holds 13,856 rows, the fixture diffs match, and Q0 is identical
+(1,326 rows).
+
+**Schema review for Arnav:** posted on #12. **Two additions are needed**:
+- `Finding` needs `detail` / `atc_class` — without it `POST /feedback` cannot key
+  learned acceptance, and the UI cannot show `conflict: confirm` or an
+  unverified-BPMH flag.
+- `FeedbackRequest` needs `source` + `attribute` so `source_outdated` can lower
+  the right trust record.
+
+**Changed shared files:** none. `safety.DOSE_CHANGES_WITHOUT_A_SCRIPT` and the
+`trust` priors changed value, not shape.
+
+**Broken:** nothing.
+
+**Needs from teammates:** **Arnav — read `docs/TODO_ARNAV.md` first.** It holds the two schema additions, the `forced_confirm` task lane and the pipeline order, in priority order.
+
+**Next:** merge this; then back to whatever helps the agent layer most.
+
+---
+
+### 2026-10-25 10:40 AEDT · Arpon · arpon/population (NOT merged — 2 tests red)
+
+**Did:** PR #14 merged (domain pack complete). Then raised the population to
+**200** (DATA_SPEC's number; default changed in the generator) and re-scored.
+
+**Held-out at 200 patients: precision 0.87, recall 0.97, F1 0.92, high-risk 25/26**
+(simulated review); no human review: F1 0.88. Tune: 0.91, high-risk 22/22. At 40
+patients the biggest error source was invisible: `dose_unconfirmable` was 21 of 32
+false positives at 200. It now fires when the sources show a phone change ("as
+directed per INR", disagreeing doses) **or** no patient states a regular dose; where
+the patient confirms, the duty is the `safety.forced_confirm` task, not a finding.
+Also: pharmacy "present" decays with the age of the last fill; a combination on the
+chart no longer hides a separately-taken component; generator stops planting chart
+dose errors whose cited GP line states no dose.
+
+**Broken — why this is not merged:** after regenerating at 200, the 10 fixture
+patients changed and two sample-sensitive tests fail:
+- `test_generator.py::test_fixtures_distinguish_an_absent_column_from_a_blank_value`
+  — "expected at least one blank IHI" in the fixture sample.
+- `test_normalise.py::test_normalisation_accuracy_against_ground_truth` — patient
+  free-text top-1 **0.837** vs floor 0.84 (DATA_SPEC target 0.85).
+Do **not** lower either floor to pass. Fix by looking at which fixture patients
+`--fixtures` picks (e.g. choose 10 that cover a blank IHI), or improve free-text
+resolution.
+
+**Also not done:** review of Arnav's schema additions (#12). **Zetaris is stale**
+(still 40 patients) — run `make refresh` then `make verify`, and re-time Q1–Q3 at
+~6 MB; latency was not measured at 200.
+
+**Needs from teammates:** nothing new. World Model stays with Arnav.
+
+**Next:** fix the two tests, `make refresh`, re-time, open the PR.
+
+---
+
+### 2026-10-25 09:35 AEDT · Arpon · arpon/sunday-logic
+
+**Did:** Finished the clinical domain pack — `fuse`, `detect`, `triage` — and
+`scripts/eval.py`, which scores it end to end against the planted ground truth.
+584 tests green, secret scan clean, Zetaris refreshed and verified.
+
+**Held-out scorecard (the number we report): precision 0.83, recall 0.94, F1 0.88,
+high-risk recall 2/2**, with simulated review of near-miss identity links. With no
+human review at all: F1 0.79. Tune: 0.91. Held-out is within 0.03 of tune and **no
+change was made by looking at it.** Pinned by `tests/eval/test_scorecard.py` (F1
+floors, 100% high-risk recall, ≤4 findings per patient, zero false merges).
+
+**Building against real patients rather than in the abstract found eleven defects
+before they could reach a demo.** In the order they were found:
+
+- **Ground truth:** 9 of 20 planted omissions cited *another patient's* rows, which
+  capped omission recall near 55% for any detector. The `dose_unconfirmable` phone
+  change left no trace in any silo, so the warfarin finding had no visible reason —
+  now rendered per DATA_SPEC 9.5 ("as directed per INR" vs "4 mg Mon Wed Fri").
+  Discharge actions contradicted what happened; stale listings were planted for
+  patients with no pharmacy record; one pack size per product made a finished
+  prednisolone 25 mg course look like 200 days of supply.
+- **normalise:** `" cr"` matched "Crestor", so rosuvastatin was modified-release;
+  a generic-level AMT code borrowed an arbitrary product's release; pharmacy dosage
+  forms were read as routes. Release and route conflicts across 108 medicines: 0.
+- **coverage:** a GP line marked *ceased* counted as support. Now evidence against.
+- **identity:** a lookalike's un-identified records were rejected outright when the
+  patient's own IHI was absent from the cluster — P0008 lost three findings. Now
+  review. And Arnav's P0002 label was a **scoring** bug: pharmacy surnames, which
+  live inside "SURNAME, Given", were weighted as maiden-name matches.
+
+**The design decisions are in `docs/DECISIONS.md` (25 Oct)** — chart excluded from
+the BPMH, silence counts half, commission needs an assertion, frequency-vs-dose by
+what changed, `dose_unconfirmable` for every current phone-dose medicine, acceptance
+keyed `(type, atc_class)`. Four are out with the consultant as **briefs 11–14**.
+
+**Changed shared files:** none of the listed ones. `types.py` is unchanged.
+
+**For Arnav — things you will hit:**
+- **`tests/fixtures/medtrace/Q0__admissions.json`** is new — your first `SAMPLE_MODE`
+  replay. Identical to live. It is one row per admission-chart **line** (290 rows,
+  40 admissions), so dedupe on `source_patient_id`.
+- **The fixtures were regenerated today.** Your `tests/fixtures/api/*.json` still
+  validate (no dangling row ids), but their demographics and row text now drift from
+  `Q1/Q2`, and `run_P0002_needs_review.json` carries the old surname label. PLAN
+  says regenerate them from real runs today anyway.
+- **Acceptance is keyed `(type, detail["atc_class"])`**, the 4-character ATC
+  subgroup, matching your `AcceptanceUpdate.atc_class`. Read it off the candidate
+  rather than computing your own.
+- **`fuse` leaves `FusedMed.high_risk_class` as `None`** (it is not given the
+  lexicon). Fill it with `safety.high_risk_class(med.atc, lex)`.
+- **The orchestrator composition is in `scripts/eval.py:reconcile()`** — Q1 →
+  `link_identity` → Q2 on the auto-merge set only → `normalise_med` → `coverage` →
+  `evidence_state` → `fuse` → `detect_discrepancies` → `prioritise`. Copy it rather
+  than rediscovering the order.
+
+**Broken:** nothing. Known and recorded rather than fixed: `coverage()` uses
+`date.today()` for the stale-GP check, so it reads the wall clock instead of the
+admission date — harmless today, wrong in a replay.
+
+**Needs from teammates:**
+- **Arnav** — the agent layer is where every unmet disqualification rule sits;
+  World Model is 17 hours overdue. Tell me what you have and have not started, and I
+  will take something off you (World Model is my preference — no coupling to your
+  orchestrator).
+- **Anshu** — nothing from you is in the repo yet. Everything you need has been on
+  `main` since 4am: `tests/fixtures/api/`, `app/schemas.py`, `types.py`.
+
+**Next:** review Arnav's schema additions (#12); then whatever he hands over.
+
+---
+
+### 2026-10-25 04:05 AEDT · Arnav · arnav/api-fixtures
+
+**Did:** PLAN 5.8 — example API responses for the UI in `tests/fixtures/api/`, one per
+endpoint: `status.json`, `patients.json`, `run_P0001_trace_partial.json` (mid-run poll),
+`run_P0001_done.json`, `run_P0002_needs_review.json`, `feedback_response.json`, plus
+one extra, **`run_P0001_gp_not_found.json`** — GP and interview not found, so the UI has
+a case with UNKNOWN cells, the BPMH banner and `bpmh_not_confirmable`.
+
+They are **hand-written illustrations, labelled as such** in `output.caveats` and in
+`tests/fixtures/api/README.md`, built through the real pydantic models so they match
+`app/schemas.py` exactly. Real where possible: demographics and row text from Arpon's
+`Q1/Q2` fixtures, P0001's two planted omissions with their real row ids, the trust priors,
+and **every identity link in the P0002 review is the actual output of
+`identity.link_identity()`** on `Q1__P0002.json`. Invented rows have `-EX` in their id.
+Patients are MRNs; `P0001` never appears inside a file.
+
+`tests/unit/test_api_fixtures.py` (20 tests) validates every file against the schema and
+checks coverage of the UI states: every `DiscrepancyType`, every `NoticeType`, all three
+coverage states, every run status the UI handles, no dangling row ids. **Any schema change
+now fails CI until these files are updated in the same PR.**
+
+**Changed shared files:** none (`app/schemas.py` unchanged since #12).
+
+**Broken:** Nothing. 464 passed / 36 skipped, secret scan clean.
+
+**Needs from teammates:**
+- **Anshu** — the files are on `main` once this merges; there were **no placeholders of
+  yours** on `main` or any branch to replace. Types: copy from `app/schemas.py` (#12) and
+  `app/domain/packs/medtrace/types.py`. The README lists which file exercises which screen.
+- **Arpon** — one observation, not verified further: on P0002, `link_identity` labels
+  `pharmacy:C000006` with *"surname matches a previous surname"*, but that row's
+  `name_family` and `name_previous` are both null (its name is the combined
+  `"PAPADOPOULOS, Thomas"` in `name_given`). The band and guards look right; the label may
+  be off. Still open from my last entry: register silos on my Zetaris or stay on fixtures,
+  and a Q0 fixture.
+
+**Next:** PLAN 5.2, the Zetaris adapter (fixture replay first).
+
+---
+
+### 2026-10-25 03:48 AEDT · Arnav · arnav/schemas
+
+**Did:** First session. Machine set up (Windows 11 + WSL2 Ubuntu; local Zetaris, own
+Nightshift, preflight 20/2/1 — see my section of `docs/ENVIRONMENTS.md`, PR #11).
+**Claiming PLAN 5.1 (schemas), 5.8 (example API JSON), then 5.2–5.7** in that order;
+5.9 (engines) runs in a second session on `arnav/engines`.
+
+PLAN 2.8 landed in `app/schemas.py`: `Finding`, `Evidence`, `IdentityReview`,
+`ModelCall`, the new `FeedbackRequest`, and the MedTrace fields on `RunResponse`
+(`coverage`, `bpmh_confirmable`, `banner`, `grid`, `notices`, `tasks`, `query_count`,
+`zetaris_ms`, `model_calls`). The domain types (`Coverage`, `FusedMed`, `IdentityLink`,
+`EvidenceState`, `Notice`, `SourceRow`, `DiscrepancyType`) are **imported from
+`types.py`, never redefined**. Every new field has a default, so a response with only
+the official fields still validates. 24 tests in `tests/unit/test_schemas.py`.
+
+Beyond 2.8, added because PLAN 6 (UI) and 5.8 (the fixture list) need them — **Arpon,
+these are the parts to review**:
+- `RunStatus` gains `running` (mid-run poll) and `needs_review` (PLAN 6.4 expects
+  `status: needs_review`). A finished run still reports only success/partial/error.
+- `RunResponse.findings`, `.identity_review`, `.trace` (timeline polling), `.trust`
+  (trust panel), `.evidence_index` (row_id → `Evidence`, for the grid's hover), `.patient_id`.
+- `Finding.id`, `.explanation` (Writer's 1–2 sentences), `.intent_reason`.
+- `IdentityReview.records` (record_key → `SourceRow`) so the UI can lay rows side by side.
+- New: `IdentityDecisionRequest`, `PatientSummary`/`PatientsResponse` (Q0),
+  `TrustEntry`, `FeedbackResponse` with `TrustUpdate` and `AcceptanceUpdate`.
+- `TraceEvent.step` and `.message` (the plain-English timeline line).
+- `HealthResponse.last_routed_model` (status pill). `RunRequest.patient_id`; `question`
+  now has a default.
+
+**Plan vs repo — followed the repo:**
+1. PLAN 2.8 says `Finding` "gains" fields; there was no `Finding` in `schemas.py`. Created it.
+2. PLAN 2.8 types `Evidence.fields` as `dict[str, str]`; it is `dict[str, str | None]`,
+   because a SQL NULL arrives as JSON null and must stay `None` (Arpon, 24 Oct handoff).
+3. Patients are identified by EMR `source_patient_id` (`MRN0000001`), not `P0001`:
+   P-keys are ground truth, which the app must not see. The fixture filenames use
+   P-keys; mapping them is a SAMPLE_MODE replay detail.
+4. Arpon's generated envelopes for P0001–P0010 are already on `main`, so I will **not**
+   hand-make P0001 fixtures as my own brief said. There is no Q0 (`q_admissions`)
+   fixture yet.
+5. The old `FeedbackRequest` (`memory_id`, `kind`) is replaced per 2.8; nothing imported it.
+
+**Changed shared files:** **`app/schemas.py`** (additive except `FeedbackRequest`, which
+is replaced per PLAN 2.8). **Anshu:** copy these into `web/src/types.ts`; example JSON
+for every endpoint follows next in `tests/fixtures/api/`.
+
+**Broken:** Nothing. 444 passed / 36 skipped, secret scan clean. Merging without
+Arpon's sign-off, by agreement — review afterwards and changes come back as a PR.
+
+**Needs from teammates:**
+- **Arpon** — review the "beyond 2.8" list above. Also: should I register the MedTrace
+  silos on my own Zetaris, or stay on fixtures until you say? And a Q0 fixture would
+  let `GET /patients` replay in SAMPLE_MODE.
+- **Anshu** — nothing to do yet; the example JSON lands next.
+
+**Next:** PLAN 5.8, the example API JSON in `tests/fixtures/api/`.
+
+---
+
 ### 2026-10-25 01:20 AEDT · Arpon · arpon/research-fixes
 
 **Did:** Applied the consultant's round-two findings (briefs 6–10) and fixed three

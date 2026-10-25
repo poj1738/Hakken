@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Parse the TGA Medicine Shortage Reports CSV export. **Not wired up.**
+"""Parse the TGA Medicine Shortage Reports CSV export for Q4.
 
-Q4 / `MT_TGA` / `/ref/tga` / `medtrace.tga_shortages` is **Monday, optional**, and
-sixth in PLAN section 4's cut order. This script exists so that Monday is a
-registration step rather than a parsing problem; nothing imports it, nothing
-registers its output, and `queries.q_shortages` still raises.
+Output: `data/reference/tga_shortages.json` (gitignored), served by `datasvc` at
+`/ref/tga`, registered as `MT_TGA.tga_raw` / `medtrace.tga_shortages` by
+`register_sources.py --with-tga`, and queried by `queries.q_shortages`. Use cleared
+for non-commercial hackathon use on 25 Oct (`docs/DATA_LICENCES.md` section 4).
 
 **The shortage database is incomplete, so it is never ground truth.** Anything
 derived from it is rendered as `NoticeType.KNOWN_SHORTAGE` -- "known shortage" --
@@ -143,7 +143,7 @@ def parse(text: str) -> list[dict[str, object]]:
         })
     if unknown_statuses:
         log(f"  WARNING unexpected status value(s): {sorted(unknown_statuses)} -- "
-            f"expected {sorted(ALL_STATUSES)}. Check before Monday's registration.")
+            f"expected {sorted(ALL_STATUSES)}. Check before registering.")
     # A column name that matches nothing yields "" for every row, and the
     # loader still reports a healthy row count. That is exactly how
     # medicine_name and expected_resolution stayed empty for all 1,010 rows
@@ -168,7 +168,7 @@ def main() -> int:
 
     if not args.src.exists():
         log(f"not found: {args.src}\n"
-            f"This is Monday's optional Q4 work. Copy the TGA shortage CSV export to\n"
+            f"Q4 needs the TGA shortage CSV export. Copy it to\n"
             f"that path first. Nothing else depends on it.")
         return 1
 
@@ -185,7 +185,8 @@ def main() -> int:
     log(f"parsed {len(rows)} shortage rows -> {args.dst}")
     log(f"  notifiable (Current or Anticipated): {len(notifiable)}")
     log(f"  not notifiable (Resolved or Discontinued): {len(rows) - len(notifiable)}")
-    log("\nNot registered. Q4 is Monday and optional; queries.q_shortages still raises.")
+    log("\nNext: `register_sources.py --apply --skip-exists --with-tga` (once), or "
+        "`register_sources.py --refresh --with-tga` if it is already registered.")
     return 0
 
 

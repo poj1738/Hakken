@@ -7,13 +7,16 @@ it against the planted ground truth.
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import pathlib
+import sys
 from datetime import date
 
 import pytest
 
 from app.domain.packs.medtrace.normalise import (
+    _canonical_route,
     llm_candidates,
     normalise_med,
     parse_frequency,
@@ -25,6 +28,20 @@ from app.domain.packs.medtrace.parse import build_lexicon, dicts_from_sql, rows_
 from app.domain.packs.medtrace.types import SourceRow
 
 FIXTURES = pathlib.Path("tests/fixtures/medtrace")
+
+
+def _deliberately_vague() -> frozenset[str]:
+    """The generator's intentionally unresolvable patient descriptions."""
+    spec = importlib.util.spec_from_file_location(
+        "generate_synthetic_for_tests", pathlib.Path("scripts/generate_synthetic.py"))
+    assert spec and spec.loader
+    gen = importlib.util.module_from_spec(spec)
+    sys.modules["generate_synthetic_for_tests"] = gen
+    spec.loader.exec_module(gen)
+    return frozenset(gen.LAY_TERMS.values()) | {"a little white one"}
+
+
+DELIBERATELY_VAGUE = _deliberately_vague()
 
 pytestmark = pytest.mark.skipif(
     not (FIXTURES / "Q_REF__lexicon.json").exists(), reason="run `make lexicon` first"
@@ -290,6 +307,7 @@ def test_normalisation_accuracy_against_ground_truth(lex) -> None:
         pathlib.Path("data/synthetic/ground_truth.json").read_text())["patients"]}
     resolved = {"structured": [0, 0], "patient": [0, 0]}
     dose_ok = dose_total = 0
+    left_unresolved: list[str] = []
 
     for path in sorted(FIXTURES.glob("Q2__*.json")):
         patient = truth_by_key[path.stem.split("__")[1]]
@@ -303,14 +321,98 @@ def test_normalisation_accuracy_against_ground_truth(lex) -> None:
             bucket = "patient" if source_row.source == "patient" else "structured"
             resolved[bucket][1] += 1
             resolved[bucket][0] += statement.resolution != "unmapped"
+            if statement.resolution == "unmapped":
+                left_unresolved.append(source_row.med_text or "")
             want = timeline.get(statement.generic or "", {}).get("true_daily_dose_mg")
             if want and statement.daily_dose_mg is not None and source_row.row_id not in planted:
                 dose_total += 1
                 dose_ok += abs(statement.daily_dose_mg - want) < 0.01
 
     structured = resolved["structured"][0] / resolved["structured"][1]
-    free_text = resolved["patient"][0] / resolved["patient"][1]
     assert structured >= 0.95, f"structured top-1 {structured:.3f}"
-    assert free_text >= 0.84, f"patient free-text top-1 {free_text:.3f}"
+    # Patient free text is checked exactly, not statistically. Everything left
+    # unresolved must be a description the generator makes vague ON PURPOSE --
+    # "a little white one", or a class-level lay term ("cholesterol tablet")
+    # that goes to the LLM candidate step instead of being guessed. A rate
+    # floor here measured the generator's dice on 10 patients (about +-0.04),
+    # not normalise: it failed at 0.837 when 82 of 82 resolvable rows resolved.
+    # The population-level DATA_SPEC 11.2 figure is in tests/eval/test_scorecard.py.
+    unexpected = [t for t in left_unresolved if t not in DELIBERATELY_VAGUE]
+    assert not unexpected, f"resolvable descriptions left unmapped: {unexpected}"
     assert dose_total > 500
     assert dose_ok / dose_total >= 0.99, f"daily dose {dose_ok}/{dose_total}"
+
+
+# --------------------------------------------------------------------------- #
+# Release and route: false formulation and route conflicts (25 Oct)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.parametrize(("texts", "expected"), [
+    # Bare-substring MR markers matched the start of ordinary names.
+    (("Crestor",), "unknown"),
+    (("Crestor 5 mg",), "unknown"),
+    (("Lasix",), "unknown"),
+    (("lansoprazole",), "unknown"),
+    (("lamotrigine",), "unknown"),
+    # ...while the real suffixes still count, as whole words.
+    (("Inderal LA",), "MR"),
+    (("Cardizem CD",), "MR"),
+    (("Diamicron MR",), "MR"),
+    (("Toprol-XL",), "MR"),
+])
+def test_mr_suffixes_match_whole_words_only(texts, expected) -> None:
+    assert parse_release(*texts) == expected
+
+
+def test_rosuvastatin_is_never_modified_release(lex) -> None:
+    """"Crestor" contains " cr", which used to make rosuvastatin MR. There is no
+    MR rosuvastatin in Australia, so every Crestor line set up a false
+    formulation finding against an EMR that correctly said nothing."""
+    statement = normalise_med(row("gp", med_text="Crestor 5 mg", strength_text="5 mg"), lex)
+    assert statement.generic == "rosuvastatin"
+    assert statement.release == "IR"
+
+
+def test_a_generic_level_code_does_not_invent_a_release(lex) -> None:
+    """An AMT MP code is shared by every product of a medicine, and
+    `by_amt_code` keeps whichever was loaded first. Metformin comes in IR and
+    MR, so the EMR's plain "metformin" must stay `unknown` -- not borrow the
+    release of an arbitrary product and contradict a GP who named Diabex XR."""
+    mp_code = next(e.amt_mp for e in lex.entries if e.generic == "metformin")
+    statement = normalise_med(row("emr", row_id="EMR-000001", med_text="metformin",
+                                  med_code=mp_code, code_system="AMT_MP",
+                                  strength_text="1000 mg", route_text="PO"), lex)
+    assert statement.generic == "metformin"
+    assert statement.release == "unknown"
+
+
+def test_a_product_level_code_does_pin_the_release(lex) -> None:
+    entry = next(e for e in lex.entries if e.generic == "metformin" and e.release == "MR")
+    statement = normalise_med(row("gp", med_text="metformin 1000 mg", med_code=entry.amt_mpp,
+                                  code_system="AMT_MPP", strength_text="1000 mg"), lex)
+    assert statement.release == "MR"
+
+
+@pytest.mark.parametrize(("text", "expected"), [
+    ("PO", "PO"), ("SL", "SL"), ("INH", "INH"), ("SC", "SC"),
+    ("tablet", "PO"), ("capsule", "PO"), ("modified release tablet", "PO"),
+    ("inhaler", "INH"), ("patch", "TD"),
+    # Ambiguous forms say nothing about route -- None, never a guess.
+    ("spray", None), ("injection", None), (None, None), ("", None),
+])
+def test_canonical_route(text, expected) -> None:
+    """The pharmacy silo has no route column; `route_text` is the dosage form.
+    Raw, it disagreed with the EMR's "PO" on nearly every medicine."""
+    assert _canonical_route(text) == expected
+
+
+def test_a_named_mr_product_outranks_a_plain_form_word(lex) -> None:
+    """The pharmacy form column says just "capsule" for Cymbalta, a
+    delayed-release capsule. Read alone, "capsule" made it IR and contradicted
+    the GP and EMR. A pinned product is a stronger signal than a form word."""
+    entry = next(e for e in lex.entries if e.generic == "duloxetine" and e.release == "MR")
+    statement = normalise_med(row("pharmacy", row_id="PHM-000001", med_text=entry.brand,
+                                  med_code=entry.pbs_code, code_system="PBS",
+                                  route_text="capsule", strength_text=entry.strength), lex)
+    assert statement.release == "MR"
