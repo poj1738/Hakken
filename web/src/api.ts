@@ -23,6 +23,8 @@ import doneFx from "@fixtures/run_P0001_done.json";
 import gpNotFoundFx from "@fixtures/run_P0001_gp_not_found.json";
 import needsReviewFx from "@fixtures/run_P0002_needs_review.json";
 import feedbackFx from "@fixtures/feedback_response.json";
+// Not an API example: a placeholder until a resumed-run example exists (see the file).
+import resumedPlaceholder from "./placeholders/run_P0002_resumed.PLACEHOLDER.json";
 
 export const API_MODE: "mock" | "live" =
   import.meta.env.VITE_API_MODE === "live" ? "live" : "mock";
@@ -89,6 +91,7 @@ const fx = {
   gpNotFound: gpNotFoundFx as unknown as RunResponse,
   needsReview: needsReviewFx as unknown as RunResponse,
   feedback: feedbackFx as unknown as FeedbackResponse,
+  resumedPlaceholder: resumedPlaceholder as unknown as RunResponse,
 };
 
 /** Patients mock mode has an example run for; the picker labels them. */
@@ -104,6 +107,7 @@ interface MockRun {
   startedAt: number;
 }
 const mockRuns = new Map<string, MockRun>();
+const mockDecisions = new Map<string, Set<string>>();
 const MOCK_STEP_MS = 700;
 
 function mockFinalFor(patientId: string): RunResponse {
@@ -141,6 +145,7 @@ const mock = {
     const final = mockFinalFor(req.patient_id ?? "");
     const run = { final, startedAt: Date.now() };
     mockRuns.set(final.run_id, run);
+    mockDecisions.delete(final.run_id);
     return mockSnapshot(run);
   },
   async getRun(runId: string): Promise<RunResponse> {
@@ -149,12 +154,17 @@ const mock = {
     if (!run) throw new ApiError(`Unknown run ${runId}`, 404);
     return mockSnapshot(run);
   },
-  async decideIdentity(_runId: string, _req: IdentityDecisionRequest): Promise<RunResponse> {
+  async decideIdentity(runId: string, req: IdentityDecisionRequest): Promise<RunResponse> {
     await sleep(300);
-    throw new ApiError(
-      "Mock mode has no example of a resumed run, so the decision was not applied. " +
-        "In live mode it is sent to POST /run/{id}/identity and the run continues.",
-    );
+    const run = mockRuns.get(runId);
+    const review = run?.final.identity_review;
+    if (!run || !review) throw new ApiError(`Run ${runId} is not waiting for an identity decision`, 409);
+    const decided = (mockDecisions.get(runId) ?? new Set<string>()).add(req.candidate_id);
+    mockDecisions.set(runId, decided);
+    // Still paused until every candidate has a decision; then the placeholder,
+    // because no example of a resumed run exists yet.
+    if (review.candidates.some((c) => !decided.has(c.candidate_id))) return clone(run.final);
+    return clone(fx.resumedPlaceholder);
   },
   async feedback(req: FeedbackRequest): Promise<FeedbackResponse> {
     await sleep(400);

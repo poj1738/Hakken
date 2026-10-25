@@ -21,8 +21,11 @@ needed. They are not real runs, and the screen says so.
 | MRN0000001 with `?mock=gp_not_found` | `run_P0001_gp_not_found.json` |
 | MRN0000002 | `run_P0002_needs_review.json` |
 
-Other patients and the identity decision have no example, so mock mode says so
-instead of inventing a result. Feedback returns `feedback_response.json` only for
+Other patients have no example, so mock mode says so instead of inventing a
+result. For MRN0000002, deciding every identity candidate returns
+`src/placeholders/run_P0002_resumed.PLACEHOLDER.json`: a **placeholder**, not an
+API example, because no resumed-run example exists yet. It says so on screen and
+shows no grid or flags. Replace it once Arnav records a real resumed run. Feedback returns `feedback_response.json` only for
 the recorded verdict (reject F-006 as "Source outdated"); any other verdict is
 acknowledged with no trust change.
 

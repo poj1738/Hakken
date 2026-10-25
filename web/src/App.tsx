@@ -210,6 +210,15 @@ export default function App() {
               onDecide={decideIdentity}
             />
           )}
+          {run?.status === "needs_review" && !run.identity_review && (
+            <section className="card">
+              <h2>Identity review needed</h2>
+              <p className="error">
+                The run paused for identity review, but the API sent no <code>identity_review</code> to show. Nothing can be
+                decided from this screen.
+              </p>
+            </section>
+          )}
           {run?.status === "error" && (
             <section className="card">
               <h2>Run failed</h2>
@@ -221,16 +230,23 @@ export default function App() {
               <section className="card summary">
                 <h2>Summary</h2>
                 <p>{run.output.summary}</p>
-                {run.status === "partial" && <p className="banner small">Partial result: read the banner and notices below before relying on it.</p>}
+                {run.status === "partial" && <p className="banner small">Status: partial. Read every caveat before relying on it.</p>}
               </section>
-              <CoverageStrip coverage={run.coverage} banner={run.banner} bpmhConfirmable={run.bpmh_confirmable} />
-              <Grid grid={run.grid} evidenceIndex={run.evidence_index} coverage={run.coverage} />
-              <Flags findings={run.findings} feedback={feedback} onFeedback={sendFeedback} />
-              <div className="two-col">
-                <Tasks tasks={run.tasks} />
-                <Notices notices={run.notices} />
-              </div>
-              <TrustPanel trust={run.trust} updates={trustUpdates} acceptance={acceptance} />
+              {/* A result with no coverage and no grid (an early stop, or the mock
+                  placeholder) shows only its summary: an empty grid and "No
+                  discrepancies found" would read as a clean bill of health. */}
+              {(Object.keys(run.coverage).length > 0 || run.grid.length > 0) && (
+                <>
+                  <CoverageStrip coverage={run.coverage} banner={run.banner} bpmhConfirmable={run.bpmh_confirmable} />
+                  <Grid grid={run.grid} evidenceIndex={run.evidence_index} coverage={run.coverage} />
+                  <Flags findings={run.findings} feedback={feedback} onFeedback={sendFeedback} />
+                  <div className="two-col">
+                    <Tasks tasks={run.tasks} />
+                    <Notices notices={run.notices} />
+                  </div>
+                  <TrustPanel trust={run.trust} updates={trustUpdates} acceptance={acceptance} />
+                </>
+              )}
             </>
           )}
           {!run && !polling && (

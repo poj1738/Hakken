@@ -37,6 +37,9 @@ interface Props {
 
 export function IdentityReview({ review, banner, decided, busy, error, onDecide }: Props) {
   const { anchor, candidates, records } = review;
+  // Evidence keys the table has no row for are still shown, never dropped.
+  const shownKeys = new Set(["guard", ...FIELDS.flatMap((f) => f.evidence)]);
+  const otherKeys = [...new Set(candidates.flatMap((c) => Object.keys(c.field_evidence)))].filter((k) => !shownKeys.has(k));
   return (
     <section className="card identity">
       <h2>Identity review needed</h2>
@@ -90,6 +93,23 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
                 })}
               </tr>
             ))}
+            {otherKeys.length > 0 && (
+              <tr>
+                <th scope="row">Other evidence</th>
+                <td className="anchor-col" />
+                {candidates.map((c) => (
+                  <td key={c.candidate_id} className="small">
+                    {otherKeys
+                      .filter((k) => c.field_evidence[k])
+                      .map((k) => (
+                        <div key={k}>
+                          <span className="muted">{k}:</span> {c.field_evidence[k]}
+                        </div>
+                      ))}
+                  </td>
+                ))}
+              </tr>
+            )}
             <tr>
               <th scope="row">Held back because</th>
               <td className="anchor-col" />
