@@ -36,5 +36,6 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Applied consultant briefs 11-14 to the detector; population to 200; identity fix for combined names; schema review for Arnav (#12) |
 | 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Loose ends: `coverage` staleness off the wall clock, core vs extended high-risk recall in the scorecard, stale PROGRESS decisions struck |
 | 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Demo data: staged learning-demo pair with CI test, showcase replay fixtures, five `input_examples/`, replay set in the Docker image |
+| 2026-10-25 | Arpon | Claude Code | Opus 5.5 | Recorded Track 1 across metadata, README, TODO and PROGRESS; README status rewritten to match the code |
 
 The README's **AI and model usage** section summarises this for judges.
