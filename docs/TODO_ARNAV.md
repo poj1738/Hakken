@@ -39,6 +39,11 @@ the scorecard **skip** without it. A skip there is a missing build, not a pass.
 > - New replay fixtures: `Q1/Q2/Q3__P0013`, `__P0015`, `__P0089`. P0003 and P0007's
 >   changed; nothing else did, and Q0 is identical.
 
+> **Scan, 25 Oct:** your items are under **Arnav** in `docs/SCAN_2026-10-25.md`
+> (S5 timeout discards results, S6 free-text tasks dropped, S9 failed Nemotron calls
+> missing from the trace, S10 unverified Writer summary, S11 stuck runs, and more).
+> World Model + conformance is still first.
+
 ---
 
 ## 0. Where things stand (two lines)
