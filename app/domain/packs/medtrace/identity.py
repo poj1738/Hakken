@@ -45,6 +45,12 @@ WEIGHTS: dict[str, tuple[float, float]] = {
     "postcode": (5.13, -1.71),   # m .70 / u .02 -- see the note below
 }
 
+#: Every `field_evidence` sentence starts with one of these and ": ", so the UI
+#: colours a field from the verdict instead of guessing from the wording (Anshu,
+#: 25 Oct). `partial` is a near-miss the score gave part credit for: a nickname, a
+#: sound-alike surname, a day/month swap. `held` prefixes a guard's explanation.
+EVIDENCE_VERDICTS = ("agrees", "partial", "differs", "held")
+
 #: Partial-credit weights for the near-misses the generator plants (DATA_SPEC 7).
 #: Each is worth less than an exact match and far more than a disagreement.
 PARTIAL: dict[str, float] = {
@@ -273,11 +279,11 @@ def score_pair(a: SourceRow, b: SourceRow, lex: Lexicon) -> IdentityLink:
                 anchor_id=a.record_key, candidate_id=b.record_key,
                 match_weight=float("inf") if False else 99.0, probability=1.0,
                 band="auto-merge", tier="ihi_exact",
-                field_evidence={"ihi_syn": "same synthetic IHI"}, guards=[])
+                field_evidence={"ihi_syn": "agrees: same synthetic IHI"}, guards=[])
         return IdentityLink(
             anchor_id=a.record_key, candidate_id=b.record_key,
             match_weight=-99.0, probability=0.0, band="new", tier="ihi_conflict",
-            field_evidence={"ihi_syn": f"different synthetic IHI ({left_ihi} vs {right_ihi})"},
+            field_evidence={"ihi_syn": f"differs: different synthetic IHI ({left_ihi} vs {right_ihi})"},
             guards=["ihi_conflict"])
 
     weight = 0.0
@@ -289,13 +295,16 @@ def score_pair(a: SourceRow, b: SourceRow, lex: Lexicon) -> IdentityLink:
         contribution, note = compare()
         weight += contribution
         if note:
-            evidence[field] = note
+            agree, disagree = WEIGHTS[field]
+            verdict = ("agrees" if contribution == agree else
+                       "differs" if contribution == disagree else "partial")
+            evidence[field] = f"{verdict}: {note}"
 
     left_sex, right_sex = normalise_text(a.sex)[:1], normalise_text(b.sex)[:1]
     if left_sex and right_sex:
         agree = left_sex == right_sex
         weight += WEIGHTS["sex"][0 if agree else 1]
-        evidence["sex"] = "sex matches" if agree else "sex differs"
+        evidence["sex"] = "agrees: sex matches" if agree else "differs: sex differs"
 
     left_pc, right_pc = (a.postcode or "").strip(), (b.postcode or "").strip()
     if left_pc and right_pc:
@@ -303,7 +312,8 @@ def score_pair(a: SourceRow, b: SourceRow, lex: Lexicon) -> IdentityLink:
         # Weak positive only. Agreement is common by chance in an age-skewed
         # cohort, and disagreement usually just means someone moved.
         weight += WEIGHTS["postcode"][0 if agree else 1]
-        evidence["postcode"] = "postcode matches" if agree else "postcode differs (a move?)"
+        evidence["postcode"] = ("agrees: postcode matches" if agree
+                                else "differs: postcode differs (a move?)")
 
     probability = _posterior(weight)
     return IdentityLink(
@@ -427,7 +437,7 @@ def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) 
             if link.candidate_id in rejected:
                 link.guards.append("ihi_conflict_in_cluster")
                 link.field_evidence["guard"] = (
-                    "another record that is clearly the same person as this one carries an "
+                    "held: another record that is clearly the same person as this one carries an "
                     "IHI that conflicts with the patient's, so this belongs to someone else"
                 )
                 link.probability = 0.0
@@ -435,7 +445,7 @@ def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) 
             elif link.candidate_id in ambiguous:
                 link.guards.append("ihi_ambiguous_in_cluster")
                 link.field_evidence["guard"] = (
-                    "this record carries no IHI and is an equally good match for two "
+                    "held: this record carries no IHI and is an equally good match for two "
                     "different people with the same name and date of birth — confirm which"
                 )
                 link.probability = min(link.probability, GUARD_CEILING)
@@ -452,7 +462,7 @@ def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) 
         for link in group:
             link.guards.append("lookalike_cluster")
             link.field_evidence["guard"] = (
-                f"{len(group)} records in {source} score as this patient; a distinguishing "
+                f"held: {len(group)} records in {source} score as this patient; a distinguishing "
                 f"field or a human decision is needed before merging either"
             )
 
@@ -466,7 +476,7 @@ def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) 
                     if "transitivity_suspect" not in link.guards:
                         link.guards.append("transitivity_suspect")
                         link.field_evidence["guard"] = (
-                            "both records match this patient but not each other, so at most "
+                            "held: both records match this patient but not each other, so at most "
                             "one of them can be right"
                         )
 

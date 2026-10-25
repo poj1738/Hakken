@@ -14,7 +14,7 @@ model: `docs/DATA_SPEC.md`.
 | PBS schedule (public API v3) | Department of Health | Redistribution allowed with copyright retained; **no modification** (`DATA_LICENCES.md` §1) | No, real | Schedule 4751 (Oct 2026): `items`, `item-atc-relationships`; codes, pack sizes and repeats for our ~100 medicines, copied verbatim | `make data` (rate-limited, ~8 min) |
 | PBS Item Report | `data.gov.au` | CC BY 3.0 AU (§2) | No, real | 2016 YTD volumes, joined on item code for `dos_weight` | **Manual download** to `data/reference/raw/pbs_item_report_2016.csv`, then `make lexicon` (no script fetches it) |
 | Medicine, high-risk and nickname tables | `data/reference_src/*.csv`, hand-built from `DATA_SPEC.md` | Ours (§3) | Reference, not patient data | 108 products, 40 APINCHS rows, 167 nickname pairs | Committed; `make lexicon` builds the served lexicon |
-| TGA Medicine Shortage Reports | Therapeutic Goods Administration | **Unconfirmed** (§4) | No, real | Parsed locally; **not committed, not served, not registered** | `scripts/load_tga_shortages.py`, then `register_sources.py --with-tga` once licensed |
+| TGA Medicine Shortage Reports | Therapeutic Goods Administration | Non-commercial hackathon use cleared by our consultant, 25 Oct (§4) | No, real | `Current` and `Anticipated` reports, matched to our medicines by exact ingredients; **not committed** | Download the CSV export, `scripts/load_tga_shortages.py`, then `register_sources.py --apply --skip-exists --with-tga` |
 
 `data/reference/` and `data/synthetic/silos/` are gitignored, so a fresh clone
 builds them with `make lexicon && make synth`, no network needed. Without a PBS fetch
