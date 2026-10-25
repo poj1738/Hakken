@@ -27,6 +27,14 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 13:14 AEDT · Arpon · arpon/loose-ends
+
+**Did:** Closed Arpon's last loose ends. (1) `coverage()` measured GP-list staleness against `date.today()`, so a fixed dataset changed its answer as the calendar moved; it now measures from the admission chart, the newest document (frozen signature has no `as_of`). Test added. (2) `scripts/eval.py` reports high-risk recall **split core APINCHS vs extended**, as the 24 Oct consultant ruling asked — pooled, a weak extension row moves a number that reads as ACSQHC compliance. Held-out: **core 30/32 [0.80, 0.98], extended 5/5**; tune core 27/27, extended 7/7. Scores otherwise unchanged. (3) PROGRESS "Waiting on Arpon" was stale: sotalol, bundle 6 and the formulation pairs were all decided and applied 24 Oct — verified in `medicines.csv` and struck off.
+**Changed shared files:** none.
+**Broken:** nothing. Both held-out high-risk misses (P0123 insulin aspart, P0174 temazepam commissions) are core APINCHS — still recorded, still not tuned against.
+**Needs from teammates:** Arnav — `docs/TODO_ARNAV.md`, unchanged. Quote core-APINCHS recall (30/32), not the pooled 35/37, anywhere it reads as ACSQHC compliance.
+**Next:** Arpon's section is done. Pick up whatever Arnav or Anshu hand back here.
+
 ### 2026-10-25 12:30 AEDT · Arpon · arpon/population (green — supersedes the entry below)
 
 **Did:** The entry below is resolved. Then applied the consultant's review of the

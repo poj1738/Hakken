@@ -105,3 +105,18 @@ def test_a_combination_is_not_present_on_one_component_alone() -> None:
     cov = Coverage(source="emr", state="found")
     assert evidence_state("perindopril/indapamide", "emr", cov,
                           [stmt(source="emr", generic="perindopril")]) is EvidenceState.ABSENT_IN_SCOPE
+
+
+def _row(source, doc_date, row_id):
+    from app.domain.packs.medtrace.types import SourceRow
+    return SourceRow(source=source, row_id=row_id, source_patient_id="X-1", doc_date=doc_date)
+
+
+@pytest.mark.parametrize("gp_date,stale", [(date(2025, 10, 1), True), (date(2026, 1, 1), False)])
+def test_gp_staleness_is_measured_from_the_admission_not_today(gp_date, stale) -> None:
+    """It used `date.today()`, so a fixed dataset changed its answer as the
+    calendar moved. The admission chart is the newest document; age is from it."""
+    from app.domain.packs.medtrace.coverage import SCOPE_STALE_DOCUMENT, coverage
+    cov = coverage([], [_row("emr", ADMITTED, "EMR-1"), _row("gp", gp_date, "GP-1")])
+    flagged = any(n.startswith(SCOPE_STALE_DOCUMENT) for n in cov["gp"].scope_notes)
+    assert flagged is stale

@@ -3,9 +3,9 @@
 One file, current state only. Overwrite it as things change — the history lives in
 `docs/HANDOFF.md` and in git. Read this first at session start.
 
-**Last updated:** 2026-10-25 12:30 AEDT by Arpon
+**Last updated:** 2026-10-25 by Arpon
 
-> **On `arpon/population` (green, awaiting merge):** consultant rulings applied, population 200, held-out F1 0.95, high-risk 35/37. See the latest HANDOFF entry.
+> **On `main`:** consultant rulings applied, population 200, held-out F1 0.95, high-risk 35/37 (core APINCHS 30/32, extended 5/5). **Arpon's section is done** — everything left is in Arnav's and Anshu's layers.
 
 ## Status
 
@@ -30,7 +30,7 @@ queries Zetaris yet (rule 1 — though the registration itself is live and verif
 | **MedTrace contract** (`types.py`) | Arpon | **frozen, on `main`.** Shared file — changes need sign-off, a HANDOFF entry and a PR line |
 | SQL templates (`queries.py`) | Arpon | **done, run live.** Q0–Q3 and Q_REF; `q_shortages` (Q4) deliberately unwritten |
 | Clinical logic — all 11 modules | Arpon | **done.** `fuse` (trust-weighted BPMH), `detect` (9 of 11 types emitted; 2 deliberately not — see `docs/DECISIONS.md` 25 Oct), `triage` (ranking with an absolute APINCHS floor) |
-| **Detector scorecard** (`scripts/eval.py`) | Arpon | **200 patients, held-out: precision 0.95, recall 0.95, F1 0.95, high-risk 35/37** (simulated review); 0.93 F1 with no human review. Tune 0.93, high-risk 34/34. Consultant rulings 11–14 applied. Pinned by `tests/eval/test_scorecard.py` |
+| **Detector scorecard** (`scripts/eval.py`) | Arpon | **200 patients, held-out: precision 0.95, recall 0.95, F1 0.95, high-risk 35/37 — core APINCHS 30/32 [0.80, 0.98], extended 5/5** (simulated review); 0.93 F1 with no human review. Tune 0.93, high-risk 34/34. Consultant rulings 11–14 applied. Pinned by `tests/eval/test_scorecard.py` |
 | Identity linkage | Arpon | 200 patients: 0 false merges; 535 true links auto-merge, 31 go to review, 2 lost |
 | Reference data | Arpon | **done** — 224 lexicon rows, 203 with a real PBS code |
 | Synthetic generator, ground truth | Arpon | **done** — 40 patients, 60 planted findings, identity traps. Ground truth now cites only the patient's own rows (9 of 20 omissions used to cite someone else's) |
@@ -64,17 +64,15 @@ feedback loop by Monday morning at the latest.
    fixture (one row per chart *line* — dedupe on `source_patient_id`).
 2. **Anshu** — PLAN §6 items 1–10 in mock mode against `tests/fixtures/api/`. First:
    picker, timeline, grid and flags rendering `run_P0001_done.json`.
-3. **Arpon** — review Arnav's schema additions (#12); then take work off Arnav —
-   World Model is the strongest candidate (a disqualification gate with no coupling
-   to his orchestrator), but **ask him what he has started first**.
+3. **Arpon** — section done; schema review posted on #12. World Model stays with
+   Arnav. Free to pick up whatever Arnav or Anshu hand back in HANDOFF.
 
 ## Waiting on Arpon (decisions only he can make)
 
-1. ~~Population size~~ — **200, done 25 Oct.**
-2. ~~Consultant briefs 11–14~~ — **answered and applied 25 Oct** (`docs/DECISIONS.md`).
-3. **Sotalol** — DATA_SPEC `C07AA07` (not APINCHS) vs PBS `C01BD` (`Ext`).
-4. **DATA_SPEC §4.2 bundle 6** shares sum to 0.95.
-5. **Four formulation-trap drugs have one form each**, so no IR/MR pair can be planted.
+Nothing. Briefs 1–5 were decided 24 Oct and briefs 11–14 on 25 Oct (`docs/DECISIONS.md`):
+sotalol stays `C07AA07`, bundle 6 gained desvenlafaxine and sums to 1.00, and
+metoprolol/gliclazide/diltiazem now have IR/MR pairs (venlafaxine and tamsulosin have no
+Australian pair).
 
 ## Operational notes
 

@@ -238,6 +238,10 @@ class Score:
     fn_items: list = field(default_factory=list)
     high_risk_planted: int = 0
     high_risk_found: int = 0
+    # Core ACSQHC APINCHS and our facility extensions, kept apart (DECISIONS 24 Oct):
+    # pooled, a weak extension row moves a number that reads as ACSQHC compliance.
+    high_risk_by_list: collections.Counter = field(default_factory=collections.Counter)
+    high_risk_found_by_list: collections.Counter = field(default_factory=collections.Counter)
     patients: int = 0
     findings: int = 0
     needed_review: int = 0
@@ -259,6 +263,7 @@ def score(world: World, keys: list[str], review: str) -> Score:
             result.tp[plant["type"]] += 1
             if plant.get("high_risk_class"):
                 result.high_risk_found += 1
+                result.high_risk_found_by_list[_risk_list(plant)] += 1
         for pred in fps:
             result.fp[pred.type.value] += 1
             result.fp_items.append((key, pred))
@@ -266,7 +271,13 @@ def score(world: World, keys: list[str], review: str) -> Score:
             result.fn[plant["type"]] += 1
             result.fn_items.append((key, plant))
         result.high_risk_planted += sum(1 for t in patient["planted"] if t.get("high_risk_class"))
+        result.high_risk_by_list.update(_risk_list(t) for t in patient["planted"]
+                                        if t.get("high_risk_class"))
     return result
+
+
+def _risk_list(plant: dict) -> str:
+    return "extended" if plant["high_risk_class"] == "ext" else "core"
 
 
 def report(result: Score, split: str, review: str, misses: bool) -> None:
@@ -288,6 +299,11 @@ def report(result: Score, split: str, review: str, misses: bool) -> None:
     log(f"{'ALL':30} {tp:3} {fp:3} {fn:3}   precision {p:.2f}  recall {r:.2f}  F1 {f1:.2f}")
     if result.high_risk_planted:
         log(f"APINCHS / high-risk recall: {result.high_risk_found}/{result.high_risk_planted}")
+        for name in ("core", "extended"):
+            found, planted = result.high_risk_found_by_list[name], result.high_risk_by_list[name]
+            if planted:
+                lo, hi = wilson(found, planted)
+                log(f"  {name:8} {found}/{planted}  [{lo:.2f},{hi:.2f}]")
     log(f"findings per patient: {result.findings / max(result.patients, 1):.2f} (target <= 4, "
         f"before notices)")
     if misses:
