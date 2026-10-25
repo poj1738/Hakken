@@ -6,7 +6,7 @@ declared here. Open-source libraries do not need declaring.
 | Component | Origin | Date | How it is used |
 |---|---|---|---|
 | H-MEM specification + conformance vectors | `github.com/Meterless/Meterless` (Apache-2.0) | pre-existing | Read-only reference in gitignored `.refs/`. Our Python implementation is written during the window; the official `vectors.json` is copied into `tests/engines/vectors/` with an Apache-2.0 attribution header. |
-| World Model specification + conformance runner | `github.com/Meterless/Meterless` (Apache-2.0) | pre-existing | Same: read-only reference; the 8 inline checks are translated to pytest during the window. |
+| World Model specification, reference implementation + conformance runner | `github.com/Meterless/Meterless` (Apache-2.0), commit `1742dec` | pre-existing | **Ported to Python during the window** (`app/engines/world_model/`, 25 Oct). The TypeScript reference `reference/src/*.ts` was translated module by module, and the runner's 8 inline checks one for one (`tests/engines/test_world_model_conformance.py`). Every ported file carries an Apache-2.0 attribution header. The reference itself stays in gitignored `.refs/`. |
 | Zetaris getting-started repo | `github.com/zetaris/getting-started` | pre-existing | Read-only reference for the REST call shape and the REST-table registration recipe. Not shipped. |
 | `zetaris-platform` Docker install | Sponsor-provided | installed 2026-10-12 | The local Zetaris instance. Infrastructure, not part of our submission. |
 | `NY_TAXI` sample database (15 tables) | Shipped with the sponsor's Zetaris install | pre-existing | Present on the instance before the build window. **Declared, not used** unless explicitly chosen later; our own data lives in separate Lightning databases. |

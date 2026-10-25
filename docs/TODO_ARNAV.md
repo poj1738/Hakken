@@ -159,8 +159,9 @@ the demo.
 - [x] API (`POST /run`, `GET /run/{id}`, `GET /status`, `GET /patients`) and
   `run.py` — rule 8. (Arnav, 25 Oct; plus `/run/{id}/identity` and `/feedback`. Docker
   still unverified.)
-- [ ] **World Model + its 8 conformance checks** (rule 2). Then swap
+- [x] **World Model + its 8 conformance checks** (rule 2). Then swap
   `identity.decide`, Arpon's local copy, for yours: same thresholds, 0.85 / 0.82.
+  (Arnav, 25 Oct: 8/8 green; `decide` delegates; tune scorecard identical before and after.)
 - [ ] H-MEM + feedback (section 2 makes the feedback half possible).
 
 Don't edit `app/domain/` except for the handed-over items in §5.
