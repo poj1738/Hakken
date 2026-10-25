@@ -11,6 +11,40 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-25 — SAMPLE_MODE never replays model text; recorded Nightshift responses are parser fixtures only
+
+**Decision.** When `SAMPLE_MODE=true`, `MeterlessClient` never contacts Nightshift.
+Each call site passes a deterministic `offline` function. Its output is
+schema-validated like a real answer and recorded with the model id `offline-heuristic`,
+in `ModelCall.routed_model` and in the trace. With no `offline` function, the call
+refuses (`MeterlessError("sample_mode")`) rather than inventing text.
+`tests/fixtures/meterless/` holds real recorded responses, used only to test the
+adapter's parsing.
+
+**Why.** Arnav's session brief said to replay recorded responses in SAMPLE_MODE. The
+README ("Sample mode") and `TODO.md` already commit, in front of judges, to an offline
+reasoner that "does not replay saved model text". Replaying saved text would make an
+output that doesn't change with its input (CLAUDE.md rule 6) for any prompt not
+recorded verbatim. The repo wins, and the brief is noted in HANDOFF.
+
+## 2026-10-25 — Arnav's Nightshift: routes still coerced, local models listed, reasoning tokens high **[live — Arnav's machine, 25 Oct, Windows build]**
+
+These are observations through the new adapter. Five calls, so take them as indications, not a distribution.
+- **`meterless/deep` was answered by `nvidia/nemotron-3.5-lightning-30b-a3b`**, and so
+  were `meterless/auto` and `meterless/fast`. This matches Arpon's 24 Oct finding:
+  the route is intent, not selection.
+- **This runtime also lists `local-runtime/*` models** (qwen3.6-35b, gpt-oss-20b,
+  llama-3.2-3b, phi-4-mini). `meterless/auto` *can* therefore route to a non-NVIDIA
+  model, so the NVIDIA evidence must come from `routed_model` per call, never from
+  configuration. Every call so far went to Nemotron.
+- **Hidden reasoning is expensive.** "In one sentence…" cost 502 completion tokens on
+  one call and 1,494 on another, which took 12.5 s. `DEFAULT_MAX_TOKENS` is 8192, and
+  the adapter refuses anything below 512.
+- **The receipt shape differs from Arpon's build.** There is no `routing` block. It adds
+  `job`, `lineage`, `mcp` and a non-null `receipt_envelope`, which carries build hashes
+  (redacted in the fixtures; they're secret-shaped). `receipt_summary()` reads every
+  field as optional.
+
 ## 2026-10-25 — TGA use cleared and Q4 switched on; identity evidence carries a verdict **[consultant + team decision, 25 Oct]**
 
 **TGA.** The team's consultant confirmed that using the TGA Medicine Shortage Reports
