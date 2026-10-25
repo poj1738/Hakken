@@ -145,7 +145,8 @@ select { font: inherit; padding: 0.35rem; border-radius: 6px; border: 1px solid 
 .id-table .anchor-col { background: var(--info-bg); }
 .id-table .score { font-weight: 400; font-size: 0.75rem; margin-top: 0.2rem; }
 .agree-agree { background: var(--ok-bg); }
-.agree-differ { background: var(--warn-bg); }
+.agree-differ { background: var(--bad-bg); }
+.agree-partial { background: var(--warn-bg); }
 .agree-missing { background: #fafbfc; }
 .why { font-size: 0.72rem; color: var(--muted); margin-top: 0.15rem; }
 .guard { font-size: 0.78rem; color: var(--warn); }
