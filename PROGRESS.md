@@ -59,6 +59,8 @@ feedback loop by Monday morning at the latest.
 
 ## Next up
 
+**Codebase scan, 25 Oct: `docs/SCAN_2026-10-25.md`** — 34 verified items by owner. Blockers: Meterless engine + conformance (Arnav), `output_examples/` empty (anyone), Docker web-stage build (Anshu).
+
 **Arnav's session: read `docs/TODO_ARNAV.md` first** — everything needed from Arpon's side, in order.
 
 1. **Arnav** — in disqualification-risk order: Meterless adapter; orchestrator wired
