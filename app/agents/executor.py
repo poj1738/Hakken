@@ -127,7 +127,8 @@ def resolve_free_text(ctx: AgentContext, stmts: list[MedStatement]) -> tuple[lis
         "Never answer with anything that is not in that line's list. Prefer an ingredient; choose an ATC "
         "class only when the text names a class (e.g. 'blood thinner').\n" + lines)}]
     # Offline: no guessing -- every line stays unmapped and is shown as such.
-    result, calls = ctx.llm.chat_json("Executor", messages, Resolutions, max_tokens=4096,
+    # 3,872 of 4,096 were used live for two lines; 8k leaves room for the hidden reasoning.
+    result, calls = ctx.llm.chat_json("Executor", messages, Resolutions, max_tokens=8192,
                                       offline=lambda: Resolutions(items=[]))
 
     by_row = {r.row_id: r for r in result.items}

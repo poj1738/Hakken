@@ -251,7 +251,8 @@ def critique(ctx: AgentContext, findings: list[Finding]) -> dict[str, list[str]]
         "supported by its own cited rows, that it never says a patient is 'not taking' a medicine where a source "
         "state is 'unknown', and that it does not instruct anyone to stop a medicine. List only real problems.\n"
         + json.dumps(brief, default=str))}]
-    result, calls = ctx.llm.chat_json("Evaluator", messages, Critique, max_tokens=4096,
+    # 4k ran out live: three `<model>_empty_response` 502s (trace, 25 Oct).
+    result, calls = ctx.llm.chat_json("Evaluator", messages, Critique, max_tokens=8192,
                                       offline=lambda: Critique(problems=[]))
     ids = {f.id for f in findings}
     for p in result.problems:

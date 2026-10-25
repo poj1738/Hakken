@@ -101,7 +101,9 @@ def draft(ctx: AgentContext, findings: list[Finding], anchor: SourceRow, banner:
     messages = [{"role": "user", "content": instructions + "\n" + json.dumps([_brief(f) for f in targets],
                                                                              default=str)}]
     result, calls = ctx.llm.chat_json(
-        "Writer", messages, Draft, max_tokens=8192,
+        # 16k: a 5-finding draft used 6,391 completion tokens live, and attempts that
+        # exhausted 8k came back as `<model>_empty_response` (trace, 25 Oct).
+        "Writer", messages, Draft, max_tokens=16384,
         offline=lambda: Draft(explanations=[Explanation(id=f.id, text=template(f)) for f in targets],
                               summary="" if revising else _offline_summary(findings, anchor, banner)))
     ids = {f.id for f in targets}

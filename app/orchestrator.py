@@ -177,7 +177,10 @@ class Orchestrator:
             state.degraded = True
             state.caveats.append(f"Nightshift unavailable for {name} ({exc.kind}); that step used the grounded "
                                  "template and is labelled offline-heuristic.")
-            state.ctx.tracer.emit(name.split()[0].capitalize(), "fallback", status="degraded", error=str(exc),
+            agent, action = name.split()
+            step = {"plan": "PLAN", "resolve_free_text": "RESOLVE_FREE_TEXT", "draft": "DRAFT",
+                    "revise": "DRAFT", "critique": "CRITIQUE"}.get(action)
+            state.ctx.tracer.emit(agent.capitalize(), "fallback", step=step, status="degraded", error=str(exc),
                                   message=f"{name}: Nightshift failed ({exc.kind}); used the grounded template.")
             return fallback()
 
