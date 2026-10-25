@@ -27,6 +27,49 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 15:55 AEDT · Arnav · arnav/zetaris-adapter
+
+**Did:** The Zetaris adapter, `app/adapters/zetaris.py`.
+- **`ZetarisClient.run(sql, template_id, replay_key)`** follows the binding call shape
+  (REFERENCE_NOTES 1.1) and **passes the envelope on untouched**: strings stay
+  strings, NULL stays `None`.
+- **Read-only guard:** SELECT, SHOW, DESCRIBE or WITH, one statement. Quoted text is
+  ignored, so `'stop; then DROP'` in a literal is data. Every real template passes it.
+- **A result that reaches its row limit is refused rather than silently truncated.**
+- **Retries:** bounded, on connection errors and 5xx only. Never on 4xx or a timeout.
+- **`RunQueries`** is one run's budget: `MAX_ZETARIS_QUERIES_PER_RUN` = 8, then
+  `QueryBudgetExceeded`. It records template, SQL, ms and rows for every query, failed
+  ones included.
+- **`load_lexicon(client)`** reads Q_REF through the adapter, once per process, not
+  counted against any run.
+- **SAMPLE_MODE replays `tests/fixtures/medtrace/`** by EMR MRN. The MRN → `P00nn` index is
+  built from the fixtures themselves: a file is indexed only if its own rows contain that
+  MRN. No ground truth is read, because it's gitignored and absent in Docker. A missing
+  fixture raises `ReplayMiss` and never guesses. This is cached Zetaris *data* (diffed
+  identical to live), not model text, so it's consistent with the README.
+
+41 tests. Live on my machine: `SELECT 1` and `SHOW LIGHTNING DATABASES` through the
+adapter. The MedTrace views are **not** registered on my Zetaris, so I'm staying on
+fixtures as agreed.
+
+**Note for the orchestrator (me, next):** a SAMPLE_MODE Q2 replay returns the recorded
+rows for that patient whatever links were confirmed. Filter rows to the confirmed
+`record_key`s after `rows_from_sql`, and filter Q3 to the requested `row_id`s. Otherwise
+a rejected identity link would still contribute medicines in sample mode.
+
+**Changed shared files:** none on the list.
+
+**Broken:** nothing. Unit tests green, secret scan clean.
+
+**Needs from teammates:**
+- **Arpon:** when you want me live on MedTrace data, say so and I'll run
+  `register_sources.py` (dry run first, with your go-ahead) on my own Zetaris.
+
+**Next:** the orchestrator, wired to the pack in `scripts/eval.py:reconcile()` order,
+with the Writer as the first real Nemotron call.
+
+---
+
 ### 2026-10-25 15:30 AEDT · Arnav · arnav/meterless-adapter
 
 **Did:** The Nightshift adapter, `app/adapters/meterless.py` (TODO_ARNAV §4, first item, ticked).

@@ -40,8 +40,8 @@ queries Zetaris yet (rule 1 — though the registration itself is live and verif
 | `app/schemas.py` (API contract) | Arnav | **done and signed off.** #12, plus Arpon's two asks: `Finding.detail`, and `FeedbackRequest.source`/`attribute` (required for `source_outdated`). Structured `Task` deferred |
 | API example fixtures for the UI | Arnav | **done, regenerated for the 25 Oct data.** Every UI state; the review example is now P0015 (file name unchanged for `web/`) |
 | Meterless adapter (Nightshift) | Arnav | **done, verified live on Arnav's machine, 25 Oct** — status, chat and JSON answered by `nvidia/nemotron-3.5-lightning-30b-a3b`; 33 tests. SAMPLE_MODE uses `offline-heuristic`, never replayed text. Not yet called by any agent |
-| Zetaris adapter | Arnav | **stub** — next |
-| Orchestrator, agents, API, trace | Arnav | not started |
+| Zetaris adapter | Arnav | **done.** Read-only guard, budget of 8 per run, a query record for the trace, SAMPLE_MODE replay of `tests/fixtures/medtrace/` by MRN, Q_REF lexicon load; 41 tests. Live `SELECT 1` / `SHOW LIGHTNING DATABASES` OK on Arnav's machine (MedTrace views are not registered there — fixtures until Arpon says otherwise). Not yet called by any agent |
+| Orchestrator, agents, API, trace | Arnav | not started — **next** |
 | **World Model + 8 conformance checks** | Arnav | **not started — a disqualification gate, due Sat 4pm.** `identity.decide` still uses Arpon's local copy |
 | H-MEM + feedback | Arnav | not started |
 | Web UI | Anshu | **on `main` (#22); review of all 10 PLAN §6 items done on `anshu/ui-review`**, mock mode only. Follows #23 (`detail`, `source_outdated` names its record) and #24 (identity verdict prefixes). Never run against a live API. Six open questions for Arnav in HANDOFF (dose unit, `TraceEvent.model`, task order …) |
