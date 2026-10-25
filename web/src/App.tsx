@@ -247,7 +247,7 @@ export default function App() {
                   <Grid grid={run.grid} evidenceIndex={run.evidence_index} coverage={run.coverage} />
                   <Flags findings={run.findings} feedback={feedback} onFeedback={sendFeedback} />
                   <div className="two-col">
-                    <Tasks tasks={run.tasks} />
+                    <Tasks tasks={run.tasks} findings={run.findings} notices={run.notices} />
                     <Notices notices={run.notices} />
                   </div>
                   <TrustPanel trust={run.trust} updates={trustUpdates} acceptance={acceptance} />

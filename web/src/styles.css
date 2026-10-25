@@ -232,6 +232,8 @@ select { font: inherit; padding: 0.35rem; border-radius: 6px; border: 1px solid 
 /* Tasks, notices */
 .tasks ul, .notices ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.88rem; }
 .tasks label.done { text-decoration: line-through; color: var(--muted); }
+.task-origin { margin-left: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem; font-size: 0.75rem; }
+.task-origin .badge { font-size: 0.65rem; }
 .notice .rowids { font-size: 0.75rem; color: var(--muted); }
 
 /* Trust */
