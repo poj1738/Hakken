@@ -21,8 +21,9 @@ from pathlib import Path
 
 from app.adapters.meterless import MeterlessClient, MeterlessError
 from app.adapters.zetaris import QueryBudgetExceeded, RunQueries, ZetarisClient, ZetarisError, load_lexicon
-from app.agents import evaluator, executor, planner, writer
+from app.agents import evaluator, executor, identity_memory, planner, writer
 from app.agents.base import AgentContext, RunTimeout
+from app.engines.world_model import WorldModel
 from app.config import Settings, get_settings
 from app.domain.packs.medtrace import coverage as cov_mod
 from app.domain.packs.medtrace import queries
@@ -74,10 +75,16 @@ class Orchestrator:
     """One per process. Holds the lexicon and patient list (read once through Zetaris) and the runs."""
 
     def __init__(self, settings: Settings | None = None, *, llm: MeterlessClient | None = None,
-                 zetaris: ZetarisClient | None = None, log_dir: Path | None = LOG_DIR) -> None:
+                 zetaris: ZetarisClient | None = None, log_dir: Path | None = LOG_DIR,
+                 world: WorldModel | None = None) -> None:
         self.settings = settings or get_settings()
         self.llm = llm or MeterlessClient(self.settings)
         self.zetaris = zetaris or ZetarisClient(self.settings)
+        # Shared identity state across runs. Persisted under STATE_DIR live; in memory in
+        # SAMPLE_MODE, so a judge's offline run never writes state.
+        self.world = world or WorldModel(namespace="medtrace",
+                                         storage="memory" if self.settings.sample_mode else "local",
+                                         directory=self.settings.state_dir)
         self.log_dir = log_dir
         self._lex: Lexicon | None = None
         self._anchors: dict[str, SourceRow] | None = None
@@ -158,6 +165,12 @@ class Orchestrator:
         state.ctx.tracer.emit("Executor", "identity_decision", step="FIND_IDENTITY",
                               message=f"Pharmacist decided {decision.candidate_id} is "
                                       f"{'the same person' if decision.same_person else 'a different person'}.")
+        seq = identity_memory.record_decision(self.world, state.anchor, decision.candidate_id, decision.same_person,
+                                              run_id=run_id, source_name=decision.candidate_id.split(":")[0])
+        state.ctx.tracer.emit("Executor", "world_model", step="FIND_IDENTITY", engine="world_model",
+                              engine_op="relate",
+                              message=f"World Model: decision recorded with provenance (audit seq {seq}); future "
+                                      "runs for this patient reuse it.")
         # The deadline restarts: time spent waiting for a human is not run time.
         state.ctx.deadline = time.monotonic() + self.settings.run_timeout_s
         state.running = True
@@ -217,6 +230,18 @@ class Orchestrator:
                                     lambda: planner._offline_plan(state.anchor, budget_left))
         self._route(state, "find_identities")
         state.links, state.candidates = executor.find_identities(ctx, state.anchor)
+        state.links, notes = identity_memory.remembered(self.world, state.anchor, state.links)
+        for note in notes:
+            ctx.tracer.emit("Executor", "world_model", step="FIND_IDENTITY", engine="world_model",
+                            engine_op="neighborsOf", message=f"World Model remembers: {note}; not asking again.")
+        q1 = next((r.query_id for r in reversed(ctx.zetaris.records) if r.template_id == "Q1"), None)
+        summary = identity_memory.record_links(self.world, state.anchor, state.links, state.candidates,
+                                               run_id=state.run_id, query_id=q1)
+        first, last = summary["audit"]
+        ctx.tracer.emit("Executor", "world_model", step="FIND_IDENTITY", engine="world_model", engine_op="upsert+relate",
+                        message=f"World Model: recorded {summary['records']} patient records and {summary['edges']} "
+                                f"same-person link(s), each with provenance (Zetaris query {q1}); audit seq "
+                                f"{first}-{last}.")
         return self._from_identity(state)
 
     def _planned(self, state: RunState, tool: str) -> bool:
@@ -241,8 +266,14 @@ class Orchestrator:
                             message=f"Paused: {len(pending)} identity near-miss(es) need your confirmation.")
             return self._needs_review(state, pending, cov)
 
+        # Whose medicines to read comes from the World Model's graph: the anchor plus every
+        # record with an open same-person edge (score-decided or pharmacist-decided).
+        keys = identity_memory.linked_record_keys(self.world, state.anchor)
+        linked = [l for l in state.links if l.band == "auto-merge" and l.candidate_id in keys]
+        ctx.tracer.emit("Executor", "world_model", step="FETCH_MEDS", engine="world_model", engine_op="neighborsOf",
+                        message=f"Linked set read from the World Model graph: {', '.join(sorted(keys))}.")
         self._route(state, "fetch_meds")
-        rows, raw, _ = executor.fetch_meds(ctx, state.anchor, state.links)
+        rows, raw, _ = executor.fetch_meds(ctx, state.anchor, linked)
         q2_id = ctx.zetaris.records[-1].query_id
         stmts = executor.normalise(ctx, rows)
         extra_tasks: list[str] = []
