@@ -235,7 +235,34 @@ class ZetarisClient:
         path = self._replay_dir / f"{name}.json"
         if not path.is_file():
             raise ReplayMiss(name)
-        return _validate(json.loads(path.read_text()), name)
+        doc = _validate(json.loads(path.read_text()), name)
+        if template_id == "Q3":
+            doc = self._with_recorded_q2(doc, suffix)
+        return doc
+
+    def _with_recorded_q2(self, q3: SqlResult, suffix: str) -> SqlResult:
+        """Q3 replay = the patient's recorded Q3 rows plus their recorded Q2 rows.
+
+        The committed Q3 fixtures were recorded for the ground truth's planted rows,
+        not for whatever a run cites; every row a finding cites came from Q2. Both
+        envelopes were recorded from live Zetaris with the harmonised columns, so
+        the union is still recorded data, and the Evaluator still keeps only the
+        rows it asked for. Live mode always runs the real Q3.
+        """
+        q2_path = self._replay_dir / f"Q2__{suffix}.json"
+        if not q2_path.is_file():
+            return q3
+        q2 = _validate(json.loads(q2_path.read_text()), f"Q2__{suffix}")
+        headers = list(q3["headers"])
+        index = {h: i for i, h in enumerate(q2["headers"])}
+        if not all(h in index for h in headers):
+            return q3
+        rid = headers.index("row_id") if "row_id" in headers else None
+        seen = {row[rid] for row in q3["data"]} if rid is not None else set()
+        extra = [[row[index[h]] for h in headers] for row in q2["data"]
+                 if rid is None or row[index["row_id"]] not in seen]
+        data = [*q3["data"], *extra]
+        return {"headers": headers, "data": data, "total": len(data)}  # type: ignore[return-value]
 
 
 class RunQueries:

@@ -27,6 +27,69 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 · Arnav · arnav/orchestrator
+
+**Did:** The orchestrator and all four agents (TODO_ARNAV §4, second item, ticked).
+`app/orchestrator.py` runs
+`PLAN → FIND_IDENTITY → (NEEDS_REVIEW) → FETCH_MEDS → NORMALISE → RESOLVE_FREE_TEXT →
+FUSE → DETECT → PRIORITISE → DRAFT → VERIFY → (CRITIQUE → revise) → DONE | PARTIAL`, with
+the pack in `reconcile()` order:
+- **Planner** (Nemotron) chooses the optional steps. The core steps are enforced in code.
+- **Executor** runs Q1 then `link_identity`. A review-band link pauses the run as
+  `needs_review`, and `resume()` continues it. Then Q2 on the confirmed set only, with
+  rows filtered to those records; normalising; and one batched Nemotron call for
+  unmapped lines, **choosing only from `llm_candidates`**.
+- **Evaluator** runs fuse → detect → `safety_gate` → prioritise. It fills the grid's
+  `high_risk_class`, adds the `forced_confirm` dose lane for every current medicine, and
+  produces the notices. Then **one Q3 re-reads every cited row**, a code check blocks
+  invented numbers, foreign rows and "not taking" over UNKNOWN, and a Nemotron critique
+  returns a faithful/unfaithful verdict per finding.
+- **Writer** (Nemotron) writes all the explanations and the summary in one call. The
+  grounded template is used offline, and wherever the code check **or** the model's
+  verdict still objects after the last round. Live, the model caught "40 mg 1 bd (once
+  daily)", which every number check had passed.
+- The run is bounded by the 8-query budget, `RUN_TIMEOUT_S` and `MAX_AGENT_ITERATIONS`.
+  A Nightshift failure in live mode degrades visibly: a caveat, trace status
+  `degraded`, run `partial`.
+- The JSONL trace goes to `logs/` with secrets masked. 21 orchestrator tests.
+
+**Results:**
+- **SAMPLE_MODE matches `input_examples/README.md` exactly:** P0089 (example_2),
+  P0015 (example_1: pauses for review, then warfarin and insulin aspart), P0001 (its two
+  planted omissions). Three queries per run.
+- **Live P0089 on my machine:** every model call (Planner, Executor, Writer, Evaluator)
+  was answered by `nvidia/nemotron-3.5-lightning-30b-a3b`, and all 5 findings were
+  verified by Q3.
+- **Fixed from the live runs:**
+  - Token budgets were raised after empty-response 502s; retries are now visible as
+    `retry_count`.
+  - The critique was too eager: asked for "problems", it restated the findings
+    themselves, so it now returns per-finding verdicts.
+
+**Plan vs repo:**
+- **SAMPLE_MODE Q3** is answered from the patient's recorded Q2 and Q3 envelopes,
+  because the committed Q3 fixtures hold only the planted rows. That's in
+  `docs/DECISIONS.md`.
+- **Arpon:** re-recording Q3 for the rows a run actually cites would remove the need
+  for this.
+
+**Changed shared files:** none on the list. `app/adapters/meterless.py` gained
+`ChatResult.attempts`.
+
+**Broken:** nothing. 700 unit tests pass, secret scan clean. **Speed is the open issue:**
+a live run takes 6–7 minutes. Nemotron spends 30–60 s per call on hidden reasoning, and
+the Zetaris share is about 15 s. That's inside the 10-minute limit, but slow for the demo.
+
+**Needs from teammates:**
+- **Anshu:** `RunResponse` from the real orchestrator has the same shape as the
+  fixtures. Once the API lands (next), `VITE_API_MODE=live` should just work. Notices
+  come from the pack, so a run may show fewer notice types than the mock.
+
+**Next:** the API (`POST /run`, `GET /run/{id}`, `POST /run/{id}/identity`,
+`GET /status`, `GET /patients`, `POST /feedback`) and `run.py`. Then World Model.
+
+---
+
 ### 2026-10-25 15:55 AEDT · Arnav · arnav/zetaris-adapter
 
 **Did:** The Zetaris adapter, `app/adapters/zetaris.py`.

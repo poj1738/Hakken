@@ -124,6 +124,9 @@ class ChatResult:
     latency_ms: int = 0
     max_tokens: int = DEFAULT_MAX_TOKENS
     offline: bool = False
+    #: HTTP attempts this answer took. >1 means upstream failures were retried --
+    #: usually `<model>_empty_response`, i.e. reasoning exhausted the budget.
+    attempts: int = 1
 
     def model_call(self) -> ModelCall:
         """The `RunResponse.model_calls` entry for this call."""
@@ -144,6 +147,7 @@ class ChatResult:
             "route": self.requested_route,
             "tokens": dict(self.usage) or None,
             "latency_ms": self.latency_ms,
+            "retry_count": self.attempts - 1,
             "meterless": receipt_summary(self.receipt) or None,
         }
 
@@ -295,10 +299,12 @@ class MeterlessClient:
         payload: dict[str, Any] = {"model": route, "messages": messages, "max_tokens": max_tokens, "stream": False}
         if temperature is not None:
             payload["temperature"] = temperature
-        response, latency_ms = self._post_with_retry(payload)
-        return self._parse_chat(response, role=role, route=route, max_tokens=max_tokens, latency_ms=latency_ms)
+        response, latency_ms, attempts = self._post_with_retry(payload)
+        result = self._parse_chat(response, role=role, route=route, max_tokens=max_tokens, latency_ms=latency_ms)
+        result.attempts = attempts
+        return result
 
-    def _post_with_retry(self, payload: dict[str, Any]) -> tuple[httpx.Response, int]:
+    def _post_with_retry(self, payload: dict[str, Any]) -> tuple[httpx.Response, int, int]:
         """Bounded retries on connection failures and 502/503/504 only. A read timeout is not
         retried: three 180 s waits would spend the whole run budget."""
         attempts = 1 + self.settings.max_retries
@@ -327,7 +333,7 @@ class MeterlessClient:
             if response.status_code != 200:
                 raise MeterlessError("bad_response", f"HTTP {response.status_code}", status=response.status_code,
                                      detail=_error_detail(response))
-            return response, latency_ms
+            return response, latency_ms, attempt + 1
         assert last is not None
         raise last
 
