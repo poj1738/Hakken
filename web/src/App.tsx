@@ -6,7 +6,6 @@ import type {
   HealthResponse,
   PatientSummary,
   RunResponse,
-  TrustUpdate,
 } from "./types";
 import { Header } from "./components/Header";
 import { Picker, type PatientsState } from "./components/Picker";
@@ -16,7 +15,7 @@ import { CoverageStrip, Notices } from "./components/Coverage";
 import { Grid } from "./components/Grid";
 import { Flags, type FeedbackChoice, type FeedbackState } from "./components/Flags";
 import { Tasks } from "./components/Tasks";
-import { TrustPanel } from "./components/TrustPanel";
+import { TrustPanel, type AppliedTrustUpdate } from "./components/TrustPanel";
 import { Footer } from "./components/Footer";
 
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
@@ -36,7 +35,7 @@ export default function App() {
   const [identityError, setIdentityError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Record<string, FeedbackState>>({});
   // Trust moves accumulate across runs in this session, so patient B shows what patient A taught.
-  const [trustUpdates, setTrustUpdates] = useState<TrustUpdate[]>([]);
+  const [trustUpdates, setTrustUpdates] = useState<AppliedTrustUpdate[]>([]);
   const [acceptance, setAcceptance] = useState<AcceptanceUpdate[]>([]);
   const pollToken = useRef(0);
 
@@ -173,7 +172,7 @@ export default function App() {
         ...(c.reason === "source_outdated" ? { source: c.source, attribute: c.attribute } : {}),
       });
       setFeedback((s) => ({ ...s, [f.id]: { result: r } }));
-      setTrustUpdates((u) => [...u, ...r.trust_updates]);
+      setTrustUpdates((u) => [...u, ...r.trust_updates.map((t) => ({ ...t, runId: r.run_id, targetId: r.target_id, reason: r.reason }))]);
       setAcceptance((a) => [...a, ...r.acceptance_updates]);
     } catch (e) {
       setFeedback((s) => ({ ...s, [f.id]: { error: msg(e) } }));
@@ -250,7 +249,7 @@ export default function App() {
                     <Tasks tasks={run.tasks} findings={run.findings} notices={run.notices} />
                     <Notices notices={run.notices} />
                   </div>
-                  <TrustPanel trust={run.trust} updates={trustUpdates} acceptance={acceptance} />
+                  <TrustPanel trust={run.trust} runId={run.run_id} updates={trustUpdates} acceptance={acceptance} />
                 </>
               )}
             </>

@@ -251,6 +251,10 @@ select { font: inherit; padding: 0.35rem; border-radius: 6px; border: 1px solid 
 .down { color: var(--bad); }
 .up { color: var(--ok); }
 .acceptance { margin-top: 0.8rem; }
+.trust-changes { background: var(--warn-bg); border: 1px solid #f0d58c; border-radius: 8px; padding: 0.5rem 0.8rem; margin-bottom: 0.8rem; }
+.trust-changes ul { margin: 0.3rem 0 0; padding-left: 1.1rem; }
+.trust-row { flex-wrap: wrap; }
+.trust-history { flex-basis: 100%; }
 @keyframes pulse { 50% { background: #ffe08a; } }
 
 /* Footer */
