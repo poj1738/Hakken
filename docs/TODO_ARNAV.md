@@ -162,7 +162,8 @@ the demo.
 - [x] **World Model + its 8 conformance checks** (rule 2). Then swap
   `identity.decide`, Arpon's local copy, for yours: same thresholds, 0.85 / 0.82.
   (Arnav, 25 Oct: 8/8 green; `decide` delegates; tune scorecard identical before and after.)
-- [ ] H-MEM + feedback (section 2 makes the feedback half possible).
+- [x] H-MEM + feedback (section 2 makes the feedback half possible). (Arnav, 25 Oct:
+  13/13 vectors green; trust lives in H-MEM; the learning demo survives a restart.)
 
 Don't edit `app/domain/` except for the handed-over items in §5.
 

@@ -11,6 +11,34 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-25 — H-MEM: a faithful Python port, and the trust the pharmacist teaches lives in it
+
+**Decision.** `app/engines/hmem/` translates the Meterless H-MEM reference
+(`reference/src/*.ts`, commit `1742dec`), and the runner section by section, against the
+**verbatim** official `vectors.json`. It passes 13/13, none weakened. The FNV-1a embedder
+is byte-compatible: `tokenize()` leaves ASCII only, so `ord()` equals `charCodeAt()`, and
+`Math.imul` becomes a 32-bit mask. The reference's quirks are kept as-is, including the
+precedence of `/\bavoid[s]?|dislike[s]?\b/`. Memory mining (the optional model hook) is
+not ported; nothing in the product or the suite uses it.
+
+**In the product** (`app/agents/memory.py`):
+- **The trust records live in H-MEM.** Each `trust.SOURCE_TRUST_PRIORS` pair is a
+  long-term record tagged `trust:<source>:<attribute>`, seeded once (never twice across
+  restarts). `fuse()` reads trust from these records' confidence, rounded to 4 places
+  so `0.7 - 0.2` reads as `0.5`, not `0.49999999999999994`.
+- **A verdict is `HMEM.feedback()`.** PLAN 5.7's deltas *are* H-MEM's
+  (+0.05 / −0.03 / −0.20, clamped), so the engine applies them, tags `wrong` for review
+  and writes the ledger entry.
+- **The verdict is also remembered,** and the Planner recalls memories before planning.
+  They're returned as `memory_used`.
+- **Recall uses threshold 0.15, not the spec default 0.35.** Absolute scores depend on
+  the embedder; the conformance README says only ordering is embedding-independent.
+  With the reference's mock embedder, a past verdict scored about 0.18 for the recall
+  query and generic trust records 0.11 or less (measured, 25 Oct). So 0.15 surfaces
+  verdicts and not the trust table. Every `retrieval_reason` states the threshold.
+- **Persistence:** `STATE_DIR/hmem/` live (`state.json` + `ledger.jsonl`); in memory in
+  SAMPLE_MODE.
+
 ## 2026-10-25 — World Model: a faithful Python port, and how it carries identity
 
 **Decision.** `app/engines/world_model/` translates the Meterless TypeScript reference
