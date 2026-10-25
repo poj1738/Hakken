@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { API_MODE, MAX_POLLS, POLL_INTERVAL_MS, api, isTerminal } from "./api";
+import { API_MODE, MAX_POLLS, POLL_INTERVAL_MS, STATUS_REFRESH_MS, api, isTerminal } from "./api";
 import type {
   AcceptanceUpdate,
   FeedbackReason,
@@ -39,8 +39,29 @@ export default function App() {
   const [acceptance, setAcceptance] = useState<AcceptanceUpdate[]>([]);
   const pollToken = useRef(0);
 
+  // The header pill shows GET /status as returned, refreshed every 30 s and
+  // whenever a run settles, so "last model" is the server's answer, not ours.
+  const refreshStatus = useCallback(() => {
+    api.status().then(
+      (h) => {
+        setHealth(h);
+        setHealthError(null);
+      },
+      (e) => setHealthError(msg(e)),
+    );
+  }, []);
+
   useEffect(() => {
-    api.status().then(setHealth, (e) => setHealthError(msg(e)));
+    refreshStatus();
+    const t = setInterval(refreshStatus, STATUS_REFRESH_MS);
+    return () => clearInterval(t);
+  }, [refreshStatus]);
+
+  useEffect(() => {
+    if (!polling) refreshStatus();
+  }, [polling, refreshStatus]);
+
+  useEffect(() => {
     api.patients().then(
       (r) => {
         setPatients(r.patients);
@@ -118,12 +139,11 @@ export default function App() {
     }
   };
 
-  const lastModel = run?.model_calls.map((c) => c.routed_model).filter(Boolean).pop() ?? null;
   const finished = run && (isTerminal(run.status) || run.status === "needs_review");
 
   return (
     <div className="app">
-      <Header health={health} error={healthError} runModel={lastModel} />
+      <Header health={health} error={healthError} />
       {API_MODE === "mock" && (
         <div className="mock-note">
           Mock mode: replaying hand-written example responses from <code>tests/fixtures/api/</code>. These are not results

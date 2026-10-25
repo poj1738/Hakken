@@ -4,16 +4,14 @@ import { API_MODE } from "../api";
 interface Props {
   health: HealthResponse | null;
   error: string | null;
-  // The model that answered most recently in this session's run, if newer than /status.
-  runModel: string | null;
 }
 
 const NIGHTSHIFT_TONE: Record<string, string> = { online: "ok", unauthorized: "warn", offline: "bad" };
 
-export function Header({ health, error, runModel }: Props) {
+export function Header({ health, error }: Props) {
   const zetaris = health?.zetaris ?? "unknown";
   const nightshift = health?.meterless ?? "unknown";
-  const model = runModel ?? health?.last_routed_model ?? null;
+  const model = health?.last_routed_model ?? null;
   return (
     <header className="header">
       <div className="brand">
