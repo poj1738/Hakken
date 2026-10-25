@@ -79,6 +79,14 @@ def coverage(links: list[IdentityLink], rows: list[SourceRow]) -> dict[str, Cove
         if row.source in rows_by_source:
             rows_by_source[row.source].append(row)
 
+    # Staleness is measured against the admission, not the wall clock: the
+    # signature carries no `as_of`, and the current admission chart is always
+    # the newest document we hold. `date.today()` made the same run answer
+    # differently on different days.
+    emr_dates = [r.doc_date for r in rows_by_source["emr"] if r.doc_date]
+    all_dates = [r.doc_date for r in rows if r.doc_date]
+    reference = max(emr_dates or all_dates) if (emr_dates or all_dates) else date.today()
+
     out: dict[str, Coverage] = {}
     for source in SOURCES:
         link = best.get(source)
@@ -117,7 +125,7 @@ def coverage(links: list[IdentityLink], rows: list[SourceRow]) -> dict[str, Cove
                 )
 
         if source == "gp" and doc_date is not None:
-            age = (date.today() - doc_date).days
+            age = (reference - doc_date).days
             if age > STALE_DOCUMENT_DAYS:
                 notes.append(f"{SCOPE_STALE_DOCUMENT} GP list last updated {doc_date.isoformat()}, "
                              f"about {age // 30} months ago")

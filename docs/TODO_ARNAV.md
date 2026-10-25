@@ -14,7 +14,7 @@ the scorecard **skip** without it. A skip there is a missing build, not a pass.
 ## 0. Where things stand (two lines)
 
 - **Arpon's side is done.** Every function in `app/domain/packs/medtrace/` is real
-  code, scored end to end: held-out F1 0.95, high-risk recall 35/37, zero false
+  code, scored end to end: held-out F1 0.95, high-risk recall 35/37 (core APINCHS 30/32), zero false
   merges over 200 patients. Your stub of the pack is no longer needed — call it.
 - **Every unmet disqualification rule is in your layer.** No model call goes
   through Nightshift yet (rules 2 and 3). No Meterless engine or conformance test
