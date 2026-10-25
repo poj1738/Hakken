@@ -121,10 +121,10 @@
         "band": "review",
         "tier": "probabilistic",
         "field_evidence": {
-          "given": "given name differs slightly (0.98)",
-          "surname": "surname matches exactly",
-          "dob": "date of birth matches exactly",
-          "guard": "this record carries no IHI and is an equally good match for two different people with the same name and date of birth — confirm which"
+          "given": "partial: given name differs slightly (0.98)",
+          "surname": "agrees: surname matches exactly",
+          "dob": "agrees: date of birth matches exactly",
+          "guard": "held: this record carries no IHI, and it falls in a group of matching records that includes Malcolm Walker (DOB 1965-06-10, emr:MRN0000159), who carries a different IHI — confirm it is this patient"
         },
         "guards": [
           "ihi_ambiguous_in_cluster"

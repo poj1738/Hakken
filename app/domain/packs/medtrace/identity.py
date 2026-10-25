@@ -343,6 +343,35 @@ def _collapse(rows: list[SourceRow]) -> dict[str, SourceRow]:
     return best
 
 
+def _display_name(row: SourceRow) -> str:
+    return " ".join(p for p in (row.name_given, row.name_family) if p).strip() or row.record_key
+
+
+def _ambiguity_reason(anchor: SourceRow, other: SourceRow | None) -> str:
+    """The `ihi_ambiguous_in_cluster` explanation, true to the records (scan S22).
+
+    It used to say "an equally good match for two different people with the same
+    name and date of birth" in every case -- false in both demo pauses (P0015,
+    P0013), where the other person has a different name and DOB. Now it names who
+    the record also clusters with, and says "same name and date of birth" only
+    when that is so.
+    """
+    if other is None:
+        return ("held: this record carries no IHI and clusters with a record carrying another "
+                "patient's IHI — confirm it is this patient")
+    same_name = normalise_text(_display_name(other)) == normalise_text(_display_name(anchor))
+    same_dob = (other.dob is not None and other.dob == anchor.dob) or (
+        bool(other.dob_raw) and other.dob_raw == anchor.dob_raw)
+    who = f"{_display_name(other)} (DOB {other.dob_raw or 'unknown'}, {other.record_key})"
+    if same_name and same_dob:
+        return (f"held: this record carries no IHI and matches two different people with the same "
+                f"name and date of birth: this patient and {who}, who has a different IHI — confirm which")
+    # Clusters are transitive (A~B, B~C), so "falls in a group with" is what is known --
+    # not that this record matches the other person directly.
+    return (f"held: this record carries no IHI, and it falls in a group of matching records that "
+            f"includes {who}, who carries a different IHI — confirm it is this patient")
+
+
 def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) -> list[IdentityLink]:
     """Score every candidate against the anchor, then apply the guards.
 
@@ -405,11 +434,18 @@ def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) 
     if anchor_ihi:
         rejected: set[str] = set()
         ambiguous: set[str] = set()
+        # ambiguous member -> the record carrying the conflicting IHI it clusters with,
+        # so the explanation names the actual other person (scan S22).
+        other_of: dict[str, str] = {}
         for members in clusters.values():
             ihis = {(records[m].ihi_syn or "").strip() for m in members} - {""}
             conflicting = ihis - {anchor_ihi}
             if not conflicting:
                 continue
+            others = sorted(m for m in members if (records[m].ihi_syn or "").strip() in conflicting)
+            for m in members:
+                if not (records[m].ihi_syn or "").strip() and others:
+                    other_of[m] = others[0]
             # The cluster holds someone else's IHI. Members carrying it are that
             # person. Members carrying NO IHI are not known to be: a lookalike
             # is identical on name and date of birth, so an un-identified record
@@ -441,10 +477,8 @@ def link_identity(anchor: SourceRow, candidates: list[SourceRow], lex: Lexicon) 
                 link.band = "new"
             elif link.candidate_id in ambiguous:
                 link.guards.append("ihi_ambiguous_in_cluster")
-                link.field_evidence["guard"] = (
-                    "held: this record carries no IHI and is an equally good match for two "
-                    "different people with the same name and date of birth — confirm which"
-                )
+                link.field_evidence["guard"] = _ambiguity_reason(
+                    anchor, records.get(other_of.get(link.candidate_id, "")))
                 link.probability = min(link.probability, GUARD_CEILING)
                 link.band = decide(link.probability)
 
