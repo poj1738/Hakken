@@ -90,6 +90,9 @@ const fx = {
   feedback: feedbackFx as unknown as FeedbackResponse,
 };
 
+/** Patients mock mode has an example run for; the picker labels them. */
+export const MOCK_RUN_PATIENTS = [fx.done.patient_id, fx.needsReview.patient_id].filter((x): x is string => !!x);
+
 /** `?mock=gp_not_found` replays the GP-not-found example for MRN0000001. */
 function mockScenario(): string | null {
   return new URLSearchParams(window.location.search).get("mock");

@@ -10,7 +10,7 @@ import type {
   TrustUpdate,
 } from "./types";
 import { Header } from "./components/Header";
-import { Picker } from "./components/Picker";
+import { Picker, type PatientsState } from "./components/Picker";
 import { Timeline } from "./components/Timeline";
 import { IdentityReview } from "./components/IdentityReview";
 import { CoverageStrip, Notices } from "./components/Coverage";
@@ -26,6 +26,7 @@ export default function App() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [healthError, setHealthError] = useState<string | null>(null);
   const [patients, setPatients] = useState<PatientSummary[]>([]);
+  const [patientsState, setPatientsState] = useState<PatientsState>({ kind: "loading" });
   const [selected, setSelected] = useState("");
   const [run, setRun] = useState<RunResponse | null>(null);
   const [polling, setPolling] = useState(false);
@@ -61,15 +62,32 @@ export default function App() {
     if (!polling) refreshStatus();
   }, [polling, refreshStatus]);
 
-  useEffect(() => {
+  const loadPatients = useCallback(() => {
+    setPatientsState({ kind: "loading" });
     api.patients().then(
       (r) => {
         setPatients(r.patients);
+        setPatientsState({ kind: "ready" });
         setSelected((s) => s || r.patients[0]?.patient_id || "");
       },
-      (e) => setRunError(msg(e)),
+      (e) => setPatientsState({ kind: "error", message: msg(e) }),
     );
   }, []);
+
+  useEffect(loadPatients, [loadPatients]);
+
+  // A result stays on screen only while its patient is selected, so one
+  // patient's medicines can never sit under another patient's name.
+  const selectPatient = (id: string) => {
+    if (id === selected) return;
+    pollToken.current++;
+    setSelected(id);
+    setRun(null);
+    setRunError(null);
+    setDecided({});
+    setIdentityError(null);
+    setFeedback({});
+  };
 
   const poll = useCallback(async (runId: string) => {
     const token = ++pollToken.current;
@@ -154,8 +172,10 @@ export default function App() {
         <div className="side">
           <Picker
             patients={patients}
+            patientsState={patientsState}
+            onRetryPatients={loadPatients}
             selected={selected}
-            onSelect={setSelected}
+            onSelect={selectPatient}
             onRun={startRun}
             running={polling}
             error={runError}
