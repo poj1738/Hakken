@@ -14,7 +14,7 @@ declared here. Open-source libraries do not need declaring.
 
 | PBS schedule data (public API v3) | `data-api.health.gov.au/pbs/api/v3`, Department of Health | pre-existing; **fetched 2026-10-24**, schedule_code 4751 | Real `pbs_code`, pack sizes and repeats joined into our hand-built lexicon, plus an ATC cross-check. The `_meta` copyright permits use and redistribution with copyright retained but **not modification**, so no value is altered, the raw snapshot stays gitignored, and only a ≤200-row attributed sample is committed. See `docs/DATA_LICENCES.md` §1. |
 | PBS Item Report (`data.gov.au`) | Department of Health, **CC BY 3.0 AU** | pre-existing; fetched 2026-10-24 (2016 YTD resource) | Real prescription volumes supply `dos_weight`, joined on PBS item code. Gitignored. See `docs/DATA_LICENCES.md` §2. |
-| TGA Medicine Shortage Reports export | Therapeutic Goods Administration | pre-existing; fetched 2026-10-24 | **Not used: licence unconfirmed.** The parser and `queries.q_shortages` (Q4) are written and tested on hand-made rows; the export is not committed, served or registered (`docs/DATA_LICENCES.md` §4). |
+| TGA Medicine Shortage Reports export | Therapeutic Goods Administration | pre-existing; fetched 2026-10-24 | **Used for Q4 "known shortage" labels.** Non-commercial hackathon use cleared by our consultant on 25 Oct; parsed locally, gitignored, never committed (`docs/DATA_LICENCES.md` §4). |
 | `carltonnorthern/nicknames` (Apache-2.0) | GitHub / PyPI | pre-existing | **Cited by `docs/DATA_SPEC.md` §10.2, not used.** Our nickname table is hand-written for Australians born 1936–1966; nothing was downloaded or vendored. |
 
 **Everything in `app/`, `datasvc/`, `scripts/`, `tests/`, `data/reference_src/`, `web/`

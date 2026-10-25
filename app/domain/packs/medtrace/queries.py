@@ -58,9 +58,8 @@ SOURCE_VIEWS: dict[str, str] = {
 
 ALL_SOURCES_VIEW = "medtrace.all_sources"
 
-#: Q4's view (PLAN 2.1) over `scripts/load_tga_shortages.py`'s output. Registered
-#: only with `register_sources.py --with-tga`, which is off until the TGA licence
-#: is recorded in `docs/DATA_LICENCES.md`.
+#: Q4's view (PLAN 2.1) over `scripts/load_tga_shortages.py`'s output, registered
+#: with `register_sources.py --with-tga` (use cleared 25 Oct, `docs/DATA_LICENCES.md`).
 TGA_VIEW = "medtrace.tga_shortages"
 
 #: The columns of `TGA_VIEW`, exactly as the loader writes them. `ingredients` is

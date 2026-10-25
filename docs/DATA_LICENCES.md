@@ -138,26 +138,29 @@ recorded here because the spec cites it, not because we used it.
 | TGA ARTG bulk export | Not used. |
 | Any real patient data | Rule 7, and the whole point of the project. |
 
-### TGA Medicine Shortage Reports — code ready, **licence unconfirmed, so not used**
+### TGA Medicine Shortage Reports — **used, cleared for non-commercial hackathon use**
 
-`scripts/load_tga_shortages.py` parses the export, and since 25 Oct
-`queries.q_shortages` (Q4) is written and tested. `register_sources.py --with-tga`
-registers it, but it is **off by default**, and `datasvc` does not serve `/ref/tga`
-(`tests/unit/test_datasvc.py::test_tga_is_deliberately_not_served`).
+| | |
+|---|---|
+| Source | TGA Medicine Shortage Reports Database, CSV export (`tga.gov.au`) |
+| Publisher | Therapeutic Goods Administration, Commonwealth of Australia |
+| Accessed | 2026-10-24 (`data/reference/raw/tga_shortages_active_20261024.csv`) |
+| Use cleared | **25 Oct, by the team's consultant**: use in this hackathon is unrestricted because it is non-commercial |
+| Attribution | Source: TGA Medicine Shortage Reports Database, Therapeutic Goods Administration |
+| Parsed by | `scripts/load_tga_shortages.py` (drops the `Phone` column, reformats dates) |
+| Stored at | `data/reference/` — **gitignored, never committed**, served locally by `datasvc` at `/ref/tga` |
+| Queried by | `queries.q_shortages` (Q4) against `medtrace.tga_shortages` |
 
-Why: on 25 Oct we could not confirm a licence. TGA's copyright page did not load. The one
-TGA copyright notice we found, on TGA shortage publications, permits reproduction only
-**in unaltered form, for personal or internal non-commercial use**, which is not an open
-licence, and parsing the export alters it. Many Commonwealth sites use CC BY 4.0, but
-that is not evidence for TGA's terms. Until someone confirms the terms in writing (TGA
-copyright page, or `tga.copyright@tga.gov.au`), nothing from this export is committed,
-served or registered. **The shortage database is incomplete, so it is never ground
-truth** — anything derived from it renders as `NoticeType.KNOWN_SHORTAGE` ("known
-shortage"), never as "unavailable".
+**What we checked before asking.** TGA's copyright page did not load on 25 Oct, and the
+one TGA notice we found, on shortage publications, permits unaltered reproduction for
+personal or internal non-commercial use. The consultant's ruling covers our use: local,
+non-commercial, shown as labels in a demo, with the file itself never redistributed.
+Anything beyond that, such as commercial use or committing the export, needs the
+question asked again.
 
-To switch it on once licensed: record the licence and attribution here, add
-`"tga": "tga_shortages.json"` to `datasvc/main.py` REFERENCES, update that test, then
-`register_sources.py --apply --skip-exists --with-tga`.
+**The shortage database is incomplete, so it is never ground truth.** Anything derived
+from it renders as `NoticeType.KNOWN_SHORTAGE` ("known shortage"), never "unavailable",
+and a medicine absent from it says nothing.
 
 ---
 

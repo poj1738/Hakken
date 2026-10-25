@@ -91,13 +91,9 @@ REFERENCES = [
      ("canonical", "variant", "sex")),
 ]
 
-#: Q4's TGA shortage table (PLAN 2.1), registered only with `--with-tga`. Kept out
-#: of REFERENCES so verify/refresh/drift never touch a table that is not there.
-#: Off by default: the TGA licence is not yet recorded in docs/DATA_LICENCES.md,
-#: and registering a view over unlicensed data is worse than shipping without it.
-#: `datasvc` does not serve `/ref/tga` either (`test_tga_is_deliberately_not_served`).
-#: Once the licence is recorded: add `"tga": "tga_shortages.json"` to datasvc's
-#: REFERENCES, update that test, then `--apply --skip-exists --with-tga`.
+#: Q4's TGA shortage table (PLAN 2.1), registered with `--with-tga`. Kept out of
+#: REFERENCES so verify/refresh/drift never touch a table someone did not choose to
+#: register. Use cleared by the team's consultant on 25 Oct (docs/DATA_LICENCES.md).
 TGA = ("MT_TGA", "tga_raw", "/ref/tga", TGA_VIEW, TGA_COLUMNS)
 
 
@@ -347,7 +343,7 @@ def schema_drift(client: Zetaris) -> list[tuple[str, str, str, list[str], list[s
     return drifted
 
 
-def refresh_statements() -> list[tuple[str, str]]:
+def refresh_statements(with_tga: bool = False) -> list[tuple[str, str]]:
     """UNCACHE then CACHE every raw table. Creates and drops nothing.
 
     `CACHE TABLE` on an already-cached table is a no-op, so re-running --apply
@@ -363,7 +359,7 @@ def refresh_statements() -> list[tuple[str, str]]:
     for db, table, _path, _view, _source in SILOS:
         out.append((f"UNCACHE {db}.{table}", f"UNCACHE TABLE {db}.{table}"))
         out.append((f"CACHE {db}.{table}", f"CACHE TABLE {db}.{table}"))
-    for db, table, _path, _view, _columns in REFERENCES:
+    for db, table, _path, _view, _columns in REFERENCES + ([TGA] if with_tga else []):
         out.append((f"UNCACHE {db}.{table}", f"UNCACHE TABLE {db}.{table}"))
         out.append((f"CACHE {db}.{table}", f"CACHE TABLE {db}.{table}"))
     return out
@@ -549,8 +545,8 @@ def main() -> int:
                     help="re-cache the raw tables after regenerating the data; "
                          "creates and drops nothing")
     ap.add_argument("--with-tga", action="store_true",
-                    help="also register Q4's TGA shortage table. Only once its licence "
-                         "is recorded in docs/DATA_LICENCES.md")
+                    help="also register Q4's TGA shortage table (needs the gitignored "
+                         "data/reference/tga_shortages.json: scripts/load_tga_shortages.py)")
     args = ap.parse_args()
 
     settings = get_settings()
@@ -625,7 +621,7 @@ def main() -> int:
         client = Zetaris()
         log("\n--- refreshing cached tables (no object is created or dropped) ---")
         failures = 0
-        for label, sql in refresh_statements():
+        for label, sql in refresh_statements(with_tga=args.with_tga):
             _result, secs, error = client.run(sql)
             # UNCACHE on a table that was never cached is not a problem.
             if error and label.startswith("UNCACHE"):
