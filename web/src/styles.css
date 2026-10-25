@@ -188,6 +188,8 @@ select { font: inherit; padding: 0.35rem; border-radius: 6px; border: 1px solid 
 .dissent-val { color: var(--warn); font-style: normal; white-space: normal; }
 .resolved { font-size: 0.8rem; min-width: 160px; }
 .abstained strong { color: var(--warn); }
+.warn-text { color: var(--warn); }
+.no-row { color: var(--warn); font-style: normal; font-size: 0.75rem; }
 .row-abstained th { box-shadow: inset 3px 0 0 var(--warn); }
 .inspector { margin-top: 0.8rem; border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; background: #fafbfc; min-height: 3rem; }
 .inspector.empty { display: flex; align-items: center; }
