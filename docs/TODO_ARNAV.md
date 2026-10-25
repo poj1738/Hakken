@@ -144,7 +144,8 @@ the demo.
 
 - [x] Meterless adapter (Nightshift) — rules 2 and 3. (Adapter done and verified live,
   25 Oct. The rules are only *met* once an agent calls it.)
-- [ ] Orchestrator wired to the pack as in section 1, with the **Writer as the
+- [x] (Arnav, 25 Oct: done; SAMPLE_MODE P0089/P0015/P0001 match `input_examples/README.md`;
+  a fully live P0089 run went through Nightshift to Nemotron.) Orchestrator wired to the pack as in section 1, with the **Writer as the
   first real Nemotron call**. In `SAMPLE_MODE`, "replay" means the **Zetaris query
   results** from `tests/fixtures/medtrace/` only. Model steps run the offline
   reasoner on that data and **never replay saved model text** (CLAUDE.md rules 6

@@ -11,6 +11,30 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-25 — SAMPLE_MODE answers Q3 from the patient's recorded Q2 + Q3 envelopes
+
+**Decision.** In SAMPLE_MODE, `ZetarisClient` answers a Q3 (`q_verify_rows`) with the
+patient's recorded Q3 rows **plus** their recorded Q2 rows, in Q3's column order. The
+Evaluator still keeps only the rows it asked for. Live mode always runs the real Q3.
+
+**Why.** The committed `Q3__P00nn.json` fixtures were recorded for the ground truth's
+**planted** row ids. A real run cites whatever the detector found, which can include
+more rows (for example every dispensing behind an omission). Replaying Q3 alone made the
+verifier block all 5 of P0089's findings as "rows missing on re-read". That's a
+fixture artefact, not a data problem. Every cited row came from Q2, and both envelopes
+were recorded from live Zetaris with the harmonised columns, so the union is still
+recorded data. **Arpon:** re-recording Q3 for the rows the pipeline actually cites would
+remove the need for this.
+
+## 2026-10-25 — Live agent token budgets, from the first live run **[live — Arnav's machine, 25 Oct]**
+
+One fully live P0089 run took 386 s. The Writer used 6,391 completion tokens, and the
+free-text step used 3,872 of 4,096. The critique, at 4,096, came back as
+`nemotron-3.5-lightning-30b-a3b_empty_response` three times, about 116 s of retries,
+before degrading to the code check. About 2.5 minutes before the Writer's success were
+almost certainly silent empty-response retries. **Budgets now:** Writer 16k, critique
+and free-text 8k, Planner 4k. Retries are visible as `TraceEvent.retry_count`.
+
 ## 2026-10-25 — SAMPLE_MODE never replays model text; recorded Nightshift responses are parser fixtures only
 
 **Decision.** When `SAMPLE_MODE=true`, `MeterlessClient` never contacts Nightshift.
