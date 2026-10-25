@@ -2,9 +2,10 @@
 
 > **Work in progress: Open Agent Hackathon 2026, team Hakken. Track 1.**
 >
-> **The data pipeline and the clinical logic are built and measured. The agent loop,
-> API and UI are not finished yet.** Everything below says which is which. The
-> sections marked **TBD** are deliberately empty rather than aspirational.
+> **The data pipeline, the clinical logic, the agent loop and the API are built and
+> run end to end. The Meterless engines and the Docker run path are not finished yet,
+> and the UI has not yet been pointed at the live API.** Everything below says which
+> is which. The sections marked **TBD** are deliberately empty rather than aspirational.
 
 Team Hakken (Anshuman, Arpon, Arnav).
 
@@ -24,7 +25,11 @@ source to trust.
 | Piece | State |
 |---|---|
 | **Synthetic data** (`scripts/generate_synthetic.py`, `make synth`) | **works.** 200 seeded patients across four silos, ~13,900 rows, with planted discrepancies and identity traps, and a ground-truth answer key. Real Australian medicine reference data (PBS, ATC, APINCHS). See `docs/DATA_SPEC.md`. |
-| **Zetaris data layer** (`scripts/register_sources.py`) | **works on Arpon's machine.** Four silos registered as REST tables, a harmonised `medtrace.all_sources` view, and every query template verified live against committed fixtures. Each query takes about 2–3 s at 200 patients. |
+| **Zetaris data layer** (`scripts/register_sources.py`) | **works on Arpon's and Arnav's machines.** Four silos registered as REST tables, a harmonised `medtrace.all_sources` view, and every query template verified live against committed fixtures. Each query takes about 2–6 s at 200 patients. |
+| **Adapters** (`app/adapters/`) | **work.** Zetaris: the REST call shape, a read-only guard, a budget of 8 queries per run, and replay of recorded results. Nightshift: the Power contract, the answering model recorded from the receipt, truncation detected by token count. |
+| **Agent loop** (`app/orchestrator.py`, `app/agents/`) | **works, live and in `SAMPLE_MODE`.** Planner → Executor → Evaluator → Writer over the domain pack. Identity near-misses pause for a human. One query re-verifies every cited row, and a critique → revise loop runs before anything is shown. Live on Arnav's machine (25 Oct), every model call was answered by `nvidia/nemotron-3.5-lightning-30b-a3b` through Nightshift. |
+| **API and `run.py`** (`app/main.py`) | **work.** `POST /run`, `GET /run/{id}`, `POST /run/{id}/identity`, `GET /status`, `GET /patients`, `POST /feedback`. `python3 run.py --input input_examples/example_2.json` prints the run. |
+| **`SAMPLE_MODE`** | **works.** Recorded Zetaris results, with every model step done by a deterministic offline function labelled `offline-heuristic`. No Zetaris, no Nightshift, no network. Examples 1, 2 and the learning pair (4 → 5) produce the outcomes written in `input_examples/README.md`. Example 3 pauses for review, shows the GP and pharmacy coverage gaps and invents no findings, **but reports the history as confirmable**, where its README expects `bpmh_not_confirmable`. Raised with Arpon (see `docs/HANDOFF.md`). |
 | **Clinical domain pack** (`app/domain/packs/medtrace/`) | **works.** Identity linkage, normalisation, coverage, trust-weighted fusion, discrepancy detection, the safety gate and triage. Real code, no model calls. |
 | **Detector scorecard** (`scripts/eval.py`) | **works.** Scores the real chain against the answer key. Held-out, with simulated pharmacist review: **precision 0.95, recall 0.95, F1 0.95** (today's code prints recall 0.97 / F1 0.96, which includes one fix found while studying held-out misses; 0.95 is the clean figure, `docs/DECISIONS.md`); core APINCHS high-risk recall **30/32** (95% CI 0.80–0.98); **0 false merges** across 200 patients. Pinned by tests. |
 | **Sample inputs** (`input_examples/`) | **five**, each with replay fixtures and a written expected outcome, including a staged learning-demo pair (see `docs/DECISIONS.md`). |
@@ -32,13 +37,17 @@ source to trust.
 
 ### Not finished
 
-The Zetaris and Meterless **adapters**, the agent loop (Planner → Executor →
-Evaluator → Writer), the H-MEM and World Model engines, `POST /run`, `run.py`,
-`SAMPLE_MODE`, and the Docker run path. `run.py` exits non-zero and says
-so. The **web UI** (`web/`) is built but runs only in mock mode, against hand-written
-example responses in `tests/fixtures/api/`. It has not been run against a live API,
-because none exists yet. No model call goes through Nightshift in the product yet. Nothing here fakes a
-result: the stubs raise `NotImplementedError` or exit non-zero.
+- **The H-MEM and World Model engines**, and their conformance tests. Feedback already
+  moves trust between runs (the learning demo works), but only in-process; it is not
+  durable until H-MEM lands.
+- **The Docker run path.** The API exists now, but the image has not been built and
+  run end to end.
+- **The web UI** (`web/`) is built but has only run in mock mode, against hand-written
+  example responses in `tests/fixtures/api/`. It has not yet been pointed at the API.
+- **Speed.** A live run takes 6–8 minutes, almost all of it Nemotron's hidden
+  reasoning. That's inside the 10-minute limit, but not by much.
+
+Nothing here fakes a result: unbuilt pieces raise `NotImplementedError` or exit non-zero.
 
 ## Quickstart
 
@@ -59,8 +68,16 @@ make test                       # now nothing skips for missing data
 .venv/bin/python scripts/eval.py --split heldout   # the scorecard
 ```
 
-Docker: **not working yet.** The image builds, but `run.py serve` exits 2 with "not
-implemented yet" until the API lands. The intended commands, once it does:
+Run it:
+
+```bash
+SAMPLE_MODE=true .venv/bin/python run.py --input input_examples/example_2.json   # no services needed
+SAMPLE_MODE=true .venv/bin/python run.py --input input_examples/example_1.json --confirm patient:INT00015
+.venv/bin/python run.py serve        # the API on :8000, live against your Zetaris and Nightshift
+```
+
+Docker: **not verified yet.** The API now exists, but nobody has built and run the
+image end to end. The intended commands:
 
 ```bash
 docker compose up --build
@@ -112,10 +129,13 @@ are not used.
 
 ## Sample mode
 
-`SAMPLE_MODE=true` is intended to run the real agent logic against recorded Zetaris
-results with no Zetaris, no Nightshift and no network, using a deterministic offline
-reasoner labelled `offline-heuristic` in traces. It does real work on the cached data
-and does **not** replay saved model text. **Not yet implemented** (Phase 2).
+`SAMPLE_MODE=true` runs the real agent logic against recorded Zetaris results
+(`tests/fixtures/medtrace/`, diffed identical to live), with no Zetaris, no Nightshift
+and no network. Every model step is done by a deterministic offline function labelled
+`offline-heuristic` in the trace and in `model_calls`. The Writer's offline
+explanations are built only from each finding's own rows. It does real work on the
+cached data, linkage, fusion, detection and verification included, and does **not**
+replay saved model text.
 
 ## Engines used
 
@@ -132,10 +152,10 @@ and its conformance runner disagree.
   (OpenAI-compatible, default `http://127.0.0.1:8088/v1`). Observed `online` on Arpon's
   machine on 23 Oct 2026, where a request on `meterless/auto` was answered by
   `nvidia/nemotron-3.5-super-vl-120b-a12b`. Each teammate runs their own runtime.
-- **Which model answered** *will be* recorded per request from the `meterless` compute
-  receipt in the response body (`routed_model` / `winning_route`), not from the route we
-  asked for. The receipt shape was confirmed on Arpon's runtime, but no tracing code
-  exists yet. **Lane pinning was not honoured** there (build `m1-m4`): every request
+- **Which model answered** is recorded per request from the `meterless` compute receipt
+  in the response body (`routed_model` / `winning_route`), not from the route we asked
+  for. It goes into `RunResponse.model_calls` and the JSONL trace in `logs/`. **Lane
+  pinning was not honoured** on Arpon's runtime (build `m1-m4`): every request
   raced six lanes under a learned router, so role→disposition routing can only ever be
   a declared intent, and the trace will record what actually ran. Lane configuration is
   per-machine. See `docs/DECISIONS.md`.
@@ -145,8 +165,8 @@ and its conformance runner disagree.
 - **Open-source code to be materially adapted:** the H-MEM and World Model
   specifications and conformance vectors from the Meterless repo (Apache-2.0). Nothing
   is ported yet; when it is, each ported test file will carry an Apache-2.0 attribution
-  header. The Zetaris REST call shape in our (stubbed) adapter follows that project's
-  reference client, and four real Zetaris responses are recorded as test fixtures.
+  header. The Zetaris REST call shape in our adapter follows that project's reference
+  client. Real Zetaris and Nightshift responses are recorded as test fixtures.
 - **Data:** synthetic only, seeded and deterministic: `make lexicon && make synth`
   reproduces the committed data exactly, and CI checks that on every push. Real PBS
   codes come from the committed lexicon; rebuilding them needs `make data` (a
@@ -167,14 +187,14 @@ it rests on, or the safety gate blocks it. The UI shows the disclaimer on every 
 
 ## Limitations
 
-- **The product is not finished.** The data layer and clinical logic work and are
-  measured; the agent loop, engines and API are unbuilt, and the UI has only run against example responses.
+- **The product is not finished.** The data layer, clinical logic, agent loop and API
+  work; the engines are unbuilt, Docker is unverified, and the UI has only run against
+  example responses.
 - Scores come from synthetic patients and a simulated pharmacist review. They show the
   logic does what it was designed to do, not how it performs on real records. 32 core
   high-risk cases cannot support a "100% recall" claim, and we don't make one.
-- The Zetaris and Meterless *adapters* are stubs. Both services and the Zetaris
-  response envelope were verified on **one machine on one day** (Arpon's, 23 Oct) and
-  on no other; see `docs/ENVIRONMENTS.md` for who can currently run what.
+- Both services have been verified live on **two machines** (Arpon's, 23–24 Oct, and
+  Arnav's, 25 Oct), not more. See `docs/ENVIRONMENTS.md` for who can run what.
 - We cannot choose *which* Nemotron answers a request (see above).
 - The Nightshift compute receipt we rely on for evidence is an undocumented,
   build-specific response shape; the adapter must degrade gracefully without it.

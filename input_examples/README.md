@@ -3,9 +3,11 @@
 `RunRequest` bodies (`app/schemas.py`) for `POST /run` and `python3 run.py --input`.
 All patients are synthetic. `patient_id` is the EMR MRN, never a ground-truth key.
 Each has committed replay fixtures in `tests/fixtures/medtrace/`, so all five will run
-under `SAMPLE_MODE=true` with no Zetaris, no Nightshift and no network. **`SAMPLE_MODE`
-and `run.py` are not implemented yet**; today `run.py` exits 2 and says so. The table
-below is what a correct run must show, checked now by the domain-pack tests.
+under `SAMPLE_MODE=true` with no Zetaris, no Nightshift and no network. For example,
+`SAMPLE_MODE=true python3 run.py --input input_examples/example_2.json`; for a run that
+stops at `needs_review`, add `--confirm <candidate_id>` to record the human decision.
+The table below is what a correct run must show. It is checked by the domain-pack
+tests and, end to end, by `tests/unit/test_orchestrator.py`.
 
 | File | Patient | What a correct run shows |
 |---|---|---|

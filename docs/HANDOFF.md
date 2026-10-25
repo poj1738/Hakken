@@ -27,6 +27,53 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 · Arnav · arnav/api
+
+**Did:** The API and `run.py` (TODO_ARNAV §4, third item, ticked).
+- **`app/main.py`:** `POST /run` returns `running` immediately; the run continues on a
+  background thread and the UI polls `GET /run/{id}`. `?wait=true` runs it to the end
+  first, for curl and tests. Also `POST /run/{id}/identity` (409 if the run isn't
+  waiting), `GET /run/{id}/trace`, `GET /status`, `GET /patients` and `POST /feedback`.
+- **Startup:** Q_REF and Q0 are read once at startup. `/status` caches its provider checks.
+- **CORS** is open for the Vite dev server.
+- **`app/feedback.py` (PLAN 5.7):**
+  - confirm +0.05; `source_outdated` / `wrong_patient` −0.20 on the named
+    `(source, attribute)`; other rejects −0.03.
+  - `intentional_change` / `not_clinically_relevant` lower acceptance per
+    `(type, atc_class)`.
+  - A `grid:<generic>:<attribute>` target covers the abstained-dose case.
+  - **The learning demo works end to end over HTTP:** reject P0003's GP dose, GP
+    `daily_dose` 0.70 → 0.50, and P0007 resolves rosuvastatin to 10 mg with a dose
+    finding. In-process only until H-MEM.
+- **`run.py --input <file> [--confirm <candidate>]`** prints the RunResponse; `run.py serve` starts the API.
+- **README and `input_examples/README.md`** now claim what works (adapters, agent loop,
+  API, SAMPLE_MODE) and nothing more. Engines and Docker are still marked unfinished.
+
+Live server on my machine: `/status` shows Zetaris connected and Nightshift online
+(18 routes); `/patients` serves 200 from my Zetaris. 14 API tests. `make test`: 721 passed.
+
+**Changed shared files:** none on the list. The orchestrator gained `create` /
+`execute` / `decide` and a `running` snapshot in `get()`.
+
+**Broken:** nothing.
+
+**Needs from teammates:**
+- **Anshu:** the live API is ready. `VITE_API_MODE=live`, `VITE_API_URL=http://localhost:8000`.
+  - Grid feedback needs `target_id: "grid:<generic>:<attribute>"` plus `source` and `attribute`.
+  - **A `source_outdated` reject must send `source` and `attribute`, or it's a 422** (see my 15:06 entry).
+  - A live run takes 6–8 minutes, so keep polling.
+- **Arpon — please look at example_3 (P0013).** Once the interview is confirmed, coverage
+  is EMR + patient found and GP + pharmacy not found. `coverage.bpmh_confirmable()`
+  returns **True**, because it counts the EMR chart as one of the two sources, but
+  `input_examples/README.md` says example_3 shows **`bpmh_not_confirmable`**. One of the
+  two is wrong. ACSQHC 4.5 suggests the chart shouldn't count, but it's your call; I haven't
+  touched `app/domain/`.
+
+**Next:** Arnav asked for Planner-driven execution: the Planner's chosen steps decide
+what the Executor turns into SQL, including the shortage check (Q4). Then World Model.
+
+---
+
 ### 2026-10-25 · Arnav · arnav/orchestrator
 
 **Did:** The orchestrator and all four agents (TODO_ARNAV §4, second item, ticked).

@@ -151,8 +151,9 @@ the demo.
   reasoner on that data and **never replay saved model text** (CLAUDE.md rules 6
   and 8). Arnav's session read the earlier wording ("`SAMPLE_MODE` replay first")
   correctly, against the repo's rules; this line was ambiguous, not the rule.
-- [ ] API (`POST /run`, `GET /run/{id}`, `GET /status`, `GET /patients`) and
-  `run.py` — rule 8.
+- [x] API (`POST /run`, `GET /run/{id}`, `GET /status`, `GET /patients`) and
+  `run.py` — rule 8. (Arnav, 25 Oct; plus `/run/{id}/identity` and `/feedback`. Docker
+  still unverified.)
 - [ ] **World Model + its 8 conformance checks** (rule 2). Then swap
   `identity.decide`, Arpon's local copy, for yours: same thresholds, 0.85 / 0.82.
 - [ ] H-MEM + feedback (section 2 makes the feedback half possible).

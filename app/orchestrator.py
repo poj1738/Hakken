@@ -66,6 +66,7 @@ class RunState:
     candidates: dict[str, SourceRow] = field(default_factory=dict)
     caveats: list[str] = field(default_factory=list)
     degraded: bool = False
+    running: bool = False
     response: RunResponse | None = None
 
 
@@ -110,6 +111,11 @@ class Orchestrator:
     # -- runs ------------------------------------------------------------------
 
     def start(self, request: RunRequest) -> RunResponse:
+        """Create and run to the end (or to `needs_review`). The API uses `create` + `execute`."""
+        return self.execute(self.create(request))
+
+    def create(self, request: RunRequest) -> str:
+        """Validate the patient and open the run. Returns its id; nothing is queried yet."""
         if not request.patient_id:
             raise UnknownPatient("patient_id is required")
         anchor = self._load_anchors().get(request.patient_id)
@@ -126,14 +132,24 @@ class Orchestrator:
                     message=f"Reconciling {anchor.name_given} {anchor.name_family} ({anchor.source_patient_id}), "
                             f"admitted {anchor.doc_date}." + (" SAMPLE_MODE: recorded Zetaris data, offline "
                                                               "agents." if self.settings.sample_mode else ""))
-        return self._guard(state, self._from_start)
+        state.running = True
+        return run_id
+
+    def execute(self, run_id: str) -> RunResponse:
+        state = self.runs[run_id]
+        return self._guard(state, self._from_start if not state.links else self._from_identity)
 
     def resume(self, run_id: str, decision: IdentityDecisionRequest) -> RunResponse:
+        self.decide(run_id, decision)
+        return self.execute(run_id)
+
+    def decide(self, run_id: str, decision: IdentityDecisionRequest) -> None:
+        """Record the pharmacist's identity decision. Raises if the run is not awaiting it."""
         state = self.runs.get(run_id)
         if state is None:
             raise KeyError(run_id)
-        if state.response is None or state.response.status != "needs_review":
-            return state.response  # type: ignore[return-value]
+        if state.running or state.response is None or state.response.status != "needs_review":
+            raise ValueError(f"{run_id} is not waiting for an identity decision")
         link = next((l for l in state.links if l.candidate_id == decision.candidate_id and l.band == "review"), None)
         if link is None:
             raise ValueError(f"{decision.candidate_id} is not awaiting review in {run_id}")
@@ -144,16 +160,23 @@ class Orchestrator:
                                       f"{'the same person' if decision.same_person else 'a different person'}.")
         # The deadline restarts: time spent waiting for a human is not run time.
         state.ctx.deadline = time.monotonic() + self.settings.run_timeout_s
-        return self._guard(state, self._from_identity)
+        state.running = True
 
     def get(self, run_id: str) -> RunResponse | None:
+        """The run as it stands: the final response, or a `running` snapshot with the trace so far."""
         state = self.runs.get(run_id)
-        return state.response if state else None
+        if state is None:
+            return None
+        if state.running or state.response is None:
+            last = state.ctx.tracer.events[-1].message if state.ctx.tracer.events else "Starting."
+            return self._respond(state, "running", summary=f"Running: {last}")
+        return state.response
 
     # -- the state machine -------------------------------------------------------
 
     def _guard(self, state: RunState, step) -> RunResponse:
         try:
+            state.running = True
             state.response = step(state)
         except (QueryBudgetExceeded, RunTimeout) as exc:
             state.ctx.tracer.emit("Evaluator", "stop", step="PARTIAL", status="partial", message=f"Stopped early: {exc}.")
@@ -165,6 +188,8 @@ class Orchestrator:
             state.response = self._respond(state, "error", summary=f"The run could not complete: {exc}",
                                            error=ErrorInfo(type=type(exc).__name__, message=str(exc),
                                                            recoverable=getattr(exc, "recoverable", False)))
+        finally:
+            state.running = False
         return state.response
 
     def _llm_step(self, state: RunState, name: str, call, fallback):
