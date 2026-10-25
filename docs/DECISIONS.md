@@ -11,6 +11,16 @@ observation rather than editing someone else's.
 
 ---
 
+## 2026-10-25 — Track 1, recorded **[team decision, 25 Oct]**
+
+The team chose **Track 1**. The product is MedTrace, as already built. Recorded in
+`metadata.json`, `README.md`, `TODO.md` and `PROGRESS.md`, which still said "track not
+chosen". The README status sections, which still claimed only a preflight script and a
+config layer existed, were rewritten to say what is built and measured (data,
+Zetaris registration, domain pack, scorecard) and what is not (adapters, agent loop,
+engines, API, UI). The official Track 1 title is not written anywhere in the repo, so
+it is recorded as "Track 1" rather than guessed.
+
 ## 2026-10-25 — The learning demo is staged, and says so **[measured, 25 Oct]**
 
 **Problem.** PLAN's 2:15 beat ("reject a GP dose as outdated, then patient B

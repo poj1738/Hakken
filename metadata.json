@@ -1,7 +1,7 @@
 {
-  "project_name": "Hakken Agent",
-  "one_liner": "TBD - set when the track is chosen.",
-  "track": "TBD",
+  "project_name": "MedTrace (Hakken Agent)",
+  "one_liner": "Reconciles an admitted patient's pre-admission medicines across four siloed systems (hospital EMR, GP, pharmacy, patient interview) via Zetaris, treats a missing source as unknown, ranks high-risk discrepancies first, and learns from pharmacist feedback which source to trust. Synthetic data only.",
+  "track": "Track 1",
   "team": [
     {
       "name": "Anshuman",
@@ -23,8 +23,8 @@
   "sponsor_tech": {
     "zetaris": {
       "role": "data layer; agents get every fact by sending Lightning SQL to the Zetaris REST API",
-      "integration": "app/adapters/zetaris.py (Phase 2)",
-      "status": "pending - stack not yet started on the dev machine"
+      "integration": "scripts/register_sources.py (registration, live); app/domain/packs/medtrace/queries.py (SQL templates); app/adapters/zetaris.py (pending)",
+      "status": "four silos registered as REST tables plus a harmonised view, all query templates verified live on the dev machine; agent adapter pending"
     },
     "meterless": {
       "engines": [
@@ -62,6 +62,25 @@
     "env": "SAMPLE_MODE=true",
     "description": "runs real agent logic with no Zetaris, no Nightshift and no network"
   },
-  "data_sources": [],
+  "data_sources": [
+    {
+      "name": "Synthetic patient silos (EMR, GP, pharmacy, patient interview)",
+      "origin": "scripts/generate_synthetic.py, seeded",
+      "licence": "ours, synthetic",
+      "regenerate": "make synth"
+    },
+    {
+      "name": "PBS schedule items",
+      "origin": "PBS public API",
+      "licence": "see docs/DATA_LICENCES.md",
+      "regenerate": "make data"
+    },
+    {
+      "name": "Medicine reference table (ATC, APINCHS class, brands, strengths)",
+      "origin": "data/reference_src/, hand-built from public sources",
+      "licence": "see docs/DATA_LICENCES.md",
+      "regenerate": "make lexicon"
+    }
+  ],
   "preexisting_components": []
 }

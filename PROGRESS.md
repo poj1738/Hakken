@@ -9,7 +9,7 @@ One file, current state only. Overwrite it as things change — the history live
 
 ## Status
 
-**The track is MedTrace**, medication reconciliation across four siloed systems.
+**Track 1. The product is MedTrace**, medication reconciliation across four siloed systems.
 Roles and contracts: `docs/PLAN_2026-10-24.md`.
 
 **The clinical domain pack is complete.** Every function in

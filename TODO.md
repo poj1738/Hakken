@@ -14,16 +14,12 @@ submission. **Hard deadline 2026-10-27 23:45 UTC** (Wed 28 Oct 10:45 AEDT).
 - [x] Zetaris response envelope resolved and recorded as fixtures
       (`headers` + `data`, every value a string).
 
-## Blocking decision — do this first
+## Decisions made
 
-- [ ] **Pick the track.** Everything below is shaped by it, and the domain-pack
-      contract (`app/domain/`) cannot be written without it. The three candidates and
-      which engines each emphasises are in the kickoff brief §12.
-- [ ] Decide whether to use the sponsor's pre-existing `NY_TAXI` (15 relational tables,
-      already on the instance, declared in `docs/PREEXISTING.md`) alongside or instead
-      of generating synthetic silos. It is open data and genuinely relational, which
-      suits a cross-source reconciliation story; synthetic-only is the safer read of
-      the rules. **Arpon's call.**
+- [x] **Track: Track 1.** The product is **MedTrace**, medication reconciliation across
+      four siloed systems (`docs/PLAN_2026-10-24.md`).
+- [x] **Synthetic-only data.** The sponsor's `NY_TAXI` and `TPCDS_DB` are declared in
+      `docs/PREEXISTING.md` and not used.
 
 ## Phase 2 — adapters (next to build; both now fully unblocked)
 
@@ -47,21 +43,17 @@ submission. **Hard deadline 2026-10-27 23:45 UTC** (Wed 28 Oct 10:45 AEDT).
 - [ ] Offline reasoner for `SAMPLE_MODE`: real rule-based work on cached data,
       labelled `offline-heuristic`. Must not replay saved model text.
 
-## Phase 3 — data layer
+## Phase 3 — data layer (done, 24–25 Oct)
 
-- [ ] `scripts/generate_synthetic.py` — 3 seeded silos with deliberate inconsistencies.
-- [ ] `datasvc/` serving each silo whole at one URL (no paging — a REST table binds one
-      fixed URL); `CACHE TABLE` immediately after each registration or every query
-      re-hits the source.
-- [ ] **Pre-join in SchemaStore views at registration time.** Agents query flat views;
-      they must never compute a join live. Same result, paid once at setup.
-- [ ] `data/zetaris/NN_*_create.sql` + `_select.sql`; `scripts/register_sources.py`
-      with `--dry-run` and `--skip-exists` (`CREATE SCHEMASTORE CONTAINER` has no
-      `IF NOT EXISTS`), then verify row counts against the source.
-- [ ] **Spike first:** prove the Zetaris containers can reach
-      `host.docker.internal:8100`. Fallbacks in order: datasvc on the Zetaris compose
-      network → MinIO/Parquet → Postgres as a JDBC datasource. Record the winner.
-- [ ] **Ask Arpon before running any create script for real.** Dry-run first.
+- [x] `scripts/generate_synthetic.py` — 4 seeded silos with deliberate inconsistencies,
+      200 patients, ground truth, replay fixtures.
+- [x] `datasvc/` serving each silo whole at one URL; every table `CACHE`d.
+- [x] Harmonised view `medtrace.all_sources` built at registration, so agents query
+      one flat view and never compute a join live.
+- [x] `scripts/register_sources.py` (generates its own SQL; `--apply`, `--refresh`,
+      `--recreate-drifted`, `--verify-only`), verified live against the fixtures.
+- [x] Spike: the Zetaris containers reach `datasvc` on the host.
+- [x] `scripts/eval.py` — detector scorecard against the ground truth.
 
 ## Phase 4 — engines and agent loop
 

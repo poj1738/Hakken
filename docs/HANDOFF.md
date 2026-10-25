@@ -27,6 +27,14 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 13:47 AEDT · Arpon · arpon/track-1
+
+**Did:** Recorded the team's **Track 1** choice in `metadata.json` (track, one-liner, Zetaris status, data sources), `README.md`, `TODO.md` (track and data decisions ticked, Phase 3 ticked) and `PROGRESS.md`, plus a superseded note on `docs/AGENT_KICKOFF.md`. Rewrote the README's stale status sections ("only two things are built") to state honestly what works and what does not.
+**Changed shared files:** none on the list.
+**Broken:** nothing.
+**Needs from teammates:** Arnav and Anshu — the README's "Not finished" list is your layers. Tick items off there as they land, so the README never claims more than the code shows.
+**Next:** Arpon waiting on Arnav's answer about which of his pieces to take.
+
 ### 2026-10-25 13:39 AEDT · Arpon · arpon/demo-data
 
 **Did:** Demo data. (1) **The learning demo had no patient B.** Under one GP-dose rejection, no replay-set patient changed. Staged a pair (`LEARNING_PAIR`: P0003 teaches, P0007 learns). Both abstain at the priors. After −0.20 on GP `daily_dose`, both resolve to the pharmacy dose, and P0007 gains a dose finding (its chart copied the stale GP dose). No rng, no new rows: every other patient is byte-identical. Recorded in the ground truth as `learning_demo`. Pinned by `tests/unit/test_learning_demo.py` on the replay fixtures (runs in CI). (2) **Showcase replay fixtures** for P0013, P0015 and P0089, plus **5 `input_examples/`** with a README saying what each correct run shows (rule 8). (3) **Dockerfile copies `tests/fixtures/medtrace/`**: `SAMPLE_MODE` in the image had nothing to replay. Live Zetaris re-cached (`make refresh`, `make verify` green), and the staged values confirmed by `row_id`.

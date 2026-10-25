@@ -37,6 +37,10 @@ disqualification-level, not nice-to-haves:
    lives ONLY in the Nightshift app's settings, never in the repo, .env, logs,
    README, video or slides.
 
+> **Superseded (25 Oct): Track 1 chosen — MedTrace.** This is the original Phase 0
+> kickoff prompt, kept for the record. Current state: `PROGRESS.md`; plan:
+> `docs/PLAN_2026-10-24.md`.
+
 The track has NOT been chosen yet. The repo is a deliberately track-agnostic
 template, so choosing a track later means writing a "domain pack" (data sources,
 prompts, output schema) rather than rewriting plumbing.
