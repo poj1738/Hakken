@@ -120,10 +120,13 @@ class QueryRecord:
     query_id: str
     replayed: bool = False
     error: str | None = None
+    #: The X-Request-ID header of the attempt that answered (None when replayed).
+    request_id: str | None = None
 
     def trace_fields(self) -> dict[str, Any]:
         return {"sql": self.sql, "row_count": self.rows, "latency_ms": self.ms, "error": self.error,
-                "sql_template_id": self.template_id, "query_id": self.query_id, "replayed": self.replayed}
+                "sql_template_id": self.template_id, "query_id": self.query_id, "request_id": self.request_id,
+                "replayed": self.replayed}
 
 
 @lru_cache(maxsize=4)
@@ -175,14 +178,16 @@ class ZetarisClient:
         check_read_only(sql)
         query_id = str(uuid.uuid4())
         start = time.monotonic()
+        request_id: str | None = None
         if self.sample_mode:
             result = self._replay(template_id, replay_key)
             replayed = True
         else:
-            result = self._post(sql, query_id, limit)
+            result, request_id = self._post(sql, query_id, limit)
             replayed = False
         record = QueryRecord(template_id=template_id, sql=sql, ms=int((time.monotonic() - start) * 1000),
-                             rows=len(result["data"]), query_id=query_id, replayed=replayed)
+                             rows=len(result["data"]), query_id=query_id, replayed=replayed,
+                             request_id=request_id)
         if not replayed and record.rows is not None and record.rows >= limit:
             raise ZetarisError(f"{template_id}: {record.rows} rows hit the limit of {limit}; the result may be "
                                "truncated, so it is refused rather than used", recoverable=False)
@@ -190,7 +195,7 @@ class ZetarisClient:
 
     # -- live -----------------------------------------------------------------
 
-    def _post(self, sql: str, query_id: str, limit: int) -> SqlResult:
+    def _post(self, sql: str, query_id: str, limit: int) -> tuple[SqlResult, str]:
         key = self.settings.require_zetaris_key() if self.settings.has_zetaris_key else None
         if key is None:
             raise ZetarisError("ZETARIS_API_KEY is unset or a placeholder", recoverable=False)
@@ -221,7 +226,7 @@ class ZetarisClient:
                                    status=401)
             if response.status_code != 200:
                 raise ZetarisError(f"HTTP {response.status_code}: {_message(response)}", status=response.status_code)
-            return _envelope(response)
+            return _envelope(response), headers["X-Request-ID"]
         assert last is not None
         raise last
 

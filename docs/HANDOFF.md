@@ -27,6 +27,39 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 · Arnav · arnav/planner-driven
+
+**Did:** "Option A", as Arnav asked: **the Planner decides what is needed, and the
+Executor turns each need into one of Arpon's verified SQL templates.** The model never
+writes SQL text.
+- **The Planner** returns each step as `{tool, need}`. The `need` is plain words, for
+  example "get every medicine line, dispensing and interview answer for those records".
+  Core steps (find_identities, fetch_meds, verify) are added by code if the model leaves
+  them out, and the trace says so.
+- **The Executor** maps find_identities → **Q1**, fetch_meds → **Q2**, check_shortages →
+  **Q4**, verify → **Q3**. resolve_free_text uses the lexicon plus a closed-list
+  Nemotron choice, with no SQL. **Optional steps run only when planned.**
+- **check_shortages (Q4) now actually runs** when planned. Rows become `known_shortage`
+  notices, never "unavailable". If the data isn't there (no SAMPLE_MODE recording, or the
+  TGA view isn't registered on this Zetaris, as on mine), the step says so and the run
+  continues.
+- **Every hand-off is traced:** `Planner need "…" -> template Qn -> Zetaris`, then the
+  query event with its SQL, `queryId` and the `X-Request-ID` the adapter sent
+  (`QueryRecord.request_id`, new).
+
+3 new orchestrator tests (24 in all); unit tests 717 passed.
+
+**Changed shared files:** none on the list.
+
+**Broken:** nothing.
+
+**Needs from teammates:** nothing.
+
+**Next:** World Model and its 8 conformance checks, per Arpon's hand-over order. Then
+the handed-over scan items (TODO_ARNAV §5).
+
+---
+
 ### 2026-10-25 · Arnav · arnav/api
 
 **Did:** The API and `run.py` (TODO_ARNAV §4, third item, ticked).

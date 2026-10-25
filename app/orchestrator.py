@@ -215,8 +215,22 @@ class Orchestrator:
         state.plan = self._llm_step(state, "planner plan",
                                     lambda: planner.plan(ctx, state.anchor, executor.catalogue(), budget_left),
                                     lambda: planner._offline_plan(state.anchor, budget_left))
+        self._route(state, "find_identities")
         state.links, state.candidates = executor.find_identities(ctx, state.anchor)
         return self._from_identity(state)
+
+    def _planned(self, state: RunState, tool: str) -> bool:
+        return state.plan is None or tool in state.plan.tools
+
+    def _route(self, state: RunState, tool: str) -> None:
+        """Trace the hand-off: the Planner's need -> the template the Executor fills -> Zetaris."""
+        need = state.plan.need(tool) if state.plan else planner.DEFAULT_NEED[tool]
+        template = planner.TEMPLATE_FOR[tool]
+        how = (f"the Executor fills template {template} and the Zetaris adapter sends it (read-only check, "
+               "Bearer key, X-Org-ID, fresh X-Request-ID)" if template else "the lexicon plus one Nemotron "
+               "choice from a closed candidate list; no SQL")
+        step = {"find_identities": "FIND_IDENTITY"}.get(tool, tool.upper())
+        state.ctx.tracer.emit("Executor", "route", step=step, message=f'Planner need "{need}" -> {how}.')
 
     def _from_identity(self, state: RunState) -> RunResponse:
         ctx = state.ctx
@@ -227,15 +241,25 @@ class Orchestrator:
                             message=f"Paused: {len(pending)} identity near-miss(es) need your confirmation.")
             return self._needs_review(state, pending, cov)
 
+        self._route(state, "fetch_meds")
         rows, raw, _ = executor.fetch_meds(ctx, state.anchor, state.links)
         q2_id = ctx.zetaris.records[-1].query_id
         stmts = executor.normalise(ctx, rows)
         extra_tasks: list[str] = []
-        if state.plan is None or "resolve_free_text" in state.plan.steps:
+        if self._planned(state, "resolve_free_text"):
+            self._route(state, "resolve_free_text")
             stmts, extra_tasks = self._llm_step(state, "executor resolve_free_text",
                                                 lambda: executor.resolve_free_text(ctx, stmts),
                                                 lambda: (stmts, []))
         analysis = evaluator.analyse(ctx, state.links, rows, stmts, raw, q2_id, self.trust, self.acceptance)
+        if extra_tasks:
+            analysis.tasks = list(dict.fromkeys([*analysis.tasks, *extra_tasks]))
+        if self._planned(state, "check_shortages"):
+            self._route(state, "check_shortages")
+            shortages = executor.check_shortages(ctx, state.anchor,
+                                                 sorted({m.generic for m in analysis.fused if evaluator.is_current(m)}))
+            analysis.notices = [*analysis.notices, *shortages]
+            analysis.tasks = list(dict.fromkeys([*analysis.tasks, *(t for n in shortages for t in n.tasks)]))
         findings = analysis.findings
 
         texts, summary = self._llm_step(
@@ -244,6 +268,7 @@ class Orchestrator:
                      writer._offline_summary(findings, state.anchor, analysis.banner)))
         findings = [f.model_copy(update={"explanation": texts.get(f.id) or writer.template(f)}) for f in findings]
 
+        self._route(state, "verify")
         findings, blocked, q3_sql = evaluator.verify(ctx, findings, state.anchor)
 
         rounds = max(1, self.settings.max_agent_iterations)

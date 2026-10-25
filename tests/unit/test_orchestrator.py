@@ -191,6 +191,53 @@ def test_live_nightshift_failure_degrades_visibly(make_settings, tmp_path) -> No
     assert all(claim_problems(f) == [] for f in r.findings)
 
 
+# -- Option A: the Planner's needs drive the templates -------------------------------
+
+
+def test_each_planned_need_is_traced_to_its_template(orch) -> None:
+    r = run(orch, "MRN0000089")
+    routes = [e for e in r.trace if e.action == "route"]
+    assert [e.step for e in routes] == ["FIND_IDENTITY", "FETCH_MEDS", "RESOLVE_FREE_TEXT", "VERIFY"]
+    assert all('Planner need "' in e.message for e in routes)
+    assert "template Q1" in routes[0].message and "template Q3" in routes[-1].message
+    assert "no SQL" in routes[2].message
+    sent = [e for e in r.trace if e.sql]
+    assert [e.sql_template_id for e in sent] == ["Q1", "Q2", "Q3"] and all(e.query_id for e in sent)
+
+
+def test_an_optional_step_runs_only_when_planned(orch, monkeypatch) -> None:
+    from app.agents import planner
+
+    no_shortage = run(orch, "MRN0000089")
+    assert not any(e.step == "CHECK_SHORTAGES" for e in no_shortage.trace)
+
+    original = planner._offline_plan
+
+    def with_shortages(anchor, budget_left):
+        p = original(anchor, budget_left)
+        return p.model_copy(update={"steps": [*p.steps, planner.PlanStep(tool="check_shortages", need="any shortages?")]})
+
+    monkeypatch.setattr(planner, "_offline_plan", with_shortages)
+    r = run(orch, "MRN0000089")
+    checks = [e for e in r.trace if e.step == "CHECK_SHORTAGES"]
+    assert any('"any shortages?"' in (e.message or "") for e in checks)
+    # SAMPLE_MODE has no recorded Q4: the step says so and the run still succeeds.
+    assert any(e.status == "skipped" for e in checks) and r.status == "success"
+
+
+def test_core_steps_are_added_when_the_model_leaves_them_out(orch, monkeypatch) -> None:
+    from app.agents import planner
+
+    def thin(anchor, budget_left):
+        return planner.Plan(steps=[planner.PlanStep(tool="fetch_meds", need="just the meds")], rationale="thin")
+
+    monkeypatch.setattr(planner, "_offline_plan", thin)
+    r = run(orch, "MRN0000089")
+    plan_msg = next(e.message for e in r.trace if e.step == "PLAN")
+    assert "Core steps added by code: find_identities, verify" in plan_msg
+    assert '"just the meds"' in plan_msg and r.status == "success"
+
+
 # -- the verifier and the trace ------------------------------------------------------
 
 

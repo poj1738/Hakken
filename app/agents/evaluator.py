@@ -61,6 +61,11 @@ class Analysis:
     blocked: list[str] = field(default_factory=list)
 
 
+def is_current(med: FusedMed) -> bool:
+    """A grid line some source says is current, and that fusion did not resolve as absent."""
+    return _current(med)
+
+
 def _current(med: FusedMed) -> bool:
     existence = med.attributes.get("existence")
     if existence is not None and str(existence.value).casefold() == "absent":
