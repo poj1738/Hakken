@@ -38,11 +38,15 @@ def raw_rows(result: SqlResult) -> dict[str, dict[str, str | None]]:
     return out
 
 
-def find_identities(ctx: AgentContext, anchor: SourceRow) -> list[IdentityLink]:
+def find_identities(ctx: AgentContext, anchor: SourceRow) -> tuple[list[IdentityLink], dict[str, SourceRow]]:
+    """Returns the links and one row per candidate record (for the side-by-side review)."""
     ctx.check_time()
     sql = queries.q_identity_candidates(anchor)
     result, record = ctx.zetaris.run(sql, template_id="Q1", replay_key=anchor.source_patient_id)
     rows = rows_from_sql(result)
+    by_key: dict[str, SourceRow] = {}
+    for r in rows:
+        by_key.setdefault(r.record_key, r)
     links = identity.link_identity(anchor, [r for r in rows if r.record_key != anchor.record_key], ctx.lex)
     merged = [l for l in links if l.band == "auto-merge"]
     review = [l for l in links if l.band == "review"]
@@ -53,7 +57,7 @@ def find_identities(ctx: AgentContext, anchor: SourceRow) -> list[IdentityLink]:
                         for l in review)
         msg += f" {len(review)} near-miss(es) need your confirmation: {why}."
     ctx.tracer.emit("Executor", "find_identities", step="FIND_IDENTITY", message=msg, **record.trace_fields())
-    return links
+    return links, by_key
 
 
 def fetch_meds(ctx: AgentContext, anchor: SourceRow, links: list[IdentityLink]
