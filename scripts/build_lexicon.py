@@ -329,6 +329,14 @@ def build() -> int:
         env = json.loads(committed.read_text())
         i = env["headers"].index("pbs_code")
         keep_committed = any(r[i] and not r[i].startswith("SYN") for r in env["data"])
+        if keep_committed:
+            # Serve the committed lexicon too. datasvc hands data/reference/lexicon.json
+            # to Zetaris, and the silos carry the committed real PBS codes, so an
+            # all-synthetic lexicon here left a teammate's live Zetaris unable to
+            # match pharmacy rows by code. Same rows, same values, PBS content unmodified.
+            records = [dict(zip(env["headers"], r)) for r in env["data"]]
+            log(f"  no PBS snapshot: using the committed lexicon ({committed}) so live "
+                f"Zetaris and the silos agree on codes")
     OUT.mkdir(parents=True, exist_ok=True)
     FIXTURES.mkdir(parents=True, exist_ok=True)
     SAMPLE.mkdir(parents=True, exist_ok=True)
