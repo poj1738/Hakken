@@ -5,26 +5,26 @@
   "team": [
     {
       "name": "Anshuman",
-      "github": "",
-      "role": ""
+      "github": "anshoey",
+      "role": "web UI (web/): Vite + React + TypeScript"
     },
     {
       "name": "Arpon",
       "github": "poj1738",
-      "role": ""
+      "role": "data layer and clinical domain pack: synthetic silos, Zetaris registration, identity/coverage/fusion/detection/triage, scorecard"
     },
     {
       "name": "Arnav",
-      "github": "",
-      "role": ""
+      "github": "arnavtrivedi1",
+      "role": "agent layer: Zetaris and Nightshift adapters, orchestrator and agents, API, World Model and H-MEM engine ports"
     }
   ],
   "repo_url": "https://github.com/poj1738/Hakken",
   "sponsor_tech": {
     "zetaris": {
       "role": "data layer; agents get every fact by sending Lightning SQL to the Zetaris REST API",
-      "integration": "scripts/register_sources.py (registration, live); app/domain/packs/medtrace/queries.py (SQL templates); app/adapters/zetaris.py (pending)",
-      "status": "four silos registered as REST tables plus a harmonised view, all query templates verified live on the dev machine; agent adapter pending"
+      "integration": "app/adapters/zetaris.py (read-only REST adapter, per-run budget of 8, SAMPLE_MODE replay); app/domain/packs/medtrace/queries.py (SQL templates); scripts/register_sources.py (registration)",
+      "status": "working: four silos and reference tables registered as REST tables with a harmonised view, verified live on two machines; every agent fact comes back through the adapter"
     },
     "meterless": {
       "engines": [
@@ -32,8 +32,8 @@
         "world_model"
       ],
       "provider": "Meterless Nightshift Runtime, OpenAI-compatible, primary AI provider for every model call",
-      "integration": "app/adapters/meterless.py, app/engines/ (Phase 2/4)",
-      "status": "provider verified online and answering; engines pending"
+      "integration": "app/adapters/meterless.py (Nightshift provider for every model call); app/engines/world_model/ and app/engines/hmem/ (engine ports); app/agents/identity_memory.py, app/agents/memory.py (engines in the product)",
+      "status": "working: Nightshift is the provider for every model call (Planner, Executor, Writer, Evaluator), verified live; World Model 8/8 and H-MEM 13/13 official conformance checks green (make conformance); World Model carries identity state and remembered pharmacist decisions, H-MEM holds the trust the pharmacist teaches and the Planner's recalled memories"
     },
     "cursor": {
       "used": false,
@@ -55,14 +55,14 @@
   },
   "entry_points": {
     "http": "POST /run",
-    "cli": "python3 run.py --input input_examples/example_1.json",
+    "cli": "python3 run.py --input input_examples/example_2.json",
     "docker": "docker compose up",
-    "status": "not implemented yet: run.py and POST /run exit with 'not implemented'"
+    "status": "working: POST /run (poll GET /run/{id}), POST /run/{id}/identity, GET /status, GET /patients, POST /feedback; run.py --input [--confirm <candidate>] and run.py serve. Docker build not yet verified end to end"
   },
   "sample_mode": {
     "env": "SAMPLE_MODE=true",
     "description": "runs real agent logic with no Zetaris, no Nightshift and no network",
-    "status": "not implemented yet; replay fixtures for five sample inputs are committed"
+    "status": "working: recorded Zetaris results plus offline-heuristic agents, no network; the five input_examples produce their documented outcomes (see input_examples/README.md)"
   },
   "data_sources": [
     {
@@ -89,13 +89,13 @@
       "name": "H-MEM specification and conformance vectors",
       "origin": "github.com/Meterless/Meterless",
       "licence": "Apache-2.0",
-      "use": "reference for our Python port (not yet built)"
+      "use": "ported to Python during the window (app/engines/hmem/); official vectors.json copied verbatim"
     },
     {
       "name": "World Model specification and conformance runner",
       "origin": "github.com/Meterless/Meterless",
       "licence": "Apache-2.0",
-      "use": "reference for our Python port (not yet built)"
+      "use": "ported to Python during the window (app/engines/world_model/); runner's 8 checks ported"
     },
     {
       "name": "Zetaris getting-started repo",
@@ -115,7 +115,7 @@
     {
       "name": "PBS schedule (public API v3), PBS Item Report, TGA shortage export",
       "origin": "Department of Health; data.gov.au; TGA",
-      "use": "external public data, see docs/PREEXISTING.md and docs/DATA_LICENCES.md (TGA not used)"
+      "use": "external public data, see docs/PREEXISTING.md and docs/DATA_LICENCES.md; the TGA export feeds the optional Q4 known-shortage overlay when registered"
     }
   ]
 }

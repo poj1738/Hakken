@@ -226,7 +226,38 @@ def evidence_state(
     if any(note.startswith(SCOPE_DISPENSING_INCOMPLETE) for note in cov.scope_notes):
         return EvidenceState.UNKNOWN
 
+    # The source may be describing it in words we could not map (scan S7).
+    if _lay_term_covers(wanted, own, stmts):
+        return EvidenceState.UNKNOWN
+
     return EvidenceState.ABSENT_IN_SCOPE
+
+
+def _lay_term_covers(wanted: str, own: list[MedStatement], stmts: list[MedStatement]) -> bool:
+    """Does an unmapped line of this source name a drug class that includes `wanted`?
+
+    "Spray under the tongue" (C01DA02), "my blue puffer" (R03AC02) and "cholesterol
+    tablet" (C10A) cannot be resolved to one medicine, so they map to nothing -- and
+    the patient column then read ABSENT_IN_SCOPE for glyceryl trinitrate,
+    salbutamol and rosuvastatin, which fusion counted as a vote against. The source
+    did not say no; it said something we could not pin down. That is UNKNOWN.
+
+    The medicine's ATC comes from any statement in the run that names it (this
+    function's signature carries no lexicon), and the classes from `LAY_TERMS`.
+    """
+    from app.domain.packs.medtrace.normalise import LAY_TERMS  # local: normalise imports this module's peers
+
+    unmapped = [_key(s.raw_text) for s in own if not s.generic and s.resolution == "unmapped"]
+    if not unmapped:
+        return False
+    atcs = {s.atc for s in stmts if s.atc and _asserts(s, wanted)}
+    if not atcs:
+        return False
+    for text in unmapped:
+        for phrase, classes in LAY_TERMS.items():
+            if phrase in text and any(atc.startswith(c) for atc in atcs for c in classes):
+                return True
+    return False
 
 
 def bpmh_confirmable(cov: dict[str, Coverage]) -> tuple[bool, str]:
@@ -239,19 +270,27 @@ def bpmh_confirmable(cov: dict[str, Coverage]) -> tuple[bool, str]:
 
     Independence matters: the EMR admission chart and a prior discharge summary
     from the same EMR are one source, not two -- which is why this counts the
-    four systems and never the records inside one.
+    systems and never the records inside one.
+
+    **The admission chart is not one of the two.** A BPMH is the *pre-admission*
+    history the chart is reconciled against, so only GP, pharmacy and the patient
+    interview count (Arnav, 25 Oct, scan S19). The generator's ground truth plants
+    `bpmh_not_confirmable` on exactly the patients with the chart plus one such
+    source (P0013: patient only; P0056: pharmacy only), so this is the rule the data
+    was built to; counting the chart had made both read as confirmable.
     """
-    found = sorted(s for s in SOURCES if cov.get(s) and cov[s].state == "found")
-    pending = sorted(s for s in SOURCES if cov.get(s) and cov[s].state == "near_miss_pending")
+    pre_admission = [s for s in SOURCES if s != "emr"]
+    found = sorted(s for s in pre_admission if cov.get(s) and cov[s].state == "found")
+    pending = sorted(s for s in pre_admission if cov.get(s) and cov[s].state == "near_miss_pending")
     if len(found) >= 2:
         return True, ""
 
-    missing = sorted(set(SOURCES) - set(found) - set(pending))
+    missing = sorted(set(pre_admission) - set(found) - set(pending))
     parts = [
-        f"Only {len(found)} of {len(SOURCES)} sources found"
+        f"Only {len(found)} of {len(pre_admission)} pre-admission sources found"
         f"{' (' + ', '.join(found) + ')' if found else ''}.",
-        "ACSQHC Standard 4 expects at least two independent sources, so this is a draft "
-        "medication history and is not confirmable.",
+        "ACSQHC Standard 4 expects at least two independent sources besides the admission "
+        "chart, so this is a draft medication history and is not confirmable.",
     ]
     if pending:
         parts.append(

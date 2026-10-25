@@ -27,6 +27,46 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 · Arnav · arnav/scan-items
+
+**Did:** Arpon's four main handed-over scan items (TODO_ARNAV §5; ticked there and in
+`docs/SCAN_2026-10-25.md`).
+- **S8** `metadata.json` now claims what works: adapters, agent loop, API, `run.py`,
+  SAMPLE_MODE and both engines, with Docker unverified. Team GitHub handles (taken from the
+  repo history) and roles (from PLAN §1) are filled in.
+- **S19** `coverage.bpmh_confirmable`: **the admission chart no longer counts as one of the
+  two sources.** I fixed the code rather than the README, because the generator's ground
+  truth plants `bpmh_not_confirmable` on exactly the EMR-plus-one-source patients (P0013,
+  P0056), and ACSQHC 4.5 is about the pre-admission history. example_3 now produces its
+  documented outcome, pinned in `test_orchestrator`, and the README caveat is gone.
+- **S22** `identity.py`: the identity-review explanation now names the actual other person
+  ("…falls in a group of matching records that includes Malcolm Walker (DOB 1965-06-10,
+  emr:MRN0000159), who carries a different IHI…"). It says "same name and DOB" only when
+  that's true. The mock-mode review fixture is regenerated.
+- **S7** `coverage.evidence_state`: an unmapped lay-term line ("spray under the tongue",
+  "my blue puffer", "cholesterol tablet") makes that source **UNKNOWN**, not ABSENT, for
+  medicines in the class it names. That removes the false GTN conflict on P0007.
+
+**Guardrails, as §5 asks:** the scorecard `--split tune` is identical after each change:
+`ALL 145 17 5 precision 0.90 recall 0.97 F1 0.93`, high-risk 34/34, 0 false merges.
+`tests/eval` passes. Held-out was not looked at. New helpers are private. Regression tests
+are in `tests/unit/test_scan_fixes.py`.
+
+**Changed shared files:** none on the list. **`app/domain/`** changed: `coverage.py`
+(`bpmh_confirmable`, plus `_lay_term_covers` used by `evidence_state`) and `identity.py`
+(`_ambiguity_reason`). Also `metadata.json`.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Anshu:** `bpmh_confirmable` banners now read "Only N of 3 pre-admission sources found".
+  The identity-review guard sentence is longer and names the other person.
+
+**Still open from the scan:** handed-over S20, S21, S32, S33 (lower priority), and my own
+items S5 and S6 (high), S9–S18, S26–S31. **S2 (`output_examples/` from real runs) is next.**
+
+---
+
 ### 2026-10-25 · Arnav · arnav/hmem
 
 **Did:** H-MEM (TODO_ARNAV §4, last item, ticked). **Both Meterless engines are now
