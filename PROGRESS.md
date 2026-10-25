@@ -39,7 +39,8 @@ queries Zetaris yet (rule 1 — though the registration itself is live and verif
 | TGA shortages loader | Arpon | parses 1,010 rows; **not registered** (Q4 optional) |
 | `app/schemas.py` (API contract) | Arnav | **done and signed off.** #12, plus Arpon's two asks: `Finding.detail`, and `FeedbackRequest.source`/`attribute` (required for `source_outdated`). Structured `Task` deferred |
 | API example fixtures for the UI | Arnav | **done, regenerated for the 25 Oct data.** Every UI state; the review example is now P0015 (file name unchanged for `web/`) |
-| Zetaris / Meterless adapters | Arnav | **stub** — Zetaris adapter is his next item |
+| Meterless adapter (Nightshift) | Arnav | **done, verified live on Arnav's machine, 25 Oct** — status, chat and JSON answered by `nvidia/nemotron-3.5-lightning-30b-a3b`; 33 tests. SAMPLE_MODE uses `offline-heuristic`, never replayed text. Not yet called by any agent |
+| Zetaris adapter | Arnav | **stub** — next |
 | Orchestrator, agents, API, trace | Arnav | not started |
 | **World Model + 8 conformance checks** | Arnav | **not started — a disqualification gate, due Sat 4pm.** `identity.decide` still uses Arpon's local copy |
 | H-MEM + feedback | Arnav | not started |

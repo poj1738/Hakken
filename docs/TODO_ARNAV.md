@@ -142,7 +142,8 @@ the demo.
 
 ## 4. Your critical path (unchanged from PLAN, in disqualification-risk order)
 
-- [ ] Meterless adapter (Nightshift) — rules 2 and 3.
+- [x] Meterless adapter (Nightshift) — rules 2 and 3. (Adapter done and verified live,
+  25 Oct. The rules are only *met* once an agent calls it.)
 - [ ] Orchestrator wired to the pack as in section 1, with the **Writer as the
   first real Nemotron call** — `SAMPLE_MODE` replay first, then live.
 - [ ] API (`POST /run`, `GET /run/{id}`, `GET /status`, `GET /patients`) and

@@ -27,6 +27,52 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-25 15:30 AEDT · Arnav · arnav/meterless-adapter
+
+**Did:** The Nightshift adapter, `app/adapters/meterless.py` (TODO_ARNAV §4, first item, ticked).
+- **`status()`** decides from `GET /v1/models`: unauthorized ≠ offline.
+- **`chat()`**:
+  - `DEFAULT_MAX_TOKENS` 8192, and refuses anything below 512.
+  - **Truncation is caught by the token count** (`completion_tokens >= max_tokens`
+    raises `TruncatedResponse`), never by `finish_reason`.
+  - The receipt is captured defensively. `routed_model` comes from `receipt.routed_model`,
+    then `winning_route.model`, then `response.model`, never from `provider_model`.
+  - Bounded retries on connection errors and 502/503/504 only; a 401 or a timeout is never retried.
+- **`chat_json()`**: schema instruction, pydantic validation, exactly one repair retry.
+- **`auto_detect()`**.
+- `ChatResult.model_call()` and `.trace_fields()` give the orchestrator its `ModelCall`
+  and `TraceEvent` fields.
+
+**Verified live on my machine:** status online with 18 routes; plain text and
+schema-validated JSON both answered by `nvidia/nemotron-3.5-lightning-30b-a3b`.
+Real responses are recorded in `tests/fixtures/meterless/`: bodies only, no token, and
+two secret-shaped build hashes redacted after the pre-commit scan caught them. 33 tests,
+all on a mock transport.
+
+**Plan vs repo:** my brief said SAMPLE_MODE should *replay recorded responses*. The
+README and TODO.md promise judges an `offline-heuristic` that **never replays saved
+model text**, so I followed the repo:
+- In SAMPLE_MODE the adapter never touches the network. Each call site supplies an
+  `offline` function, and the result is recorded as `offline-heuristic`.
+- The recordings are parser fixtures only.
+
+Logged in `docs/DECISIONS.md` with the live observations: routes are still coerced, this
+runtime also lists `local-runtime/*` models (so `meterless/auto` *could* answer with a
+non-Nemotron), and a one-sentence answer cost up to 1,494 completion tokens.
+
+**Changed shared files:** none on the list.
+
+**Broken:** nothing. 641 passed / 6 skipped, secret scan clean.
+
+**Needs from teammates:** nothing blocking.
+- **Arpon:** on your runtime, does `meterless/auto` ever route to a local model? Mine
+  lists `local-runtime/*`. If yours does, the NVIDIA story needs a pinned Nemotron route.
+
+**Next:** Zetaris adapter, then the orchestrator with the Writer as the first real
+Nemotron call.
+
+---
+
 ### 2026-10-25 15:10 AEDT · Arpon · arpon/tga-on
 
 **Did:** (1) **TGA cleared** by the consultant for non-commercial hackathon use. `datasvc` serves `/ref/tga`, the docs record the ruling, and `register_sources.py --with-tga` also works with `--refresh`. Restarted Arpon's local `datasvc` so it serves the route. (2) **Identity evidence has a verdict prefix** for Anshu's UI: `agrees:` / `partial:` / `differs:` / `held:` at the start of every `field_evidence` sentence, from the score itself. (3) Repo stays public (team decision).
