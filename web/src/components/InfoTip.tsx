@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 
 /**
  * A small "i" that shows explanatory text on hover or keyboard focus. The text
@@ -6,7 +6,7 @@ import { useId } from "react";
  * and nothing is lost. The button is focusable and names its text for screen
  * readers; the bubble is hidden (display: none) until hover or focus.
  */
-export function InfoTip({ text, label = "More information" }: { text: string; label?: string }) {
+export function InfoTip({ text, label = "More information" }: { text: ReactNode; label?: string }) {
   const id = useId();
   return (
     <span className="tip">

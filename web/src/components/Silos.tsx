@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import type { RunResponse } from "../types";
 import { SOURCES } from "../types";
-import { cleanText, fmtDate, sourceLabel } from "../format";
+import { fmtDate, sourceLabel } from "../format";
 import { InfoTip } from "./InfoTip";
+import { ScopeNotes } from "./Coverage";
 import { TechDetails } from "./TechDetails";
 
 /**
@@ -44,10 +45,8 @@ export function Silos({ run, searching }: { run: RunResponse | null; searching: 
           const c = cov[s];
           const key = c ? c.state : hasCov ? "unreported" : searching ? "searching" : "idle";
           const st = STATE[key] ?? STATE.unreported;
-          const notes = [
-            ...(c?.scope_notes.map(cleanText) ?? []),
-            ...(c?.state === "not_found" ? ["No record available — this is not the same as “not taking”."] : []),
-          ];
+          const notes = c?.scope_notes ?? [];
+          const unreached = c?.state === "not_found";
           return (
             <li key={s} className={`silo ${st.cls}`}>
               <svg className="silo-ico" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -56,7 +55,17 @@ export function Silos({ run, searching }: { run: RunResponse | null; searching: 
               <div className="silo-body">
                 <div className="silo-name">
                   {s === "emr" ? "Hospital chart" : sourceLabel(s)}
-                  {notes.length > 0 && <InfoTip label={`${sourceLabel(s)} limitations`} text={notes.join(" ")} />}
+                  {(notes.length > 0 || unreached) && (
+                    <InfoTip
+                      label={`${sourceLabel(s)} limitations`}
+                      text={
+                        <>
+                          <ScopeNotes notes={notes} className="scope-notes scope-tip" />
+                          {unreached && <span>No record available — not the same as “not taking”.</span>}
+                        </>
+                      }
+                    />
+                  )}
                 </div>
                 <div className="silo-state">
                   <span className="silo-dot" aria-hidden />

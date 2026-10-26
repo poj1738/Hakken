@@ -67,3 +67,66 @@ export const asWritten = (e: Evidence) =>
   AS_WRITTEN.filter((k) => e.fields[k])
     .map((k) => (LABELLED[k] ? LABELLED[k](e.fields[k] as string) : e.fields[k]))
     .join(" · ");
+
+// ---- S39: what one source says about one medicine, and why ----
+
+export type Says = { label: string; tone: "current" | "stopped" | "none" | "unreached" };
+
+/**
+ * The cell card's state: the API's existence value for this source when it has one,
+ * else its evidence state:
+ * present → "Says current"; absent with a row that mentions it → "Says stopped";
+ * absent with no row → "Not in this source"; unknown → "Not reached".
+ */
+export function says(state: string | undefined, rowCount: number, existence?: unknown): Says {
+  // What the API read this source as saying about whether the patient is on it wins over
+  // per_source, which is "present" whenever the source has a row (S39's "Listed" vs "absent").
+  if (existence === "present") return { label: "Says current", tone: "current" };
+  if (existence === "absent") return { label: "Says stopped", tone: "stopped" };
+  if (state === "present") return { label: "Says current", tone: "current" };
+  if (state === "absent_in_scope") return rowCount ? { label: "Says stopped", tone: "stopped" } : { label: "Not in this source", tone: "none" };
+  return { label: "Not reached", tone: "unreached" };
+}
+
+const DAY = 86400000;
+const addDays = (d: Date, n: number) => new Date(d.getTime() + n * DAY);
+const monthsBetween = (a: Date, b: Date) => Math.round((b.getTime() - a.getTime()) / DAY / 30.44);
+const q = (s: string) => `‘${s}’`;
+
+/**
+ * A plain reason under the state, read from the cited row(s) only:
+ * pharmacy — last dispensed, days' supply, when it would have run out, and how
+ * long before admission that was; GP — on the list, last updated; patient — their
+ * words and what they said about still taking it; chart — what was charted.
+ */
+export function reason(source: string, rows: Evidence[], admission: string | null | undefined): string | null {
+  const e = latest(rows);
+  if (!e) return null;
+  const f = e.fields;
+  const date = parseDate(f.doc_date);
+  if (source === "pharmacy") {
+    if (!date) return `Dispensed: ${asWritten(e)}.`;
+    const n = Number(f.days_supply);
+    const fills = rows.length > 1 ? ` (last of ${rows.length} fills)` : "";
+    if (!Number.isFinite(n) || n <= 0) return `Last dispensed ${rowDate(f.doc_date)}${fills}.`;
+    const out = addDays(date, n);
+    const adm = parseDate(admission);
+    const gap = adm ? monthsBetween(out, adm) : 0;
+    const lead = `Last dispensed ${rowDate(f.doc_date)} (${n} days)${fills}`;
+    if (adm && out < adm && gap >= 1) return `${lead} — ran out about ${fmtDate(iso(out))}; no fills for ${gap} ${gap === 1 ? "month" : "months"}.`;
+    return `${lead} — supply runs to about ${fmtDate(iso(out))}.`;
+  }
+  if (source === "gp") {
+    const status = f.status_text && f.status_text !== "active" ? ` (marked ${q(f.status_text)})` : "";
+    return `On the GP list${status}${date ? `, last updated ${rowDate(f.doc_date)}` : ""}.`;
+  }
+  if (source === "patient") {
+    const words = [f.med_text, f.dose_text, f.freq_text].filter(Boolean).join(", ");
+    return `Patient: ${q(words)}${f.status_text ? ` — still taking? ${f.status_text}.` : "."}`;
+  }
+  if (source === "emr") {
+    const words = [f.med_text, f.dose_text, f.freq_text, f.route_text].filter(Boolean).join(" ");
+    return `Charted at admission: ${words}.`;
+  }
+  return null;
+}

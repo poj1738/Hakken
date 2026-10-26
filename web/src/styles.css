@@ -490,6 +490,34 @@ pre.code { margin: 8px 0 0; padding: 8px 10px; white-space: pre-wrap; font-size:
 .log-dt { color: var(--muted); font-size: 11.5px; }
 .log .log-item { padding-bottom: 10px; }
 
+/* S39: what a source says, and why */
+.insp-statement { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 10px; padding: 8px 12px; background: #fff; border-left: 3px solid #e3922f; border-radius: 6px; }
+.says { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; border-radius: 6px; padding: 3px 9px; border: 1px solid transparent; }
+.says-current { background: #e2f1ec; color: #0d5c3a; }
+.says-stopped { background: #fff6ea; color: #7a3a00; border-color: #e3922f; }
+.says-none { background: #fff; color: var(--muted); border-color: #d7dedb; }
+.says-unreached { background: repeating-linear-gradient(135deg, #f2eefa 0 5px, #e8e1f6 5px 10px); color: #4d2c86; font-style: italic; }
+.insp-why { font-size: 14px; color: var(--ink-2); margin: 8px 0 4px; }
+
+/* S41: scope notes, one per line, with a short label */
+.scope-notes { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--muted); }
+.scope-label { display: inline-block; font-size: 11px; font-weight: 600; color: var(--nav-ink); background: var(--hover); border-radius: 5px; padding: 1px 6px; margin-right: 4px; }
+.scope-tip { margin: 0 0 4px; color: #fff; }
+.scope-tip .scope-label { background: rgba(255, 255, 255, 0.18); color: #fff; }
+
+/* S42: Supply */
+.supply-caveat { padding: 0 24px 10px; font-size: 12.5px; color: var(--muted); }
+.supply-group { padding: 0 24px 8px; display: flex; flex-direction: column; gap: 8px; }
+.supply-card { border: 1px solid #f0c2b0; background: #fff7f4; border-radius: 10px; padding: 12px 14px; box-shadow: inset 4px 0 0 var(--alert); }
+.supply-med { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
+.supply-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 13.5px; padding: 3px 0; }
+.supply-product { color: var(--ink-2); }
+.supply-back { font-size: 13px; font-weight: 600; color: var(--accent-dark); }
+.supply-fold { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: #fff; }
+.supply-fold > summary { font-size: 14px; }
+.supply-fold[open] > summary { margin-bottom: 4px; }
+.supply-dropped { padding: 0 24px 12px; font-size: 12px; color: var(--muted); }
+
 /* Tablet and phone */
 @media (max-width: 1100px) {
   .silos { grid-template-columns: 1fr; gap: 10px; }
@@ -514,7 +542,7 @@ pre.code { margin: 8px 0 0; padding: 8px 10px; white-space: pre-wrap; font-size:
   .silo { padding: 10px; }
   .pipe-stage + .pipe-stage { margin-left: 0; }
   .pipe-stage + .pipe-stage::before { content: none; }
-  .fgroup, .grid-scroll, .legend, .sec-head, .sec-summary, .sec-empty, .sec-pad, .insp-wrap, .action, .notice, .log, .side-foot, .id-scroll, .id-head, .id-legend { padding-left: 16px; padding-right: 16px; }
+  .supply-group, .supply-caveat, .fgroup, .grid-scroll, .legend, .sec-head, .sec-summary, .sec-empty, .sec-pad, .insp-wrap, .action, .notice, .log, .side-foot, .id-scroll, .id-head, .id-legend { padding-left: 16px; padding-right: 16px; }
   .finding { padding: 14px 16px; }
   .finding-foot { flex-direction: column; align-items: stretch; }
   .finding-action { flex: none; }

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import type { Coverage, Evidence, FusedMed } from "../types";
 import { SOURCES } from "../types";
-import { STATE_SHORT, fmtValue, medName, sourceLabel, withUnit } from "../format";
-import { asWritten, fillSummary, groupRows, latest, rowDate } from "../records";
+import { fmtValue, medName, sourceLabel, withUnit } from "../format";
+import { asWritten, fillSummary, groupRows, latest, rowDate, says } from "../records";
 import { InfoTip } from "./InfoTip";
 
 /**
@@ -83,7 +83,7 @@ export function Compare({
                 const missing = !bySource(s).length && coverage[s] && NOT_REACHED[coverage[s]!.state];
                 return (
                   <td key={s} className={flagged(s, ["existence"]) ? "cmp-diff" : ""}>
-                    {missing || (st ? STATE_SHORT[st] : bySource(s).length ? "Listed" : "No record")}
+                    {missing || (st ? says(st, bySource(s).length, med?.attributes.existence ? med.attributes.existence.dissenting[s] ?? (med.attributes.existence.supporting.includes(s) ? med.attributes.existence.value : undefined) : undefined).label : bySource(s).length ? "Listed" : "No record")}
                   </td>
                 );
               })}

@@ -1,10 +1,12 @@
 import { useState } from "react";
-import type { Coverage, Evidence, EvidenceState, FusedMed, FusedValue, Source, TrustAttribute } from "../types";
+import type { Coverage, Evidence, EvidenceState, Finding, FusedMed, FusedValue, Source, TrustAttribute } from "../types";
 import type { FeedbackState } from "./Flags";
 import { SOURCES } from "../types";
 import { ROW_TEXT_FIELDS, STATE_LABEL, STATE_SHORT, attributeLabel, cleanText, fieldLabel, medName, sourceLabel, withUnit } from "../format";
 import { InfoTip } from "./InfoTip";
 import { Compare } from "./Compare";
+import { ScopeNotes } from "./Coverage";
+import { reason, says } from "../records";
 import { TechDetails } from "./TechDetails";
 
 export const gridFeedbackKey = (generic: string, attribute: string, source: string) => `grid:${generic}:${attribute}:${source}`;
@@ -15,6 +17,10 @@ interface Props {
   coverage: Partial<Record<string, Coverage>>;
   /** RunResponse.dose_units: the unit of each medicine's resolved daily dose, when the API knows it. */
   doseUnits: Record<string, string>;
+  /** The run's findings, for a medicine's one-line statement (S36 `detail.statement`). */
+  findings: Finding[];
+  /** The patient's admission date, for "no fills for N months" before admission. */
+  admissionDate?: string | null;
   feedback: Record<string, FeedbackState>;
   onRejectCell: (generic: string, attribute: TrustAttribute, source: Source) => void;
 }
@@ -119,6 +125,10 @@ function sourceValues(med: FusedMed, source: string) {
     .filter((x) => x.said !== undefined && x.said !== null);
 }
 
+/** S39: the button says what it does: "This pharmacy record is out of date", "This GP daily dose is out of date". */
+const outdatedLabel = (source: string, attribute: string) =>
+  `This ${source === "gp" ? "GP" : source === "emr" ? "admission chart" : sourceLabel(source).toLowerCase()} ${attribute === "existence" ? "record" : attributeLabel(attribute).toLowerCase()} is out of date`;
+
 function CellFeedback({ med, source, unit, feedback, onRejectCell }: { med: FusedMed; source: string; unit?: string; feedback: Props["feedback"]; onRejectCell: Props["onRejectCell"] }) {
   const values = sourceValues(med, source);
   if (!values.length) return null;
@@ -148,12 +158,11 @@ function CellFeedback({ med, source, unit, feedback, onRejectCell }: { med: Fuse
               <button
                 type="button"
                 className="btn btn-line btn-sm"
-                aria-label={`Mark ${sourceLabel(source)} ${attributeLabel(v.attribute).toLowerCase()} as outdated`}
-                title={`Mark ${sourceLabel(source)} ${attributeLabel(v.attribute).toLowerCase()} as outdated`}
+                title="Tells MedTrace this source is outdated for this kind of information; its confidence drops"
                 disabled={st?.busy}
                 onClick={() => onRejectCell(med.generic, v.attribute as TrustAttribute, source as Source)}
               >
-                Mark outdated
+                {outdatedLabel(source, v.attribute)}
               </button>
             )}
             {st?.error && <span className="error"> {st.error}</span>}
@@ -164,7 +173,7 @@ function CellFeedback({ med, source, unit, feedback, onRejectCell }: { med: Fuse
   );
 }
 
-function Inspector({ cell, idx, coverage, unit, pinned, onClose, feedback, onRejectCell }: { cell: Cell; idx: Record<string, Evidence>; coverage: Props["coverage"]; unit?: string; pinned: boolean; onClose: () => void; feedback: Props["feedback"]; onRejectCell: Props["onRejectCell"] }) {
+function Inspector({ cell, idx, coverage, unit, statement, admissionDate, pinned, onClose, feedback, onRejectCell }: { cell: Cell; idx: Record<string, Evidence>; coverage: Props["coverage"]; unit?: string; statement?: string | null; admissionDate?: string | null; pinned: boolean; onClose: () => void; feedback: Props["feedback"]; onRejectCell: Props["onRejectCell"] }) {
   const { med, source } = cell;
   const state = med.per_source[source] ?? "unknown";
   const rows = rowsFor(med, source, idx);
@@ -173,14 +182,18 @@ function Inspector({ cell, idx, coverage, unit, pinned, onClose, feedback, onRej
   // Sources disagree or a value is unresolved: open with the side-by-side view of every source.
   const disputed = dissentingSources(med).size > 0 || med.abstained.length > 0 || Object.values(med.attributes).some((v) => v.abstained);
   const allRows = med.row_ids.map((id) => idx[id]).filter((e): e is Evidence => !!e);
+  // S39: what this source says (not whether it has a record), and why, from its cited row.
+  const ex = med.attributes.existence;
+  const said = says(state, rows.length, ex ? ex.dissenting[source] ?? (ex.supporting.includes(source) ? ex.value : undefined) : undefined);
+  const why = reason(source, rows, admissionDate ?? coverage.emr?.doc_date);
   return (
     <aside className="insp" aria-live="polite">
+      {statement && <p className="insp-statement">{cleanText(statement)}</p>}
       <div className="insp-head">
         <strong>{medName(med.generic)}</strong>
         <span className="insp-src">{sourceLabel(source)}</span>
-        <span className={`cell c-${KIND_OF_STATE[state]}`}>
-          <span className="dot" />
-          {STATE_LABEL[state]}
+        <span className={`says says-${said.tone}`} title={`Evidence state: ${STATE_LABEL[state]}`}>
+          {said.label}
         </span>
         {pinned && (
           <button type="button" className="lnk insp-close" onClick={onClose}>
@@ -188,23 +201,16 @@ function Inspector({ cell, idx, coverage, unit, pinned, onClose, feedback, onRej
           </button>
         )}
       </div>
-      {pinned && disputed && <Compare generic={med.generic} rows={allRows} med={med} coverage={coverage} unit={unit} />}
-      {state === "unknown" && (
-        <p className="insp-note" title="This source cannot be seen for this medicine.">
-          <strong>No record</strong> — not the same as "not taking".
+      {why && <p className="insp-why">{why}</p>}
+      {!why && state === "unknown" && (
+        <p className="insp-why" title="This source cannot be seen for this medicine.">
+          {cov?.state === "not_found" ? `No ${sourceLabel(source)} record found` : "This source doesn't cover it"} — not the same as "not taking".
         </p>
       )}
-      {state === "absent_in_scope" && <p className="insp-note">Source found; this medicine isn't in it.</p>}
+      {!why && state === "absent_in_scope" && <p className="insp-why">The {sourceLabel(source)} record doesn't mention it.</p>}
       {cov?.state === "near_miss_pending" && <p className="insp-note">Link to the patient under review.</p>}
-      {cov?.scope_notes.length ? (
-        <ul className="insp-scope">
-          {cov.scope_notes.map((n) => (
-            <li key={n} title={n}>
-              {cleanText(n)}
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      <ScopeNotes notes={cov?.scope_notes ?? []} />
+      {pinned && disputed && <Compare generic={med.generic} rows={allRows} med={med} coverage={coverage} unit={unit} />}
       {/* Buttons only on a pinned (clicked) cell, so a hover never fires feedback. */}
       {pinned && <CellFeedback med={med} source={source} unit={unit} feedback={feedback} onRejectCell={onRejectCell} />}
       {!pinned && sourceValues(med, source).some((x) => x.dissents || x.v.abstained) && (
@@ -274,7 +280,12 @@ function Reconciled({ med, unit }: { med: FusedMed; unit?: string }) {
   );
 }
 
-export function Grid({ grid, evidenceIndex, coverage, doseUnits, feedback, onRejectCell }: Props) {
+export function Grid({ grid, evidenceIndex, coverage, doseUnits, findings, admissionDate, feedback, onRejectCell }: Props) {
+  // The one-line conflict for a medicine: the first finding on it that carries an S36 statement.
+  const statementFor = (generic: string) => {
+    const f = findings.find((x) => x.generic === generic && x.detail && typeof x.detail.statement === "string" && x.detail.statement);
+    return f ? String(f.detail.statement) : null;
+  };
   const [hover, setHover] = useState<Cell | null>(null);
   const [pinned, setPinned] = useState<Cell | null>(null);
   const shown = pinned ?? hover;
@@ -400,6 +411,8 @@ export function Grid({ grid, evidenceIndex, coverage, doseUnits, feedback, onRej
             idx={evidenceIndex}
             coverage={coverage}
             unit={doseUnits[shown.med.generic]}
+            statement={statementFor(shown.med.generic)}
+            admissionDate={admissionDate}
             pinned={!!pinned && shown === pinned}
             onClose={() => setPinned(null)}
             feedback={feedback}
