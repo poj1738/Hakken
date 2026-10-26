@@ -13,26 +13,35 @@ import { Header } from "./components/Header";
 import { Picker, type PatientsState } from "./components/Picker";
 import { Timeline } from "./components/Timeline";
 import { IdentityReview } from "./components/IdentityReview";
-import { CoverageStrip, Notices } from "./components/Coverage";
+import { BpmhBanner, RecordSources } from "./components/Coverage";
 import { Grid, gridFeedbackKey } from "./components/Grid";
 import { Flags, type FeedbackChoice, type FeedbackState } from "./components/Flags";
 import { Tasks } from "./components/Tasks";
 import { TrustPanel, type AppliedTrustUpdate } from "./components/TrustPanel";
+import { SummaryCards } from "./components/SummaryCards";
 import { DISCLAIMER, Footer } from "./components/Footer";
 import { cleanText } from "./format";
+
+type Tab = "findings" | "meds" | "actions" | "trust";
+const TABS: [Tab, string][] = [
+  ["findings", "Discrepancies"],
+  ["meds", "Medication History"],
+  ["actions", "Actions Required"],
+  ["trust", "Source Confidence"],
+];
 
 /** The API's caveats about this result, minus the fixed disclaimer shown in the header and footer. */
 function Caveats({ caveats }: { caveats: string[] }) {
   const shown = caveats.filter((c) => c !== DISCLAIMER);
   if (!shown.length) return null;
   return (
-    <ul className="caveats small">
+    <div className="alert alert-note" role="note">
       {shown.map((c) => (
-        <li key={c} title={c}>
+        <div key={c} title={c}>
           {cleanText(c)}
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }
 
@@ -52,13 +61,16 @@ export default function App() {
   const [identityBusy, setIdentityBusy] = useState<string | null>(null);
   const [identityError, setIdentityError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Record<string, FeedbackState>>({});
+  const [tab, setTab] = useState<Tab>("findings");
+  // Checklist ticks for this screen only; the summary card counts them live.
+  const [actionsDone, setActionsDone] = useState<Record<number, boolean>>({});
   // Trust moves accumulate across runs in this session, so patient B shows what patient A taught.
   const [trustUpdates, setTrustUpdates] = useState<AppliedTrustUpdate[]>([]);
   const [acceptance, setAcceptance] = useState<AcceptanceUpdate[]>([]);
   const pollToken = useRef(0);
 
-  // The header pill shows GET /status as returned, refreshed every 30 s and
-  // whenever a run settles, so "last model" is the server's answer, not ours.
+  // The header shows GET /status as returned, refreshed every 30 s and whenever
+  // a run settles, so "Model" is the server's answer, not ours.
   const refreshStatus = useCallback(() => {
     api.status().then(
       (h) => {
@@ -93,17 +105,23 @@ export default function App() {
 
   useEffect(loadPatients, [loadPatients]);
 
+  const resetResult = () => {
+    setRun(null);
+    setRunError(null);
+    setDecided({});
+    setIdentityError(null);
+    setFeedback({});
+    setActionsDone({});
+    setTab("findings");
+  };
+
   // A result stays on screen only while its patient is selected, so one
   // patient's medicines can never sit under another patient's name.
   const selectPatient = (id: string) => {
     if (id === selected) return;
     pollToken.current++;
     setSelected(id);
-    setRun(null);
-    setRunError(null);
-    setDecided({});
-    setIdentityError(null);
-    setFeedback({});
+    resetResult();
   };
 
   const poll = useCallback(async (runId: string) => {
@@ -122,7 +140,7 @@ export default function App() {
           // One dropped poll must not abandon a run that is still going; give up
           // only after MAX_POLL_FAILURES in a row.
           if (++failures >= MAX_POLL_FAILURES) throw e;
-          if (token === pollToken.current) setPollWarning(`Lost contact with the run (${failures}/${MAX_POLL_FAILURES}), retrying: ${msg(e)}`);
+          if (token === pollToken.current) setPollWarning(`Connection to the reconciliation lost (${failures}/${MAX_POLL_FAILURES}); retrying. ${msg(e)}`);
           continue;
         }
         failures = 0;
@@ -131,7 +149,7 @@ export default function App() {
         setRun(r);
         if (isTerminal(r.status) || r.status === "needs_review") return;
       }
-      setRunError(`Stopped polling after ${Math.round((MAX_POLLS * POLL_INTERVAL_MS) / 60000)} minutes; the run may still finish.`);
+      setRunError(`Stopped checking after ${Math.round((MAX_POLLS * POLL_INTERVAL_MS) / 60000)} minutes; the reconciliation may still finish.`);
     } catch (e) {
       if (token === pollToken.current) setRunError(msg(e));
     } finally {
@@ -144,11 +162,7 @@ export default function App() {
 
   const startRun = async () => {
     pollToken.current++;
-    setRun(null);
-    setRunError(null);
-    setDecided({});
-    setIdentityError(null);
-    setFeedback({});
+    resetResult();
     setPolling(true);
     try {
       const r = await api.startRun({ patient_id: selected });
@@ -208,93 +222,125 @@ export default function App() {
       attribute,
     });
 
-  const finished = run && (isTerminal(run.status) || run.status === "needs_review");
+  const finished = !!run && isTerminal(run.status);
+  // A result with no coverage and no grid (an early stop, or the mock placeholder)
+  // shows only its summary: an empty grid and "No discrepancies" would read as a
+  // clean bill of health.
+  const hasResult = finished && (Object.keys(run!.coverage).length > 0 || run!.grid.length > 0);
+  const doneCount = run ? run.tasks.filter((_, i) => actionsDone[i]).length : 0;
 
   return (
     <div className="app">
       <Header health={health} error={healthError} />
       {API_MODE === "mock" && (
         <div className="mock-note" title="VITE_API_MODE=mock: replaying tests/fixtures/api/*.json">
-          Example data: these screens replay hand-written examples, not the results of a real run.
+          Example data: these screens replay hand-written examples, not the results of a real reconciliation.
         </div>
       )}
-      <main className="layout">
-        <div className="side">
-          <Picker
-            patients={patients}
-            patientsState={patientsState}
-            onRetryPatients={loadPatients}
-            selected={selected}
-            onSelect={selectPatient}
-            onRun={startRun}
-            running={polling}
-            error={runError}
-          />
-          <Timeline run={run} polling={polling} warning={pollWarning} />
-        </div>
-        <div className="main">
-          {run?.status === "needs_review" && run.identity_review && (
-            <IdentityReview
-              review={run.identity_review}
-              banner={run.banner}
-              decided={decided}
-              busy={identityBusy}
-              error={identityError}
-              onDecide={decideIdentity}
-            />
-          )}
-          {run?.status === "needs_review" && <Caveats caveats={run.output.caveats} />}
-          {run?.status === "needs_review" && !run.identity_review && (
-            <section className="card">
-              <h2>Identity Review Needed</h2>
-              <p className="error">
-                The run paused for an identity review, but no review details were sent, so nothing can be decided from this
-                screen.
-              </p>
-            </section>
-          )}
-          {run?.status === "error" && (
-            <section className="card">
-              <h2>Reconciliation Failed</h2>
-              <p className="error">{run.error?.message ?? "The run ended with an error."}</p>
-            </section>
-          )}
-          {finished && run.status !== "needs_review" && (
-            <>
-              <section className="card summary">
-                <h2>Summary</h2>
-                <p title={run.output.summary}>{cleanText(run.output.summary)}</p>
-                {/* The API's caveats qualify this result, so they sit with it. The
-                    fixed disclaimer is already in the header and footer. */}
-                <Caveats caveats={run.output.caveats} />
-                {run.status === "partial" && <p className="banner banner-warn">Partial result. Read every caveat before relying on it.</p>}
+      <Picker
+        patients={patients}
+        patientsState={patientsState}
+        onRetryPatients={loadPatients}
+        selected={selected}
+        onSelect={selectPatient}
+        onRun={startRun}
+        running={polling}
+        error={runError}
+      />
+      <main className="wrap">
+        {run && (finished || run.status === "needs_review") && <Caveats caveats={run.output.caveats} />}
+        {hasResult && <BpmhBanner banner={run!.banner} bpmhConfirmable={run!.bpmh_confirmable} />}
+        {run?.status === "partial" && <div className="alert alert-medium">Partial result. Read every caveat before relying on it.</div>}
+        {hasResult && <SummaryCards run={run!} actionsDone={doneCount} />}
+
+        <div className="cols">
+          <div className="col-main">
+            {run?.status === "needs_review" &&
+              (run.identity_review ? (
+                <IdentityReview
+                  review={run.identity_review}
+                  banner={run.banner}
+                  decided={decided}
+                  busy={identityBusy}
+                  error={identityError}
+                  onDecide={decideIdentity}
+                />
+              ) : (
+                <section className="card card-pad">
+                  <h2 className="card-title">Identity Review Required</h2>
+                  <p className="error">
+                    The reconciliation paused for an identity review, but no review details were provided, so no decision can be
+                    made from this screen.
+                  </p>
+                </section>
+              ))}
+
+            {run?.status === "error" && (
+              <section className="card card-pad">
+                <h2 className="card-title">Reconciliation Failed</h2>
+                <p className="error">{run.error?.message ?? "The reconciliation ended with an error."}</p>
               </section>
-              {/* A result with no coverage and no grid (an early stop, or the mock
-                  placeholder) shows only its summary: an empty grid and "No
-                  discrepancies found" would read as a clean bill of health. */}
-              {(Object.keys(run.coverage).length > 0 || run.grid.length > 0) && (
-                <>
-                  <CoverageStrip coverage={run.coverage} banner={run.banner} bpmhConfirmable={run.bpmh_confirmable} />
-                  <Grid grid={run.grid} evidenceIndex={run.evidence_index} coverage={run.coverage} feedback={feedback} onRejectCell={rejectCell} />
-                  <Flags findings={run.findings} feedback={feedback} onFeedback={sendFeedback} />
-                  <div className="two-col">
-                    <Tasks tasks={run.tasks} findings={run.findings} notices={run.notices} />
-                    <Notices notices={run.notices} />
-                  </div>
-                  <TrustPanel trust={run.trust} runId={run.run_id} updates={trustUpdates} acceptance={acceptance} />
-                </>
-              )}
-            </>
-          )}
-          {!run && !polling && (
-            <section className="card empty-state">
-              <h2>Reconcile a Patient's Medicines</h2>
-              <p>
-                MedTrace finds the patient in the admission chart, GP list, pharmacy dispensing history and patient
-                interview, lines up every medicine side by side, and flags what a pharmacist must check.
-              </p>
-            </section>
-          )}
+            )}
+
+            {finished && run.status !== "error" && !hasResult && (
+              <section className="card card-pad">
+                <h2 className="card-title">Summary</h2>
+                <p className="tab-summary" title={run.output.summary}>
+                  {cleanText(run.output.summary)}
+                </p>
+              </section>
+            )}
+
+            {hasResult && (
+              <div className="card tabs-card">
+                <nav className="tabs" aria-label="Reconciliation sections" role="tablist">
+                  {TABS.map(([id, label]) => (
+                    <button key={id} type="button" role="tab" aria-selected={tab === id} className={`tab ${tab === id ? "on" : ""}`} onClick={() => setTab(id)}>
+                      {label}
+                    </button>
+                  ))}
+                </nav>
+                {tab === "findings" && <Flags findings={run!.findings} summary={run!.output.summary} feedback={feedback} onFeedback={sendFeedback} />}
+                {tab === "meds" && (
+                  <Grid grid={run!.grid} evidenceIndex={run!.evidence_index} coverage={run!.coverage} feedback={feedback} onRejectCell={rejectCell} />
+                )}
+                {tab === "actions" && (
+                  <Tasks
+                    tasks={run!.tasks}
+                    findings={run!.findings}
+                    notices={run!.notices}
+                    done={actionsDone}
+                    onToggle={(i, d) => setActionsDone((s) => ({ ...s, [i]: d }))}
+                  />
+                )}
+                {tab === "trust" && <TrustPanel trust={run!.trust} runId={run!.run_id} updates={trustUpdates} acceptance={acceptance} />}
+              </div>
+            )}
+
+            {!run && (
+              <section className="card card-pad empty-state">
+                <h2 className="card-title">{polling ? "Reconciliation in Progress" : "Reconcile a Patient's Medicines"}</h2>
+                <p>
+                  {polling
+                    ? "Locating the patient across the four record sources. Progress is shown in the processing log."
+                    : "MedTrace locates the patient in the admission chart, GP record, pharmacy dispensing history and patient interview, compares every medicine across them, and lists what a pharmacist must review."}
+                </p>
+              </section>
+            )}
+            {run && polling && !finished && run.status !== "needs_review" && (
+              <section className="card card-pad empty-state">
+                <h2 className="card-title">Reconciliation in Progress</h2>
+                <p>Progress is shown in the processing log.</p>
+              </section>
+            )}
+          </div>
+
+          <aside className="col-side">
+            {run && Object.keys(run.coverage).length > 0 && run.status !== "running" && (
+              <RecordSources coverage={run.coverage} notices={run.notices} />
+            )}
+            <Timeline run={run} polling={polling} warning={pollWarning} />
+          </aside>
         </div>
       </main>
       <Footer />

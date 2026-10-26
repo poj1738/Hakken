@@ -13,33 +13,40 @@ export const SOURCE_LABEL: Record<string, string> = {
 };
 export const sourceLabel = (s: string | null | undefined) => (s ? SOURCE_LABEL[s] ?? humanize(s) : "");
 
+/** Cell states, in the design's wording. Unknown must never read like absent. */
 export const STATE_LABEL: Record<EvidenceState, string> = {
-  present: "Present",
-  absent_in_scope: "Absent",
-  unknown: "Unknown",
+  present: "Listed",
+  absent_in_scope: "Not listed",
+  unknown: "No record available",
+};
+/** The shorter in-grid form; the full label is the cell's tooltip and the legend. */
+export const STATE_SHORT: Record<EvidenceState, string> = {
+  present: "Listed",
+  absent_in_scope: "Not listed",
+  unknown: "No record",
 };
 
 export const TYPE_LABEL: Record<DiscrepancyType, string> = {
   omission: "Omission",
-  commission: "Commission",
-  dose: "Dose difference",
-  frequency: "Frequency difference",
-  formulation: "Formulation difference",
-  route: "Route difference",
-  duplication: "Duplication",
-  stale_listing: "Stale listing",
+  commission: "Unverified addition",
+  dose: "Dose discrepancy",
+  frequency: "Frequency discrepancy",
+  formulation: "Formulation discrepancy",
+  route: "Route discrepancy",
+  duplication: "Therapeutic duplication",
+  stale_listing: "Possibly discontinued",
   dose_unconfirmable: "Dose cannot be confirmed",
-  unpropagated_discharge_change: "Discharge change not passed on",
-  identity_uncertain: "Identity uncertain",
+  unpropagated_discharge_change: "Discharge change not communicated",
+  identity_uncertain: "Uncertain patient match",
 };
 export const typeLabel = (t: string) => TYPE_LABEL[t as DiscrepancyType] ?? humanize(t);
 
 export const NOTICE_LABEL: Record<NoticeType, string> = {
   coverage_gap: "Coverage gap",
-  bpmh_not_confirmable: "BPMH not confirmable",
+  bpmh_not_confirmable: "Medication history not confirmable",
   possible_second_pharmacy: "Possible second pharmacy",
   patient_only_item: "Patient-only item",
-  conflict_abstained: "Conflict: ask patient",
+  conflict_abstained: "Unresolved — verify with patient",
   stale_document: "Stale document",
   known_shortage: "Known shortage",
 };
@@ -104,13 +111,14 @@ export function fmtTime(iso: string): string {
   return d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }).replace(/\s?([AP])M$/i, (_, p: string) => ` ${p.toLowerCase()}m`);
 }
 
-/** "2026-10-24" -> "24 Oct 2026" in the viewer's locale; anything else is shown as sent. */
+/** "2026-10-24" -> "24 Oct 2026"; anything else (e.g. "08/09/2026" from a source row) is shown as sent. */
 export function fmtDate(s: string | null | undefined): string {
   if (!s) return "—";
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
   if (!m) return s;
   const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-  return d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+  // Day-month-year, as in the design ("24 Feb 1951"): unambiguous for an Australian reader.
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
 const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
@@ -146,6 +154,7 @@ export function cleanText(raw: string | null | undefined): string {
   s = s.replace(RECORD_KEY, (_, src: string) => sourceLabel(src));
   s = s.replace(/\b[a-z]+(?:_[a-z]+)+\b/g, (w) => (w in TYPE_LABEL ? typeLabel(w).toLowerCase() : w.replace(/_/g, " ")));
   s = s.replace(/\b[A-Z]{2,}(?:_[A-Z]+)+\b/g, (w) => humanize(w));
+  s = s.replace(/Conflict:\s*ask patient\.?/gi, "Unresolved — verify with patient.");
   s = s.replace(/^([a-z])/, (c) => c.toUpperCase());
   return s.replace(/\s+([.,;:])/g, "$1").replace(/\s{2,}/g, " ").trim();
 }
