@@ -102,6 +102,28 @@ export const medName = (g: string) => g.replace(/(^|[\s/(-])([a-z])/g, (_, sep: 
 
 export const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
+/** Meterless engine names as the trace sends them (`TraceEvent.engine`). */
+export const ENGINE_LABEL: Record<string, string> = { world_model: "World Model", hmem: "H-MEM" };
+export const engineLabel = (e: string) => ENGINE_LABEL[e] ?? humanize(e);
+
+/** What the API records when an agent step was answered by the offline fallback, not a model. */
+export const OFFLINE_MODEL = "offline-heuristic";
+
+/**
+ * A daily dose with the unit the API sent for it (`RunResponse.dose_units`, #47).
+ * No unit field, no unit: the number is shown as sent, never labelled by guess.
+ */
+export const withUnit = (v: unknown, unit: string | null | undefined) => {
+  const s = fmtValue(v);
+  return unit && s !== "—" ? `${s} ${unit}` : s;
+};
+
+/** The first sentence of API prose, for a one-line view; the full text stays one click away. */
+export function firstSentence(s: string): string {
+  const m = /^(.+?[.!?])(\s+[A-Z(]|$)/.exec(s.trim());
+  return m ? m[1] : s.trim();
+}
+
 export const fmtValue = (v: unknown) => (v === null || v === undefined || v === "" ? "—" : String(v));
 
 /** Viewer's local time, short: "3:21 pm". */

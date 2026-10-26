@@ -2,7 +2,8 @@ import { useState } from "react";
 import type { Coverage, Evidence, EvidenceState, FusedMed, FusedValue, Source, TrustAttribute } from "../types";
 import type { FeedbackState } from "./Flags";
 import { SOURCES } from "../types";
-import { ROW_TEXT_FIELDS, STATE_LABEL, STATE_SHORT, attributeLabel, cleanText, fieldLabel, fmtValue, medName, sourceLabel } from "../format";
+import { ROW_TEXT_FIELDS, STATE_LABEL, STATE_SHORT, attributeLabel, cleanText, fieldLabel, medName, sourceLabel, withUnit } from "../format";
+import { InfoTip } from "./InfoTip";
 import { TechDetails } from "./TechDetails";
 
 export const gridFeedbackKey = (generic: string, attribute: string, source: string) => `grid:${generic}:${attribute}:${source}`;
@@ -11,6 +12,8 @@ interface Props {
   grid: FusedMed[];
   evidenceIndex: Record<string, Evidence>;
   coverage: Partial<Record<string, Coverage>>;
+  /** RunResponse.dose_units: the unit of each medicine's resolved daily dose, when the API knows it. */
+  doseUnits: Record<string, string>;
   feedback: Record<string, FeedbackState>;
   onRejectCell: (generic: string, attribute: TrustAttribute, source: Source) => void;
 }
@@ -59,8 +62,8 @@ function kindOf(med: FusedMed, source: string, coverage: Props["coverage"], diss
 }
 
 /** A short code like "IR" or "PO" is shown as sent, with a tooltip; the UI does not expand it. */
-function Value({ v }: { v: unknown }) {
-  const s = fmtValue(v);
+function Value({ v, unit }: { v: unknown; unit?: string | null }) {
+  const s = withUnit(v, unit);
   if (/^[A-Z]{2,4}$/.test(s)) {
     return (
       <abbr title={`"${s}" as recorded in the source data`} className="abbr">
@@ -109,24 +112,26 @@ function sourceValues(med: FusedMed, source: string) {
       v,
       said: v.dissenting[source] ?? (v.supporting.includes(source) ? v.value : undefined),
       dissents: source in v.dissenting,
+      // Only the resolved value carries the API's unit; a dissenting value is shown as sent.
+      resolved: !(source in v.dissenting) && v.supporting.includes(source) && !v.abstained,
     }))
     .filter((x) => x.said !== undefined && x.said !== null);
 }
 
-function CellFeedback({ med, source, feedback, onRejectCell }: { med: FusedMed; source: string; feedback: Props["feedback"]; onRejectCell: Props["onRejectCell"] }) {
+function CellFeedback({ med, source, unit, feedback, onRejectCell }: { med: FusedMed; source: string; unit?: string; feedback: Props["feedback"]; onRejectCell: Props["onRejectCell"] }) {
   const values = sourceValues(med, source);
   if (!values.length) return null;
   return (
     <div className="insp-section">
       <div className="eyebrow">Recorded by {sourceLabel(source)}</div>
-      {values.map(({ v, said, dissents }) => {
+      {values.map(({ v, said, dissents, resolved }) => {
         const st = feedback[gridFeedbackKey(med.generic, v.attribute, source)];
         const r = st?.result;
         return (
           <div key={v.attribute} className="insp-row">
             <span className="insp-k">{attributeLabel(v.attribute)}</span>
             <span className="insp-v">
-              <Value v={said} />
+              <Value v={said} unit={resolved && v.attribute === "daily_dose" ? unit : null} />
             </span>
             {v.abstained ? (
               <span className="pill sev-medium">Unresolved</span>
@@ -139,8 +144,15 @@ function CellFeedback({ med, source, feedback, onRejectCell }: { med: FusedMed; 
                 {r.trust_updates.map((u) => ` · confidence ${u.before.toFixed(2)} → ${u.after.toFixed(2)}`).join("")}
               </span>
             ) : (
-              <button type="button" className="lnk" disabled={st?.busy} onClick={() => onRejectCell(med.generic, v.attribute as TrustAttribute, source as Source)}>
-                Mark {sourceLabel(source)} {attributeLabel(v.attribute).toLowerCase()} as outdated
+              <button
+                type="button"
+                className="btn btn-quiet btn-sm"
+                aria-label={`Mark ${sourceLabel(source)} ${attributeLabel(v.attribute).toLowerCase()} as outdated`}
+                title={`Mark ${sourceLabel(source)} ${attributeLabel(v.attribute).toLowerCase()} as outdated`}
+                disabled={st?.busy}
+                onClick={() => onRejectCell(med.generic, v.attribute as TrustAttribute, source as Source)}
+              >
+                Mark outdated
               </button>
             )}
             {st?.error && <span className="error"> {st.error}</span>}
@@ -151,7 +163,7 @@ function CellFeedback({ med, source, feedback, onRejectCell }: { med: FusedMed; 
   );
 }
 
-function Inspector({ cell, idx, coverage, pinned, onClose, feedback, onRejectCell }: { cell: Cell; idx: Record<string, Evidence>; coverage: Props["coverage"]; pinned: boolean; onClose: () => void; feedback: Props["feedback"]; onRejectCell: Props["onRejectCell"] }) {
+function Inspector({ cell, idx, coverage, unit, pinned, onClose, feedback, onRejectCell }: { cell: Cell; idx: Record<string, Evidence>; coverage: Props["coverage"]; unit?: string; pinned: boolean; onClose: () => void; feedback: Props["feedback"]; onRejectCell: Props["onRejectCell"] }) {
   const { med, source } = cell;
   const state = med.per_source[source] ?? "unknown";
   const rows = rowsFor(med, source, idx);
@@ -182,7 +194,7 @@ function Inspector({ cell, idx, coverage, pinned, onClose, feedback, onRejectCel
       {cov?.state === "near_miss_pending" && <p className="insp-note">This source's link to the patient is under review.</p>}
       {cov?.scope_notes.length ? <p className="insp-note muted">Scope: {cov.scope_notes.map(cleanText).join("; ")}</p> : null}
       {/* Buttons only on a pinned (clicked) cell, so a hover never fires feedback. */}
-      {pinned && <CellFeedback med={med} source={source} feedback={feedback} onRejectCell={onRejectCell} />}
+      {pinned && <CellFeedback med={med} source={source} unit={unit} feedback={feedback} onRejectCell={onRejectCell} />}
       {!pinned && sourceValues(med, source).some((x) => x.dissents || x.v.abstained) && (
         <p className="insp-note muted">Select the cell to mark this source's value as outdated.</p>
       )}
@@ -210,7 +222,7 @@ function Inspector({ cell, idx, coverage, pinned, onClose, feedback, onRejectCel
 }
 
 /** The reconciled column: what the API resolved, as a main line and its basis. */
-function Reconciled({ med }: { med: FusedMed }) {
+function Reconciled({ med, unit }: { med: FusedMed; unit?: string }) {
   const attrs = Object.values(med.attributes);
   const unresolved = attrs.filter((v) => v.abstained).map((v) => v.attribute);
   for (const a of med.abstained) if (!unresolved.includes(a)) unresolved.push(a);
@@ -239,7 +251,7 @@ function Reconciled({ med }: { med: FusedMed }) {
           <span key={v.attribute} title={`${attributeLabel(v.attribute)}${from(v) ? ` · ${from(v)}` : ""}`}>
             {i > 0 && " · "}
             {v.attribute === "daily_dose" ? "Daily dose " : ""}
-            <Value v={v.value} />
+            <Value v={v.value} unit={v.attribute === "daily_dose" ? unit : null} />
           </span>
         ))}
       </div>
@@ -248,14 +260,28 @@ function Reconciled({ med }: { med: FusedMed }) {
   );
 }
 
-export function Grid({ grid, evidenceIndex, coverage, feedback, onRejectCell }: Props) {
+export function Grid({ grid, evidenceIndex, coverage, doseUnits, feedback, onRejectCell }: Props) {
   const [hover, setHover] = useState<Cell | null>(null);
   const [pinned, setPinned] = useState<Cell | null>(null);
   const shown = pinned ?? hover;
   const same = (a: Cell | null, b: Cell) => !!a && a.med === b.med && a.source === b.source;
+  // The legend lists only the states this grid uses; "No record" vs "Not listed" is always explained.
+  const kinds = new Set<CellKind>(["listed", "absent", "unknown"]);
+  let anyNoRow = false;
+  for (const med of grid) {
+    const dissent = dissentingSources(med);
+    for (const s of SOURCES) {
+      kinds.add(kindOf(med, s, coverage, dissent));
+      if (med.per_source[s] === "present" && !rowsFor(med, s, evidenceIndex).length) anyNoRow = true;
+    }
+  }
 
   return (
     <>
+      <div className="sec-head">
+        <h2 className="sec-title">Medication history</h2>
+        <InfoTip text="Each medicine across the four sources. Select a cell to see its source record, original text and the SQL template that retrieved it." />
+      </div>
       <div className="legend">
         <span className="cell c-listed">
           <span className="dot" />
@@ -265,21 +291,27 @@ export function Grid({ grid, evidenceIndex, coverage, feedback, onRejectCell }: 
           <span className="dot" />
           Not listed
         </span>
-        <span className="cell c-unknown">
+        <span className="cell c-unknown" title="No record available does not mean &quot;not taking&quot;">
           <span className="dot" />
           No record available
         </span>
-        <span className="cell c-conflict">
-          <span className="dot" />
-          Sources disagree
-        </span>
-        <span className="cell c-review">
-          <span className="dot" />
-          Linkage under review
-        </span>
-        <span className="legend-item">
-          <NoRowIcon /> No source record cited
-        </span>
+        {kinds.has("conflict") && (
+          <span className="cell c-conflict">
+            <span className="dot" />
+            Sources disagree
+          </span>
+        )}
+        {kinds.has("review") && (
+          <span className="cell c-review">
+            <span className="dot" />
+            Linkage under review
+          </span>
+        )}
+        {anyNoRow && (
+          <span className="legend-item">
+            <NoRowIcon /> No source record cited
+          </span>
+        )}
       </div>
       <div className="grid-scroll">
         <div className="grid-inner" role="table" aria-label="Medication history by source">
@@ -295,10 +327,14 @@ export function Grid({ grid, evidenceIndex, coverage, feedback, onRejectCell }: 
           {grid.map((med) => {
             const dissent = dissentingSources(med);
             return (
-              <div key={med.generic} className={`row ${med.abstained.length ? "row-unresolved" : ""}`} role="row">
+              <div key={med.generic} className={`row ${med.abstained.length ? "row-unresolved" : ""} ${med.high_risk_class ? "row-alert" : ""}`} role="row">
                 <div role="rowheader">
                   <div className="med-name">{medName(med.generic)}</div>
-                  {med.high_risk_class && <div className="med-sub">High-alert medicine · APINCHS {med.high_risk_class}</div>}
+                  {med.high_risk_class && (
+                    <span className="pill apinchs pill-xs" title={`High-alert medicine, APINCHS class ${med.high_risk_class}`}>
+                      APINCHS · {med.high_risk_class}
+                    </span>
+                  )}
                 </div>
                 {SOURCES.map((s) => {
                   const st = med.per_source[s] ?? "unknown";
@@ -308,19 +344,26 @@ export function Grid({ grid, evidenceIndex, coverage, feedback, onRejectCell }: 
                     .filter((v) => v.attribute !== "existence")
                     .map((v) => v.dissenting[s])
                     .filter(Boolean);
+                  const label = `${medName(med.generic)}, ${sourceLabel(s)}: ${STATE_LABEL[st]}${kind === "conflict" ? ", sources disagree" : ""}${kind === "review" ? ", linkage under review" : ""}`;
                   return (
                     <div
                       key={s}
                       role="cell"
                       tabIndex={0}
+                      aria-label={label}
                       className={`gcell ${same(pinned, cell) ? "pinned" : ""}`}
                       onMouseEnter={() => setHover(cell)}
                       onMouseLeave={() => setHover(null)}
                       onFocus={() => setHover(cell)}
                       onClick={() => setPinned(same(pinned, cell) ? null : cell)}
-                      onKeyDown={(e) => e.key === "Enter" && setPinned(same(pinned, cell) ? null : cell)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setPinned(same(pinned, cell) ? null : cell);
+                        }
+                      }}
                     >
-                      <span className={`cell c-${kind}`} title={`${sourceLabel(s)}: ${STATE_LABEL[st]}${kind === "conflict" ? " (sources disagree)" : ""}${kind === "review" ? " (linkage under review)" : ""}`}>
+                      <span className={`cell c-${kind}`} title={label}>
                         <span className="dot" />
                         {KIND_SHORT[kind]}
                       </span>
@@ -330,7 +373,7 @@ export function Grid({ grid, evidenceIndex, coverage, feedback, onRejectCell }: 
                   );
                 })}
                 <div role="cell">
-                  <Reconciled med={med} />
+                  <Reconciled med={med} unit={doseUnits[med.generic]} />
                 </div>
               </div>
             );
@@ -339,9 +382,18 @@ export function Grid({ grid, evidenceIndex, coverage, feedback, onRejectCell }: 
       </div>
       <div className="insp-wrap">
         {shown ? (
-          <Inspector cell={shown} idx={evidenceIndex} coverage={coverage} pinned={!!pinned && shown === pinned} onClose={() => setPinned(null)} feedback={feedback} onRejectCell={onRejectCell} />
+          <Inspector
+            cell={shown}
+            idx={evidenceIndex}
+            coverage={coverage}
+            unit={doseUnits[shown.med.generic]}
+            pinned={!!pinned && shown === pinned}
+            onClose={() => setPinned(null)}
+            feedback={feedback}
+            onRejectCell={onRejectCell}
+          />
         ) : (
-          <aside className="insp insp-empty">Select a cell to see the source record, its original text and the SQL template that retrieved it.</aside>
+          <aside className="insp insp-empty">Select a cell to see its source record.</aside>
         )}
       </div>
     </>

@@ -1,5 +1,6 @@
 import type { IdentityReview as Review, SourceRow } from "../types";
 import { cleanText, fmtDate, humanize, sourceLabel } from "../format";
+import { InfoTip } from "./InfoTip";
 import { TechDetails } from "./TechDetails";
 
 // Rows of the side-by-side table. `show` is the text displayed (the raw DOB,
@@ -70,12 +71,11 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
   return (
     <section className="card identity">
       <div className="id-head">
-        <div className="eyebrow">Identity review required</div>
-        <h2>Confirm Patient Records</h2>
-        <p className="id-lead">
-          {cleanText(banner) ||
-            "These records may belong to this patient, but the match is not certain enough to link automatically. An incorrect link would combine two people's medicines."}
-        </p>
+        <h2>
+          Is this the same patient?
+          <InfoTip text="These records may belong to this patient, but the match is not certain enough to link automatically. An incorrect link would combine two people's medicines." />
+        </h2>
+        {banner && <p className="id-lead">{cleanText(banner)}</p>}
       </div>
       <div className="id-scroll">
         <table className="id-table">
@@ -110,11 +110,7 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
                   return (
                     <td key={c.candidate_id} className={`agree-${agreement(ev)}`}>
                       {r ? show(r, f.show) : <span className="muted">Record not sent</span>}
-                      {ev.map((t) => (
-                        <div key={t} className="why">
-                          {stripVerdict(t)}
-                        </div>
-                      ))}
+                      {ev.length > 0 && <InfoTip label={`Why: ${f.label}`} text={ev.map(stripVerdict).join(" ")} />}
                     </td>
                   );
                 })}
@@ -175,9 +171,9 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
         </table>
       </div>
       <p className="id-legend">
-        <span className="swatch agree-agree" /> Agrees <span className="swatch agree-partial" /> Partial match{" "}
-        <span className="swatch agree-differ" /> Differs <span className="swatch agree-missing" /> Not compared. Colours show
-        the matching engine's own verdict; the text under each value is its reason.
+        <span className="swatch agree-agree" /> Agrees <span className="swatch agree-partial" /> Partial{" "}
+        <span className="swatch agree-differ" /> Differs <span className="swatch agree-missing" /> Not compared
+        <InfoTip text="Colours show the matching engine's own verdict. The (i) beside each value gives its reason." />
       </p>
       <TechDetails
         items={[

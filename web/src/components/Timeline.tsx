@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { RunResponse, TraceEvent } from "../types";
-import { cleanText, fmtTime, humanize, plural } from "../format";
+import { OFFLINE_MODEL, cleanText, engineLabel, fmtTime, humanize, plural } from "../format";
 import { TechDetails } from "./TechDetails";
 
 // Step names from the orchestrator, as a reader would say them.
@@ -23,7 +23,7 @@ const STEP_LABEL: Record<string, string> = {
 };
 // The API records an agent step its offline fallback answered with
 // routed_model "offline-heuristic"; only the rest reached Nightshift.
-const OFFLINE = "offline-heuristic";
+const OFFLINE = OFFLINE_MODEL;
 function footModels(calls: RunResponse["model_calls"]): string {
   const live = calls.filter((c) => c.routed_model && c.routed_model !== OFFLINE).length;
   const offline = calls.length - live;
@@ -42,7 +42,36 @@ function routedModel(e: TraceEvent): string | null {
   return typeof m === "string" ? m : e.model ?? null;
 }
 
-export function Timeline({ run, polling, warning }: { run: RunResponse | null; polling: boolean; warning: string | null }) {
+/** One step's tags: the Meterless engine it used, and the model that answered it, both from the trace. */
+function StepTags({ e }: { e: TraceEvent }) {
+  const m = routedModel(e);
+  return (
+    <>
+      {e.engine && (
+        <span className="tag tag-engine" title={`Meterless ${engineLabel(e.engine)}${e.engine_op ? `: ${e.engine_op}` : ""}`}>
+          {engineLabel(e.engine)}
+        </span>
+      )}
+      {m &&
+        (m === OFFLINE ? (
+          <span className="tag tag-off" title="Answered by the offline fallback; no model was called">
+            Offline
+          </span>
+        ) : (
+          <span className="tag tag-model" title={`Answered by ${m}${e.route ? ` (requested ${e.route})` : ""}`}>
+            {m.replace(/^nvidia\//, "")}
+          </span>
+        ))}
+    </>
+  );
+}
+
+/**
+ * The processing log. `compact` is the live view while a run is in progress:
+ * steps only, newest last. The full section adds each step's message and the
+ * Technical details (per-step routed model, model calls, SQL).
+ */
+export function Timeline({ run, polling, warning, compact = false }: { run: RunResponse | null; polling: boolean; warning: string | null; compact?: boolean }) {
   const end = useRef<HTMLDivElement>(null);
   const n = run?.trace.length ?? 0;
   useEffect(() => {
@@ -50,14 +79,16 @@ export function Timeline({ run, polling, warning }: { run: RunResponse | null; p
   }, [n, polling]);
 
   return (
-    <div className="card side-card">
-      <div className="side-head">
-        <h2 className="side-title">Processing Log</h2>
-        {polling ? <span className="spinner" aria-label="running" /> : run && <span className="side-meta">{run.execution_time_seconds < 0.05 ? "< 0.1" : run.execution_time_seconds.toFixed(1)} s</span>}
-      </div>
-      {!run && !polling && <p className="side-empty">Select a patient and run a reconciliation. Each step is logged here as it happens.</p>}
+    <div className="timeline">
+      {!compact && (
+        <div className="sec-head">
+          <h2 className="sec-title">Processing log</h2>
+          {polling ? <span className="spinner" aria-label="running" /> : run && <span className="sec-meta">{run.execution_time_seconds < 0.05 ? "< 0.1" : run.execution_time_seconds.toFixed(1)} s</span>}
+        </div>
+      )}
+      {!run && !polling && <p className="sec-empty">Each step is logged here as it happens.</p>}
       {run && (
-        <div className="log">
+        <div className={`log ${compact ? "log-compact" : ""}`}>
           {run.trace.map((e, i) => {
             const warn = e.status === "blocked" || e.status === "error" || !!e.error;
             const raw = e.message ?? e.output_summary ?? e.action;
@@ -71,13 +102,18 @@ export function Timeline({ run, polling, warning }: { run: RunResponse | null; p
                       {e.status === "blocked" && <span className="log-flag"> · Withheld</span>}
                       {e.retry_count > 0 && <span className="log-flag"> · Retried {e.retry_count}×</span>}
                     </span>
-                    <time dateTime={e.timestamp} title={new Date(e.timestamp).toLocaleString()}>
-                      {fmtTime(e.timestamp)}
-                    </time>
+                    <span className="log-tags">
+                      <StepTags e={e} />
+                      <time dateTime={e.timestamp} title={new Date(e.timestamp).toLocaleString()}>
+                        {fmtTime(e.timestamp)}
+                      </time>
+                    </span>
                   </div>
-                  <div className="log-text" title={raw}>
-                    {cleanText(raw)}
-                  </div>
+                  {!compact && (
+                    <div className="log-text" title={raw}>
+                      {cleanText(raw)}
+                    </div>
+                  )}
                   {e.error && <div className="log-err">{e.error}</div>}
                 </div>
               </div>
@@ -94,12 +130,12 @@ export function Timeline({ run, polling, warning }: { run: RunResponse | null; p
           </div>
         </div>
       )}
-      {run && !polling && (
+      {run && !polling && !compact && (
         <div className="side-foot">
           {plural(run.query_count, "data query", "data queries")} · {footModels(run.model_calls)}
         </div>
       )}
-      {run && (
+      {run && !compact && (
         <TechDetails
           items={[
             ["Run", run.run_id],

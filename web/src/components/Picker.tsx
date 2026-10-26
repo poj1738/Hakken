@@ -1,6 +1,8 @@
 import type { PatientSummary } from "../types";
 import { API_MODE, MOCK_RUN_PATIENTS } from "../api";
 import { fmtDate } from "../format";
+import { Stepper } from "./Stepper";
+import { TechDetails } from "./TechDetails";
 
 export type PatientsState = { kind: "loading" } | { kind: "ready" } | { kind: "error"; message: string };
 
@@ -13,6 +15,7 @@ interface Props {
   onRun: () => void;
   running: boolean;
   error: string | null;
+  step: 1 | 2 | 3;
 }
 
 const SEX: Record<string, string> = { F: "Female", M: "Male" };
@@ -25,15 +28,20 @@ function optionLabel(p: PatientSummary) {
 }
 
 /** The white patient banner: who is being reconciled, and the controls to pick and run. */
-export function Picker({ patients, patientsState, onRetryPatients, selected, onSelect, onRun, running, error }: Props) {
+export function Picker({ patients, patientsState, onRetryPatients, selected, onSelect, onRun, running, error, step }: Props) {
   const p = patients.find((x) => x.patient_id === selected);
   const ready = patientsState.kind === "ready" && patients.length > 0;
   return (
     <section className="banner-pt">
+      <div className="banner-pt-steps">
+        <Stepper current={step} busy={running} />
+      </div>
       <div className="banner-pt-inner">
         <div>
-          <div className="eyebrow">Patient</div>
-          <h1 className="pt-name">{p ? fullName(p) : patientsState.kind === "loading" ? "Loading patients…" : "No patient selected"}</h1>
+          <h1 className="pt-name">
+            {p ? fullName(p) : patientsState.kind === "loading" ? "Loading patients…" : "Choose a patient to begin"}
+            {patientsState.kind === "loading" && <span className="spinner spinner-sm" aria-hidden />}
+          </h1>
           {p && (
             <div className="pt-facts">
               <div title={p.patient_id}>
@@ -52,18 +60,27 @@ export function Picker({ patients, patientsState, onRetryPatients, selected, onS
             </div>
           )}
           {patientsState.kind === "error" && (
-            <p className="error">
-              Patients could not be loaded: {patientsState.message}{" "}
-              <button className="lnk" onClick={onRetryPatients}>
-                Retry
+            <div className="friendly-err" role="alert">
+              <span>The patient list didn't load. Check that the MedTrace API is running, then try again.</span>
+              <button type="button" className="btn btn-quiet btn-sm" onClick={onRetryPatients}>
+                Try again
               </button>
-            </p>
+              <TechDetails items={[["Error", patientsState.message]]} />
+            </div>
           )}
-          {error && <p className="error">{error}</p>}
+          {error && (
+            <div className="friendly-err" role="alert">
+              <span>The reconciliation didn't finish.</span>
+              <button type="button" className="btn btn-quiet btn-sm" onClick={onRun} disabled={running || !ready || !selected}>
+                Run again
+              </button>
+              <TechDetails items={[["Error", error]]} />
+            </div>
+          )}
         </div>
         <div className="pt-controls">
           <div className="pt-select">
-            <label htmlFor="patient">Select patient</label>
+            <label htmlFor="patient">Patient</label>
             <select id="patient" value={selected} onChange={(e) => onSelect(e.target.value)} disabled={running || !ready}>
               {patientsState.kind === "loading" && <option value="">Loading patients…</option>}
               {patientsState.kind === "error" && <option value="">Patients could not be loaded</option>}

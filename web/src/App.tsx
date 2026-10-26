@@ -13,29 +13,43 @@ import { Header } from "./components/Header";
 import { Picker, type PatientsState } from "./components/Picker";
 import { Timeline } from "./components/Timeline";
 import { IdentityReview } from "./components/IdentityReview";
-import { BpmhBanner, RecordSources } from "./components/Coverage";
+import { BpmhBanner, Notices } from "./components/Coverage";
 import { Grid, gridFeedbackKey } from "./components/Grid";
 import { Flags, type FeedbackChoice, type FeedbackState } from "./components/Flags";
 import { Tasks } from "./components/Tasks";
 import { TrustPanel, type AppliedTrustUpdate } from "./components/TrustPanel";
-import { SummaryCards } from "./components/SummaryCards";
 import { DISCLAIMER, Footer } from "./components/Footer";
-import { cleanText } from "./format";
+import { Silos } from "./components/Silos";
+import { Pipeline } from "./components/Pipeline";
+import { LearningHero } from "./components/LearningHero";
+import { SectionNav, type NavItem } from "./components/SectionNav";
+import { InfoTip } from "./components/InfoTip";
+import { cleanText, medName, targetLabel, typeLabel } from "./format";
 
-type Tab = "findings" | "meds" | "actions" | "trust";
-const TABS: [Tab, string][] = [
-  ["findings", "Discrepancies"],
-  ["meds", "Medication History"],
-  ["actions", "Actions Required"],
-  ["trust", "Source Confidence"],
-];
+type Section = "identity" | "findings" | "meds" | "actions" | "notices" | "trust" | "log";
+const PANEL = "section-panel";
+
+// Approved wording and sources from docs/PITCH_CLAIMS.md (claims 1 and 2), verbatim.
+const WHY = "In a landmark Canadian study, more than half of older inpatients had at least one unintended medication discrepancy at admission.";
+const WHY_CITE = "Cornish et al. 2005, Arch Intern Med";
+const WHY_MORE =
+  "Medication-related problems cause about 250,000 hospital admissions in Australia each year, at a cost of $1.4 billion — and about half of that harm is preventable. (PSA, Medicine Safety: Take Care, 2019)";
+
+function WhyItMatters() {
+  return (
+    <p className="why-line">
+      <span className="why-k">Why it matters</span> {WHY} <cite>{WHY_CITE}</cite>
+      <InfoTip label="More evidence" text={WHY_MORE} />
+    </p>
+  );
+}
 
 /** The API's caveats about this result, minus the fixed disclaimer shown in the header and footer. */
 function Caveats({ caveats }: { caveats: string[] }) {
   const shown = caveats.filter((c) => c !== DISCLAIMER);
   if (!shown.length) return null;
   return (
-    <div className="alert alert-note" role="note">
+    <div className="alert alert-note caveats" role="note">
       {shown.map((c) => (
         <div key={c} title={c}>
           {cleanText(c)}
@@ -61,7 +75,7 @@ export default function App() {
   const [identityBusy, setIdentityBusy] = useState<string | null>(null);
   const [identityError, setIdentityError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Record<string, FeedbackState>>({});
-  const [tab, setTab] = useState<Tab>("findings");
+  const [section, setSection] = useState<Section>("findings");
   // Checklist ticks for this screen only; the summary card counts them live.
   const [actionsDone, setActionsDone] = useState<Record<number, boolean>>({});
   // Trust moves accumulate across runs in this session, so patient B shows what patient A taught.
@@ -112,7 +126,7 @@ export default function App() {
     setIdentityError(null);
     setFeedback({});
     setActionsDone({});
-    setTab("findings");
+    setSection("findings");
   };
 
   // A result stays on screen only while its patient is selected, so one
@@ -147,6 +161,7 @@ export default function App() {
         if (token !== pollToken.current) return;
         setPollWarning(null);
         setRun(r);
+        if (r.status === "needs_review") setSection("identity");
         if (isTerminal(r.status) || r.status === "needs_review") return;
       }
       setRunError(`Stopped checking after ${Math.round((MAX_POLLS * POLL_INTERVAL_MS) / 60000)} minutes; the reconciliation may still finish.`);
@@ -167,6 +182,7 @@ export default function App() {
     try {
       const r = await api.startRun({ patient_id: selected });
       setRun(r);
+      if (r.status === "needs_review") setSection("identity");
       if (isTerminal(r.status) || r.status === "needs_review") setPolling(false);
       else void poll(r.run_id);
     } catch (e) {
@@ -183,6 +199,7 @@ export default function App() {
       const r = await api.decideIdentity(run.run_id, { candidate_id: candidateId, same_person: samePerson });
       setDecided((d) => ({ ...d, [candidateId]: samePerson ? "same" : "different" }));
       setRun(r);
+      if (r.status !== "needs_review") setSection("findings");
       if (!isTerminal(r.status) && r.status !== "needs_review") void poll(r.run_id);
     } catch (e) {
       setIdentityError(msg(e));
@@ -206,7 +223,10 @@ export default function App() {
         ...(c.reason === "source_outdated" ? { source: c.source, attribute: c.attribute } : {}),
       });
       setFeedback((s) => ({ ...s, [key]: { result: r } }));
-      setTrustUpdates((u) => [...u, ...r.trust_updates.map((t) => ({ ...t, runId: r.run_id, targetId: r.target_id, reason: r.reason }))]);
+      // Name the target in words now, while its finding is on screen (a finding id alone means nothing on the next patient).
+      const f = run.findings.find((x) => x.id === targetId);
+      const targetName = f ? `${medName(f.generic)} · ${typeLabel(f.type)}` : targetLabel(targetId);
+      setTrustUpdates((u) => [...u, ...r.trust_updates.map((t) => ({ ...t, runId: r.run_id, targetId: r.target_id, targetName, reason: r.reason }))]);
       setAcceptance((a) => [...a, ...r.acceptance_updates]);
     } catch (e) {
       setFeedback((s) => ({ ...s, [key]: { error: msg(e) } }));
@@ -227,10 +247,42 @@ export default function App() {
   // shows only its summary: an empty grid and "No discrepancies" would read as a
   // clean bill of health.
   const hasResult = finished && (Object.keys(run!.coverage).length > 0 || run!.grid.length > 0);
+  const review = run?.status === "needs_review";
   const doneCount = run ? run.tasks.filter((_, i) => actionsDone[i]).length : 0;
+  const step: 1 | 2 | 3 = !selected ? 1 : run && (review || finished) ? 3 : 2;
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const choose = (id: Section) => {
+    setSection(id);
+    // Scroll the chosen section into view (on a phone the rail sits above it).
+    requestAnimationFrame(() => panelRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }));
+  };
+
+  const nav: NavItem<Section>[] = run
+    ? [
+        ...(review ? [{ id: "identity" as const, label: "Identity review", count: run.identity_review?.candidates.length ?? null, alert: true }] : []),
+        {
+          id: "findings",
+          label: "Discrepancies",
+          count: hasResult ? run.findings.length : null,
+          alert: hasResult && run.findings.some((f) => f.high_risk_class),
+          disabled: !hasResult,
+        },
+        { id: "meds", label: "Medication history", count: hasResult ? run.grid.length : null, disabled: !hasResult },
+        { id: "actions", label: "Actions", count: hasResult ? run.tasks.length - doneCount : null, disabled: !hasResult },
+        { id: "notices", label: "Notices", count: hasResult ? run.notices.length : null, disabled: !hasResult },
+        { id: "trust", label: "Source confidence", count: trustUpdates.length || null, disabled: !hasResult },
+        { id: "log", label: "Processing log", count: run.trace.length },
+      ]
+    : [];
+  // Never show a section the rail has disabled (e.g. right after a new run starts).
+  const shownSection: Section = nav.find((i) => i.id === section && !i.disabled) ? section : review ? "identity" : hasResult ? "findings" : "log";
 
   return (
     <div className="app">
+      <a className="skip" href={`#${PANEL}`}>
+        Skip to results
+      </a>
       <Header health={health} error={healthError} />
       {API_MODE === "mock" && (
         <div className="mock-note" title="VITE_API_MODE=mock: replaying tests/fixtures/api/*.json">
@@ -246,102 +298,107 @@ export default function App() {
         onRun={startRun}
         running={polling}
         error={runError}
+        step={step}
       />
       <main className="wrap">
-        {run && (finished || run.status === "needs_review") && <Caveats caveats={run.output.caveats} />}
+        {run && (finished || review) && <Caveats caveats={run.output.caveats} />}
         {hasResult && <BpmhBanner banner={run!.banner} bpmhConfirmable={run!.bpmh_confirmable} />}
         {run?.status === "partial" && <div className="alert alert-medium">Partial result. Read every caveat before relying on it.</div>}
-        {hasResult && <SummaryCards run={run!} actionsDone={doneCount} />}
 
-        <div className="cols">
-          <div className="col-main">
-            {run?.status === "needs_review" &&
-              (run.identity_review ? (
-                <IdentityReview
-                  review={run.identity_review}
-                  banner={run.banner}
-                  decided={decided}
-                  busy={identityBusy}
-                  error={identityError}
-                  onDecide={decideIdentity}
-                />
-              ) : (
-                <section className="card card-pad">
-                  <h2 className="card-title">Identity Review Required</h2>
-                  <p className="error">
-                    The reconciliation paused for an identity review, but no review details were provided, so no decision can be
-                    made from this screen.
-                  </p>
-                </section>
-              ))}
+        <Silos run={run} searching={polling} />
+        <Pipeline run={run} health={health} />
+        {!run && !polling && <WhyItMatters />}
+        {hasResult && <LearningHero run={run!} updates={trustUpdates} />}
 
-            {run?.status === "error" && (
-              <section className="card card-pad">
-                <h2 className="card-title">Reconciliation Failed</h2>
-                <p className="error">{run.error?.message ?? "The reconciliation ended with an error."}</p>
-              </section>
-            )}
+        {!run && polling && (
+          <section className="card card-pad empty-state" aria-live="polite">
+            <h2 className="card-title">
+              Starting the reconciliation <span className="spinner spinner-sm" aria-hidden />
+            </h2>
+          </section>
+        )}
 
-            {finished && run.status !== "error" && !hasResult && (
-              <section className="card card-pad">
-                <h2 className="card-title">Summary</h2>
-                <p className="tab-summary" title={run.output.summary}>
-                  {cleanText(run.output.summary)}
-                </p>
-              </section>
-            )}
-
-            {hasResult && (
-              <div className="card tabs-card">
-                <nav className="tabs" aria-label="Reconciliation sections" role="tablist">
-                  {TABS.map(([id, label]) => (
-                    <button key={id} type="button" role="tab" aria-selected={tab === id} className={`tab ${tab === id ? "on" : ""}`} onClick={() => setTab(id)}>
-                      {label}
-                    </button>
-                  ))}
-                </nav>
-                {tab === "findings" && <Flags findings={run!.findings} summary={run!.output.summary} feedback={feedback} onFeedback={sendFeedback} />}
-                {tab === "meds" && (
-                  <Grid grid={run!.grid} evidenceIndex={run!.evidence_index} coverage={run!.coverage} feedback={feedback} onRejectCell={rejectCell} />
-                )}
-                {tab === "actions" && (
-                  <Tasks
-                    tasks={run!.tasks}
-                    findings={run!.findings}
-                    notices={run!.notices}
-                    done={actionsDone}
-                    onToggle={(i, d) => setActionsDone((s) => ({ ...s, [i]: d }))}
+        {run && (
+          <div className="workspace">
+            <SectionNav items={nav} current={shownSection} onSelect={choose} panelId={PANEL} />
+            <div className="card panel" id={PANEL} ref={panelRef} role="tabpanel" aria-labelledby={`nav-${shownSection}`} tabIndex={-1}>
+              {shownSection === "identity" &&
+                (run.identity_review ? (
+                  <IdentityReview
+                    review={run.identity_review}
+                    banner={run.banner}
+                    decided={decided}
+                    busy={identityBusy}
+                    error={identityError}
+                    onDecide={decideIdentity}
                   />
-                )}
-                {tab === "trust" && <TrustPanel trust={run!.trust} runId={run!.run_id} updates={trustUpdates} acceptance={acceptance} />}
-              </div>
-            )}
+                ) : (
+                  <div className="card-pad">
+                    <h2 className="card-title">Identity review required</h2>
+                    <p className="error">
+                      The reconciliation paused for an identity review, but no review details were provided, so no decision can be
+                      made from this screen.
+                    </p>
+                  </div>
+                ))}
 
-            {!run && (
-              <section className="card card-pad empty-state">
-                <h2 className="card-title">{polling ? "Reconciliation in Progress" : "Reconcile a Patient's Medicines"}</h2>
-                <p>
-                  {polling
-                    ? "Locating the patient across the four record sources. Progress is shown in the processing log."
-                    : "MedTrace locates the patient in the admission chart, GP record, pharmacy dispensing history and patient interview, compares every medicine across them, and lists what a pharmacist must review."}
-                </p>
-              </section>
-            )}
-            {run && polling && !finished && run.status !== "needs_review" && (
-              <section className="card card-pad empty-state">
-                <h2 className="card-title">Reconciliation in Progress</h2>
-                <p>Progress is shown in the processing log.</p>
-              </section>
-            )}
+              {shownSection === "log" && polling && (
+                <div className="card-pad running" aria-live="polite">
+                  <h2 className="card-title">
+                    Reconciling… <span className="spinner spinner-sm" aria-hidden />
+                  </h2>
+                  <Timeline run={run} polling={polling} warning={pollWarning} compact />
+                </div>
+              )}
+              {shownSection === "log" && !polling && <Timeline run={run} polling={polling} warning={pollWarning} />}
+
+              {shownSection === "log" && !polling && run.status === "error" && (
+                <div className="card-pad">
+                  <div className="friendly-err" role="alert">
+                    <span>The reconciliation stopped with an error. Nothing below is a result.</span>
+                    <button type="button" className="btn btn-quiet btn-sm" onClick={startRun}>
+                      Run again
+                    </button>
+                  </div>
+                  <p className="error">{run.error?.message ?? "The reconciliation ended with an error."}</p>
+                </div>
+              )}
+              {shownSection === "log" && finished && run.status !== "error" && !hasResult && (
+                <div className="card-pad">
+                  <h2 className="card-title">Summary</h2>
+                  <p className="sec-summary" title={run.output.summary}>
+                    {cleanText(run.output.summary)}
+                  </p>
+                </div>
+              )}
+
+              {hasResult && shownSection === "findings" && (
+                <Flags findings={run.findings} summary={run.output.summary} feedback={feedback} onFeedback={sendFeedback} />
+              )}
+              {hasResult && shownSection === "meds" && (
+                <Grid
+                  grid={run.grid}
+                  evidenceIndex={run.evidence_index}
+                  coverage={run.coverage}
+                  doseUnits={run.dose_units ?? {}}
+                  feedback={feedback}
+                  onRejectCell={rejectCell}
+                />
+              )}
+              {hasResult && shownSection === "actions" && (
+                <Tasks
+                  tasks={run.tasks}
+                  findings={run.findings}
+                  notices={run.notices}
+                  done={actionsDone}
+                  onToggle={(i, d) => setActionsDone((s) => ({ ...s, [i]: d }))}
+                />
+              )}
+              {hasResult && shownSection === "notices" && <Notices notices={run.notices} />}
+              {hasResult && shownSection === "trust" && <TrustPanel trust={run.trust} runId={run.run_id} updates={trustUpdates} acceptance={acceptance} />}
+            </div>
           </div>
-
-          <aside className="col-side">
-            {run && Object.keys(run.coverage).length > 0 && run.status !== "running" && (
-              <RecordSources coverage={run.coverage} notices={run.notices} />
-            )}
-            <Timeline run={run} polling={polling} warning={pollWarning} />
-          </aside>
-        </div>
+        )}
       </main>
       <Footer />
     </div>
