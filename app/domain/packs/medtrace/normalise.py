@@ -119,6 +119,10 @@ def parse_strength_mg(text: str | None) -> float | None:
     if not text:
         return None
     raw = str(text).strip()
+    if _PER_ML.search(raw):
+        # "300 units/mL" is a concentration, not a strength per dose: no daily dose is
+        # made up from it (scan S21: insulin glargine came out at 7500 "mg/day").
+        return None
     number = _NUMBER.search(raw)
     if not number:
         return None
@@ -164,6 +168,32 @@ _WORD_NUMBERS = {"one": 1.0, "two": 2.0, "three": 3.0, "four": 4.0,
                  "half": 0.5, "a": 1.0, "an": 1.0}
 
 _DOSE_FORM = r"(?:tab|tabs|tablet|tablets|cap|caps|capsule|capsules|puff|puffs)?"
+_PER_ML = re.compile(r"/\s*ml\b", re.I)
+#: A number or range followed by a unit of measure, at the front of a direction:
+#: "10 to 20 mg once weekly", "10 to 40 units nocte". That is a stated dose.
+_STATED = re.compile(r"\s*(\d+(?:\.\d+)?)(?:\s*(?:to|-|–)\s*(\d+(?:\.\d+)?))?\s*"
+                     r"(microgram|mcg|µg|milligram|mg|gram|g|units?|iu|ml)\b", re.I)
+
+
+def _stated_dose(text: str | None) -> float | None:
+    """The dose a direction states outright, in mg (or units for unit-dosed medicines).
+
+    A range is averaged, as `_leading_units` does for counts. Scan S21: `_leading_units`
+    read "10 to 20 mg once weekly" as 15 tablets, so methotrexate 2.5 mg came out at
+    5.36 mg/day instead of ~2.14.
+    """
+    if not text:
+        return None
+    m = _STATED.match(normalise_text(text))
+    if not m:
+        return None
+    value = float(m.group(1)) if not m.group(2) else (float(m.group(1)) + float(m.group(2))) / 2.0
+    unit = m.group(3).lower()
+    if unit in ("microgram", "mcg", "µg"):
+        return value / 1000.0
+    if unit in ("gram", "g"):
+        return value * 1000.0
+    return value
 
 
 def _leading_units(raw: str) -> float:
@@ -174,7 +204,12 @@ def _leading_units(raw: str) -> float:
     is averaged rather than taken at either end: picking the low end
     understates every titrated dose and the high end overstates it, and both
     land on a dose comparison that then reports a discrepancy that is not there.
+
+    A number followed by a unit of measure ("10 to 20 mg weekly") is a stated dose, not a
+    count: one administration (scan S21). `normalise_med` uses `_stated_dose` for it.
     """
+    if _STATED.match(raw):
+        return 1.0
     span = re.match(rf"\s*(\d+(?:\.\d+)?)\s*(?:to|-|–)\s*(\d+(?:\.\d+)?)\s*{_DOSE_FORM}\s", raw)
     if span:
         return (float(span.group(1)) + float(span.group(2))) / 2.0
@@ -423,7 +458,13 @@ def normalise_med(row: SourceRow, lex: Lexicon) -> MedStatement:
         if not _is_device(row, entry):
             per_day = row.qty / row.days_supply
 
-    daily = round(strength * per_day, 4) if (strength is not None and per_day) else None
+    stated = _stated_dose(row.freq_text)
+    if stated is not None and per_day:
+        # The direction states the dose itself ("10 to 20 mg once weekly"): that, not the
+        # product strength, times administrations per day (scan S21).
+        daily = round(stated * per_day, 4)
+    else:
+        daily = round(strength * per_day, 4) if (strength is not None and per_day) else None
 
     return MedStatement(
         source=row.source,
