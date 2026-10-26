@@ -46,5 +46,6 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-26 | Anshu | Claude Code (cloud session) | Opus 5.5 | UI live mode against the SAMPLE_MODE API: learning-demo grid feedback, sample-mode pills; found the evidence_index gap |
 | 2026-10-26 | Anshu | Claude Code (cloud session) | Opus 5.5 | UI visual polish and the Clinical Navy restyle of `web/` (presentation only), checked with Playwright against mock and SAMPLE_MODE API |
 | 2026-10-26 | Anshu | Claude Code (cloud session) | Opus 5.5 | Demo rehearsal: `docs/DEMO_SCRIPT.md` and a Playwright click-path script against the SAMPLE_MODE API; small UI display fixes found while rehearsing |
+| 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | UI judges pass in `web/`: design B layout, four-silos and Powered-by strips, learning card, side-by-side compare, grouped fills, condensed log, accessibility checks with Playwright |
 
 The README's **AI and model usage** section summarises this for judges.

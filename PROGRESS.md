@@ -3,7 +3,7 @@
 One file, current state only. Overwrite it as things change — the history lives in
 `docs/HANDOFF.md` and in git. Read this first at session start.
 
-**Last updated:** 2026-10-26 by Anshu
+**Last updated:** 2026-10-27 by Anshu
 
 > **On `main`:** consultant rulings applied, population 200, held-out F1 0.95, high-risk 35/37 (core APINCHS 30/32, extended 5/5). **Arpon's section is done**, including demo data: 5 `input_examples/` with replay fixtures, a staged learning-demo pair (P0003 → P0007, `docs/DECISIONS.md`), and sample data in the Docker image. Everything left is in Arnav's and Anshu's layers.
 
@@ -48,7 +48,7 @@ five inputs. Docker works from a fresh clone (`SAMPLE_MODE=true docker compose u
 | Feedback learning | Arnav | **durable, through H-MEM** (`app/feedback.py`, `app/agents/memory.py`). The learning demo survives a restart |
 | **World Model + 8 conformance checks** | Arnav | **done: 8/8 green** (`make conformance`). A Python port of the Meterless reference. `identity.decide` now delegates to it, and the scorecard is unchanged (tune `ALL 145 17 5 P 0.90 R 0.97 F1 0.93`). **In the product:** linked patient records written with provenance; the medicine fetch reads the linked set from the graph; pharmacist identity decisions remembered across runs (persisted under `STATE_DIR`) |
 | **H-MEM + 13 conformance vectors** | Arnav | **done: 13/13 green** (`make conformance` runs 22 checks with World Model). A Python port of the Meterless reference. **In the product:** trust records seeded from the priors; verdicts are `HMEM.feedback()` with ledger entries; verdict memories recalled by the Planner (`memory_used`); findings cite `hmem_record_ids`; persisted under `STATE_DIR/hmem` |
-| Web UI | Anshu | **"Clinical Navy" design on `main`**: tabs, summary cards, sidebar, Technical details; works against the `SAMPLE_MODE` API, including the learning demo P0003 → P0007. **Demo rehearsal on `anshu/demo-rehearsal`:** `docs/DEMO_SCRIPT.md` (3-minute script, PITCH_CLAIMS wording only) and `web/scripts/rehearse-demo.cjs` (Playwright click path, clean after #47). Open: show `dose_units` in the grid; record scene 2 live for the Nemotron model pill |
+| Web UI | Anshu | **Design B "Calm Workspace" on `anshu/ui-judges`:** white sidebar (patients, sections with counts, status), 3-step flow, four-silos and Powered-by strips, learning card (only where the changed record was used), findings with `detail.by_source` (S36) and a side-by-side compare (S40), grouped pharmacy fills (S38), `dose_units`, condensed processing log with per-agent colours. Demo script and Playwright rehearsal updated. Open: S39, S41/S42 display |
 | Docker run path | Arnav | **verified 26 Oct.** A fresh clone with no `.env` runs `SAMPLE_MODE=true docker compose up --build`: example_2 success, example_1 pauses then resumes. Live in Docker: Zetaris connected, Nightshift online through `host.docker.internal`, example_3 success. The image serves the UI built in live mode at :8000 (S18). The API is on 127.0.0.1 only (S30) |
 
 ## Sunday's goal
