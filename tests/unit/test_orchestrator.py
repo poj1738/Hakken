@@ -263,7 +263,8 @@ def test_each_planned_need_is_traced_to_its_template(orch) -> None:
     routes = [e for e in r.trace if e.action == "route"]
     assert [e.step for e in routes] == ["FIND_IDENTITY", "FETCH_MEDS", "RESOLVE_FREE_TEXT", "VERIFY"]
     assert all('Planner need "' in e.message for e in routes)
-    assert "template Q1" in routes[0].message and "template Q3" in routes[-1].message
+    assert "verified query Q1" in routes[0].message and "verified query Q3" in routes[-1].message
+    assert "Bearer" not in routes[0].message  # judge-facing text, not developer notes (Anshu, 26 Oct)
     assert "no SQL" in routes[2].message
     sent = [e for e in r.trace if e.sql]
     assert [e.sql_template_id for e in sent] == ["Q1", "Q2", "Q3"] and all(e.query_id for e in sent)

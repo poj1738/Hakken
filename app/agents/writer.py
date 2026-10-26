@@ -29,7 +29,7 @@ _WHAT = {
     DT.FREQUENCY: "is charted at a different frequency than before admission",
     DT.FORMULATION: "is charted with a different release form than before admission",
     DT.ROUTE: "is charted by a different route than before admission",
-    DT.DUPLICATION: "appears more than once once combination products are decomposed",
+    DT.DUPLICATION: "appears more than once when combination products are split into their ingredients",
     DT.STALE_LISTING: "is listed as current but its supply ran out long ago",
     DT.DOSE_UNCONFIRMABLE: "has a dose the sources disagree on, and it changes without a new script",
     DT.UNPROPAGATED_DISCHARGE_CHANGE: "was changed at a previous discharge, but another source still shows the old state",

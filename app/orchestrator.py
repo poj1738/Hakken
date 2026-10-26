@@ -342,9 +342,8 @@ class Orchestrator:
         """Trace the hand-off: the Planner's need -> the template the Executor fills -> Zetaris."""
         need = state.plan.need(tool) if state.plan else planner.DEFAULT_NEED[tool]
         template = planner.TEMPLATE_FOR[tool]
-        how = (f"the Executor fills template {template} and the Zetaris adapter sends it (read-only check, "
-               "Bearer key, X-Org-ID, fresh X-Request-ID)" if template else "the lexicon plus one Nemotron "
-               "choice from a closed candidate list; no SQL")
+        how = (f"the Executor runs verified query {template} on Zetaris, read-only" if template else
+               "matched against the medicines lexicon, with Nemotron choosing only from a closed list; no SQL")
         step = {"find_identities": "FIND_IDENTITY"}.get(tool, tool.upper())
         state.ctx.tracer.emit("Executor", "route", step=step, message=f'Planner need "{need}" -> {how}.')
 
