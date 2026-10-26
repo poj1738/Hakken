@@ -5,8 +5,13 @@
 services:
   app:
     build: .
-    env_file: [.env]
+    # Optional, so a fresh clone runs:  SAMPLE_MODE=true docker compose up --build
+    env_file:
+      - path: .env
+        required: false
     environment:
+      # From the shell, else from .env (compose reads it for interpolation), else live.
+      SAMPLE_MODE: ${SAMPLE_MODE:-false}
       # Override the host-facing URLs for in-container networking.
       ZETARIS_REST_URL: http://host.docker.internal:8888/api/v1.0
       METERLESS_BASE_URL: http://host.docker.internal:8088/v1
@@ -20,7 +25,10 @@ services:
     extra_hosts: ["host.docker.internal:host-gateway"]
     volumes:
       - ./logs:/app/logs
-      - ./.state:/app/.state
+      # A named volume, not ./.state: that directory is untracked, so on a fresh clone
+      # Docker would create it root-owned and the non-root app could not persist
+      # H-MEM or World Model state. A named volume starts owned by the app user.
+      - hakken-state:/app/.state
     depends_on: [datasvc]
 
   datasvc:
@@ -30,3 +38,10 @@ services:
     # host.docker.internal:8100 when registering REST tables.
     ports: ["8100:8100"]
     extra_hosts: ["host.docker.internal:host-gateway"]
+    # What it serves is gitignored and kept out of the image (.dockerignore): the silos
+    # come from `make synth`, the reference tables from `make lexicon`. Mounted read-only.
+    volumes:
+      - ./data:/app/data:ro
+
+volumes:
+  hakken-state:
