@@ -167,6 +167,11 @@ class ZetarisClient:
     def sample_mode(self) -> bool:
         return self.settings.sample_mode
 
+    def replayable(self) -> set[str]:
+        """EMR MRNs with a full recorded run (Q1, Q2 and Q3), i.e. what SAMPLE_MODE can replay."""
+        return {mrn for mrn, key in _replay_index(self._replay_dir).items()
+                if all((self._replay_dir / f"{t}__{key}.json").is_file() for t in ("Q2", "Q3"))}
+
     def run(self, sql: str, *, template_id: str, replay_key: str | None = None,
             limit: int = queries.DEFAULT_ROW_LIMIT) -> tuple[SqlResult, QueryRecord]:
         """Send one read-only statement. Returns the raw envelope and its trace record.

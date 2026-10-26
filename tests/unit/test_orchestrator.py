@@ -168,9 +168,11 @@ def test_unknown_patient(orch) -> None:
 
 
 def test_patients_list_comes_from_q0(orch) -> None:
+    """Q0 admits 200; SAMPLE_MODE lists the 13 with a recorded Q1-Q3 (scan S14)."""
+    assert len(orch._load_anchors()) == 200
     pts = orch.patients()
-    assert len(pts) == 200 and len({p.patient_id for p in pts}) == 200
-    assert pts[0].patient_id.startswith("MRN")
+    assert [p.patient_id for p in pts] == sorted(orch.zetaris.replayable())
+    assert len(pts) == 13 and pts[0].patient_id == "MRN0000001"
 
 
 # -- bounded and honest under failure ------------------------------------------------

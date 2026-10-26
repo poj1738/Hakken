@@ -131,9 +131,15 @@ class Orchestrator:
         return self._anchors
 
     def patients(self) -> list[PatientSummary]:
+        """Every admitted patient live; in SAMPLE_MODE only those with a recorded run (scan S14:
+        Q0 lists 200, but 187 of them would end in a replay miss)."""
+        anchors = self._load_anchors().values()
+        if self.settings.sample_mode:
+            recorded = self.zetaris.replayable()
+            anchors = [a for a in anchors if a.source_patient_id in recorded]
         return [PatientSummary(patient_id=a.source_patient_id, record_key=a.record_key, name_given=a.name_given,
                                name_family=a.name_family, dob=a.dob, sex=a.sex, admission_date=a.doc_date)
-                for a in sorted(self._load_anchors().values(), key=lambda a: a.source_patient_id)]
+                for a in sorted(anchors, key=lambda a: a.source_patient_id)]
 
     # -- runs ------------------------------------------------------------------
 
@@ -148,6 +154,9 @@ class Orchestrator:
         anchor = self._load_anchors().get(request.patient_id)
         if anchor is None:
             raise UnknownPatient(f"{request.patient_id} is not an admitted patient")
+        if self.settings.sample_mode and request.patient_id not in self.zetaris.replayable():
+            raise UnknownPatient(f"{request.patient_id} has no recorded data in SAMPLE_MODE; recorded patients: "
+                                 f"{', '.join(sorted(self.zetaris.replayable()))}")
         run_id = f"run-{uuid.uuid4().hex[:12]}"
         tracer = Tracer(run_id, settings=self.settings, log_dir=self.log_dir)
         started = time.monotonic()
