@@ -20,7 +20,6 @@ export interface FeedbackChoice {
 
 interface Props {
   findings: Finding[];
-  summary: string;
   feedback: Record<string, FeedbackState>;
   onFeedback: (f: Finding, choice: FeedbackChoice) => void;
 }
@@ -83,7 +82,7 @@ function FeedbackControls({ f, state, onFeedback }: { f: Finding; state?: Feedba
         <button type="button" className="btn btn-primary" disabled={state?.busy} onClick={() => onFeedback(f, { verdict: "confirm" })}>
           Confirm
         </button>
-        <button type="button" className="btn btn-quiet" disabled={state?.busy} onClick={() => setRejecting(true)}>
+        <button type="button" className="btn btn-line" disabled={state?.busy} onClick={() => setRejecting(true)}>
           Reject
         </button>
         {state?.error && <p className="error">{state.error}</p>}
@@ -150,7 +149,7 @@ function FeedbackControls({ f, state, onFeedback }: { f: Finding; state?: Feedba
         >
           Submit
         </button>
-        <button type="button" className="btn btn-quiet" onClick={() => setRejecting(false)}>
+        <button type="button" className="btn btn-line" onClick={() => setRejecting(false)}>
           Cancel
         </button>
       </div>
@@ -316,7 +315,7 @@ function Group({ title, tip, items, feedback, onFeedback }: { title: string; tip
   );
 }
 
-export function Flags({ findings, summary, feedback, onFeedback }: Props) {
+export function Flags({ findings, feedback, onFeedback }: Props) {
   const must = findings.filter((f) => f.needs_pharmacist);
   const reviewed = findings.filter((f) => feedback[f.id]?.result).length;
   return (
@@ -327,11 +326,6 @@ export function Flags({ findings, summary, feedback, onFeedback }: Props) {
           {reviewed} of {findings.length} reviewed
         </span>
       </div>
-      {summary && (
-        <p className="sec-summary" title={summary}>
-          {cleanText(summary)}
-        </p>
-      )}
       {!findings.length && <p className="sec-empty">✓ No discrepancies found across the sources located.</p>}
       <Group
         title="Pharmacist review"

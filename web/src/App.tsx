@@ -9,8 +9,9 @@ import type {
   Source,
   TrustAttribute,
 } from "./types";
-import { Header } from "./components/Header";
-import { Picker, type PatientsState } from "./components/Picker";
+import { Brand, SideStatus } from "./components/Header";
+import { PatientHead, PatientList, type PatientsState } from "./components/Picker";
+import { Stepper } from "./components/Stepper";
 import { Timeline } from "./components/Timeline";
 import { IdentityReview } from "./components/IdentityReview";
 import { BpmhBanner, Notices } from "./components/Coverage";
@@ -60,6 +61,15 @@ function Caveats({ caveats }: { caveats: string[] }) {
 }
 
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
+
+// The run's status (from the API) in words, for the patient header and the sidebar list.
+const STATUS_TAG: Record<string, { label: string; tone: string }> = {
+  running: { label: "Reconciling…", tone: "t-low" },
+  needs_review: { label: "Review needed", tone: "t-medium" },
+  success: { label: "Reconciliation complete", tone: "t-done" },
+  partial: { label: "Partial result", tone: "t-medium" },
+  error: { label: "Stopped with an error", tone: "t-high" },
+};
 
 export default function App() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
@@ -251,11 +261,20 @@ export default function App() {
   const doneCount = run ? run.tasks.filter((_, i) => actionsDone[i]).length : 0;
   const step: 1 | 2 | 3 = !selected ? 1 : run && (review || finished) ? 3 : 2;
   const panelRef = useRef<HTMLDivElement>(null);
+  const patient = patients.find((x) => x.patient_id === selected);
+  const ready = patientsState.kind === "ready" && patients.length > 0;
+
+  // What this screen has seen for each patient in this session, for the sidebar list.
+  const [seen, setSeen] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const id = run?.patient_id ?? (run ? selected : null);
+    if (id && run) setSeen((m) => ({ ...m, [id]: (STATUS_TAG[run.status] ?? STATUS_TAG.running).label.replace("Reconciliation complete", "Complete") }));
+  }, [run, selected]);
 
   const choose = (id: Section) => {
     setSection(id);
-    // Scroll the chosen section into view (on a phone the rail sits above it).
-    requestAnimationFrame(() => panelRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }));
+    // Scroll the chosen section into view.
+    requestAnimationFrame(() => panelRef.current?.scrollIntoView({ block: "start", behavior: "smooth" }));
   };
 
   const nav: NavItem<Section>[] = run
@@ -283,45 +302,73 @@ export default function App() {
       <a className="skip" href={`#${PANEL}`}>
         Skip to results
       </a>
-      <Header health={health} error={healthError} />
-      {API_MODE === "mock" && (
-        <div className="mock-note" title="VITE_API_MODE=mock: replaying tests/fixtures/api/*.json">
-          Example data: these screens replay hand-written examples, not the results of a real reconciliation.
-        </div>
-      )}
-      <Picker
-        patients={patients}
-        patientsState={patientsState}
-        onRetryPatients={loadPatients}
-        selected={selected}
-        onSelect={selectPatient}
-        onRun={startRun}
-        running={polling}
-        error={runError}
-        step={step}
-      />
-      <main className="wrap">
-        {run && (finished || review) && <Caveats caveats={run.output.caveats} />}
-        {hasResult && <BpmhBanner banner={run!.banner} bpmhConfirmable={run!.bpmh_confirmable} />}
-        {run?.status === "partial" && <div className="alert alert-medium">Partial result. Read every caveat before relying on it.</div>}
-
-        <Silos run={run} searching={polling} />
-        <Pipeline run={run} health={health} />
-        {!run && !polling && <WhyItMatters />}
-        {hasResult && <LearningHero run={run!} updates={trustUpdates} />}
-
-        {!run && polling && (
-          <section className="card card-pad empty-state" aria-live="polite">
-            <h2 className="card-title">
-              Starting the reconciliation <span className="spinner spinner-sm" aria-hidden />
-            </h2>
-          </section>
-        )}
-
+      <aside className="side" aria-label="Workspace">
+        <Brand />
+        <PatientList
+          patients={patients}
+          patientsState={patientsState}
+          onRetry={loadPatients}
+          selected={selected}
+          onSelect={selectPatient}
+          disabled={polling}
+          states={seen}
+        />
         {run && (
-          <div className="workspace">
+          <div className="side-group">
+            <h2 className="side-label">This reconciliation</h2>
             <SectionNav items={nav} current={shownSection} onSelect={choose} panelId={PANEL} />
-            <div className="card panel" id={PANEL} ref={panelRef} role="tabpanel" aria-labelledby={`nav-${shownSection}`} tabIndex={-1}>
+          </div>
+        )}
+        <SideStatus health={health} error={healthError} />
+      </aside>
+
+      <div className="main-col">
+        {API_MODE === "mock" && (
+          <div className="mock-note" title="VITE_API_MODE=mock: replaying tests/fixtures/api/*.json">
+            Example data: these screens replay hand-written examples, not the results of a real reconciliation.
+          </div>
+        )}
+        <main className="wrap">
+          <Stepper current={step} busy={polling} />
+          <PatientHead
+            patient={patient}
+            loading={patientsState.kind === "loading"}
+            status={run ? STATUS_TAG[run.status] ?? null : null}
+            onRun={startRun}
+            running={polling}
+            canRun={ready && !!selected}
+            error={runError}
+            mock={API_MODE === "mock"}
+          />
+          {run && (finished || review) && <Caveats caveats={run.output.caveats} />}
+          {hasResult && <BpmhBanner banner={run!.banner} bpmhConfirmable={run!.bpmh_confirmable} />}
+          {run?.status === "partial" && <div className="alert alert-medium">Partial result. Read every caveat before relying on it.</div>}
+
+          <section className="panel overview" aria-labelledby="overview-title">
+            <h2 className="h2" id="overview-title">
+              Overview
+            </h2>
+            {hasResult && run!.output.summary && (
+              <p className="overview-summary" title={run!.output.summary}>
+                {cleanText(run!.output.summary)}
+              </p>
+            )}
+            <Silos run={run} searching={polling} />
+            <Pipeline run={run} health={health} />
+            {!run && !polling && <WhyItMatters />}
+          </section>
+          {hasResult && <LearningHero run={run!} updates={trustUpdates} />}
+
+          {!run && polling && (
+            <section className="panel panel-pad" aria-live="polite">
+              <h2 className="h2">
+                Starting the reconciliation <span className="spinner spinner-sm" aria-hidden />
+              </h2>
+            </section>
+          )}
+
+          {run && (
+            <div className="panel section" id={PANEL} ref={panelRef} role="tabpanel" aria-labelledby={`nav-${shownSection}`} tabIndex={-1}>
               {shownSection === "identity" &&
                 (run.identity_review ? (
                   <IdentityReview
@@ -333,8 +380,8 @@ export default function App() {
                     onDecide={decideIdentity}
                   />
                 ) : (
-                  <div className="card-pad">
-                    <h2 className="card-title">Identity review required</h2>
+                  <div className="panel-pad">
+                    <h2 className="h2">Identity review required</h2>
                     <p className="error">
                       The reconciliation paused for an identity review, but no review details were provided, so no decision can be
                       made from this screen.
@@ -343,8 +390,8 @@ export default function App() {
                 ))}
 
               {shownSection === "log" && polling && (
-                <div className="card-pad running" aria-live="polite">
-                  <h2 className="card-title">
+                <div className="panel-pad running" aria-live="polite">
+                  <h2 className="h2">
                     Reconciling… <span className="spinner spinner-sm" aria-hidden />
                   </h2>
                   <Timeline run={run} polling={polling} warning={pollWarning} compact />
@@ -353,10 +400,10 @@ export default function App() {
               {shownSection === "log" && !polling && <Timeline run={run} polling={polling} warning={pollWarning} />}
 
               {shownSection === "log" && !polling && run.status === "error" && (
-                <div className="card-pad">
+                <div className="panel-pad">
                   <div className="friendly-err" role="alert">
                     <span>The reconciliation stopped with an error. Nothing below is a result.</span>
-                    <button type="button" className="btn btn-quiet btn-sm" onClick={startRun}>
+                    <button type="button" className="btn btn-line btn-sm" onClick={startRun}>
                       Run again
                     </button>
                   </div>
@@ -364,17 +411,15 @@ export default function App() {
                 </div>
               )}
               {shownSection === "log" && finished && run.status !== "error" && !hasResult && (
-                <div className="card-pad">
-                  <h2 className="card-title">Summary</h2>
-                  <p className="sec-summary" title={run.output.summary}>
+                <div className="panel-pad">
+                  <h2 className="h2">Summary</h2>
+                  <p className="overview-summary" title={run.output.summary}>
                     {cleanText(run.output.summary)}
                   </p>
                 </div>
               )}
 
-              {hasResult && shownSection === "findings" && (
-                <Flags findings={run.findings} summary={run.output.summary} feedback={feedback} onFeedback={sendFeedback} />
-              )}
+              {hasResult && shownSection === "findings" && <Flags findings={run.findings} feedback={feedback} onFeedback={sendFeedback} />}
               {hasResult && shownSection === "meds" && (
                 <Grid
                   grid={run.grid}
@@ -397,10 +442,10 @@ export default function App() {
               {hasResult && shownSection === "notices" && <Notices notices={run.notices} />}
               {hasResult && shownSection === "trust" && <TrustPanel trust={run.trust} runId={run.run_id} updates={trustUpdates} acceptance={acceptance} />}
             </div>
-          </div>
-        )}
-      </main>
-      <Footer />
+          )}
+          <Footer />
+        </main>
+      </div>
     </div>
   );
 }

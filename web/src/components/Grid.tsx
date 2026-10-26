@@ -146,7 +146,7 @@ function CellFeedback({ med, source, unit, feedback, onRejectCell }: { med: Fuse
             ) : (
               <button
                 type="button"
-                className="btn btn-quiet btn-sm"
+                className="btn btn-line btn-sm"
                 aria-label={`Mark ${sourceLabel(source)} ${attributeLabel(v.attribute).toLowerCase()} as outdated`}
                 title={`Mark ${sourceLabel(source)} ${attributeLabel(v.attribute).toLowerCase()} as outdated`}
                 disabled={st?.busy}
@@ -255,7 +255,7 @@ function Reconciled({ med, unit }: { med: FusedMed; unit?: string }) {
           </span>
         ))}
       </div>
-      <div className="recon-basis">{supporters.map(sourceLabel).join(", ")}</div>
+      <div className="recon-basis">From {supporters.map(sourceLabel).join(", ")}</div>
     </div>
   );
 }
@@ -322,19 +322,21 @@ export function Grid({ grid, evidenceIndex, coverage, doseUnits, feedback, onRej
                 {sourceLabel(s)}
               </div>
             ))}
-            <div role="columnheader">Reconciled</div>
           </div>
           {grid.map((med) => {
             const dissent = dissentingSources(med);
             return (
               <div key={med.generic} className={`row ${med.abstained.length ? "row-unresolved" : ""} ${med.high_risk_class ? "row-alert" : ""}`} role="row">
                 <div role="rowheader">
-                  <div className="med-name">{medName(med.generic)}</div>
-                  {med.high_risk_class && (
-                    <span className="pill apinchs pill-xs" title={`High-alert medicine, APINCHS class ${med.high_risk_class}`}>
-                      APINCHS · {med.high_risk_class}
-                    </span>
-                  )}
+                  <div className="med-name">
+                    {medName(med.generic)}
+                    {med.high_risk_class && (
+                      <span className="pill apinchs pill-xs" title={`High-alert medicine, APINCHS class ${med.high_risk_class}`}>
+                        APINCHS · {med.high_risk_class}
+                      </span>
+                    )}
+                  </div>
+                  <Reconciled med={med} unit={doseUnits[med.generic]} />
                 </div>
                 {SOURCES.map((s) => {
                   const st = med.per_source[s] ?? "unknown";
@@ -372,9 +374,6 @@ export function Grid({ grid, evidenceIndex, coverage, doseUnits, feedback, onRej
                     </div>
                   );
                 })}
-                <div role="cell">
-                  <Reconciled med={med} unit={doseUnits[med.generic]} />
-                </div>
               </div>
             );
           })}

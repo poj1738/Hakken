@@ -158,7 +158,7 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
                         <button type="button" className="btn btn-primary" disabled={!!busy} onClick={() => onDecide(c.candidate_id, true)}>
                           Same patient
                         </button>
-                        <button type="button" className="btn btn-quiet" disabled={!!busy} onClick={() => onDecide(c.candidate_id, false)}>
+                        <button type="button" className="btn btn-line" disabled={!!busy} onClick={() => onDecide(c.candidate_id, false)}>
                           Different patients
                         </button>
                       </div>

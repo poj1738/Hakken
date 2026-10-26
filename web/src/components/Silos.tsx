@@ -38,7 +38,7 @@ export function Silos({ run, searching }: { run: RunResponse | null; searching: 
   const result = !!run && hasCov && run.status !== "running" && run.status !== "needs_review";
   const highAlert = run ? run.findings.filter((f) => f.high_risk_class).length : 0;
   return (
-    <section className="silos card" aria-label="Four record sources, one view">
+    <section className="silos" aria-label="Four record sources, one view">
       <ol className="silo-row">
         {SOURCES.map((s) => {
           const c = cov[s];

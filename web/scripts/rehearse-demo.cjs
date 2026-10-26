@@ -27,12 +27,13 @@ const note = (scene, s) => notes.push(`[${scene}] ${s}`);
   p.on('pageerror', (e) => errs.push(e.message));
   p.on('response', (r) => r.status() >= 400 && errs.push(`${r.status()} ${r.request().method()} ${r.url()}`));
   const shot = (n) => p.screenshot({ path: `${OUT}/${n}.png`, fullPage: true });
-  const run = async (mrn) => { await p.selectOption('#patient', mrn); const t = Date.now(); await p.click('.run-btn'); await settle(p); return ((Date.now() - t) / 1000).toFixed(1); };
+  // Patients are picked from the sidebar list (button per patient, data-patient=MRN).
+  const run = async (mrn) => { await p.click(`[data-patient="${mrn}"]`); const t = Date.now(); await p.click('.run-btn'); await settle(p); return ((Date.now() - t) / 1000).toFixed(1); };
   // Sections are the left rail's links (role="tab"; the name includes its count).
   const tab = (name) => p.getByRole('tab', { name }).click();
 
-  await p.goto(UI); await p.waitForSelector('#patient:not([disabled])');
-  note('0', `header: ${(await p.locator('.hd-right').innerText()).replace(/\n/g, ' | ')}`);
+  await p.goto(UI); await p.waitForSelector('[data-patient]');
+  note('0', `status: ${(await p.locator('.side-status').innerText()).replace(/\n/g, ' | ')}`);
   note('0', `steps: ${(await p.locator('.steps').innerText()).replace(/\n/g, ' ')}; why: ${(await p.locator('.why-line').innerText()).slice(0, 80)}…`);
   await shot('scene0-landing');
 
@@ -102,7 +103,7 @@ const note = (scene, s) => notes.push(`[${scene}] ${s}`);
   note('3', `P0007 GP daily dose row: ${(await p.locator('.trow', { hasText: 'Daily dose' }).nth(1).innerText()).replace(/\n/g, ' ')}`);
   await shot('scene3e-p0007-confidence');
 
-  note('end', `header model: ${await p.locator('.hd-status').nth(2).innerText()}`);
+  note('end', `sidebar model: ${(await p.locator('.side-status .st-model').innerText()).replace(/\n/g, ' ')}`);
   console.log(notes.join('\n'));
   console.log(errs.length ? 'ERRORS:\n' + errs.join('\n') : 'no page or HTTP errors');
   await b.close();
