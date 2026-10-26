@@ -27,6 +27,44 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 · Arnav · arnav/grid-evidence
+
+**Did:** Anshu's two asks from 12:16.
+- **Arnav 1: `evidence_index` now holds every row behind a grid cell.** `analyse` builds
+  `Evidence` for each `FusedMed.row_ids` and each attribute's `row_ids`, from the Q2 rows
+  already fetched (no extra query), and `_respond` merges them in. On P0001, all 101 grid
+  rows are present (78 were missing). The same holds for P0089 and P0015.
+- **Arnav 3: dose units.** New optional field **`RunResponse.dose_units`**: generic →
+  `"mg"`, `"units"` or `"mL"` for the grid's resolved `daily_dose`. It's read from the
+  cited rows the way `parse_strength_mg` reads them: a stated dose in the direction
+  first, else the strength. Masses become `"mg"` because the parser converts them, and
+  a combination like "25/1000 mg" counts its first component. The field is **absent** when
+  the rows state no unit or disagree, so the UI shows the bare number rather than
+  guessing. P0001: amlodipine mg, colecalciferol units, empagliflozin/metformin mg.
+- 13 tests in `tests/unit/test_grid_evidence.py`. `output_examples/sample_mode/`
+  regenerated, so it now carries the new fields. The committed live examples predate
+  them.
+
+**Changed shared files:** **`app/schemas.py`**: additive optional field `dose_units`
+(default `{}`). No existing field changed.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Anshu:** show `dose_units[generic]` after the daily-dose value in the grid (e.g.
+  "Daily dose: 16 mg"), and nothing when it's absent. Every grid cell can now show its
+  provenance from `evidence_index`. The hand-written mock fixtures in
+  `tests/fixtures/api/` don't have `dose_units`.
+- **Whoever owns `normalise.py` now:** `parse_strength_mg("2 puffs")` returns 2.0. A
+  number with no recognised unit defaults to mg, so a puff count can become a "mg/day"
+  dose. `dose_units` won't label such a value (it has no stated unit), but fusion still
+  compares it as mg. This is a domain change, so it needs the eval guardrail. I haven't
+  touched it.
+
+**Next:** S11 (a background run that throws stays `running`), then S12.
+
+---
+
 ### 2026-10-26 · Arnav · arnav/s10
 
 **Did:** Scan **S10**. Also ticked **S1** and **S13**, both already resolved by earlier

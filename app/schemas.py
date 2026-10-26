@@ -318,6 +318,10 @@ class RunResponse(BaseModel):
     bpmh_confirmable: bool = False
     banner: str | None = None
     grid: list[FusedMed] = Field(default_factory=list)
+    # Additive (26 Oct, Anshu's ask): generic -> unit of the grid's resolved `daily_dose`
+    # ("mg", "units" or "mL"; masses are converted to mg). Absent where the cited rows state
+    # no unit or disagree -- the UI then shows the number unlabelled rather than guessing.
+    dose_units: dict[str, str] = Field(default_factory=dict)
     findings: list[Finding] = Field(default_factory=list)
     notices: list[Notice] = Field(default_factory=list)
     tasks: list[str] = Field(default_factory=list)

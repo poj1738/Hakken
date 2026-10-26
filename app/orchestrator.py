@@ -506,7 +506,7 @@ class Orchestrator:
         evidence_index = {e.row_id: e for f in findings for e in f.evidence}
         if analysis is not None:
             coverage, banner, confirmable = analysis.cov, analysis.banner, analysis.bpmh_confirmable
-            evidence_index = {**analysis.notice_evidence, **evidence_index}
+            evidence_index = {**analysis.grid_evidence, **analysis.notice_evidence, **evidence_index}
         return RunResponse(
             run_id=state.run_id, status=status,  # type: ignore[arg-type]
             output=RunOutput(
@@ -521,7 +521,8 @@ class Orchestrator:
             sample_mode=self.settings.sample_mode,
             provider_state="sample_mode" if self.settings.sample_mode else ("online" if live else None),
             patient_id=state.anchor.source_patient_id, coverage=coverage or {}, bpmh_confirmable=confirmable,
-            banner=banner, grid=analysis.fused if analysis else [], findings=findings,
+            banner=banner, grid=analysis.fused if analysis else [],
+            dose_units=analysis.dose_units if analysis else {}, findings=findings,
             notices=analysis.notices if analysis else [], tasks=analysis.tasks if analysis else [],
             evidence_index=evidence_index,
             trust=[TrustEntry(source=s, attribute=a, value=v, hmem_record_id=self.memory.record_id(s, a))
