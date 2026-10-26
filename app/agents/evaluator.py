@@ -18,6 +18,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -32,6 +33,7 @@ from app.domain.packs.medtrace.types import (
     SOURCES,
     Coverage,
     DiscrepancyCandidate,
+    DiscrepancyType,
     EvidenceState,
     FusedMed,
     IdentityLink,
@@ -85,6 +87,73 @@ _DOSE_UNIT = re.compile(r"(?:^|\s)\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)*(?:\s*(?
                         r"(microgram|mcg|µg|milligram|mg|gram|g|units?|iu|ml)\b", re.IGNORECASE)
 _UNIT_FAMILY = {"microgram": "mg", "mcg": "mg", "µg": "mg", "milligram": "mg", "mg": "mg", "gram": "mg",
                 "g": "mg", "unit": "units", "units": "units", "iu": "units", "ml": "mL"}
+
+
+#: Findings about how a medicine is taken: they get "what each source says" (scan S36).
+_SAYS_TYPES = {DiscrepancyType.DOSE_UNCONFIRMABLE, DiscrepancyType.DOSE, DiscrepancyType.FREQUENCY,
+               DiscrepancyType.FORMULATION, DiscrepancyType.ROUTE}
+_SOURCE_ORDER = ("gp", "pharmacy", "patient", "emr")
+_SOURCE_LABEL = {"gp": "GP", "pharmacy": "pharmacy", "patient": "patient", "emr": "chart"}
+
+
+def _plain_number(text: str) -> str:
+    """ "5.0" -> "5"; anything else unchanged."""
+    try:
+        value = float(text)
+    except ValueError:
+        return text
+    return f"{value:g}"
+
+
+def _source_words(source: str, rows: list[dict[str, str | None]]) -> str | None:
+    """One source's dose words, as written in its rows -- nothing inferred, nothing computed.
+
+    The pharmacy silo has no directions column, so its words are what it does record (the
+    strength and the pack), and say that no dose is stated. The chart's dose column holds the
+    number alone; its unit is read from the strength ("100 units/mL" -> units).
+    """
+    if not rows:
+        return None
+    if source == "pharmacy":
+        last = rows[-1]
+        pack = ", ".join(x for x in (last.get("strength_text"),
+                                     f"{last.get('qty')} per {last.get('days_supply')} days"
+                                     if last.get("qty") and last.get("days_supply") else None) if x)
+        fills = f"{len(rows)} fills, latest " if len(rows) > 1 else ""
+        return f"{fills}{pack or 'dispensed'}, no dose stated"
+    if source == "emr":
+        charted = [r for r in rows if r.get("record_kind") == "admission_chart"] or rows
+        r = charted[-1]
+        dose = r.get("dose_text")
+        unit = ("units" if "unit" in (r.get("strength_text") or "").lower() else "mg") if dose else ""
+        return " ".join(x for x in (_plain_number(dose) if dose else None, unit or None, r.get("freq_text")) if x) or None
+    r = rows[-1]
+    words = " ".join(x for x in (r.get("dose_text"), r.get("freq_text")) if x)
+    return words or (r.get("med_text") if source == "patient" else None) or None
+
+
+def _what_each_source_says(c: DiscrepancyCandidate, raw: dict[str, dict[str, str | None]]) -> dict:
+    """`detail["by_source"]` and, where the detector wrote none, a one-line `statement` (scan S36).
+
+    Built here rather than in `detect`: the detector works on normalised statements, which
+    keep the parsed dose but not the words each source wrote, and those words are the point.
+    """
+    rows = [raw[r] for r in c.row_ids if r in raw]
+    by_source = {s: w for s in _SOURCE_ORDER
+                 if (w := _source_words(s, [r for r in rows if r.get("source") == s]))}
+    if not by_source:
+        return {}
+    out: dict[str, Any] = {"by_source": by_source}
+    if not c.detail.get("statement"):
+        said = " · ".join(f"{_SOURCE_LABEL[s]} '{w}'" if s == "patient" else f"{_SOURCE_LABEL[s]} {w}"
+                          for s, w in by_source.items())
+        if c.type is DiscrepancyType.DOSE_UNCONFIRMABLE:
+            lead = ("The sources disagree on the dose" if c.detail.get("sources_disagree")
+                    else "No source confirms the current dose")
+            out["statement"] = f"{lead}: {said}"
+        elif "charted" in c.detail and "bpmh" in c.detail:
+            out["statement"] = f"charted {c.detail['charted']} against {c.detail['bpmh']} before admission"
+    return out
 
 
 def _row_dose_unit(fields: dict[str, str | None]) -> str | None:
@@ -209,7 +278,8 @@ def analyse(ctx: AgentContext, links: list[IdentityLink], rows: list[SourceRow],
         findings.append(Finding(
             id=c.id, type=c.type, generic=c.generic, high_risk_class=c.high_risk_class, severity=c.severity,
             intent_status=c.intent_status, intent_reason=(c.detail.get("chart_note") or c.detail.get("reason"))
-            if c.intent_status == "documented_intentional" else None, priority=c.priority, detail=dict(c.detail),
+            if c.intent_status == "documented_intentional" else None, priority=c.priority,
+            detail={**c.detail, **(_what_each_source_says(c, raw) if c.type in _SAYS_TYPES else {})},
             evidence=[Evidence(source=raw[r].get("source") or "", row_id=r, sql_template_id="Q2",
                                query_id=q2_query_id, fields=raw[r]) for r in c.row_ids if r in raw],
             evidence_states=evidence.get(c.generic, {}),
