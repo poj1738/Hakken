@@ -53,9 +53,9 @@ def _write(path: Path, model) -> None:
     path.write_text(json.dumps(model.model_dump(mode="json"), indent=2, ensure_ascii=False) + "\n")
 
 
-def run_mode(mode: str) -> list[dict]:
-    settings = get_settings().model_copy(update={"sample_mode": mode == "sample_mode"})
-    out = OUT / mode
+def run_mode(mode: str, out_root: Path = OUT, settings=None) -> list[dict]:
+    settings = (settings or get_settings()).model_copy(update={"sample_mode": mode == "sample_mode"})
+    out = out_root / mode
     out.mkdir(parents=True, exist_ok=True)
     traces = Path(tempfile.mkdtemp(prefix="hakken-traces-"))
     orch = Orchestrator(settings, log_dir=traces, world=WorldModel(namespace="examples"), hmem=HMEM())

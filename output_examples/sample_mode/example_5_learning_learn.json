@@ -1,5 +1,5 @@
 {
-  "run_id": "run-125c96ebe594",
+  "run_id": "run-55f92bd20f78",
   "status": "success",
   "output": {
     "summary": "1 finding(s) for Benjamin O'Brien (MRN0000007).",
@@ -12,6 +12,12 @@
       },
       {
         "text": "Obtain a second source (the patient, a dispensing record or My Health Record) before acting: the history here rests on one source",
+        "rationale": null,
+        "confidence": 0.5,
+        "requires_human_review": true
+      },
+      {
+        "text": "Identify \"spray under the tongue\" (patient, PAT-000069) with the patient",
         "rationale": null,
         "confidence": 0.5,
         "requires_human_review": true
@@ -85,9 +91,9 @@
       "status": "ok"
     }
   ],
-  "trace_id": "run-125c96ebe594",
-  "log_file": "/tmp/hakken-traces-2afp62bq/trace-run-125c96ebe594.jsonl",
-  "execution_time_seconds": 0.02,
+  "trace_id": "run-55f92bd20f78",
+  "log_file": "/tmp/hakken-traces-2qvw88n1/trace-run-55f92bd20f78.jsonl",
+  "execution_time_seconds": 0.03,
   "error": null,
   "memory_used": [
     {
@@ -704,7 +710,7 @@
           "source": "emr",
           "row_id": "EMR-000060",
           "sql_template_id": "Q2",
-          "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+          "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
           "fields": {
             "source": "emr",
             "row_id": "EMR-000060",
@@ -737,7 +743,7 @@
           "source": "pharmacy",
           "row_id": "PHM-000399",
           "sql_template_id": "Q2",
-          "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+          "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-000399",
@@ -770,7 +776,7 @@
           "source": "pharmacy",
           "row_id": "PHM-000400",
           "sql_template_id": "Q2",
-          "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+          "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-000400",
@@ -803,7 +809,7 @@
           "source": "pharmacy",
           "row_id": "PHM-000401",
           "sql_template_id": "Q2",
-          "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+          "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-000401",
@@ -836,7 +842,7 @@
           "source": "pharmacy",
           "row_id": "PHM-000402",
           "sql_template_id": "Q2",
-          "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+          "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-000402",
@@ -869,7 +875,7 @@
           "source": "pharmacy",
           "row_id": "PHM-000403",
           "sql_template_id": "Q2",
-          "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+          "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-000403",
@@ -902,7 +908,7 @@
           "source": "pharmacy",
           "row_id": "PHM-000404",
           "sql_template_id": "Q2",
-          "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+          "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-000404",
@@ -962,19 +968,65 @@
       "generic": null,
       "row_ids": [],
       "tasks": []
+    },
+    {
+      "type": "patient_only_item",
+      "detail": "Could not identify \"spray under the tongue\" (patient, PAT-000069); kept for review.",
+      "source": "patient",
+      "generic": null,
+      "row_ids": [
+        "PAT-000069"
+      ],
+      "tasks": [
+        "Identify \"spray under the tongue\" (patient, PAT-000069) with the patient"
+      ]
     }
   ],
   "tasks": [
     "Confirm the correct rosuvastatin dose",
-    "Obtain a second source (the patient, a dispensing record or My Health Record) before acting: the history here rests on one source"
+    "Obtain a second source (the patient, a dispensing record or My Health Record) before acting: the history here rests on one source",
+    "Identify \"spray under the tongue\" (patient, PAT-000069) with the patient"
   ],
   "identity_review": null,
   "evidence_index": {
+    "PAT-000069": {
+      "source": "patient",
+      "row_id": "PAT-000069",
+      "sql_template_id": "Q2",
+      "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000069",
+        "source_patient_id": "INT00007",
+        "ihi_syn": "SYN-958471148299",
+        "name_given": "Benjamin O'Brien",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1936-12-30",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "spray under the tongue",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "only when I need it",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
     "EMR-000060": {
       "source": "emr",
       "row_id": "EMR-000060",
       "sql_template_id": "Q2",
-      "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+      "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000060",
@@ -1007,7 +1059,7 @@
       "source": "pharmacy",
       "row_id": "PHM-000399",
       "sql_template_id": "Q2",
-      "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+      "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-000399",
@@ -1040,7 +1092,7 @@
       "source": "pharmacy",
       "row_id": "PHM-000400",
       "sql_template_id": "Q2",
-      "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+      "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-000400",
@@ -1073,7 +1125,7 @@
       "source": "pharmacy",
       "row_id": "PHM-000401",
       "sql_template_id": "Q2",
-      "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+      "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-000401",
@@ -1106,7 +1158,7 @@
       "source": "pharmacy",
       "row_id": "PHM-000402",
       "sql_template_id": "Q2",
-      "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+      "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-000402",
@@ -1139,7 +1191,7 @@
       "source": "pharmacy",
       "row_id": "PHM-000403",
       "sql_template_id": "Q2",
-      "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+      "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-000403",
@@ -1172,7 +1224,7 @@
       "source": "pharmacy",
       "row_id": "PHM-000404",
       "sql_template_id": "Q2",
-      "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+      "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-000404",
@@ -1465,8 +1517,8 @@
   ],
   "trace": [
     {
-      "timestamp": "2026-10-26T02:05:26.174805+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.349627+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Planner",
       "action": "start",
       "input_summary": null,
@@ -1490,8 +1542,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.176135+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.350985+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Planner",
       "action": "recall",
       "input_summary": null,
@@ -1517,8 +1569,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.176621+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.351327+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Planner",
       "action": "plan",
       "input_summary": null,
@@ -1542,8 +1594,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.176808+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.351502+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1567,8 +1619,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.179547+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.354830+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Executor",
       "action": "find_identities",
       "input_summary": null,
@@ -1591,13 +1643,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q1",
-      "query_id": "4d359bb3-dde6-42ae-8eb5-2b116dab7f8e",
+      "query_id": "91406b6d-3846-4489-b171-dad351eac1f7",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T02:05:26.180244+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.355750+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1608,7 +1660,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "World Model: recorded 4 patient records and 3 same-person link(s), each with provenance (Zetaris query 4d359bb3-dde6-42ae-8eb5-2b116dab7f8e); audit seq 34-40.",
+      "message": "World Model: recorded 4 patient records and 3 same-person link(s), each with provenance (Zetaris query 91406b6d-3846-4489-b171-dad351eac1f7); audit seq 34-40.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -1621,8 +1673,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.180501+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.356004+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1646,8 +1698,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.180638+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.356249+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1671,8 +1723,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.183824+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.360333+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Executor",
       "action": "fetch_meds",
       "input_summary": null,
@@ -1695,13 +1747,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q2",
-      "query_id": "0213b31e-e40a-4a13-a091-7d6a7dd36e28",
+      "query_id": "3b614e6b-5531-4866-8bf8-4fdf0020c13a",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T02:05:26.187380+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.365278+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Executor",
       "action": "normalise",
       "input_summary": null,
@@ -1725,8 +1777,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.188122+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.365607+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1750,8 +1802,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.189298+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.366822+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Executor",
       "action": "resolve_free_text",
       "input_summary": null,
@@ -1775,8 +1827,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.192510+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.370520+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Evaluator",
       "action": "fuse",
       "input_summary": null,
@@ -1800,8 +1852,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.193533+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.371618+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Evaluator",
       "action": "detect",
       "input_summary": null,
@@ -1825,8 +1877,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.193875+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.372030+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Evaluator",
       "action": "prioritise",
       "input_summary": null,
@@ -1850,8 +1902,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.194504+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.373049+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Writer",
       "action": "draft",
       "input_summary": null,
@@ -1875,8 +1927,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.194679+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.373344+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1900,8 +1952,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.196575+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.374994+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Evaluator",
       "action": "verify",
       "input_summary": null,
@@ -1914,7 +1966,7 @@
       "step": "VERIFY",
       "message": "Re-read 7 cited rows in one query; 1 findings verified.",
       "route": null,
-      "latency_ms": 1,
+      "latency_ms": 0,
       "tokens": null,
       "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE row_id IN ('EMR-000060', 'PHM-000399', 'PHM-000400', 'PHM-000401', 'PHM-000402', 'PHM-000403', 'PHM-000404')",
       "row_count": 7,
@@ -1924,13 +1976,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q3",
-      "query_id": "8cff6b8a-2560-40ba-989d-4f74a8248830",
+      "query_id": "596e3e29-1649-4ed6-ab09-ebde5df87a0c",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T02:05:26.197355+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.376116+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Evaluator",
       "action": "critique",
       "input_summary": null,
@@ -1954,8 +2006,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.197612+00:00",
-      "run_id": "run-125c96ebe594",
+      "timestamp": "2026-10-26T03:34:32.376393+00:00",
+      "run_id": "run-55f92bd20f78",
       "agent_name": "Writer",
       "action": "done",
       "input_summary": null,
@@ -1966,7 +2018,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "DONE",
-      "message": "Done: 1 findings, 1 notices, 2 tasks.",
+      "message": "Done: 1 findings, 2 notices, 3 tasks.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -1980,7 +2032,7 @@
     }
   ],
   "query_count": 3,
-  "zetaris_ms": 1,
+  "zetaris_ms": 0,
   "model_calls": [
     {
       "role": "Planner",

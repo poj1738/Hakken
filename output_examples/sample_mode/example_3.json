@@ -1,5 +1,5 @@
 {
-  "run_id": "run-b7c87edb79a0",
+  "run_id": "run-0a9c95427d0a",
   "status": "success",
   "output": {
     "summary": "",
@@ -18,6 +18,18 @@
       },
       {
         "text": "Verify the glucosamine dose",
+        "rationale": null,
+        "confidence": 0.5,
+        "requires_human_review": true
+      },
+      {
+        "text": "Identify \"a little white one\" (patient, PAT-000115) with the patient",
+        "rationale": null,
+        "confidence": 0.5,
+        "requires_human_review": true
+      },
+      {
+        "text": "Identify \"cholesterol tablet\" (patient, PAT-000116) with the patient",
         "rationale": null,
         "confidence": 0.5,
         "requires_human_review": true
@@ -72,9 +84,9 @@
       "status": "ok"
     }
   ],
-  "trace_id": "run-b7c87edb79a0",
-  "log_file": "/tmp/hakken-traces-2afp62bq/trace-run-b7c87edb79a0.jsonl",
-  "execution_time_seconds": 0.02,
+  "trace_id": "run-0a9c95427d0a",
+  "log_file": "/tmp/hakken-traces-2qvw88n1/trace-run-0a9c95427d0a.jsonl",
+  "execution_time_seconds": 0.03,
   "error": null,
   "memory_used": [],
   "sample_mode": true,
@@ -722,15 +734,141 @@
       "tasks": [
         "Verify the glucosamine dose"
       ]
+    },
+    {
+      "type": "patient_only_item",
+      "detail": "Could not identify \"a little white one\" (patient, PAT-000115); kept for review.",
+      "source": "patient",
+      "generic": null,
+      "row_ids": [
+        "PAT-000115"
+      ],
+      "tasks": [
+        "Identify \"a little white one\" (patient, PAT-000115) with the patient"
+      ]
+    },
+    {
+      "type": "patient_only_item",
+      "detail": "Could not identify \"cholesterol tablet\" (patient, PAT-000116); kept for review.",
+      "source": "patient",
+      "generic": null,
+      "row_ids": [
+        "PAT-000116"
+      ],
+      "tasks": [
+        "Identify \"cholesterol tablet\" (patient, PAT-000116) with the patient"
+      ]
     }
   ],
   "tasks": [
     "Call GP practice",
     "Ask the patient which pharmacy they use",
-    "Verify the glucosamine dose"
+    "Verify the glucosamine dose",
+    "Identify \"a little white one\" (patient, PAT-000115) with the patient",
+    "Identify \"cholesterol tablet\" (patient, PAT-000116) with the patient"
   ],
   "identity_review": null,
-  "evidence_index": {},
+  "evidence_index": {
+    "PAT-000121": {
+      "source": "patient",
+      "row_id": "PAT-000121",
+      "sql_template_id": "Q2",
+      "query_id": "79ad25f5-79d0-4a0d-8a8e-ed9093d8b427",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000121",
+        "source_patient_id": "INT00013",
+        "ihi_syn": "",
+        "name_given": "Jennifer Young",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "glucosamine",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000115": {
+      "source": "patient",
+      "row_id": "PAT-000115",
+      "sql_template_id": "Q2",
+      "query_id": "79ad25f5-79d0-4a0d-8a8e-ed9093d8b427",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000115",
+        "source_patient_id": "INT00013",
+        "ihi_syn": "",
+        "name_given": "Jennifer Young",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "a little white one",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000116": {
+      "source": "patient",
+      "row_id": "PAT-000116",
+      "sql_template_id": "Q2",
+      "query_id": "79ad25f5-79d0-4a0d-8a8e-ed9093d8b427",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000116",
+        "source_patient_id": "INT00013",
+        "ihi_syn": "",
+        "name_given": "Jennifer Young",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "cholesterol tablet",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    }
+  },
   "trust": [
     {
       "source": "emr",
@@ -994,8 +1132,8 @@
   ],
   "trace": [
     {
-      "timestamp": "2026-10-26T02:05:26.112570+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.254464+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Planner",
       "action": "start",
       "input_summary": null,
@@ -1019,8 +1157,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.113950+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.256265+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Planner",
       "action": "recall",
       "input_summary": null,
@@ -1044,8 +1182,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.114311+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.256846+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Planner",
       "action": "plan",
       "input_summary": null,
@@ -1069,8 +1207,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.114472+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.257066+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1094,8 +1232,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.118191+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.261878+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "find_identities",
       "input_summary": null,
@@ -1118,13 +1256,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q1",
-      "query_id": "aa5f54b9-d8ee-47dd-a52a-ef4d5ef314b9",
+      "query_id": "7d2a7206-cc1d-489f-9193-f210e719b671",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T02:05:26.118707+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.262545+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1135,7 +1273,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query aa5f54b9-d8ee-47dd-a52a-ef4d5ef314b9); audit seq 21-25.",
+      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query 7d2a7206-cc1d-489f-9193-f210e719b671); audit seq 21-25.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -1148,8 +1286,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.118921+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.262841+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "needs_review",
       "input_summary": null,
@@ -1173,8 +1311,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.120999+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.266210+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "identity_decision",
       "input_summary": null,
@@ -1198,8 +1336,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.121277+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.266733+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1223,8 +1361,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.121463+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.266958+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1248,8 +1386,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.121627+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.267100+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1273,8 +1411,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.123832+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.268677+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "fetch_meds",
       "input_summary": null,
@@ -1297,13 +1435,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q2",
-      "query_id": "d813c700-f6d1-4d67-829f-4a462f912927",
+      "query_id": "79ad25f5-79d0-4a0d-8a8e-ed9093d8b427",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T02:05:26.127025+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.273287+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "normalise",
       "input_summary": null,
@@ -1327,8 +1465,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.127224+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.274004+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1352,8 +1490,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.129479+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.276083+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "resolve_free_text",
       "input_summary": null,
@@ -1377,8 +1515,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.131699+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.278867+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Evaluator",
       "action": "fuse",
       "input_summary": null,
@@ -1402,8 +1540,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.132306+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.280012+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Evaluator",
       "action": "detect",
       "input_summary": null,
@@ -1427,8 +1565,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.132446+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.280277+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Evaluator",
       "action": "prioritise",
       "input_summary": null,
@@ -1452,8 +1590,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.132740+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.280853+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1477,8 +1615,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.132881+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.281076+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Evaluator",
       "action": "verify",
       "input_summary": null,
@@ -1502,8 +1640,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.133085+00:00",
-      "run_id": "run-b7c87edb79a0",
+      "timestamp": "2026-10-26T03:34:32.281316+00:00",
+      "run_id": "run-0a9c95427d0a",
       "agent_name": "Writer",
       "action": "done",
       "input_summary": null,
@@ -1514,7 +1652,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "DONE",
-      "message": "Done: 0 findings, 4 notices, 3 tasks.",
+      "message": "Done: 0 findings, 6 notices, 5 tasks.",
       "route": null,
       "latency_ms": null,
       "tokens": null,

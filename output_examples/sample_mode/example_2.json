@@ -1,5 +1,5 @@
 {
-  "run_id": "run-b2326f8224a5",
+  "run_id": "run-2ed2d4ef6e8c",
   "status": "success",
   "output": {
     "summary": "5 finding(s) for Dorothy Nguyen (MRN0000089); 3 need a pharmacist first: oxycodone/naloxone (duplication), gliclazide (omission), oxycodone/naloxone (frequency).",
@@ -143,9 +143,9 @@
       "status": "ok"
     }
   ],
-  "trace_id": "run-b2326f8224a5",
-  "log_file": "/tmp/hakken-traces-2afp62bq/trace-run-b2326f8224a5.jsonl",
-  "execution_time_seconds": 0.04,
+  "trace_id": "run-2ed2d4ef6e8c",
+  "log_file": "/tmp/hakken-traces-2qvw88n1/trace-run-2ed2d4ef6e8c.jsonl",
+  "execution_time_seconds": 0.05,
   "error": null,
   "memory_used": [],
   "sample_mode": true,
@@ -1286,7 +1286,7 @@
           "source": "gp",
           "row_id": "GP-000684",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "gp",
             "row_id": "GP-000684",
@@ -1319,7 +1319,7 @@
           "source": "gp",
           "row_id": "GP-000680",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "gp",
             "row_id": "GP-000680",
@@ -1391,7 +1391,7 @@
           "source": "gp",
           "row_id": "GP-000682",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "gp",
             "row_id": "GP-000682",
@@ -1424,7 +1424,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004127",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004127",
@@ -1457,7 +1457,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004128",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004128",
@@ -1490,7 +1490,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004129",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004129",
@@ -1568,7 +1568,7 @@
           "source": "emr",
           "row_id": "EMR-000737",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "emr",
             "row_id": "EMR-000737",
@@ -1601,7 +1601,7 @@
           "source": "gp",
           "row_id": "GP-000684",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "gp",
             "row_id": "GP-000684",
@@ -1634,7 +1634,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004135",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004135",
@@ -1667,7 +1667,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004136",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004136",
@@ -1700,7 +1700,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004137",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004137",
@@ -1733,7 +1733,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004138",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004138",
@@ -1766,7 +1766,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004139",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004139",
@@ -1799,7 +1799,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004140",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004140",
@@ -1832,7 +1832,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004141",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004141",
@@ -1865,7 +1865,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004142",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004142",
@@ -1898,7 +1898,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004143",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004143",
@@ -1931,7 +1931,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004144",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004144",
@@ -1964,7 +1964,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004145",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004145",
@@ -2044,7 +2044,7 @@
           "source": "emr",
           "row_id": "EMR-000734",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "emr",
             "row_id": "EMR-000734",
@@ -2077,7 +2077,7 @@
           "source": "gp",
           "row_id": "GP-000679",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "gp",
             "row_id": "GP-000679",
@@ -2110,7 +2110,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004108",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004108",
@@ -2143,7 +2143,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004109",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004109",
@@ -2176,7 +2176,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004110",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004110",
@@ -2209,7 +2209,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004111",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004111",
@@ -2242,7 +2242,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004112",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004112",
@@ -2275,7 +2275,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004113",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004113",
@@ -2348,7 +2348,7 @@
           "source": "gp",
           "row_id": "GP-000681",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "gp",
             "row_id": "GP-000681",
@@ -2381,7 +2381,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004126",
           "sql_template_id": "Q2",
-          "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+          "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004126",
@@ -2457,6 +2457,30 @@
       "tasks": [
         "Verify the turmeric dose"
       ]
+    },
+    {
+      "type": "patient_only_item",
+      "detail": "Could not identify \"a little white one\" (patient, PAT-000721); kept for review.",
+      "source": "patient",
+      "generic": null,
+      "row_ids": [
+        "PAT-000721"
+      ],
+      "tasks": [
+        "Identify \"a little white one\" (patient, PAT-000721) with the patient"
+      ]
+    },
+    {
+      "type": "patient_only_item",
+      "detail": "Could not identify \"a little white one\" (patient, PAT-000726); kept for review.",
+      "source": "patient",
+      "generic": null,
+      "row_ids": [
+        "PAT-000726"
+      ],
+      "tasks": [
+        "Identify \"a little white one\" (patient, PAT-000726) with the patient"
+      ]
     }
   ],
   "tasks": [
@@ -2465,15 +2489,215 @@
     "Confirm how often oxycodone/naloxone is taken",
     "Confirm how often esomeprazole is taken",
     "Ask the GP practice whether dapagliflozin is still current",
-    "Verify the turmeric dose"
+    "Verify the turmeric dose",
+    "Identify \"a little white one\" (patient, PAT-000721) with the patient",
+    "Identify \"a little white one\" (patient, PAT-000726) with the patient"
   ],
   "identity_review": null,
   "evidence_index": {
+    "GP-000681": {
+      "source": "gp",
+      "row_id": "GP-000681",
+      "sql_template_id": "Q2",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-000681",
+        "source_patient_id": "GPP000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "Dorothy",
+        "name_family": "Nguyen",
+        "name_previous": "",
+        "dob_text": "27/01/1938",
+        "sex": "Female",
+        "postcode": "2554",
+        "record_kind": "gp_list",
+        "doc_date": "30/04/2026",
+        "med_text": "dapagliflozin 10 mg",
+        "med_code": "SYN-AMT-MPP-0185",
+        "code_system": "amt",
+        "strength_text": "10 mg",
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "active",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000725": {
+      "source": "patient",
+      "row_id": "PAT-000725",
+      "sql_template_id": "Q2",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000725",
+        "source_patient_id": "INT00089",
+        "ihi_syn": "",
+        "name_given": "Dot Nguyen",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "Forxiga",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "unsure",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PHM-004126": {
+      "source": "pharmacy",
+      "row_id": "PHM-004126",
+      "sql_template_id": "Q2",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004126",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": "Forxiga",
+        "med_code": "10011X",
+        "code_system": "pbs",
+        "strength_text": "10 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "28",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PAT-000728": {
+      "source": "patient",
+      "row_id": "PAT-000728",
+      "sql_template_id": "Q2",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000728",
+        "source_patient_id": "INT00089",
+        "ihi_syn": "",
+        "name_given": "Dot Nguyen",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "turmeric",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000721": {
+      "source": "patient",
+      "row_id": "PAT-000721",
+      "sql_template_id": "Q2",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000721",
+        "source_patient_id": "INT00089",
+        "ihi_syn": "",
+        "name_given": "Dot Nguyen",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "a little white one",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000726": {
+      "source": "patient",
+      "row_id": "PAT-000726",
+      "sql_template_id": "Q2",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000726",
+        "source_patient_id": "INT00089",
+        "ihi_syn": "",
+        "name_given": "Dot Nguyen",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "a little white one",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one in the morning",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
     "GP-000684": {
       "source": "gp",
       "row_id": "GP-000684",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "gp",
         "row_id": "GP-000684",
@@ -2506,7 +2730,7 @@
       "source": "gp",
       "row_id": "GP-000680",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "gp",
         "row_id": "GP-000680",
@@ -2539,7 +2763,7 @@
       "source": "gp",
       "row_id": "GP-000682",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "gp",
         "row_id": "GP-000682",
@@ -2572,7 +2796,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004127",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004127",
@@ -2605,7 +2829,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004128",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004128",
@@ -2638,7 +2862,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004129",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004129",
@@ -2671,7 +2895,7 @@
       "source": "emr",
       "row_id": "EMR-000737",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000737",
@@ -2704,7 +2928,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004135",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004135",
@@ -2737,7 +2961,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004136",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004136",
@@ -2770,7 +2994,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004137",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004137",
@@ -2803,7 +3027,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004138",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004138",
@@ -2836,7 +3060,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004139",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004139",
@@ -2869,7 +3093,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004140",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004140",
@@ -2902,7 +3126,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004141",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004141",
@@ -2935,7 +3159,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004142",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004142",
@@ -2968,7 +3192,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004143",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004143",
@@ -3001,7 +3225,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004144",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004144",
@@ -3034,7 +3258,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004145",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004145",
@@ -3067,7 +3291,7 @@
       "source": "emr",
       "row_id": "EMR-000734",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000734",
@@ -3100,7 +3324,7 @@
       "source": "gp",
       "row_id": "GP-000679",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "gp",
         "row_id": "GP-000679",
@@ -3133,7 +3357,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004108",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004108",
@@ -3166,7 +3390,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004109",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004109",
@@ -3199,7 +3423,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004110",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004110",
@@ -3232,7 +3456,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004111",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004111",
@@ -3265,7 +3489,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004112",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004112",
@@ -3298,7 +3522,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004113",
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004113",
@@ -3323,72 +3547,6 @@
         "note_text": null,
         "qty": "60",
         "days_supply": "60",
-        "pharmacy_id": "PHX03",
-        "script_type": "PBS"
-      }
-    },
-    "GP-000681": {
-      "source": "gp",
-      "row_id": "GP-000681",
-      "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
-      "fields": {
-        "source": "gp",
-        "row_id": "GP-000681",
-        "source_patient_id": "GPP000089",
-        "ihi_syn": "SYN-562526771569",
-        "name_given": "Dorothy",
-        "name_family": "Nguyen",
-        "name_previous": "",
-        "dob_text": "27/01/1938",
-        "sex": "Female",
-        "postcode": "2554",
-        "record_kind": "gp_list",
-        "doc_date": "30/04/2026",
-        "med_text": "dapagliflozin 10 mg",
-        "med_code": "SYN-AMT-MPP-0185",
-        "code_system": "amt",
-        "strength_text": "10 mg",
-        "dose_text": null,
-        "route_text": null,
-        "freq_text": "one a day",
-        "status_text": "active",
-        "note_text": null,
-        "qty": null,
-        "days_supply": null,
-        "pharmacy_id": null,
-        "script_type": null
-      }
-    },
-    "PHM-004126": {
-      "source": "pharmacy",
-      "row_id": "PHM-004126",
-      "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
-      "fields": {
-        "source": "pharmacy",
-        "row_id": "PHM-004126",
-        "source_patient_id": "C000089",
-        "ihi_syn": "SYN-562526771569",
-        "name_given": "NGUYEN, Dorothy",
-        "name_family": null,
-        "name_previous": null,
-        "dob_text": "1938-01-27",
-        "sex": null,
-        "postcode": "2554",
-        "record_kind": "dispense",
-        "doc_date": "2025-10-24",
-        "med_text": "Forxiga",
-        "med_code": "10011X",
-        "code_system": "pbs",
-        "strength_text": "10 mg",
-        "dose_text": null,
-        "route_text": "tablet",
-        "freq_text": null,
-        "status_text": null,
-        "note_text": null,
-        "qty": "28",
-        "days_supply": "28",
         "pharmacy_id": "PHX03",
         "script_type": "PBS"
       }
@@ -3657,8 +3815,8 @@
   ],
   "trace": [
     {
-      "timestamp": "2026-10-26T02:05:26.063325+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.181386+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Planner",
       "action": "start",
       "input_summary": null,
@@ -3682,8 +3840,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.064812+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.182815+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Planner",
       "action": "recall",
       "input_summary": null,
@@ -3707,8 +3865,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.065283+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.183259+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Planner",
       "action": "plan",
       "input_summary": null,
@@ -3732,8 +3890,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.065560+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.183433+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -3757,8 +3915,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.071962+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.192614+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Executor",
       "action": "find_identities",
       "input_summary": null,
@@ -3781,13 +3939,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q1",
-      "query_id": "dd7d33ab-ee28-4b1f-ae3f-79073f451ab9",
+      "query_id": "e4c8571e-e7fb-4106-a84e-b595fa8e4e2a",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T02:05:26.072934+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.194355+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -3798,7 +3956,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "World Model: recorded 7 patient records and 3 same-person link(s), each with provenance (Zetaris query dd7d33ab-ee28-4b1f-ae3f-79073f451ab9); audit seq 11-20.",
+      "message": "World Model: recorded 7 patient records and 3 same-person link(s), each with provenance (Zetaris query e4c8571e-e7fb-4106-a84e-b595fa8e4e2a); audit seq 11-20.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -3811,8 +3969,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.073182+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.194756+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -3836,8 +3994,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.073324+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.194929+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -3861,8 +4019,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.078495+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.200040+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Executor",
       "action": "fetch_meds",
       "input_summary": null,
@@ -3875,7 +4033,7 @@
       "step": "FETCH_MEDS",
       "message": "Fetched 79 medicine rows in one query: emr 7, gp 9, patient 8, pharmacy 55.",
       "route": null,
-      "latency_ms": 1,
+      "latency_ms": 0,
       "tokens": null,
       "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE (source = 'emr' AND source_patient_id = 'MRN0000089') OR (source = 'gp' AND source_patient_id = 'GPP000089') OR (source = 'pharmacy' AND source_patient_id = 'C000089') OR (source = 'patient' AND source_patient_id = 'INT00089')",
       "row_count": 79,
@@ -3885,13 +4043,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q2",
-      "query_id": "d492f656-60ed-48d3-8862-667ed6ec72bb",
+      "query_id": "f15e6d20-a165-4c1d-9a0b-0c22ace46bec",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T02:05:26.085126+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.209860+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Executor",
       "action": "normalise",
       "input_summary": null,
@@ -3915,8 +4073,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.085329+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.211124+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -3940,8 +4098,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.086357+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.212995+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Executor",
       "action": "resolve_free_text",
       "input_summary": null,
@@ -3965,8 +4123,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.091543+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.219343+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Evaluator",
       "action": "fuse",
       "input_summary": null,
@@ -3990,8 +4148,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.093718+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.222237+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Evaluator",
       "action": "detect",
       "input_summary": null,
@@ -4015,8 +4173,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.094789+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.223244+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Evaluator",
       "action": "prioritise",
       "input_summary": null,
@@ -4040,8 +4198,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.096004+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.225017+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Writer",
       "action": "draft",
       "input_summary": null,
@@ -4065,8 +4223,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.096231+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.225403+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -4090,8 +4248,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.098813+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.227449+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Evaluator",
       "action": "verify",
       "input_summary": null,
@@ -4104,7 +4262,7 @@
       "step": "VERIFY",
       "message": "Re-read 28 cited rows in one query; 5 findings verified.",
       "route": null,
-      "latency_ms": 1,
+      "latency_ms": 0,
       "tokens": null,
       "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE row_id IN ('EMR-000734', 'EMR-000737', 'GP-000679', 'GP-000680', 'GP-000681', 'GP-000682', 'GP-000684', 'PHM-004108', 'PHM-004109', 'PHM-004110', 'PHM-004111', 'PHM-004112', 'PHM-004113', 'PHM-004126', 'PHM-004127', 'PHM-004128', 'PHM-004129', 'PHM-004135', 'PHM-004136', 'PHM-004137', 'PHM-004138', 'PHM-004139', 'PHM-004140', 'PHM-004141', 'PHM-004142', 'PHM-004143', 'PHM-004144', 'PHM-004145')",
       "row_count": 28,
@@ -4114,13 +4272,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q3",
-      "query_id": "851d976f-a936-48b9-9751-ae08cd4b2cc2",
+      "query_id": "5d2e18e7-2b7e-4256-8bda-71eb5d54aad9",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T02:05:26.101094+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.230589+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Evaluator",
       "action": "critique",
       "input_summary": null,
@@ -4144,8 +4302,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.101277+00:00",
-      "run_id": "run-b2326f8224a5",
+      "timestamp": "2026-10-26T03:34:32.231143+00:00",
+      "run_id": "run-2ed2d4ef6e8c",
       "agent_name": "Writer",
       "action": "done",
       "input_summary": null,
@@ -4156,7 +4314,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "DONE",
-      "message": "Done: 5 findings, 2 notices, 6 tasks.",
+      "message": "Done: 5 findings, 4 notices, 8 tasks.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -4170,7 +4328,7 @@
     }
   ],
   "query_count": 3,
-  "zetaris_ms": 2,
+  "zetaris_ms": 0,
   "model_calls": [
     {
       "role": "Planner",

@@ -1,5 +1,5 @@
 {
-  "run_id": "run-1d2b9f62011e",
+  "run_id": "run-19738939f4c9",
   "status": "success",
   "output": {
     "summary": "1 finding(s) for Christine O'Brien (MRN0000003).",
@@ -12,6 +12,12 @@
       },
       {
         "text": "Verify the glucosamine dose",
+        "rationale": null,
+        "confidence": 0.5,
+        "requires_human_review": true
+      },
+      {
+        "text": "Identify \"a little white one\" (patient, PAT-000025) with the patient",
         "rationale": null,
         "confidence": 0.5,
         "requires_human_review": true
@@ -85,9 +91,9 @@
       "status": "ok"
     }
   ],
-  "trace_id": "run-1d2b9f62011e",
-  "log_file": "/tmp/hakken-traces-2afp62bq/trace-run-1d2b9f62011e.jsonl",
-  "execution_time_seconds": 0.03,
+  "trace_id": "run-19738939f4c9",
+  "log_file": "/tmp/hakken-traces-2qvw88n1/trace-run-19738939f4c9.jsonl",
+  "execution_time_seconds": 0.04,
   "error": null,
   "memory_used": [],
   "sample_mode": true,
@@ -1036,7 +1042,7 @@
           "source": "gp",
           "row_id": "GP-000024",
           "sql_template_id": "Q2",
-          "query_id": "63fe52a8-843b-4c41-ad27-863c85281e97",
+          "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
           "fields": {
             "source": "gp",
             "row_id": "GP-000024",
@@ -1069,7 +1075,7 @@
           "source": "pharmacy",
           "row_id": "PHM-000157",
           "sql_template_id": "Q2",
-          "query_id": "63fe52a8-843b-4c41-ad27-863c85281e97",
+          "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-000157",
@@ -1102,7 +1108,7 @@
           "source": "pharmacy",
           "row_id": "PHM-000158",
           "sql_template_id": "Q2",
-          "query_id": "63fe52a8-843b-4c41-ad27-863c85281e97",
+          "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-000158",
@@ -1135,7 +1141,7 @@
           "source": "pharmacy",
           "row_id": "PHM-000159",
           "sql_template_id": "Q2",
-          "query_id": "63fe52a8-843b-4c41-ad27-863c85281e97",
+          "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-000159",
@@ -1168,7 +1174,7 @@
           "source": "pharmacy",
           "row_id": "PHM-000160",
           "sql_template_id": "Q2",
-          "query_id": "63fe52a8-843b-4c41-ad27-863c85281e97",
+          "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-000160",
@@ -1265,19 +1271,296 @@
       "generic": null,
       "row_ids": [],
       "tasks": []
+    },
+    {
+      "type": "patient_only_item",
+      "detail": "Could not identify \"a little white one\" (patient, PAT-000025); kept for review.",
+      "source": "patient",
+      "generic": null,
+      "row_ids": [
+        "PAT-000025"
+      ],
+      "tasks": [
+        "Identify \"a little white one\" (patient, PAT-000025) with the patient"
+      ]
     }
   ],
   "tasks": [
     "Confirm whether amlodipine should be charted",
-    "Verify the glucosamine dose"
+    "Verify the glucosamine dose",
+    "Identify \"a little white one\" (patient, PAT-000025) with the patient"
   ],
   "identity_review": null,
   "evidence_index": {
+    "EMR-000019": {
+      "source": "emr",
+      "row_id": "EMR-000019",
+      "sql_template_id": "Q2",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000019",
+        "source_patient_id": "MRN0000003",
+        "ihi_syn": "SYN-347411028047",
+        "name_given": "Christine",
+        "name_family": "O'Brien",
+        "name_previous": null,
+        "dob_text": "1955-01-25",
+        "sex": "F",
+        "postcode": "2716",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": "candesartan",
+        "med_code": "SYN-AMT-MP-0014",
+        "code_system": "amt",
+        "strength_text": "8 mg",
+        "dose_text": "8.0",
+        "route_text": "PO",
+        "freq_text": "1 daily",
+        "status_text": "",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "GP-000023": {
+      "source": "gp",
+      "row_id": "GP-000023",
+      "sql_template_id": "Q2",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-000023",
+        "source_patient_id": "GPP000003",
+        "ihi_syn": "SYN-347411028047",
+        "name_given": "Chris",
+        "name_family": "O'Brien",
+        "name_previous": "",
+        "dob_text": "25/01/1955",
+        "sex": "Female",
+        "postcode": "2716",
+        "record_kind": "gp_list",
+        "doc_date": "09/10/2025",
+        "med_text": "candesartan 16 mg",
+        "med_code": "SYN-AMT-MPP-0007",
+        "code_system": "amt",
+        "strength_text": "16 mg",
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "active",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000023": {
+      "source": "patient",
+      "row_id": "PAT-000023",
+      "sql_template_id": "Q2",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000023",
+        "source_patient_id": "INT00003",
+        "ihi_syn": "",
+        "name_given": "Christine O'Brien",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1955-01-25",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "Atacand",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PHM-000154": {
+      "source": "pharmacy",
+      "row_id": "PHM-000154",
+      "sql_template_id": "Q2",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-000154",
+        "source_patient_id": "C000003",
+        "ihi_syn": "",
+        "name_given": "O'BRIEN, Christine",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1955-01-25",
+        "sex": null,
+        "postcode": "2716",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": "Atacand",
+        "med_code": "13436E",
+        "code_system": "pbs",
+        "strength_text": "8 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "60",
+        "days_supply": "60",
+        "pharmacy_id": "PHX08",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-000155": {
+      "source": "pharmacy",
+      "row_id": "PHM-000155",
+      "sql_template_id": "Q2",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-000155",
+        "source_patient_id": "C000003",
+        "ihi_syn": "",
+        "name_given": "O'BRIEN, Christine",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1955-01-25",
+        "sex": null,
+        "postcode": "2716",
+        "record_kind": "dispense",
+        "doc_date": "2026-03-02",
+        "med_text": "Atacand",
+        "med_code": "13436E",
+        "code_system": "pbs",
+        "strength_text": "8 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "60",
+        "days_supply": "60",
+        "pharmacy_id": "PHX08",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-000156": {
+      "source": "pharmacy",
+      "row_id": "PHM-000156",
+      "sql_template_id": "Q2",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-000156",
+        "source_patient_id": "C000003",
+        "ihi_syn": "",
+        "name_given": "O'BRIEN, Christine",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1955-01-25",
+        "sex": null,
+        "postcode": "2716",
+        "record_kind": "dispense",
+        "doc_date": "2026-10-18",
+        "med_text": "Atacand",
+        "med_code": "13436E",
+        "code_system": "pbs",
+        "strength_text": "8 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "60",
+        "days_supply": "60",
+        "pharmacy_id": "PHX08",
+        "script_type": "PBS"
+      }
+    },
+    "PAT-000031": {
+      "source": "patient",
+      "row_id": "PAT-000031",
+      "sql_template_id": "Q2",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000031",
+        "source_patient_id": "INT00003",
+        "ihi_syn": "",
+        "name_given": "Christine O'Brien",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1955-01-25",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "glucosamine",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000025": {
+      "source": "patient",
+      "row_id": "PAT-000025",
+      "sql_template_id": "Q2",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000025",
+        "source_patient_id": "INT00003",
+        "ihi_syn": "",
+        "name_given": "Christine O'Brien",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1955-01-25",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "a little white one",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
     "GP-000024": {
       "source": "gp",
       "row_id": "GP-000024",
       "sql_template_id": "Q2",
-      "query_id": "63fe52a8-843b-4c41-ad27-863c85281e97",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
       "fields": {
         "source": "gp",
         "row_id": "GP-000024",
@@ -1310,7 +1593,7 @@
       "source": "pharmacy",
       "row_id": "PHM-000157",
       "sql_template_id": "Q2",
-      "query_id": "63fe52a8-843b-4c41-ad27-863c85281e97",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-000157",
@@ -1343,7 +1626,7 @@
       "source": "pharmacy",
       "row_id": "PHM-000158",
       "sql_template_id": "Q2",
-      "query_id": "63fe52a8-843b-4c41-ad27-863c85281e97",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-000158",
@@ -1376,7 +1659,7 @@
       "source": "pharmacy",
       "row_id": "PHM-000159",
       "sql_template_id": "Q2",
-      "query_id": "63fe52a8-843b-4c41-ad27-863c85281e97",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-000159",
@@ -1409,7 +1692,7 @@
       "source": "pharmacy",
       "row_id": "PHM-000160",
       "sql_template_id": "Q2",
-      "query_id": "63fe52a8-843b-4c41-ad27-863c85281e97",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-000160",
@@ -1702,8 +1985,8 @@
   ],
   "trace": [
     {
-      "timestamp": "2026-10-26T02:05:26.137158+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.293402+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Planner",
       "action": "start",
       "input_summary": null,
@@ -1727,8 +2010,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.139343+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.295277+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Planner",
       "action": "recall",
       "input_summary": null,
@@ -1752,8 +2035,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.139780+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.295733+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Planner",
       "action": "plan",
       "input_summary": null,
@@ -1777,8 +2060,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.140070+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.295986+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1802,8 +2085,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.144849+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.302324+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Executor",
       "action": "find_identities",
       "input_summary": null,
@@ -1826,13 +2109,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q1",
-      "query_id": "e879e213-c734-443f-bbb4-be1884d13825",
+      "query_id": "3b14e764-0f90-4170-aea7-86a5a07fa792",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T02:05:26.145828+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.303324+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1843,7 +2126,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "World Model: recorded 4 patient records and 3 same-person link(s), each with provenance (Zetaris query e879e213-c734-443f-bbb4-be1884d13825); audit seq 27-33.",
+      "message": "World Model: recorded 4 patient records and 3 same-person link(s), each with provenance (Zetaris query 3b14e764-0f90-4170-aea7-86a5a07fa792); audit seq 27-33.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -1856,8 +2139,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.146090+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.303785+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1881,8 +2164,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.146228+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.304021+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1906,8 +2189,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.150362+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.310770+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Executor",
       "action": "fetch_meds",
       "input_summary": null,
@@ -1930,13 +2213,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q2",
-      "query_id": "63fe52a8-843b-4c41-ad27-863c85281e97",
+      "query_id": "aeedd917-dbfd-4364-a96e-d1661380c88f",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T02:05:26.156156+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.318159+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Executor",
       "action": "normalise",
       "input_summary": null,
@@ -1960,8 +2243,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.156699+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.318889+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1985,8 +2268,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.157561+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.319861+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Executor",
       "action": "resolve_free_text",
       "input_summary": null,
@@ -2010,8 +2293,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.161946+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.326105+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Evaluator",
       "action": "fuse",
       "input_summary": null,
@@ -2035,8 +2318,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.163234+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.328065+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Evaluator",
       "action": "detect",
       "input_summary": null,
@@ -2060,8 +2343,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.163540+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.328607+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Evaluator",
       "action": "prioritise",
       "input_summary": null,
@@ -2085,8 +2368,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.164142+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.329740+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Writer",
       "action": "draft",
       "input_summary": null,
@@ -2110,8 +2393,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.164326+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.329994+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -2135,8 +2418,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.166130+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.331588+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Evaluator",
       "action": "verify",
       "input_summary": null,
@@ -2149,7 +2432,7 @@
       "step": "VERIFY",
       "message": "Re-read 5 cited rows in one query; 1 findings verified.",
       "route": null,
-      "latency_ms": 1,
+      "latency_ms": 0,
       "tokens": null,
       "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE row_id IN ('GP-000024', 'PHM-000157', 'PHM-000158', 'PHM-000159', 'PHM-000160')",
       "row_count": 5,
@@ -2159,13 +2442,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q3",
-      "query_id": "75ce4d8e-8faa-40a1-bfd7-649ee54d22b1",
+      "query_id": "c3b56912-fe6d-415e-9092-ac8907eac0e1",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T02:05:26.166807+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.332430+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Evaluator",
       "action": "critique",
       "input_summary": null,
@@ -2189,8 +2472,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T02:05:26.166977+00:00",
-      "run_id": "run-1d2b9f62011e",
+      "timestamp": "2026-10-26T03:34:32.332779+00:00",
+      "run_id": "run-19738939f4c9",
       "agent_name": "Writer",
       "action": "done",
       "input_summary": null,
@@ -2201,7 +2484,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "DONE",
-      "message": "Done: 1 findings, 4 notices, 2 tasks.",
+      "message": "Done: 1 findings, 5 notices, 3 tasks.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -2215,7 +2498,7 @@
     }
   ],
   "query_count": 3,
-  "zetaris_ms": 1,
+  "zetaris_ms": 0,
   "model_calls": [
     {
       "role": "Planner",
