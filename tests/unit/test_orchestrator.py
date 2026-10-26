@@ -404,3 +404,23 @@ def test_a_failed_model_step_still_shows_its_calls(orch) -> None:
     models = [e.model for e in state.ctx.tracer.events if e.agent_name == "Writer" and e.action == "draft"]
     assert models == ["nvidia/nemotron-3.5-lightning-30b-a3b"] * 2
     assert state.ctx.tracer.events[-1].action == "fallback" and state.degraded
+
+
+def test_recommendations_follow_the_ranked_findings_with_real_confidence(orch) -> None:
+    """Scan S16: not task strings at a constant 0.5, but one per finding with its explanation and
+    triage's evidence strength (0.6 + 0.2 per independent pre-admission source cited, capped at 1)."""
+    r = run(orch, "MRN0000089")
+    recs = r.output.recommendations
+    assert len(recs) == min(5, len(r.findings))
+    for rec, f in zip(recs, r.findings):
+        independent = {e.source for e in f.evidence} - {"emr"}
+        assert rec.rationale == f.explanation and rec.text == f.tasks[0]
+        assert rec.confidence == pytest.approx(min(1.0, 0.6 + 0.2 * len(independent)))
+        assert rec.requires_human_review
+    assert len({rec.confidence for rec in recs}) > 1  # it varies with the evidence
+
+
+def test_a_zero_finding_run_has_no_recommendations(orch) -> None:
+    first = run(orch, "MRN0000013")
+    r = orch.resume(first.run_id, IdentityDecisionRequest(candidate_id="patient:INT00013", same_person=True))
+    assert r.output.recommendations == [] and r.tasks  # the notices' tasks are still in `tasks`

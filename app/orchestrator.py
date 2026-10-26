@@ -452,6 +452,20 @@ class Orchestrator:
                                       "Replaced with the grounded summary.")
         return writer._offline_summary(findings, state.anchor, banner)
 
+    @staticmethod
+    def _recommendation(f: Finding) -> Recommendation:
+        """One per ranked finding, in triage order (scan S16).
+
+        `confidence` is triage's evidence strength for the finding -- 0.6 plus 0.2 per
+        independent pre-admission source it cites, capped at 1 (`triage.prioritise`) --
+        not a constant. Tasks from notices carry no such measure, so they stay in
+        `RunResponse.tasks` rather than appearing here with an invented number.
+        """
+        independent = {e.source for e in f.evidence if e.source and e.source != "emr"}
+        return Recommendation(text=f.tasks[0] if f.tasks else f"Review {f.generic} ({f.type.value.replace('_', ' ')})",
+                              rationale=f.explanation or None, confidence=min(1.0, 0.6 + 0.2 * len(independent)),
+                              requires_human_review=True)
+
     def _hmem_ids(self, f: Finding) -> list[str]:
         """The H-MEM trust records a verdict on this finding would move (feedback, PLAN 5.7)."""
         from app.feedback import _attribute_for
@@ -527,8 +541,7 @@ class Orchestrator:
             run_id=state.run_id, status=status,  # type: ignore[arg-type]
             output=RunOutput(
                 summary=summary or "",
-                recommendations=[Recommendation(text=t, requires_human_review=True)
-                                 for t in (analysis.tasks[:5] if analysis else [])],
+                recommendations=[self._recommendation(f) for f in findings[:5]],
                 evidence=[EvidenceItem(claim=f.explanation, sql=q3_sql, source=queries.ALL_SOURCES_VIEW,
                                        row_count=len(f.evidence), verified=True) for f in findings if q3_sql],
                 caveats=caveats),
