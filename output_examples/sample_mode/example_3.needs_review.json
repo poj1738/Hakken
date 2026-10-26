@@ -1,5 +1,5 @@
 {
-  "run_id": "run-0a9c95427d0a",
+  "run_id": "run-0998bb5b2770",
   "status": "needs_review",
   "output": {
     "summary": "Waiting for identity review: 1 near-miss record(s).",
@@ -49,8 +49,8 @@
       "status": "ok"
     }
   ],
-  "trace_id": "run-0a9c95427d0a",
-  "log_file": "/tmp/hakken-traces-2qvw88n1/trace-run-0a9c95427d0a.jsonl",
+  "trace_id": "run-0998bb5b2770",
+  "log_file": "/tmp/hakken-traces-vgqarxza/trace-run-0998bb5b2770.jsonl",
   "execution_time_seconds": 0.01,
   "error": null,
   "memory_used": [],
@@ -92,6 +92,7 @@
   "bpmh_confirmable": false,
   "banner": "Only 0 of 3 pre-admission sources found. ACSQHC Standard 4 expects at least two independent sources besides the admission chart, so this is a draft medication history and is not confirmable. Awaiting an identity decision for: patient — confirming it may make this confirmable. No record found in: gp, pharmacy.",
   "grid": [],
+  "dose_units": {},
   "findings": [],
   "notices": [],
   "tasks": [],
@@ -522,8 +523,8 @@
   ],
   "trace": [
     {
-      "timestamp": "2026-10-26T03:34:32.254464+00:00",
-      "run_id": "run-0a9c95427d0a",
+      "timestamp": "2026-10-26T06:23:13.348130+00:00",
+      "run_id": "run-0998bb5b2770",
       "agent_name": "Planner",
       "action": "start",
       "input_summary": null,
@@ -547,8 +548,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:34:32.256265+00:00",
-      "run_id": "run-0a9c95427d0a",
+      "timestamp": "2026-10-26T06:23:13.349251+00:00",
+      "run_id": "run-0998bb5b2770",
       "agent_name": "Planner",
       "action": "recall",
       "input_summary": null,
@@ -572,8 +573,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:34:32.256846+00:00",
-      "run_id": "run-0a9c95427d0a",
+      "timestamp": "2026-10-26T06:23:13.349586+00:00",
+      "run_id": "run-0998bb5b2770",
       "agent_name": "Planner",
       "action": "plan",
       "input_summary": null,
@@ -597,8 +598,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:34:32.257066+00:00",
-      "run_id": "run-0a9c95427d0a",
+      "timestamp": "2026-10-26T06:23:13.349770+00:00",
+      "run_id": "run-0998bb5b2770",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -622,8 +623,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:34:32.261878+00:00",
-      "run_id": "run-0a9c95427d0a",
+      "timestamp": "2026-10-26T06:23:13.353870+00:00",
+      "run_id": "run-0998bb5b2770",
       "agent_name": "Executor",
       "action": "find_identities",
       "input_summary": null,
@@ -646,13 +647,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q1",
-      "query_id": "7d2a7206-cc1d-489f-9193-f210e719b671",
+      "query_id": "a447e139-4aef-44fb-a94e-e1e955dd6da7",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T03:34:32.262545+00:00",
-      "run_id": "run-0a9c95427d0a",
+      "timestamp": "2026-10-26T06:23:13.354952+00:00",
+      "run_id": "run-0998bb5b2770",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -663,7 +664,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query 7d2a7206-cc1d-489f-9193-f210e719b671); audit seq 21-25.",
+      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query a447e139-4aef-44fb-a94e-e1e955dd6da7); audit seq 21-25.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -676,8 +677,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:34:32.262841+00:00",
-      "run_id": "run-0a9c95427d0a",
+      "timestamp": "2026-10-26T06:23:13.355427+00:00",
+      "run_id": "run-0998bb5b2770",
       "agent_name": "Executor",
       "action": "needs_review",
       "input_summary": null,

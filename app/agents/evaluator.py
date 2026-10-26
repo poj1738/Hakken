@@ -70,6 +70,42 @@ class Analysis:
     blocked: list[str] = field(default_factory=list)
     #: rows cited by notices (e.g. an unidentified line), so the UI can show their text
     notice_evidence: dict[str, Evidence] = field(default_factory=dict)
+    #: rows behind the grid's cells, for the same reason (Anshu, 26 Oct: 78 of 101 were missing)
+    grid_evidence: dict[str, Evidence] = field(default_factory=dict)
+    #: generic -> the unit of its resolved daily dose, where the cited rows state one
+    dose_units: dict[str, str] = field(default_factory=dict)
+
+
+#: The unit a row states its dose in, read the way `normalise.parse_strength_mg` reads it:
+#: a direction that states the dose ("10 to 40 units nocte") first, else the strength.
+#: Masses are converted to mg there, so they are "mg" here; units and mL are not masses
+#: and are carried unscaled. No explicit unit, no answer: a bare number is not labelled.
+#: A combination ("25/1000 mg") resolves its first component, in the stated unit.
+_DOSE_UNIT = re.compile(r"(?:^|\s)\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)*(?:\s*(?:to|-|–)\s*\d+(?:\.\d+)?)?\s*"
+                        r"(microgram|mcg|µg|milligram|mg|gram|g|units?|iu|ml)\b", re.IGNORECASE)
+_UNIT_FAMILY = {"microgram": "mg", "mcg": "mg", "µg": "mg", "milligram": "mg", "mg": "mg", "gram": "mg",
+                "g": "mg", "unit": "units", "units": "units", "iu": "units", "ml": "mL"}
+
+
+def _row_dose_unit(fields: dict[str, str | None]) -> str | None:
+    freq = fields.get("freq_text") or ""
+    if m := re.match(_DOSE_UNIT.pattern, freq.strip(), re.IGNORECASE):
+        return _UNIT_FAMILY[m.group(1).lower()]
+    m = _DOSE_UNIT.search(" " + (fields.get("strength_text") or fields.get("dose_text") or ""))
+    return _UNIT_FAMILY[m.group(1).lower()] if m else None
+
+
+def _dose_units(fused: list[FusedMed], raw: dict[str, dict[str, str | None]]) -> dict[str, str]:
+    """generic -> unit, only where every row behind the resolved dose states the same one."""
+    out: dict[str, str] = {}
+    for m in fused:
+        dose = m.attributes.get("daily_dose")
+        if dose is None or dose.value is None:
+            continue
+        units = {_row_dose_unit(raw[r]) for r in dose.row_ids if r in raw}
+        if len(units) == 1 and None not in units:
+            out[m.generic] = units.pop()
+    return out
 
 
 def is_current(med: FusedMed) -> bool:
@@ -194,9 +230,13 @@ def analyse(ctx: AgentContext, links: list[IdentityLink], rows: list[SourceRow],
     notice_evidence = {r: Evidence(source=raw[r].get("source") or "", row_id=r, sql_template_id="Q2",
                                    query_id=q2_query_id, fields=raw[r])
                        for n in notices for r in n.row_ids if r in raw}
+    grid_rows = {r for m in fused for r in [*m.row_ids, *(x for v in m.attributes.values() for x in v.row_ids)]}
+    grid_evidence = {r: Evidence(source=raw[r].get("source") or "", row_id=r, sql_template_id="Q2",
+                                 query_id=q2_query_id, fields=raw[r]) for r in sorted(grid_rows) if r in raw}
     return Analysis(cov=cov, evidence=evidence, fused=fused, findings=findings, notices=notices, tasks=tasks,
                     bpmh_confirmable=confirmable, banner=banner or None, blocked=blocked,
-                    notice_evidence=notice_evidence)
+                    notice_evidence=notice_evidence, grid_evidence=grid_evidence,
+                    dose_units=_dose_units(fused, raw))
 
 
 # --------------------------------------------------------------------------- #
