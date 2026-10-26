@@ -21,6 +21,18 @@ const STEP_LABEL: Record<string, string> = {
   CRITIQUE: "Review",
   DONE: "Report prepared",
 };
+// The API records an agent step its offline fallback answered with
+// routed_model "offline-heuristic"; only the rest reached Nightshift.
+const OFFLINE = "offline-heuristic";
+function footModels(calls: RunResponse["model_calls"]): string {
+  const live = calls.filter((c) => c.routed_model && c.routed_model !== OFFLINE).length;
+  const offline = calls.length - live;
+  const parts = [];
+  if (live || !offline) parts.push(`${plural(live, "model call")} via Nightshift`);
+  if (offline) parts.push(`${plural(offline, "agent step")} offline`);
+  return parts.join(" · ");
+}
+
 const stepLabel = (e: TraceEvent) => STEP_LABEL[e.step ?? ""] ?? humanize(e.step ?? e.action);
 
 // The model that answered: the Meterless receipt's routed_model when the event
@@ -41,7 +53,7 @@ export function Timeline({ run, polling, warning }: { run: RunResponse | null; p
     <div className="card side-card">
       <div className="side-head">
         <h2 className="side-title">Processing Log</h2>
-        {polling ? <span className="spinner" aria-label="running" /> : run && <span className="side-meta">{run.execution_time_seconds.toFixed(1)} s</span>}
+        {polling ? <span className="spinner" aria-label="running" /> : run && <span className="side-meta">{run.execution_time_seconds < 0.05 ? "< 0.1" : run.execution_time_seconds.toFixed(1)} s</span>}
       </div>
       {!run && !polling && <p className="side-empty">Select a patient and run a reconciliation. Each step is logged here as it happens.</p>}
       {run && (
@@ -84,7 +96,7 @@ export function Timeline({ run, polling, warning }: { run: RunResponse | null; p
       )}
       {run && !polling && (
         <div className="side-foot">
-          {plural(run.query_count, "data query", "data queries")} · {plural(run.model_calls.length, "model call")} via Nightshift
+          {plural(run.query_count, "data query", "data queries")} · {footModels(run.model_calls)}
         </div>
       )}
       {run && (
