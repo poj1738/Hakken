@@ -69,9 +69,13 @@ def _brief(f: Finding) -> dict:
 
 
 def _offline_summary(findings: list[Finding], anchor: SourceRow, banner: str | None) -> str:
+    who = f"{anchor.name_given} {anchor.name_family} ({anchor.source_patient_id})"
+    if not findings:
+        # Not "nothing to worry about": only that the sources found agree (scan S12).
+        return (f"No discrepancies found for {who} among the sources found; see the notices and tasks."
+                + (f" {banner}" if banner else ""))
     must = [f for f in findings if f.needs_pharmacist]
-    head = (f"{len(findings)} finding(s) for {anchor.name_given} {anchor.name_family} "
-            f"({anchor.source_patient_id})")
+    head = f"{len(findings)} finding(s) for {who}"
     if must:
         head += f"; {len(must)} need a pharmacist first: " + ", ".join(f"{f.generic} ({f.type.value})" for f in must[:4])
     return head + "." + (f" {banner}" if banner else "")
@@ -84,7 +88,8 @@ def draft(ctx: AgentContext, findings: list[Finding], anchor: SourceRow, banner:
     ctx.check_time()
     targets = [f for f in findings if problems is None or f.id in problems]
     if not targets:
-        return {}, None
+        # A zero-finding run still gets a headline (scan S12); a revision keeps the first one.
+        return {}, (None if problems is not None else _offline_summary(findings, anchor, banner))
     revising = problems is not None
     instructions = (
         "Write the explanation a hospital pharmacist sees for each finding below. Synthetic data; these are "
