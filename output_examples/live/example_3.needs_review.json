@@ -1,0 +1,756 @@
+{
+  "run_id": "run-a6e19f2fee2f",
+  "status": "needs_review",
+  "output": {
+    "summary": "Waiting for identity review: 1 near-miss record(s).",
+    "recommendations": [],
+    "evidence": [],
+    "caveats": [
+      "Synthetic data. Not medical advice. A pharmacist must confirm every item."
+    ],
+    "artifacts": []
+  },
+  "agents": [
+    {
+      "name": "Planner",
+      "role": "plan the investigation",
+      "iterations": 1,
+      "models_used": [
+        "nvidia/nemotron-3.5-lightning-30b-a3b"
+      ],
+      "routes_requested": [
+        "meterless/fast"
+      ],
+      "status": "ok"
+    },
+    {
+      "name": "Executor",
+      "role": "fetch, link, normalise, resolve free text",
+      "iterations": 0,
+      "models_used": [],
+      "routes_requested": [],
+      "status": "ok"
+    },
+    {
+      "name": "Evaluator",
+      "role": "fuse, detect, gate, verify, critique",
+      "iterations": 0,
+      "models_used": [],
+      "routes_requested": [],
+      "status": "ok"
+    },
+    {
+      "name": "Writer",
+      "role": "explain and summarise",
+      "iterations": 0,
+      "models_used": [],
+      "routes_requested": [],
+      "status": "ok"
+    }
+  ],
+  "trace_id": "run-a6e19f2fee2f",
+  "log_file": "/tmp/hakken-traces-6m1ic0ea/trace-run-a6e19f2fee2f.jsonl",
+  "execution_time_seconds": 25.68,
+  "error": null,
+  "memory_used": [],
+  "sample_mode": false,
+  "provider_state": "online",
+  "patient_id": "MRN0000013",
+  "coverage": {
+    "emr": {
+      "source": "emr",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "emr:MRN0000013",
+      "doc_date": "2026-10-24"
+    },
+    "gp": {
+      "source": "gp",
+      "state": "not_found",
+      "scope_notes": [],
+      "record_key": null,
+      "doc_date": null
+    },
+    "pharmacy": {
+      "source": "pharmacy",
+      "state": "not_found",
+      "scope_notes": [],
+      "record_key": null,
+      "doc_date": null
+    },
+    "patient": {
+      "source": "patient",
+      "state": "near_miss_pending",
+      "scope_notes": [
+        "waiting for identity review"
+      ],
+      "record_key": null,
+      "doc_date": null
+    }
+  },
+  "bpmh_confirmable": false,
+  "banner": "Only 0 of 3 pre-admission sources found. ACSQHC Standard 4 expects at least two independent sources besides the admission chart, so this is a draft medication history and is not confirmable. Awaiting an identity decision for: patient — confirming it may make this confirmable. No record found in: gp, pharmacy.",
+  "grid": [],
+  "findings": [],
+  "notices": [],
+  "tasks": [],
+  "identity_review": {
+    "anchor": {
+      "source": "emr",
+      "row_id": "EMR-000108",
+      "source_patient_id": "MRN0000013",
+      "ihi_syn": "SYN-306753773813",
+      "name_given": "Jennifer",
+      "name_family": "Young",
+      "name_previous": null,
+      "dob": "1956-02-13",
+      "dob_raw": "1956-02-13",
+      "sex": "F",
+      "postcode": "2716",
+      "record_kind": "admission_chart",
+      "doc_date": "2026-10-24",
+      "med_text": null,
+      "med_code": null,
+      "code_system": null,
+      "strength_text": null,
+      "dose_text": null,
+      "route_text": null,
+      "freq_text": null,
+      "status_text": null,
+      "note_text": null,
+      "qty": null,
+      "days_supply": null,
+      "pharmacy_id": null,
+      "script_type": null
+    },
+    "candidates": [
+      {
+        "anchor_id": "emr:MRN0000013",
+        "candidate_id": "patient:INT00013",
+        "match_weight": 23.89,
+        "probability": 0.84,
+        "band": "review",
+        "tier": "probabilistic",
+        "field_evidence": {
+          "given": "agrees: given name matches exactly (within a combined name field)",
+          "surname": "agrees: surname matches exactly",
+          "dob": "agrees: date of birth matches exactly",
+          "guard": "held: this record carries no IHI, and it falls in a group of matching records that includes Joseph Young (DOB 1956-12-13, emr:MRN0000009), who carries a different IHI — confirm it is this patient"
+        },
+        "guards": [
+          "ihi_ambiguous_in_cluster"
+        ]
+      }
+    ],
+    "records": {
+      "patient:INT00013": {
+        "source": "patient",
+        "row_id": "PAT-000114",
+        "source_patient_id": "INT00013",
+        "ihi_syn": null,
+        "name_given": "Jennifer Young",
+        "name_family": null,
+        "name_previous": null,
+        "dob": "1956-02-13",
+        "dob_raw": "1956-02-13",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "pharmacy:C000009": {
+        "source": "pharmacy",
+        "row_id": "PHM-000499",
+        "source_patient_id": "C000009",
+        "ihi_syn": null,
+        "name_given": "YOUNG, Joseph",
+        "name_family": null,
+        "name_previous": null,
+        "dob": "1956-12-13",
+        "dob_raw": "1956-12-13",
+        "sex": null,
+        "postcode": "2235",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "emr:MRN0000009": {
+        "source": "emr",
+        "row_id": "EMR-000073",
+        "source_patient_id": "MRN0000009",
+        "ihi_syn": "SYN-460717914827",
+        "name_given": "Joseph",
+        "name_family": "Young",
+        "name_previous": null,
+        "dob": "1956-12-13",
+        "dob_raw": "1956-12-13",
+        "sex": "M",
+        "postcode": "2235",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "gp:GPP000009": {
+        "source": "gp",
+        "row_id": "GP-000068",
+        "source_patient_id": "GPP000009",
+        "ihi_syn": "SYN-460717914827",
+        "name_given": "Joseph",
+        "name_family": "Young",
+        "name_previous": null,
+        "dob": "1956-12-13",
+        "dob_raw": "13/12/1956",
+        "sex": "Male",
+        "postcode": "2235",
+        "record_kind": "gp_list",
+        "doc_date": "2026-08-17",
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    }
+  },
+  "evidence_index": {},
+  "trust": [
+    {
+      "source": "emr",
+      "attribute": "actually_taking",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-1"
+    },
+    {
+      "source": "emr",
+      "attribute": "admission_chart",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-2"
+    },
+    {
+      "source": "emr",
+      "attribute": "daily_dose",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-3"
+    },
+    {
+      "source": "emr",
+      "attribute": "existence",
+      "value": 0.65,
+      "uncertainty": null,
+      "hmem_record_id": "mem-4"
+    },
+    {
+      "source": "emr",
+      "attribute": "frequency",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-5"
+    },
+    {
+      "source": "emr",
+      "attribute": "intended_dose",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-6"
+    },
+    {
+      "source": "emr",
+      "attribute": "name",
+      "value": 0.9,
+      "uncertainty": null,
+      "hmem_record_id": "mem-7"
+    },
+    {
+      "source": "emr",
+      "attribute": "release",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-8"
+    },
+    {
+      "source": "emr",
+      "attribute": "route",
+      "value": 0.9,
+      "uncertainty": null,
+      "hmem_record_id": "mem-9"
+    },
+    {
+      "source": "emr",
+      "attribute": "strength",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-10"
+    },
+    {
+      "source": "gp",
+      "attribute": "actually_taking",
+      "value": 0.45,
+      "uncertainty": null,
+      "hmem_record_id": "mem-11"
+    },
+    {
+      "source": "gp",
+      "attribute": "daily_dose",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-12"
+    },
+    {
+      "source": "gp",
+      "attribute": "existence",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-13"
+    },
+    {
+      "source": "gp",
+      "attribute": "frequency",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-14"
+    },
+    {
+      "source": "gp",
+      "attribute": "intended_dose",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-15"
+    },
+    {
+      "source": "gp",
+      "attribute": "name",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-16"
+    },
+    {
+      "source": "gp",
+      "attribute": "release",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-17"
+    },
+    {
+      "source": "gp",
+      "attribute": "route",
+      "value": 0.5,
+      "uncertainty": null,
+      "hmem_record_id": "mem-18"
+    },
+    {
+      "source": "gp",
+      "attribute": "strength",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-19"
+    },
+    {
+      "source": "patient",
+      "attribute": "actually_taking",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-20"
+    },
+    {
+      "source": "patient",
+      "attribute": "daily_dose",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-21"
+    },
+    {
+      "source": "patient",
+      "attribute": "existence",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-22"
+    },
+    {
+      "source": "patient",
+      "attribute": "frequency",
+      "value": 0.45,
+      "uncertainty": null,
+      "hmem_record_id": "mem-23"
+    },
+    {
+      "source": "patient",
+      "attribute": "intended_dose",
+      "value": 0.35,
+      "uncertainty": null,
+      "hmem_record_id": "mem-24"
+    },
+    {
+      "source": "patient",
+      "attribute": "name",
+      "value": 0.5,
+      "uncertainty": null,
+      "hmem_record_id": "mem-25"
+    },
+    {
+      "source": "patient",
+      "attribute": "release",
+      "value": 0.2,
+      "uncertainty": null,
+      "hmem_record_id": "mem-26"
+    },
+    {
+      "source": "patient",
+      "attribute": "route",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-27"
+    },
+    {
+      "source": "patient",
+      "attribute": "strength",
+      "value": 0.3,
+      "uncertainty": null,
+      "hmem_record_id": "mem-28"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "actually_taking",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-29"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "daily_dose",
+      "value": 0.55,
+      "uncertainty": null,
+      "hmem_record_id": "mem-30"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "existence",
+      "value": 0.85,
+      "uncertainty": null,
+      "hmem_record_id": "mem-31"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "frequency",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-32"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "intended_dose",
+      "value": 0.5,
+      "uncertainty": null,
+      "hmem_record_id": "mem-33"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "name",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-34"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "release",
+      "value": 0.85,
+      "uncertainty": null,
+      "hmem_record_id": "mem-35"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "route",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-36"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "strength",
+      "value": 0.9,
+      "uncertainty": null,
+      "hmem_record_id": "mem-37"
+    }
+  ],
+  "trace": [
+    {
+      "timestamp": "2026-10-26T03:50:22.296160+00:00",
+      "run_id": "run-a6e19f2fee2f",
+      "agent_name": "Planner",
+      "action": "start",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "START",
+      "message": "Reconciling Jennifer Young (MRN0000013), admitted 2026-10-24.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:50:22.297907+00:00",
+      "run_id": "run-a6e19f2fee2f",
+      "agent_name": "Planner",
+      "action": "recall",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PLAN",
+      "message": "H-MEM recalled 0 memories for the plan.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": "hmem",
+      "engine_op": "query",
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:50:41.534378+00:00",
+      "run_id": "run-a6e19f2fee2f",
+      "agent_name": "Planner",
+      "action": "plan",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PLAN",
+      "message": "Plan: find_identities (\"Confirm patient identity across all data sources using MRN0000013\"); fetch_meds (\"Retrieve current medication list from general practice (medtrace.gp)\"); verify (\"Re‑read cited rows to confirm reconciliation accuracy\"). The plan systematically identifies the patient, gathers medication data from key sources (EMR, pharmacy, GP), and verifies the reconciled list to ensure accuracy and safety, staying within the query budget of 8.",
+      "route": "meterless/fast",
+      "latency_ms": 18132,
+      "tokens": {
+        "prompt_tokens": 475,
+        "completion_tokens": 1200,
+        "total_tokens": 1675
+      },
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": {
+        "receipt_id": "rcpt_req_7xsklyd8",
+        "decision_id": "req_7xsklyd8",
+        "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "provider_model": "meterless/auto",
+        "requested_model": "meterless/fast",
+        "mode": "auto",
+        "winning_route": {
+          "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+          "label": "Nemotron 3.5 Lightning 30B A3B",
+          "provider": "nvidia",
+          "kind": "cloud",
+          "tier": "A"
+        },
+        "egress": {
+          "destination": "nvidia"
+        },
+        "cost": {
+          "actual_usd": 0,
+          "naive_usd": 0
+        },
+        "consensus": {
+          "raced": 1
+        },
+        "phases": [
+          {
+            "phase": "planning",
+            "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+            "ms": 18351,
+            "tokensIn": 475,
+            "tokensOut": 1200
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-10-26T03:50:41.535106+00:00",
+      "run_id": "run-a6e19f2fee2f",
+      "agent_name": "Executor",
+      "action": "route",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "Planner need \"Confirm patient identity across all data sources using MRN0000013\" -> the Executor fills template Q1 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:50:49.073617+00:00",
+      "run_id": "run-a6e19f2fee2f",
+      "agent_name": "Executor",
+      "action": "find_identities",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "Found Jennifer Young in 0 other record(s): none. 1 near-miss(es) need your confirmation: patient:INT00013 0.84 (held: this record carries no IHI, and it falls in a group of matching records that includes Joseph Young (DOB 1956-12-13, emr:MRN0000009), who carries a different IHI — confirm it is this patient).",
+      "route": null,
+      "latency_ms": 7531,
+      "tokens": null,
+      "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date FROM medtrace.all_sources WHERE ihi_syn = 'SYN-306753773813' OR dob_text IN ('13/02/1956', '1956-02-13') OR (dob_text LIKE '%1956%' AND (UPPER(name_family) LIKE 'YOUN%' OR UPPER(name_previous) LIKE 'YOUN%' OR UPPER(name_given) LIKE 'YOUN%')) OR (source = 'emr' AND source_patient_id = 'MRN0000013')",
+      "row_count": 57,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null,
+      "sql_template_id": "Q1",
+      "query_id": "febf0b88-ea0f-4ac7-af5a-6d4262ea5138",
+      "request_id": "73e8f6dc-0abc-46e3-835d-468924fba95e",
+      "replayed": false
+    },
+    {
+      "timestamp": "2026-10-26T03:50:49.074812+00:00",
+      "run_id": "run-a6e19f2fee2f",
+      "agent_name": "Executor",
+      "action": "world_model",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query febf0b88-ea0f-4ac7-af5a-6d4262ea5138); audit seq 21-25.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": "world_model",
+      "engine_op": "upsert+relate",
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:50:49.075372+00:00",
+      "run_id": "run-a6e19f2fee2f",
+      "agent_name": "Executor",
+      "action": "needs_review",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "waiting",
+      "step": "NEEDS_REVIEW",
+      "message": "Paused: 1 identity near-miss(es) need your confirmation.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    }
+  ],
+  "query_count": 1,
+  "zetaris_ms": 7531,
+  "model_calls": [
+    {
+      "role": "Planner",
+      "requested_route": "meterless/fast",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "request_id": "chatcmpl-75bd66c9-ff4e-4adc-b589-ab7067fb9893",
+      "tokens": {
+        "prompt_tokens": 475,
+        "completion_tokens": 1200,
+        "total_tokens": 1675
+      },
+      "truncated": false
+    }
+  ]
+}

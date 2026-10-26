@@ -100,6 +100,11 @@ def write_readme() -> None:
         "- `live/` — live Zetaris and Nightshift; `model_calls[].routed_model` names the Nemotron that",
         "  answered each call. Synthetic data. Not medical advice.",
         "",
+        "`partial` means a step degraded rather than failed: a Nightshift call timed out or returned an",
+        "upstream error, that step used the grounded template, and the run's `output.caveats` say which.",
+        "Findings are still verified against Zetaris. Clinical findings match between modes because",
+        "detection is deterministic; the model plans and explains.",
+        "",
         "| Mode | Example | Patient | Status | Findings | Models | Zetaris queries | Seconds |",
         "|---|---|---|---|---|---|---|---|",
     ]

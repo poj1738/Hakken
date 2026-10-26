@@ -1,0 +1,4372 @@
+{
+  "run_id": "run-997371954f29",
+  "status": "partial",
+  "output": {
+    "summary": "5 finding(s) for Dorothy Nguyen (MRN0000089); 3 need a pharmacist first: oxycodone/naloxone (duplication), gliclazide (omission), oxycodone/naloxone (frequency).",
+    "recommendations": [
+      {
+        "text": "Review oxycodone/naloxone: it duplicates an ingredient of another medicine",
+        "rationale": null,
+        "confidence": 0.5,
+        "requires_human_review": true
+      },
+      {
+        "text": "Confirm whether gliclazide should be charted",
+        "rationale": null,
+        "confidence": 0.5,
+        "requires_human_review": true
+      },
+      {
+        "text": "Confirm how often oxycodone/naloxone is taken",
+        "rationale": null,
+        "confidence": 0.5,
+        "requires_human_review": true
+      },
+      {
+        "text": "Confirm how often esomeprazole is taken",
+        "rationale": null,
+        "confidence": 0.5,
+        "requires_human_review": true
+      },
+      {
+        "text": "Ask the GP practice whether dapagliflozin is still current",
+        "rationale": null,
+        "confidence": 0.5,
+        "requires_human_review": true
+      }
+    ],
+    "evidence": [
+      {
+        "claim": "Oxycodone/naloxone appears more than once once combination products are decomposed (GP-000684, GP-000680).",
+        "value": null,
+        "unit": null,
+        "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE row_id IN ('EMR-000734', 'EMR-000737', 'GP-000679', 'GP-000680', 'GP-000681', 'GP-000682', 'GP-000684', 'PHM-004108', 'PHM-004109', 'PHM-004110', 'PHM-004111', 'PHM-004112', 'PHM-004113', 'PHM-004126', 'PHM-004127', 'PHM-004128', 'PHM-004129', 'PHM-004135', 'PHM-004136', 'PHM-004137', 'PHM-004138', 'PHM-004139', 'PHM-004140', 'PHM-004141', 'PHM-004142', 'PHM-004143', 'PHM-004144', 'PHM-004145')",
+        "source": "medtrace.all_sources",
+        "row_count": 2,
+        "verified": true,
+        "world_model_entity_id": null
+      },
+      {
+        "claim": "Gliclazide is supported before admission but is not on the admission chart (GP-000682, PHM-004127, PHM-004128, PHM-004129).",
+        "value": null,
+        "unit": null,
+        "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE row_id IN ('EMR-000734', 'EMR-000737', 'GP-000679', 'GP-000680', 'GP-000681', 'GP-000682', 'GP-000684', 'PHM-004108', 'PHM-004109', 'PHM-004110', 'PHM-004111', 'PHM-004112', 'PHM-004113', 'PHM-004126', 'PHM-004127', 'PHM-004128', 'PHM-004129', 'PHM-004135', 'PHM-004136', 'PHM-004137', 'PHM-004138', 'PHM-004139', 'PHM-004140', 'PHM-004141', 'PHM-004142', 'PHM-004143', 'PHM-004144', 'PHM-004145')",
+        "source": "medtrace.all_sources",
+        "row_count": 4,
+        "verified": true,
+        "world_model_entity_id": null
+      },
+      {
+        "claim": "Oxycodone/naloxone is charted at a different frequency than before admission: charted 20 mg/day against 40 mg/day before admission (EMR-000737, GP-000684, PHM-004135, PHM-004136, PHM-004137, PHM-004138, PHM-004139, PHM-004140, PHM-004141, PHM-004142, PHM-004143, PHM-004144, PHM-004145).",
+        "value": null,
+        "unit": null,
+        "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE row_id IN ('EMR-000734', 'EMR-000737', 'GP-000679', 'GP-000680', 'GP-000681', 'GP-000682', 'GP-000684', 'PHM-004108', 'PHM-004109', 'PHM-004110', 'PHM-004111', 'PHM-004112', 'PHM-004113', 'PHM-004126', 'PHM-004127', 'PHM-004128', 'PHM-004129', 'PHM-004135', 'PHM-004136', 'PHM-004137', 'PHM-004138', 'PHM-004139', 'PHM-004140', 'PHM-004141', 'PHM-004142', 'PHM-004143', 'PHM-004144', 'PHM-004145')",
+        "source": "medtrace.all_sources",
+        "row_count": 13,
+        "verified": true,
+        "world_model_entity_id": null
+      },
+      {
+        "claim": "Esomeprazole is charted at a different frequency than before admission: charted 80 mg/day against 40 mg/day before admission (EMR-000734, GP-000679, PHM-004108, PHM-004109, PHM-004110, PHM-004111, PHM-004112, PHM-004113).",
+        "value": null,
+        "unit": null,
+        "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE row_id IN ('EMR-000734', 'EMR-000737', 'GP-000679', 'GP-000680', 'GP-000681', 'GP-000682', 'GP-000684', 'PHM-004108', 'PHM-004109', 'PHM-004110', 'PHM-004111', 'PHM-004112', 'PHM-004113', 'PHM-004126', 'PHM-004127', 'PHM-004128', 'PHM-004129', 'PHM-004135', 'PHM-004136', 'PHM-004137', 'PHM-004138', 'PHM-004139', 'PHM-004140', 'PHM-004141', 'PHM-004142', 'PHM-004143', 'PHM-004144', 'PHM-004145')",
+        "source": "medtrace.all_sources",
+        "row_count": 8,
+        "verified": true,
+        "world_model_entity_id": null
+      },
+      {
+        "claim": "Dapagliflozin is listed as current but its supply ran out long ago (GP-000681, PHM-004126).",
+        "value": null,
+        "unit": null,
+        "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE row_id IN ('EMR-000734', 'EMR-000737', 'GP-000679', 'GP-000680', 'GP-000681', 'GP-000682', 'GP-000684', 'PHM-004108', 'PHM-004109', 'PHM-004110', 'PHM-004111', 'PHM-004112', 'PHM-004113', 'PHM-004126', 'PHM-004127', 'PHM-004128', 'PHM-004129', 'PHM-004135', 'PHM-004136', 'PHM-004137', 'PHM-004138', 'PHM-004139', 'PHM-004140', 'PHM-004141', 'PHM-004142', 'PHM-004143', 'PHM-004144', 'PHM-004145')",
+        "source": "medtrace.all_sources",
+        "row_count": 2,
+        "verified": true,
+        "world_model_entity_id": null
+      }
+    ],
+    "caveats": [
+      "Synthetic data. Not medical advice. A pharmacist must confirm every item.",
+      "Nightshift unavailable for writer draft (offline); that step used the grounded template and is labelled offline-heuristic.",
+      "Nightshift unavailable for evaluator critique (upstream); that step used the grounded template and is labelled offline-heuristic."
+    ],
+    "artifacts": []
+  },
+  "agents": [
+    {
+      "name": "Planner",
+      "role": "plan the investigation",
+      "iterations": 1,
+      "models_used": [
+        "nvidia/nemotron-3.5-lightning-30b-a3b"
+      ],
+      "routes_requested": [
+        "meterless/fast"
+      ],
+      "status": "ok"
+    },
+    {
+      "name": "Executor",
+      "role": "fetch, link, normalise, resolve free text",
+      "iterations": 0,
+      "models_used": [],
+      "routes_requested": [],
+      "status": "ok"
+    },
+    {
+      "name": "Evaluator",
+      "role": "fuse, detect, gate, verify, critique",
+      "iterations": 0,
+      "models_used": [],
+      "routes_requested": [],
+      "status": "ok"
+    },
+    {
+      "name": "Writer",
+      "role": "explain and summarise",
+      "iterations": 0,
+      "models_used": [],
+      "routes_requested": [],
+      "status": "ok"
+    }
+  ],
+  "trace_id": "run-997371954f29",
+  "log_file": "/tmp/hakken-traces-6m1ic0ea/trace-run-997371954f29.jsonl",
+  "execution_time_seconds": 526.58,
+  "error": null,
+  "memory_used": [],
+  "sample_mode": false,
+  "provider_state": "online",
+  "patient_id": "MRN0000089",
+  "coverage": {
+    "emr": {
+      "source": "emr",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "emr:MRN0000089",
+      "doc_date": "2026-10-24"
+    },
+    "gp": {
+      "source": "gp",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "gp:GPP000089",
+      "doc_date": "2026-04-30"
+    },
+    "pharmacy": {
+      "source": "pharmacy",
+      "state": "found",
+      "scope_notes": [
+        "single pharmacy: only PHX03 is visible; anything dispensed elsewhere is not in this record",
+        "dispensing incomplete: private scripts carry no PBS code, so a privately dispensed medicine may not be matchable by code"
+      ],
+      "record_key": "pharmacy:C000089",
+      "doc_date": "2026-10-19"
+    },
+    "patient": {
+      "source": "patient",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "patient:INT00089",
+      "doc_date": null
+    }
+  },
+  "bpmh_confirmable": true,
+  "banner": null,
+  "grid": [
+    {
+      "generic": "clopidogrel",
+      "atc": "B01AC04",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "absent_in_scope"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 1.2485,
+          "runner_up": "absent",
+          "runner_up_score": 0.4,
+          "margin": 0.5147,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {
+            "patient": "absent"
+          },
+          "row_ids": [
+            "GP-000676",
+            "PHM-004096"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 75.0,
+          "score": 1.0525,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000676",
+            "PHM-004096"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1/day",
+          "score": 0.5493,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000676"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "IR",
+          "score": 1.2485,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000676",
+            "PHM-004096"
+          ]
+        },
+        "route": {
+          "attribute": "route",
+          "value": "PO",
+          "score": 0.6405,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PHM-004096"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000731",
+        "GP-000676",
+        "PHM-004091",
+        "PHM-004092",
+        "PHM-004093",
+        "PHM-004094",
+        "PHM-004095",
+        "PHM-004096"
+      ]
+    },
+    {
+      "generic": "dapagliflozin",
+      "atc": "A10BK01",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "absent_in_scope",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "present"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": null,
+          "score": 0.6375,
+          "runner_up": "present",
+          "runner_up_score": 0.4708,
+          "margin": 0.1504,
+          "abstained": true,
+          "supporting": [],
+          "dissenting": {
+            "gp": "present",
+            "pharmacy": "absent"
+          },
+          "row_ids": [
+            "GP-000681",
+            "PHM-004126"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 10.0,
+          "score": 0.5493,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000681"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1/day",
+          "score": 0.5493,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000681"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "IR",
+          "score": 0.4708,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000681"
+          ]
+        }
+      },
+      "abstained": [
+        "existence"
+      ],
+      "row_ids": [
+        "GP-000681",
+        "PAT-000725",
+        "PHM-004126"
+      ]
+    },
+    {
+      "generic": "escitalopram",
+      "atc": "N06AB10",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "present"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 1.8665,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "patient",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000683",
+            "PAT-000727",
+            "PHM-004134"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 10.0,
+          "score": 0.9347,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000683",
+            "PHM-004134"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1/day",
+          "score": 0.9993,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000683",
+            "PAT-000727"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "IR",
+          "score": 1.2665,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "patient",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000683",
+            "PAT-000727",
+            "PHM-004134"
+          ]
+        },
+        "route": {
+          "attribute": "route",
+          "value": "PO",
+          "score": 0.4905,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PHM-004134"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000736",
+        "GP-000683",
+        "PAT-000727",
+        "PHM-004130",
+        "PHM-004131",
+        "PHM-004132",
+        "PHM-004133",
+        "PHM-004134"
+      ]
+    },
+    {
+      "generic": "esomeprazole",
+      "atc": "A02BC05",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "present"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 2.0975,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "patient",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000679",
+            "PAT-000723",
+            "PHM-004113"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 40.0,
+          "score": 1.0842,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000679",
+            "PHM-004113"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1/day",
+          "score": 0.9993,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000679",
+            "PAT-000723"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "IR",
+          "score": 1.4975,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "patient",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000679",
+            "PAT-000723",
+            "PHM-004113"
+          ]
+        },
+        "route": {
+          "attribute": "route",
+          "value": "PO",
+          "score": 0.6808,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PHM-004113"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000734",
+        "GP-000679",
+        "PAT-000723",
+        "PHM-004108",
+        "PHM-004109",
+        "PHM-004110",
+        "PHM-004111",
+        "PHM-004112",
+        "PHM-004113"
+      ]
+    },
+    {
+      "generic": "gliclazide",
+      "atc": "A10BB09",
+      "high_risk_class": "Ext",
+      "per_source": {
+        "emr": "absent_in_scope",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "absent_in_scope"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 1.047,
+          "runner_up": "absent",
+          "runner_up_score": 0.4,
+          "margin": 0.4471,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {
+            "patient": "absent"
+          },
+          "row_ids": [
+            "GP-000682",
+            "PHM-004129"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 60.0,
+          "score": 0.9221,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000682",
+            "PHM-004129"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1/day",
+          "score": 0.5493,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000682"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "MR",
+          "score": 1.047,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000682",
+            "PHM-004129"
+          ]
+        },
+        "route": {
+          "attribute": "route",
+          "value": "PO",
+          "score": 0.4745,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PHM-004129"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "GP-000682",
+        "PHM-004127",
+        "PHM-004128",
+        "PHM-004129"
+      ]
+    },
+    {
+      "generic": "irbesartan",
+      "atc": "C09CA04",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "present"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 1.9706,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "patient",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000677",
+            "PAT-000722",
+            "PHM-004102"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 150.0,
+          "score": 1.0021,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000677",
+            "PHM-004102"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1/day",
+          "score": 0.9993,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000677",
+            "PAT-000722"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "IR",
+          "score": 1.3706,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "patient",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000677",
+            "PAT-000722",
+            "PHM-004102"
+          ]
+        },
+        "route": {
+          "attribute": "route",
+          "value": "PO",
+          "score": 0.5763,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PHM-004102"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000732",
+        "GP-000677",
+        "PAT-000722",
+        "PHM-004097",
+        "PHM-004098",
+        "PHM-004099",
+        "PHM-004100",
+        "PHM-004101",
+        "PHM-004102"
+      ]
+    },
+    {
+      "generic": "oxycodone",
+      "atc": "N02AA05",
+      "high_risk_class": "N",
+      "per_source": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "present"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 2.0399,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "patient",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000680",
+            "PAT-000724",
+            "PHM-004125"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 40.0,
+          "score": 1.0469,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000680",
+            "PHM-004125"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "2/day",
+          "score": 0.9993,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000680",
+            "PAT-000724"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "MR",
+          "score": 1.2399,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000680",
+            "PHM-004125"
+          ]
+        },
+        "route": {
+          "attribute": "route",
+          "value": "PO",
+          "score": 0.6334,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PHM-004125"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000735",
+        "GP-000680",
+        "PAT-000724",
+        "PHM-004114",
+        "PHM-004115",
+        "PHM-004116",
+        "PHM-004117",
+        "PHM-004118",
+        "PHM-004119",
+        "PHM-004120",
+        "PHM-004121",
+        "PHM-004122",
+        "PHM-004123",
+        "PHM-004124",
+        "PHM-004125"
+      ]
+    },
+    {
+      "generic": "oxycodone/naloxone",
+      "atc": "N02AA55",
+      "high_risk_class": "N",
+      "per_source": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "absent_in_scope"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 1.2485,
+          "runner_up": "absent",
+          "runner_up_score": 0.4,
+          "margin": 0.5147,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {
+            "patient": "absent"
+          },
+          "row_ids": [
+            "GP-000684",
+            "PHM-004145"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 40.0,
+          "score": 1.0525,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000684",
+            "PHM-004145"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "2/day",
+          "score": 0.5493,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000684"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "MR",
+          "score": 1.2485,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000684",
+            "PHM-004145"
+          ]
+        },
+        "route": {
+          "attribute": "route",
+          "value": "PO",
+          "score": 0.6405,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PHM-004145"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000737",
+        "GP-000684",
+        "PHM-004135",
+        "PHM-004136",
+        "PHM-004137",
+        "PHM-004138",
+        "PHM-004139",
+        "PHM-004140",
+        "PHM-004141",
+        "PHM-004142",
+        "PHM-004143",
+        "PHM-004144",
+        "PHM-004145"
+      ]
+    },
+    {
+      "generic": "rosuvastatin",
+      "atc": "C10AA07",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "absent_in_scope"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 1.159,
+          "runner_up": "absent",
+          "runner_up_score": 0.4,
+          "margin": 0.4869,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {
+            "patient": "absent"
+          },
+          "row_ids": [
+            "GP-000678",
+            "PHM-004107"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 40.0,
+          "score": 0.9946,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000678",
+            "PHM-004107"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1/day",
+          "score": 0.5493,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000678"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "IR",
+          "score": 1.159,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "gp",
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "GP-000678",
+            "PHM-004107"
+          ]
+        },
+        "route": {
+          "attribute": "route",
+          "value": "PO",
+          "score": 0.5668,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "pharmacy"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PHM-004107"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000733",
+        "GP-000678",
+        "PHM-004103",
+        "PHM-004104",
+        "PHM-004105",
+        "PHM-004106",
+        "PHM-004107"
+      ]
+    },
+    {
+      "generic": "turmeric",
+      "atc": null,
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "absent_in_scope",
+        "gp": "absent_in_scope",
+        "pharmacy": "unknown",
+        "patient": "present"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 0.8,
+          "runner_up": "absent",
+          "runner_up_score": 0.3,
+          "margin": 0.4545,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {
+            "gp": "absent"
+          },
+          "row_ids": [
+            "PAT-000728"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1/day",
+          "score": 0.45,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000728"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "IR",
+          "score": 0.2,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000728"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "PAT-000728"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "duplication:oxycodone/naloxone",
+      "type": "duplication",
+      "generic": "oxycodone/naloxone",
+      "high_risk_class": "N",
+      "severity": "high",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 7.2,
+      "explanation": "Oxycodone/naloxone appears more than once once combination products are decomposed (GP-000684, GP-000680).",
+      "detail": {
+        "overlaps_with": "oxycodone",
+        "shared": [
+          "oxycodone"
+        ],
+        "listed_together_in": "gp",
+        "atc": "N02AA55",
+        "atc_class": "N02A"
+      },
+      "evidence": [
+        {
+          "source": "gp",
+          "row_id": "GP-000684",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-000684",
+            "source_patient_id": "GPP000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "Dorothy",
+            "name_family": "Nguyen",
+            "name_previous": "",
+            "dob_text": "27/01/1938",
+            "sex": "Female",
+            "postcode": "2554",
+            "record_kind": "gp_list",
+            "doc_date": "30/04/2026",
+            "med_text": "oxycodone/naloxone 20/10 mg",
+            "med_code": "SYN-AMT-MPP-0053",
+            "code_system": "amt",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": null,
+            "freq_text": "morning and night",
+            "status_text": "active",
+            "note_text": null,
+            "qty": null,
+            "days_supply": null,
+            "pharmacy_id": null,
+            "script_type": null
+          }
+        },
+        {
+          "source": "gp",
+          "row_id": "GP-000680",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-000680",
+            "source_patient_id": "GPP000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "Dorothy",
+            "name_family": "Nguyen",
+            "name_previous": "",
+            "dob_text": "27/01/1938",
+            "sex": "Female",
+            "postcode": "2554",
+            "record_kind": "gp_list",
+            "doc_date": "30/04/2026",
+            "med_text": "OxyContin 20 mg",
+            "med_code": "SYN-AMT-MPP-0051",
+            "code_system": "amt",
+            "strength_text": "20 mg",
+            "dose_text": null,
+            "route_text": null,
+            "freq_text": "morning and night",
+            "status_text": "active",
+            "note_text": null,
+            "qty": null,
+            "days_supply": null,
+            "pharmacy_id": null,
+            "script_type": null
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "absent_in_scope"
+      },
+      "tasks": [
+        "Review oxycodone/naloxone: it duplicates an ingredient of another medicine"
+      ],
+      "needs_pharmacist": true,
+      "trust_explanation": [
+        "gp daily_dose trust 0.70",
+        "gp existence trust 0.60"
+      ],
+      "hmem_record_ids": [
+        "mem-13"
+      ]
+    },
+    {
+      "id": "omission:gliclazide",
+      "type": "omission",
+      "generic": "gliclazide",
+      "high_risk_class": "Ext",
+      "severity": "high",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 6.0,
+      "explanation": "Gliclazide is supported before admission but is not on the admission chart (GP-000682, PHM-004127, PHM-004128, PHM-004129).",
+      "detail": {
+        "reason": "supported before admission, not on the admission chart",
+        "supported_by": [
+          "gp",
+          "pharmacy"
+        ],
+        "atc": "A10BB09",
+        "atc_class": "A10B"
+      },
+      "evidence": [
+        {
+          "source": "gp",
+          "row_id": "GP-000682",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-000682",
+            "source_patient_id": "GPP000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "Dorothy",
+            "name_family": "Nguyen",
+            "name_previous": "",
+            "dob_text": "27/01/1938",
+            "sex": "Female",
+            "postcode": "2554",
+            "record_kind": "gp_list",
+            "doc_date": "30/04/2026",
+            "med_text": "gliclazide 60 mg",
+            "med_code": "SYN-AMT-MPP-0081",
+            "code_system": "amt",
+            "strength_text": "60 mg",
+            "dose_text": null,
+            "route_text": null,
+            "freq_text": "one in the morning",
+            "status_text": "active",
+            "note_text": null,
+            "qty": null,
+            "days_supply": null,
+            "pharmacy_id": null,
+            "script_type": null
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004127",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004127",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2025-10-24",
+            "med_text": "Diamicron MR",
+            "med_code": "13922R",
+            "code_system": "pbs",
+            "strength_text": "60 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "120",
+            "days_supply": "120",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004128",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004128",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-03-22",
+            "med_text": "Diamicron MR",
+            "med_code": "13922R",
+            "code_system": "pbs",
+            "strength_text": "60 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "120",
+            "days_supply": "120",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004129",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004129",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-08-15",
+            "med_text": "Diamicron MR",
+            "med_code": "13922R",
+            "code_system": "pbs",
+            "strength_text": "60 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "120",
+            "days_supply": "120",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "absent_in_scope",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "absent_in_scope"
+      },
+      "tasks": [
+        "Confirm whether gliclazide should be charted"
+      ],
+      "needs_pharmacist": true,
+      "trust_explanation": [
+        "gp daily_dose trust 0.70",
+        "gp existence trust 0.60",
+        "pharmacy daily_dose trust 0.55",
+        "pharmacy existence trust 0.85"
+      ],
+      "hmem_record_ids": [
+        "mem-13",
+        "mem-31"
+      ]
+    },
+    {
+      "id": "frequency:oxycodone/naloxone",
+      "type": "frequency",
+      "generic": "oxycodone/naloxone",
+      "high_risk_class": "N",
+      "severity": "high",
+      "intent_status": "documented_intentional",
+      "intent_reason": null,
+      "priority": 4.5,
+      "explanation": "Oxycodone/naloxone is charted at a different frequency than before admission: charted 20 mg/day against 40 mg/day before admission (EMR-000737, GP-000684, PHM-004135, PHM-004136, PHM-004137, PHM-004138, PHM-004139, PHM-004140, PHM-004141, PHM-004142, PHM-004143, PHM-004144, PHM-004145).",
+      "detail": {
+        "charted_daily_mg": 20.0,
+        "bpmh_daily_mg": 40.0,
+        "charted_frequency": "1 daily",
+        "daily_dose_ratio": 0.5,
+        "statement": "charted 20 mg/day against 40 mg/day before admission",
+        "administrations_ratio": 0.5,
+        "per_dose_ratio": 1.0,
+        "subtype": "frequency",
+        "atc": "N02AA55",
+        "atc_class": "N02A"
+      },
+      "evidence": [
+        {
+          "source": "emr",
+          "row_id": "EMR-000737",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "emr",
+            "row_id": "EMR-000737",
+            "source_patient_id": "MRN0000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "Dorothy",
+            "name_family": "Nguyen",
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": "F",
+            "postcode": "2554",
+            "record_kind": "admission_chart",
+            "doc_date": "2026-10-24",
+            "med_text": "oxycodone/naloxone",
+            "med_code": "SYN-AMT-MP-0064",
+            "code_system": "amt",
+            "strength_text": "20/10 mg",
+            "dose_text": "20.0",
+            "route_text": "PO",
+            "freq_text": "1 daily",
+            "status_text": "",
+            "note_text": "withheld: hypotension",
+            "qty": null,
+            "days_supply": null,
+            "pharmacy_id": null,
+            "script_type": null
+          }
+        },
+        {
+          "source": "gp",
+          "row_id": "GP-000684",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-000684",
+            "source_patient_id": "GPP000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "Dorothy",
+            "name_family": "Nguyen",
+            "name_previous": "",
+            "dob_text": "27/01/1938",
+            "sex": "Female",
+            "postcode": "2554",
+            "record_kind": "gp_list",
+            "doc_date": "30/04/2026",
+            "med_text": "oxycodone/naloxone 20/10 mg",
+            "med_code": "SYN-AMT-MPP-0053",
+            "code_system": "amt",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": null,
+            "freq_text": "morning and night",
+            "status_text": "active",
+            "note_text": null,
+            "qty": null,
+            "days_supply": null,
+            "pharmacy_id": null,
+            "script_type": null
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004135",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004135",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2025-10-24",
+            "med_text": "Targin",
+            "med_code": "12475N",
+            "code_system": "pbs",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "56",
+            "days_supply": "28",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004136",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004136",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2025-11-27",
+            "med_text": "Targin",
+            "med_code": "12475N",
+            "code_system": "pbs",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "56",
+            "days_supply": "28",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004137",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004137",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-01-05",
+            "med_text": "Targin",
+            "med_code": "12475N",
+            "code_system": "pbs",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "56",
+            "days_supply": "28",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004138",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004138",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-02-04",
+            "med_text": "Targin",
+            "med_code": "12475N",
+            "code_system": "pbs",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "56",
+            "days_supply": "28",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004139",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004139",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-03-08",
+            "med_text": "Targin",
+            "med_code": "12475N",
+            "code_system": "pbs",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "56",
+            "days_supply": "28",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004140",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004140",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-04-18",
+            "med_text": "Targin",
+            "med_code": "12475N",
+            "code_system": "pbs",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "56",
+            "days_supply": "28",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004141",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004141",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-05-25",
+            "med_text": "Targin",
+            "med_code": "12475N",
+            "code_system": "pbs",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "56",
+            "days_supply": "28",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004142",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004142",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-07-03",
+            "med_text": "Targin",
+            "med_code": "12475N",
+            "code_system": "pbs",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "56",
+            "days_supply": "28",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004143",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004143",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-08-05",
+            "med_text": "Targin",
+            "med_code": "12475N",
+            "code_system": "pbs",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "56",
+            "days_supply": "28",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004144",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004144",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-09-10",
+            "med_text": "Targin",
+            "med_code": "12475N",
+            "code_system": "pbs",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "56",
+            "days_supply": "28",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004145",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004145",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-10-08",
+            "med_text": "Targin",
+            "med_code": "12475N",
+            "code_system": "pbs",
+            "strength_text": "20/10 mg",
+            "dose_text": null,
+            "route_text": "modified release tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "56",
+            "days_supply": "28",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "absent_in_scope"
+      },
+      "tasks": [
+        "Confirm how often oxycodone/naloxone is taken"
+      ],
+      "needs_pharmacist": true,
+      "trust_explanation": [
+        "emr daily_dose trust 0.70",
+        "emr existence trust 0.65",
+        "gp daily_dose trust 0.70",
+        "gp existence trust 0.60",
+        "pharmacy daily_dose trust 0.55",
+        "pharmacy existence trust 0.85"
+      ],
+      "hmem_record_ids": [
+        "mem-12",
+        "mem-30"
+      ]
+    },
+    {
+      "id": "frequency:esomeprazole",
+      "type": "frequency",
+      "generic": "esomeprazole",
+      "high_risk_class": null,
+      "severity": "medium",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 2.0,
+      "explanation": "Esomeprazole is charted at a different frequency than before admission: charted 80 mg/day against 40 mg/day before admission (EMR-000734, GP-000679, PHM-004108, PHM-004109, PHM-004110, PHM-004111, PHM-004112, PHM-004113).",
+      "detail": {
+        "charted_daily_mg": 80.0,
+        "bpmh_daily_mg": 40.0,
+        "charted_frequency": "1 bd",
+        "daily_dose_ratio": 2.0,
+        "statement": "charted 80 mg/day against 40 mg/day before admission",
+        "administrations_ratio": 2.0,
+        "per_dose_ratio": 1.0,
+        "subtype": "frequency",
+        "atc": "A02BC05",
+        "atc_class": "A02B"
+      },
+      "evidence": [
+        {
+          "source": "emr",
+          "row_id": "EMR-000734",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "emr",
+            "row_id": "EMR-000734",
+            "source_patient_id": "MRN0000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "Dorothy",
+            "name_family": "Nguyen",
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": "F",
+            "postcode": "2554",
+            "record_kind": "admission_chart",
+            "doc_date": "2026-10-24",
+            "med_text": "esomeprazole",
+            "med_code": "SYN-AMT-MP-0033",
+            "code_system": "amt",
+            "strength_text": "40 mg",
+            "dose_text": "40.0",
+            "route_text": "PO",
+            "freq_text": "1 bd",
+            "status_text": "",
+            "note_text": "",
+            "qty": null,
+            "days_supply": null,
+            "pharmacy_id": null,
+            "script_type": null
+          }
+        },
+        {
+          "source": "gp",
+          "row_id": "GP-000679",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-000679",
+            "source_patient_id": "GPP000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "Dorothy",
+            "name_family": "Nguyen",
+            "name_previous": "",
+            "dob_text": "27/01/1938",
+            "sex": "Female",
+            "postcode": "2554",
+            "record_kind": "gp_list",
+            "doc_date": "30/04/2026",
+            "med_text": "esomeprazole 40 mg",
+            "med_code": "SYN-AMT-MPP-0045",
+            "code_system": "amt",
+            "strength_text": "40 mg",
+            "dose_text": null,
+            "route_text": null,
+            "freq_text": "one a day",
+            "status_text": "active",
+            "note_text": null,
+            "qty": null,
+            "days_supply": null,
+            "pharmacy_id": null,
+            "script_type": null
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004108",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004108",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2025-10-24",
+            "med_text": "Nexium",
+            "med_code": "12283L",
+            "code_system": "pbs",
+            "strength_text": "40 mg",
+            "dose_text": null,
+            "route_text": "tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "60",
+            "days_supply": "60",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004109",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004109",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2025-12-30",
+            "med_text": "Nexium",
+            "med_code": "12283L",
+            "code_system": "pbs",
+            "strength_text": "40 mg",
+            "dose_text": null,
+            "route_text": "tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "60",
+            "days_supply": "60",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004110",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004110",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-03-12",
+            "med_text": "Nexium",
+            "med_code": "12283L",
+            "code_system": "pbs",
+            "strength_text": "40 mg",
+            "dose_text": null,
+            "route_text": "tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "60",
+            "days_supply": "60",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004111",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004111",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-05-23",
+            "med_text": "Nexium",
+            "med_code": "12283L",
+            "code_system": "pbs",
+            "strength_text": "40 mg",
+            "dose_text": null,
+            "route_text": "tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "60",
+            "days_supply": "60",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004112",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004112",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-08-03",
+            "med_text": "Nexium",
+            "med_code": "12283L",
+            "code_system": "pbs",
+            "strength_text": "40 mg",
+            "dose_text": null,
+            "route_text": "tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "60",
+            "days_supply": "60",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004113",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004113",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2026-10-19",
+            "med_text": "Nexium",
+            "med_code": "12283L",
+            "code_system": "pbs",
+            "strength_text": "40 mg",
+            "dose_text": null,
+            "route_text": "tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "60",
+            "days_supply": "60",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "present",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "present"
+      },
+      "tasks": [
+        "Confirm how often esomeprazole is taken"
+      ],
+      "needs_pharmacist": false,
+      "trust_explanation": [
+        "emr daily_dose trust 0.70",
+        "emr existence trust 0.65",
+        "gp daily_dose trust 0.70",
+        "gp existence trust 0.60",
+        "pharmacy daily_dose trust 0.55",
+        "pharmacy existence trust 0.85"
+      ],
+      "hmem_record_ids": [
+        "mem-12",
+        "mem-30"
+      ]
+    },
+    {
+      "id": "stale_listing:dapagliflozin",
+      "type": "stale_listing",
+      "generic": "dapagliflozin",
+      "high_risk_class": null,
+      "severity": "low",
+      "intent_status": "likely_unintentional",
+      "intent_reason": null,
+      "priority": 1.0,
+      "explanation": "Dapagliflozin is listed as current but its supply ran out long ago (GP-000681, PHM-004126).",
+      "detail": {
+        "last_dispensed": "2025-10-24",
+        "atc": "A10BK01",
+        "atc_class": "A10B"
+      },
+      "evidence": [
+        {
+          "source": "gp",
+          "row_id": "GP-000681",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "gp",
+            "row_id": "GP-000681",
+            "source_patient_id": "GPP000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "Dorothy",
+            "name_family": "Nguyen",
+            "name_previous": "",
+            "dob_text": "27/01/1938",
+            "sex": "Female",
+            "postcode": "2554",
+            "record_kind": "gp_list",
+            "doc_date": "30/04/2026",
+            "med_text": "dapagliflozin 10 mg",
+            "med_code": "SYN-AMT-MPP-0185",
+            "code_system": "amt",
+            "strength_text": "10 mg",
+            "dose_text": null,
+            "route_text": null,
+            "freq_text": "one a day",
+            "status_text": "active",
+            "note_text": null,
+            "qty": null,
+            "days_supply": null,
+            "pharmacy_id": null,
+            "script_type": null
+          }
+        },
+        {
+          "source": "pharmacy",
+          "row_id": "PHM-004126",
+          "sql_template_id": "Q2",
+          "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+          "fields": {
+            "source": "pharmacy",
+            "row_id": "PHM-004126",
+            "source_patient_id": "C000089",
+            "ihi_syn": "SYN-562526771569",
+            "name_given": "NGUYEN, Dorothy",
+            "name_family": null,
+            "name_previous": null,
+            "dob_text": "1938-01-27",
+            "sex": null,
+            "postcode": "2554",
+            "record_kind": "dispense",
+            "doc_date": "2025-10-24",
+            "med_text": "Forxiga",
+            "med_code": "10011X",
+            "code_system": "pbs",
+            "strength_text": "10 mg",
+            "dose_text": null,
+            "route_text": "tablet",
+            "freq_text": null,
+            "status_text": null,
+            "note_text": null,
+            "qty": "28",
+            "days_supply": "28",
+            "pharmacy_id": "PHX03",
+            "script_type": "PBS"
+          }
+        }
+      ],
+      "evidence_states": {
+        "emr": "absent_in_scope",
+        "gp": "present",
+        "pharmacy": "present",
+        "patient": "present"
+      },
+      "tasks": [
+        "Ask the GP practice whether dapagliflozin is still current"
+      ],
+      "needs_pharmacist": false,
+      "trust_explanation": [
+        "gp daily_dose trust 0.70",
+        "gp existence trust 0.60",
+        "pharmacy daily_dose trust 0.55",
+        "pharmacy existence trust 0.85"
+      ],
+      "hmem_record_ids": [
+        "mem-13",
+        "mem-31"
+      ]
+    }
+  ],
+  "notices": [
+    {
+      "type": "conflict_abstained",
+      "detail": "dapagliflozin existence: sources disagree within the margin. Conflict: ask patient.",
+      "source": null,
+      "generic": "dapagliflozin",
+      "row_ids": [
+        "GP-000681",
+        "PAT-000725",
+        "PHM-004126"
+      ],
+      "tasks": []
+    },
+    {
+      "type": "patient_only_item",
+      "detail": "turmeric is reported only by the patient; kept, verify the dose.",
+      "source": "patient",
+      "generic": "turmeric",
+      "row_ids": [
+        "PAT-000728"
+      ],
+      "tasks": [
+        "Verify the turmeric dose"
+      ]
+    },
+    {
+      "type": "patient_only_item",
+      "detail": "Could not identify \"a little white one\" (patient, PAT-000721); kept for review.",
+      "source": "patient",
+      "generic": null,
+      "row_ids": [
+        "PAT-000721"
+      ],
+      "tasks": [
+        "Identify \"a little white one\" (patient, PAT-000721) with the patient"
+      ]
+    },
+    {
+      "type": "patient_only_item",
+      "detail": "Could not identify \"a little white one\" (patient, PAT-000726); kept for review.",
+      "source": "patient",
+      "generic": null,
+      "row_ids": [
+        "PAT-000726"
+      ],
+      "tasks": [
+        "Identify \"a little white one\" (patient, PAT-000726) with the patient"
+      ]
+    }
+  ],
+  "tasks": [
+    "Review oxycodone/naloxone: it duplicates an ingredient of another medicine",
+    "Confirm whether gliclazide should be charted",
+    "Confirm how often oxycodone/naloxone is taken",
+    "Confirm how often esomeprazole is taken",
+    "Ask the GP practice whether dapagliflozin is still current",
+    "Verify the turmeric dose",
+    "Identify \"a little white one\" (patient, PAT-000721) with the patient",
+    "Identify \"a little white one\" (patient, PAT-000726) with the patient"
+  ],
+  "identity_review": null,
+  "evidence_index": {
+    "GP-000681": {
+      "source": "gp",
+      "row_id": "GP-000681",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-000681",
+        "source_patient_id": "GPP000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "Dorothy",
+        "name_family": "Nguyen",
+        "name_previous": "",
+        "dob_text": "27/01/1938",
+        "sex": "Female",
+        "postcode": "2554",
+        "record_kind": "gp_list",
+        "doc_date": "30/04/2026",
+        "med_text": "dapagliflozin 10 mg",
+        "med_code": "SYN-AMT-MPP-0185",
+        "code_system": "amt",
+        "strength_text": "10 mg",
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "active",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000725": {
+      "source": "patient",
+      "row_id": "PAT-000725",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000725",
+        "source_patient_id": "INT00089",
+        "ihi_syn": "",
+        "name_given": "Dot Nguyen",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "Forxiga",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "unsure",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PHM-004126": {
+      "source": "pharmacy",
+      "row_id": "PHM-004126",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004126",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": "Forxiga",
+        "med_code": "10011X",
+        "code_system": "pbs",
+        "strength_text": "10 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "28",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PAT-000728": {
+      "source": "patient",
+      "row_id": "PAT-000728",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000728",
+        "source_patient_id": "INT00089",
+        "ihi_syn": "",
+        "name_given": "Dot Nguyen",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "turmeric",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000721": {
+      "source": "patient",
+      "row_id": "PAT-000721",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000721",
+        "source_patient_id": "INT00089",
+        "ihi_syn": "",
+        "name_given": "Dot Nguyen",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "a little white one",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000726": {
+      "source": "patient",
+      "row_id": "PAT-000726",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000726",
+        "source_patient_id": "INT00089",
+        "ihi_syn": "",
+        "name_given": "Dot Nguyen",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "a little white one",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one in the morning",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "GP-000684": {
+      "source": "gp",
+      "row_id": "GP-000684",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-000684",
+        "source_patient_id": "GPP000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "Dorothy",
+        "name_family": "Nguyen",
+        "name_previous": "",
+        "dob_text": "27/01/1938",
+        "sex": "Female",
+        "postcode": "2554",
+        "record_kind": "gp_list",
+        "doc_date": "30/04/2026",
+        "med_text": "oxycodone/naloxone 20/10 mg",
+        "med_code": "SYN-AMT-MPP-0053",
+        "code_system": "amt",
+        "strength_text": "20/10 mg",
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "morning and night",
+        "status_text": "active",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "GP-000680": {
+      "source": "gp",
+      "row_id": "GP-000680",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-000680",
+        "source_patient_id": "GPP000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "Dorothy",
+        "name_family": "Nguyen",
+        "name_previous": "",
+        "dob_text": "27/01/1938",
+        "sex": "Female",
+        "postcode": "2554",
+        "record_kind": "gp_list",
+        "doc_date": "30/04/2026",
+        "med_text": "OxyContin 20 mg",
+        "med_code": "SYN-AMT-MPP-0051",
+        "code_system": "amt",
+        "strength_text": "20 mg",
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "morning and night",
+        "status_text": "active",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "GP-000682": {
+      "source": "gp",
+      "row_id": "GP-000682",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-000682",
+        "source_patient_id": "GPP000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "Dorothy",
+        "name_family": "Nguyen",
+        "name_previous": "",
+        "dob_text": "27/01/1938",
+        "sex": "Female",
+        "postcode": "2554",
+        "record_kind": "gp_list",
+        "doc_date": "30/04/2026",
+        "med_text": "gliclazide 60 mg",
+        "med_code": "SYN-AMT-MPP-0081",
+        "code_system": "amt",
+        "strength_text": "60 mg",
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one in the morning",
+        "status_text": "active",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PHM-004127": {
+      "source": "pharmacy",
+      "row_id": "PHM-004127",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004127",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": "Diamicron MR",
+        "med_code": "13922R",
+        "code_system": "pbs",
+        "strength_text": "60 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "120",
+        "days_supply": "120",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004128": {
+      "source": "pharmacy",
+      "row_id": "PHM-004128",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004128",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-03-22",
+        "med_text": "Diamicron MR",
+        "med_code": "13922R",
+        "code_system": "pbs",
+        "strength_text": "60 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "120",
+        "days_supply": "120",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004129": {
+      "source": "pharmacy",
+      "row_id": "PHM-004129",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004129",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-08-15",
+        "med_text": "Diamicron MR",
+        "med_code": "13922R",
+        "code_system": "pbs",
+        "strength_text": "60 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "120",
+        "days_supply": "120",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "EMR-000737": {
+      "source": "emr",
+      "row_id": "EMR-000737",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000737",
+        "source_patient_id": "MRN0000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "Dorothy",
+        "name_family": "Nguyen",
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": "F",
+        "postcode": "2554",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": "oxycodone/naloxone",
+        "med_code": "SYN-AMT-MP-0064",
+        "code_system": "amt",
+        "strength_text": "20/10 mg",
+        "dose_text": "20.0",
+        "route_text": "PO",
+        "freq_text": "1 daily",
+        "status_text": "",
+        "note_text": "withheld: hypotension",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PHM-004135": {
+      "source": "pharmacy",
+      "row_id": "PHM-004135",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004135",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": "Targin",
+        "med_code": "12475N",
+        "code_system": "pbs",
+        "strength_text": "20/10 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "56",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004136": {
+      "source": "pharmacy",
+      "row_id": "PHM-004136",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004136",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2025-11-27",
+        "med_text": "Targin",
+        "med_code": "12475N",
+        "code_system": "pbs",
+        "strength_text": "20/10 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "56",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004137": {
+      "source": "pharmacy",
+      "row_id": "PHM-004137",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004137",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-01-05",
+        "med_text": "Targin",
+        "med_code": "12475N",
+        "code_system": "pbs",
+        "strength_text": "20/10 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "56",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004138": {
+      "source": "pharmacy",
+      "row_id": "PHM-004138",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004138",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-02-04",
+        "med_text": "Targin",
+        "med_code": "12475N",
+        "code_system": "pbs",
+        "strength_text": "20/10 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "56",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004139": {
+      "source": "pharmacy",
+      "row_id": "PHM-004139",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004139",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-03-08",
+        "med_text": "Targin",
+        "med_code": "12475N",
+        "code_system": "pbs",
+        "strength_text": "20/10 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "56",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004140": {
+      "source": "pharmacy",
+      "row_id": "PHM-004140",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004140",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-04-18",
+        "med_text": "Targin",
+        "med_code": "12475N",
+        "code_system": "pbs",
+        "strength_text": "20/10 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "56",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004141": {
+      "source": "pharmacy",
+      "row_id": "PHM-004141",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004141",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-05-25",
+        "med_text": "Targin",
+        "med_code": "12475N",
+        "code_system": "pbs",
+        "strength_text": "20/10 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "56",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004142": {
+      "source": "pharmacy",
+      "row_id": "PHM-004142",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004142",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-07-03",
+        "med_text": "Targin",
+        "med_code": "12475N",
+        "code_system": "pbs",
+        "strength_text": "20/10 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "56",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004143": {
+      "source": "pharmacy",
+      "row_id": "PHM-004143",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004143",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-08-05",
+        "med_text": "Targin",
+        "med_code": "12475N",
+        "code_system": "pbs",
+        "strength_text": "20/10 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "56",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004144": {
+      "source": "pharmacy",
+      "row_id": "PHM-004144",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004144",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-09-10",
+        "med_text": "Targin",
+        "med_code": "12475N",
+        "code_system": "pbs",
+        "strength_text": "20/10 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "56",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004145": {
+      "source": "pharmacy",
+      "row_id": "PHM-004145",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004145",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-10-08",
+        "med_text": "Targin",
+        "med_code": "12475N",
+        "code_system": "pbs",
+        "strength_text": "20/10 mg",
+        "dose_text": null,
+        "route_text": "modified release tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "56",
+        "days_supply": "28",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "EMR-000734": {
+      "source": "emr",
+      "row_id": "EMR-000734",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000734",
+        "source_patient_id": "MRN0000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "Dorothy",
+        "name_family": "Nguyen",
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": "F",
+        "postcode": "2554",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": "esomeprazole",
+        "med_code": "SYN-AMT-MP-0033",
+        "code_system": "amt",
+        "strength_text": "40 mg",
+        "dose_text": "40.0",
+        "route_text": "PO",
+        "freq_text": "1 bd",
+        "status_text": "",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "GP-000679": {
+      "source": "gp",
+      "row_id": "GP-000679",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "gp",
+        "row_id": "GP-000679",
+        "source_patient_id": "GPP000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "Dorothy",
+        "name_family": "Nguyen",
+        "name_previous": "",
+        "dob_text": "27/01/1938",
+        "sex": "Female",
+        "postcode": "2554",
+        "record_kind": "gp_list",
+        "doc_date": "30/04/2026",
+        "med_text": "esomeprazole 40 mg",
+        "med_code": "SYN-AMT-MPP-0045",
+        "code_system": "amt",
+        "strength_text": "40 mg",
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "active",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PHM-004108": {
+      "source": "pharmacy",
+      "row_id": "PHM-004108",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004108",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": "Nexium",
+        "med_code": "12283L",
+        "code_system": "pbs",
+        "strength_text": "40 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "60",
+        "days_supply": "60",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004109": {
+      "source": "pharmacy",
+      "row_id": "PHM-004109",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004109",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2025-12-30",
+        "med_text": "Nexium",
+        "med_code": "12283L",
+        "code_system": "pbs",
+        "strength_text": "40 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "60",
+        "days_supply": "60",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004110": {
+      "source": "pharmacy",
+      "row_id": "PHM-004110",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004110",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-03-12",
+        "med_text": "Nexium",
+        "med_code": "12283L",
+        "code_system": "pbs",
+        "strength_text": "40 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "60",
+        "days_supply": "60",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004111": {
+      "source": "pharmacy",
+      "row_id": "PHM-004111",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004111",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-05-23",
+        "med_text": "Nexium",
+        "med_code": "12283L",
+        "code_system": "pbs",
+        "strength_text": "40 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "60",
+        "days_supply": "60",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004112": {
+      "source": "pharmacy",
+      "row_id": "PHM-004112",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004112",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-08-03",
+        "med_text": "Nexium",
+        "med_code": "12283L",
+        "code_system": "pbs",
+        "strength_text": "40 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "60",
+        "days_supply": "60",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    },
+    "PHM-004113": {
+      "source": "pharmacy",
+      "row_id": "PHM-004113",
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "fields": {
+        "source": "pharmacy",
+        "row_id": "PHM-004113",
+        "source_patient_id": "C000089",
+        "ihi_syn": "SYN-562526771569",
+        "name_given": "NGUYEN, Dorothy",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1938-01-27",
+        "sex": null,
+        "postcode": "2554",
+        "record_kind": "dispense",
+        "doc_date": "2026-10-19",
+        "med_text": "Nexium",
+        "med_code": "12283L",
+        "code_system": "pbs",
+        "strength_text": "40 mg",
+        "dose_text": null,
+        "route_text": "tablet",
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": "60",
+        "days_supply": "60",
+        "pharmacy_id": "PHX03",
+        "script_type": "PBS"
+      }
+    }
+  },
+  "trust": [
+    {
+      "source": "emr",
+      "attribute": "actually_taking",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-1"
+    },
+    {
+      "source": "emr",
+      "attribute": "admission_chart",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-2"
+    },
+    {
+      "source": "emr",
+      "attribute": "daily_dose",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-3"
+    },
+    {
+      "source": "emr",
+      "attribute": "existence",
+      "value": 0.65,
+      "uncertainty": null,
+      "hmem_record_id": "mem-4"
+    },
+    {
+      "source": "emr",
+      "attribute": "frequency",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-5"
+    },
+    {
+      "source": "emr",
+      "attribute": "intended_dose",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-6"
+    },
+    {
+      "source": "emr",
+      "attribute": "name",
+      "value": 0.9,
+      "uncertainty": null,
+      "hmem_record_id": "mem-7"
+    },
+    {
+      "source": "emr",
+      "attribute": "release",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-8"
+    },
+    {
+      "source": "emr",
+      "attribute": "route",
+      "value": 0.9,
+      "uncertainty": null,
+      "hmem_record_id": "mem-9"
+    },
+    {
+      "source": "emr",
+      "attribute": "strength",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-10"
+    },
+    {
+      "source": "gp",
+      "attribute": "actually_taking",
+      "value": 0.45,
+      "uncertainty": null,
+      "hmem_record_id": "mem-11"
+    },
+    {
+      "source": "gp",
+      "attribute": "daily_dose",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-12"
+    },
+    {
+      "source": "gp",
+      "attribute": "existence",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-13"
+    },
+    {
+      "source": "gp",
+      "attribute": "frequency",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-14"
+    },
+    {
+      "source": "gp",
+      "attribute": "intended_dose",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-15"
+    },
+    {
+      "source": "gp",
+      "attribute": "name",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-16"
+    },
+    {
+      "source": "gp",
+      "attribute": "release",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-17"
+    },
+    {
+      "source": "gp",
+      "attribute": "route",
+      "value": 0.5,
+      "uncertainty": null,
+      "hmem_record_id": "mem-18"
+    },
+    {
+      "source": "gp",
+      "attribute": "strength",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-19"
+    },
+    {
+      "source": "patient",
+      "attribute": "actually_taking",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-20"
+    },
+    {
+      "source": "patient",
+      "attribute": "daily_dose",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-21"
+    },
+    {
+      "source": "patient",
+      "attribute": "existence",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-22"
+    },
+    {
+      "source": "patient",
+      "attribute": "frequency",
+      "value": 0.45,
+      "uncertainty": null,
+      "hmem_record_id": "mem-23"
+    },
+    {
+      "source": "patient",
+      "attribute": "intended_dose",
+      "value": 0.35,
+      "uncertainty": null,
+      "hmem_record_id": "mem-24"
+    },
+    {
+      "source": "patient",
+      "attribute": "name",
+      "value": 0.5,
+      "uncertainty": null,
+      "hmem_record_id": "mem-25"
+    },
+    {
+      "source": "patient",
+      "attribute": "release",
+      "value": 0.2,
+      "uncertainty": null,
+      "hmem_record_id": "mem-26"
+    },
+    {
+      "source": "patient",
+      "attribute": "route",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-27"
+    },
+    {
+      "source": "patient",
+      "attribute": "strength",
+      "value": 0.3,
+      "uncertainty": null,
+      "hmem_record_id": "mem-28"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "actually_taking",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-29"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "daily_dose",
+      "value": 0.55,
+      "uncertainty": null,
+      "hmem_record_id": "mem-30"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "existence",
+      "value": 0.85,
+      "uncertainty": null,
+      "hmem_record_id": "mem-31"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "frequency",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-32"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "intended_dose",
+      "value": 0.5,
+      "uncertainty": null,
+      "hmem_record_id": "mem-33"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "name",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-34"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "release",
+      "value": 0.85,
+      "uncertainty": null,
+      "hmem_record_id": "mem-35"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "route",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-36"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "strength",
+      "value": 0.9,
+      "uncertainty": null,
+      "hmem_record_id": "mem-37"
+    }
+  ],
+  "trace": [
+    {
+      "timestamp": "2026-10-26T03:41:21.689300+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Planner",
+      "action": "start",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "START",
+      "message": "Reconciling Dorothy Nguyen (MRN0000089), admitted 2026-10-24.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:41:21.692592+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Planner",
+      "action": "recall",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PLAN",
+      "message": "H-MEM recalled 0 memories for the plan.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": "hmem",
+      "engine_op": "query",
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:41:36.784195+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Planner",
+      "action": "plan",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PLAN",
+      "message": "Plan: find_identities (\"Locate patient Dorothy Nguyen MRN0000089 across all integrated systems to confirm record identity.\"); fetch_meds (\"Get list of regularly prescribed medicines from the general practitioner (GP).\"); check_shortages (\"Identify any known supply shortages that may affect current prescriptions.\"); verify (\"Pharmacist verification of the retrieved medication list against patient‑reported and other source data.\"). The plan systematically identifies the patient, gathers medication data from all relevant sources (EMR, pharmacy, GP), checks for known drug shortages, and culminates in pharmacist verification to ensure an accurate, complete medication reconciliation within the 8‑query budget.",
+      "route": "meterless/fast",
+      "latency_ms": 15087,
+      "tokens": {
+        "prompt_tokens": 475,
+        "completion_tokens": 1110,
+        "total_tokens": 1585
+      },
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": {
+        "receipt_id": "rcpt_req_zvcargzc",
+        "decision_id": "req_zvcargzc",
+        "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "provider_model": "meterless/auto",
+        "requested_model": "meterless/fast",
+        "mode": "auto",
+        "winning_route": {
+          "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+          "label": "Nemotron 3.5 Lightning 30B A3B",
+          "provider": "nvidia",
+          "kind": "cloud",
+          "tier": "A"
+        },
+        "egress": {
+          "destination": "nvidia"
+        },
+        "cost": {
+          "actual_usd": 0,
+          "naive_usd": 0
+        },
+        "consensus": {
+          "raced": 1
+        },
+        "phases": [
+          {
+            "phase": "planning",
+            "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+            "ms": 15161,
+            "tokensIn": 475,
+            "tokensOut": 1110
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-10-26T03:41:36.785259+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Executor",
+      "action": "route",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "Planner need \"Locate patient Dorothy Nguyen MRN0000089 across all integrated systems to confirm record identity.\" -> the Executor fills template Q1 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:41:45.885808+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Executor",
+      "action": "find_identities",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "Found Dorothy Nguyen in 3 other record(s): gp:GPP000089, pharmacy:C000089, patient:INT00089.",
+      "route": null,
+      "latency_ms": 8418,
+      "tokens": null,
+      "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date FROM medtrace.all_sources WHERE ihi_syn = 'SYN-562526771569' OR dob_text IN ('1938-01-27', '27/01/1938') OR (dob_text LIKE '%1938%' AND (UPPER(name_family) LIKE 'NGUY%' OR UPPER(name_previous) LIKE 'NGUY%' OR UPPER(name_given) LIKE 'NGUY%')) OR (source = 'emr' AND source_patient_id = 'MRN0000089')",
+      "row_count": 116,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null,
+      "sql_template_id": "Q1",
+      "query_id": "204fbd4f-85ed-48a4-afdc-fc42839084c3",
+      "request_id": "1abeea92-ba65-4d6e-b319-5e50fba22a26",
+      "replayed": false
+    },
+    {
+      "timestamp": "2026-10-26T03:41:45.887788+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Executor",
+      "action": "world_model",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "World Model: recorded 7 patient records and 3 same-person link(s), each with provenance (Zetaris query 204fbd4f-85ed-48a4-afdc-fc42839084c3); audit seq 11-20.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": "world_model",
+      "engine_op": "upsert+relate",
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:41:45.888016+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Executor",
+      "action": "world_model",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FETCH_MEDS",
+      "message": "Linked set read from the World Model graph: emr:MRN0000089, gp:GPP000089, patient:INT00089, pharmacy:C000089.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": "world_model",
+      "engine_op": "neighborsOf",
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:41:45.888239+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Executor",
+      "action": "route",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FETCH_MEDS",
+      "message": "Planner need \"Get list of regularly prescribed medicines from the general practitioner (GP).\" -> the Executor fills template Q2 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:41:52.926730+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Executor",
+      "action": "fetch_meds",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FETCH_MEDS",
+      "message": "Fetched 79 medicine rows in one query: emr 7, gp 9, patient 8, pharmacy 55.",
+      "route": null,
+      "latency_ms": 7033,
+      "tokens": null,
+      "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE (source = 'emr' AND source_patient_id = 'MRN0000089') OR (source = 'gp' AND source_patient_id = 'GPP000089') OR (source = 'pharmacy' AND source_patient_id = 'C000089') OR (source = 'patient' AND source_patient_id = 'INT00089')",
+      "row_count": 79,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null,
+      "sql_template_id": "Q2",
+      "query_id": "50fd116d-6a33-447a-882d-f6c40833087f",
+      "request_id": "b654fb2e-64af-4757-9133-4430d193589c",
+      "replayed": false
+    },
+    {
+      "timestamp": "2026-10-26T03:41:53.008524+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Executor",
+      "action": "normalise",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "NORMALISE",
+      "message": "Normalised 79 lines: 65 by code, 12 by lexicon, 2 by unmapped.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:41:53.015005+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Evaluator",
+      "action": "fuse",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FUSE",
+      "message": "Built the BPMH grid: 10 medicines; abstained on dapagliflozin (sources disagree: ask patient).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:41:53.017659+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Evaluator",
+      "action": "detect",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "DETECT",
+      "message": "5 candidate discrepancies; 0 blocked by the safety gate (no citable rows).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:41:53.018832+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Evaluator",
+      "action": "prioritise",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PRIORITISE",
+      "message": "Ranked 5 findings; 3 need a pharmacist's tick.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:41:53.019723+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Executor",
+      "action": "route",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "CHECK_SHORTAGES",
+      "message": "Planner need \"Identify any known supply shortages that may affect current prescriptions.\" -> the Executor fills template Q4 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:41:53.458194+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Executor",
+      "action": "check_shortages",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "skipped",
+      "step": "CHECK_SHORTAGES",
+      "message": "Shortage overlay unavailable on this Zetaris (the TGA view may not be registered); continuing without it.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": "HTTP 400: {'msg': \"[TABLE_OR_VIEW_NOT_FOUND] The table or view `medtrace`.`tga_shortages` cannot be found. Verify the spelling and correctness of the schema and catalog.\\nIf you did not qualify the name with a ",
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:44:58.579762+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Writer",
+      "action": "fallback",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "degraded",
+      "step": "DRAFT",
+      "message": "writer draft: Nightshift failed (offline); used the grounded template.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": "offline: no answer within 180s (ReadTimeout)",
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:44:58.583901+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Executor",
+      "action": "route",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "VERIFY",
+      "message": "Planner need \"Pharmacist verification of the retrieved medication list against patient‑reported and other source data.\" -> the Executor fills template Q3 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:45:05.721300+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Evaluator",
+      "action": "verify",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "VERIFY",
+      "message": "Re-read 28 cited rows in one query; 5 findings verified.",
+      "route": null,
+      "latency_ms": 7135,
+      "tokens": null,
+      "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE row_id IN ('EMR-000734', 'EMR-000737', 'GP-000679', 'GP-000680', 'GP-000681', 'GP-000682', 'GP-000684', 'PHM-004108', 'PHM-004109', 'PHM-004110', 'PHM-004111', 'PHM-004112', 'PHM-004113', 'PHM-004126', 'PHM-004127', 'PHM-004128', 'PHM-004129', 'PHM-004135', 'PHM-004136', 'PHM-004137', 'PHM-004138', 'PHM-004139', 'PHM-004140', 'PHM-004141', 'PHM-004142', 'PHM-004143', 'PHM-004144', 'PHM-004145')",
+      "row_count": 28,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null,
+      "sql_template_id": "Q3",
+      "query_id": "0bc11acb-4243-495d-ba45-d8bc0fdcdd89",
+      "request_id": "6f28d9fd-0613-491d-bbc2-84dc450c249f",
+      "replayed": false
+    },
+    {
+      "timestamp": "2026-10-26T03:50:22.268961+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Evaluator",
+      "action": "fallback",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "degraded",
+      "step": "CRITIQUE",
+      "message": "evaluator critique: Nightshift failed (upstream); used the grounded template.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": "upstream: HTTP 502 (nvidia/nemotron-3.5-lightning-30b-a3b_empty_response)",
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:50:22.272632+00:00",
+      "run_id": "run-997371954f29",
+      "agent_name": "Writer",
+      "action": "done",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PARTIAL",
+      "message": "Done: 5 findings, 4 notices, 8 tasks.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    }
+  ],
+  "query_count": 4,
+  "zetaris_ms": 22586,
+  "model_calls": [
+    {
+      "role": "Planner",
+      "requested_route": "meterless/fast",
+      "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "request_id": "chatcmpl-dceb50bd-8ef6-4fe7-84e1-cae935cfca4e",
+      "tokens": {
+        "prompt_tokens": 475,
+        "completion_tokens": 1110,
+        "total_tokens": 1585
+      },
+      "truncated": false
+    }
+  ]
+}

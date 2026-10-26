@@ -1,0 +1,18 @@
+{
+  "run_id": "run-53736ab7feb9",
+  "target_id": "grid:candesartan:daily_dose",
+  "verdict": "reject",
+  "reason": "source_outdated",
+  "trust_updates": [
+    {
+      "source": "gp",
+      "attribute": "daily_dose",
+      "hmem_record_id": "mem-12",
+      "kind": "wrong",
+      "before": 0.7,
+      "after": 0.5,
+      "delta": -0.2
+    }
+  ],
+  "acceptance_updates": []
+}
