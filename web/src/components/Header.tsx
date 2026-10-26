@@ -6,7 +6,11 @@ interface Props {
   error: string | null;
 }
 
-const NIGHTSHIFT_TONE: Record<string, string> = { online: "ok", unauthorized: "warn", offline: "bad" };
+const NIGHTSHIFT_TONE: Record<string, string> = { online: "ok", unauthorized: "warn", offline: "bad", sample_mode: "info" };
+// In SAMPLE_MODE the API replays recorded Zetaris responses and makes no model
+// calls, and says so as "sample_mode": neither up nor down.
+const ZETARIS_TONE: Record<string, string> = { connected: "ok", sample_mode: "info" };
+const said = (v: string) => (v === "sample_mode" ? "sample mode" : v);
 
 export function Header({ health, error }: Props) {
   const zetaris = health?.zetaris ?? "unknown";
@@ -43,11 +47,11 @@ export function Header({ health, error }: Props) {
           </span>
         ) : (
           <>
-            <span className={`pill tone-${zetaris === "connected" ? "ok" : "bad"}`} title="Zetaris data layer">
-              <i className="dot" /> Zetaris: {zetaris}
+            <span className={`pill tone-${ZETARIS_TONE[zetaris] ?? "bad"}`} title="Zetaris data layer">
+              <i className="dot" /> Zetaris: {said(zetaris)}
             </span>
             <span className={`pill tone-${NIGHTSHIFT_TONE[nightshift] ?? "bad"}`} title="Meterless Nightshift (GET /v1/models)">
-              <i className="dot" /> Nightshift: {nightshift}
+              <i className="dot" /> Nightshift: {said(nightshift)}
             </span>
             <span className="pill tone-model" title="The model that actually answered (meterless.routed_model)">
               Model: <code>{model ?? "none yet"}</code>

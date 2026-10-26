@@ -1,12 +1,17 @@
 import { useState } from "react";
-import type { Coverage, Evidence, EvidenceState, FusedMed } from "../types";
+import type { Coverage, Evidence, EvidenceState, FusedMed, Source, TrustAttribute } from "../types";
+import type { FeedbackState } from "./Flags";
 import { SOURCES } from "../types";
 import { ROW_TEXT_FIELDS, STATE_LABEL, attributeLabel, fmtValue, sourceLabel } from "../format";
+
+export const gridFeedbackKey = (generic: string, attribute: string, source: string) => `grid:${generic}:${attribute}:${source}`;
 
 interface Props {
   grid: FusedMed[];
   evidenceIndex: Record<string, Evidence>;
   coverage: Partial<Record<string, Coverage>>;
+  feedback: Record<string, FeedbackState>;
+  onRejectCell: (generic: string, attribute: TrustAttribute, source: Source) => void;
 }
 
 interface Cell {
@@ -58,7 +63,58 @@ function RowText({ e }: { e: Evidence }) {
   );
 }
 
-function Inspector({ cell, idx, coverage, pinned, onClose }: { cell: Cell; idx: Record<string, Evidence>; coverage: Props["coverage"]; pinned: boolean; onClose: () => void }) {
+/** What this source said for each resolved attribute, as the API reports it. */
+function sourceValues(med: FusedMed, source: string) {
+  return Object.values(med.attributes)
+    .map((v) => ({
+      v,
+      said: v.dissenting[source] ?? (v.supporting.includes(source) ? v.value : undefined),
+      dissents: source in v.dissenting,
+    }))
+    .filter((x) => x.said !== undefined && x.said !== null);
+}
+
+function CellFeedback({ med, source, feedback, onRejectCell }: { med: FusedMed; source: string; feedback: Props["feedback"]; onRejectCell: Props["onRejectCell"] }) {
+  const values = sourceValues(med, source);
+  if (!values.length) return null;
+  return (
+    <div className="cell-feedback">
+      <div className="small muted">
+        What {sourceLabel(source)} says. Where it disagrees, you can mark its value as outdated:
+      </div>
+      {values.map(({ v, said, dissents }) => {
+        const st = feedback[gridFeedbackKey(med.generic, v.attribute, source)];
+        const r = st?.result;
+        return (
+          <div key={v.attribute} className="cell-fb-row small">
+            <span>
+              {attributeLabel(v.attribute)}: <strong>{fmtValue(said)}</strong>
+              {v.abstained ? <span className="warn-text"> (conflict)</span> : dissents ? <span className="warn-text"> (disagrees)</span> : null}
+            </span>
+            {!(v.abstained || dissents) ? null : r ? (
+              <span className="badge neutral">
+                Rejected as outdated
+                {r.trust_updates.map((u) => ` · trust ${u.before.toFixed(2)} → ${u.after.toFixed(2)}`).join("")}
+                {!r.trust_updates.length && " · no trust change"}
+              </span>
+            ) : (
+              <button
+                className="bad small-btn"
+                disabled={st?.busy}
+                onClick={() => onRejectCell(med.generic, v.attribute as TrustAttribute, source as Source)}
+              >
+                {sourceLabel(source)} {attributeLabel(v.attribute).toLowerCase()} is outdated
+              </button>
+            )}
+            {st?.error && <span className="error"> {st.error}</span>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function Inspector({ cell, idx, coverage, pinned, onClose, feedback, onRejectCell }: { cell: Cell; idx: Record<string, Evidence>; coverage: Props["coverage"]; pinned: boolean; onClose: () => void; feedback: Props["feedback"]; onRejectCell: Props["onRejectCell"] }) {
   const { med, source } = cell;
   const state = med.per_source[source] ?? "unknown";
   const rows = rowsFor(med, source, idx);
@@ -88,6 +144,11 @@ function Inspector({ cell, idx, coverage, pinned, onClose }: { cell: Cell; idx: 
         <p className="small">The source was found and the part of it that would list this medicine does not.</p>
       )}
       {cov?.scope_notes.length ? <p className="small muted">Scope: {cov.scope_notes.join("; ")}</p> : null}
+      {/* Buttons only on a pinned (clicked) cell, so a hover never fires feedback. */}
+      {pinned && <CellFeedback med={med} source={source} feedback={feedback} onRejectCell={onRejectCell} />}
+      {!pinned && sourceValues(med, source).length > 0 && (
+        <p className="small muted">Click the cell to mark this source's value as outdated.</p>
+      )}
       {rows.map((e) => (
         <RowText key={e.row_id} e={e} />
       ))}
@@ -106,7 +167,7 @@ function Inspector({ cell, idx, coverage, pinned, onClose }: { cell: Cell; idx: 
   );
 }
 
-export function Grid({ grid, evidenceIndex, coverage }: Props) {
+export function Grid({ grid, evidenceIndex, coverage, feedback, onRejectCell }: Props) {
   const [hover, setHover] = useState<Cell | null>(null);
   const [pinned, setPinned] = useState<Cell | null>(null);
   const shown = pinned ?? hover;
@@ -206,7 +267,7 @@ export function Grid({ grid, evidenceIndex, coverage }: Props) {
         </table>
       </div>
       {shown ? (
-        <Inspector cell={shown} idx={evidenceIndex} coverage={coverage} pinned={!!pinned} onClose={() => setPinned(null)} />
+        <Inspector cell={shown} idx={evidenceIndex} coverage={coverage} pinned={!!pinned && shown === pinned} onClose={() => setPinned(null)} feedback={feedback} onRejectCell={onRejectCell} />
       ) : (
         <aside className="inspector empty muted small">Hover a cell to see where it came from.</aside>
       )}

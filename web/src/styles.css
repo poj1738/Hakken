@@ -69,6 +69,7 @@ select { font: inherit; padding: 0.35rem; border-radius: 6px; border: 1px solid 
 .tone-bad .dot { color: #f87171; }
 .tone-mock { background: #fbbf24; color: #3b2a00; border-color: #fbbf24; font-weight: 600; }
 .tone-info { background: rgba(31, 111, 235, 0.45); }
+.tone-info .dot { color: #93c5fd; }
 .tone-disclaimer { background: #fff; color: #0d2538; border-color: #fff; font-weight: 600; }
 .caveats { margin: 0.4rem 0 0; padding-left: 1.1rem; color: var(--warn); }
 .mock-note { background: var(--warn-bg); color: var(--warn); padding: 0.4rem 1.2rem; font-size: 0.82rem; border-bottom: 1px solid #f0d58c; }
@@ -192,6 +193,9 @@ select { font: inherit; padding: 0.35rem; border-radius: 6px; border: 1px solid 
 .resolved { font-size: 0.8rem; min-width: 160px; }
 .abstained strong { color: var(--warn); }
 .warn-text { color: var(--warn); }
+.cell-feedback { margin-top: 0.5rem; border-top: 1px dashed var(--line); padding-top: 0.4rem; }
+.cell-fb-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin: 0.25rem 0; }
+button.small-btn { padding: 0.15rem 0.5rem; font-size: 0.8rem; }
 .ask-first { background: var(--warn-bg); color: var(--warn); border-radius: 6px; padding: 0.35rem 0.55rem; margin: 0.3rem 0; font-size: 0.86rem; }
 .statement { margin: 0.2rem 0; font-style: italic; }
 .detail-tags { display: flex; flex-wrap: wrap; gap: 0.8rem; margin: 0.2rem 0; }

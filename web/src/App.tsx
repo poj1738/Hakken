@@ -6,13 +6,15 @@ import type {
   HealthResponse,
   PatientSummary,
   RunResponse,
+  Source,
+  TrustAttribute,
 } from "./types";
 import { Header } from "./components/Header";
 import { Picker, type PatientsState } from "./components/Picker";
 import { Timeline } from "./components/Timeline";
 import { IdentityReview } from "./components/IdentityReview";
 import { CoverageStrip, Notices } from "./components/Coverage";
-import { Grid } from "./components/Grid";
+import { Grid, gridFeedbackKey } from "./components/Grid";
 import { Flags, type FeedbackChoice, type FeedbackState } from "./components/Flags";
 import { Tasks } from "./components/Tasks";
 import { TrustPanel, type AppliedTrustUpdate } from "./components/TrustPanel";
@@ -172,25 +174,36 @@ export default function App() {
     }
   };
 
-  const sendFeedback = async (f: Finding, c: FeedbackChoice) => {
+  // `key` is where the UI shows the result (a finding id, or one grid cell);
+  // `targetId` is what the API is told: a finding id, or grid:<generic>:<attribute>.
+  const sendFeedbackFor = async (key: string, targetId: string, c: FeedbackChoice) => {
     if (!run) return;
-    setFeedback((s) => ({ ...s, [f.id]: { busy: true } }));
+    setFeedback((s) => ({ ...s, [key]: { busy: true } }));
     try {
       const r = await api.feedback({
         run_id: run.run_id,
-        target_id: f.id,
+        target_id: targetId,
         verdict: c.verdict,
         reason: c.reason ?? null,
         // Only a source_outdated reject names a record; the API rejects them elsewhere.
         ...(c.reason === "source_outdated" ? { source: c.source, attribute: c.attribute } : {}),
       });
-      setFeedback((s) => ({ ...s, [f.id]: { result: r } }));
+      setFeedback((s) => ({ ...s, [key]: { result: r } }));
       setTrustUpdates((u) => [...u, ...r.trust_updates.map((t) => ({ ...t, runId: r.run_id, targetId: r.target_id, reason: r.reason }))]);
       setAcceptance((a) => [...a, ...r.acceptance_updates]);
     } catch (e) {
-      setFeedback((s) => ({ ...s, [f.id]: { error: msg(e) } }));
+      setFeedback((s) => ({ ...s, [key]: { error: msg(e) } }));
     }
   };
+  const sendFeedback = (f: Finding, c: FeedbackChoice) => sendFeedbackFor(f.id, f.id, c);
+  // The learning demo's step 1: a source's value for one grid attribute is outdated.
+  const rejectCell = (generic: string, attribute: TrustAttribute, source: Source) =>
+    sendFeedbackFor(gridFeedbackKey(generic, attribute, source), `grid:${generic}:${attribute}`, {
+      verdict: "reject",
+      reason: "source_outdated",
+      source,
+      attribute,
+    });
 
   const finished = run && (isTerminal(run.status) || run.status === "needs_review");
 
@@ -260,7 +273,7 @@ export default function App() {
               {(Object.keys(run.coverage).length > 0 || run.grid.length > 0) && (
                 <>
                   <CoverageStrip coverage={run.coverage} banner={run.banner} bpmhConfirmable={run.bpmh_confirmable} />
-                  <Grid grid={run.grid} evidenceIndex={run.evidence_index} coverage={run.coverage} />
+                  <Grid grid={run.grid} evidenceIndex={run.evidence_index} coverage={run.coverage} feedback={feedback} onRejectCell={rejectCell} />
                   <Flags findings={run.findings} feedback={feedback} onFeedback={sendFeedback} />
                   <div className="two-col">
                     <Tasks tasks={run.tasks} findings={run.findings} notices={run.notices} />

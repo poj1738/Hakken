@@ -280,7 +280,8 @@ export function Flags({ findings, feedback, onFeedback }: Props) {
         </div>
       )}
       {rest.length > 0 && (
-        <details className="tier">
+        // Open when nothing needs a pharmacist first, so a run's only findings are never hidden.
+        <details className="tier" open={mustSorted.length === 0}>
           <summary>
             <h3>Other findings ({rest.length})</h3>
           </summary>
