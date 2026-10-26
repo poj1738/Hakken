@@ -424,3 +424,13 @@ def test_a_zero_finding_run_has_no_recommendations(orch) -> None:
     first = run(orch, "MRN0000013")
     r = orch.resume(first.run_id, IdentityDecisionRequest(candidate_id="patient:INT00013", same_person=True))
     assert r.output.recommendations == [] and r.tasks  # the notices' tasks are still in `tasks`
+
+
+def test_a_documented_intentional_finding_carries_its_chart_note(orch) -> None:
+    """Scan S17: example_2's oxycodone/naloxone frequency change is documented on the chart
+    (EMR-000737, "withheld: hypotension"); the pharmacist must see that reason."""
+    r = run(orch, "MRN0000089")
+    f = next(f for f in r.findings if f.id == "frequency:oxycodone/naloxone")
+    assert f.intent_status == "documented_intentional"
+    assert f.intent_reason == "withheld: hypotension" == f.detail["chart_note"]
+    assert all(x.intent_reason is None for x in r.findings if x.intent_status != "documented_intentional")

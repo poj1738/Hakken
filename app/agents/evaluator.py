@@ -208,8 +208,8 @@ def analyse(ctx: AgentContext, links: list[IdentityLink], rows: list[SourceRow],
         gate = gates[id(c)]
         findings.append(Finding(
             id=c.id, type=c.type, generic=c.generic, high_risk_class=c.high_risk_class, severity=c.severity,
-            intent_status=c.intent_status, intent_reason=c.detail.get("reason") if c.intent_status ==
-            "documented_intentional" else None, priority=c.priority, detail=dict(c.detail),
+            intent_status=c.intent_status, intent_reason=(c.detail.get("chart_note") or c.detail.get("reason"))
+            if c.intent_status == "documented_intentional" else None, priority=c.priority, detail=dict(c.detail),
             evidence=[Evidence(source=raw[r].get("source") or "", row_id=r, sql_template_id="Q2",
                                query_id=q2_query_id, fields=raw[r]) for r in c.row_ids if r in raw],
             evidence_states=evidence.get(c.generic, {}),

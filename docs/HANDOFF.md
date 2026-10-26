@@ -27,6 +27,37 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 · Arnav · arnav/s17
+
+**Did:** Scan **S17** (the backend half). A `documented_intentional` finding now carries
+the chart note that made it intentional:
+- `detect.emit` sets `detail["chart_note"]`, using the same note `detect` uses to decide
+  intent.
+- The evaluator sets `intent_reason` from it.
+- Before, `intent_reason` read `detail["reason"]`, which the chart comparisons never
+  set, so it was always null.
+- **Example_2:** `frequency:oxycodone/naloxone` now has `intent_reason: "withheld:
+  hypotension"`, from EMR-000737.
+- **Guardrail:** `scripts/eval.py --split tune` before and after is identical: `ALL 145
+  17 5 precision 0.90 recall 0.97 F1 0.93`, high-risk 34/34, 0 false merges. Held-out
+  was not touched.
+- 1 test in `tests/unit/test_orchestrator.py`. `output_examples/sample_mode/`
+  regenerated.
+
+**Changed shared files:** none on the list. **`app/domain/packs/medtrace/detect.py`
+(Arpon's pack)** gets one additive detail key. No detection logic changed.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Anshu (the UI half of S17):** `Flags.tsx` shows the intent line only when
+  `intent_reason` is set. It's now set for this case. The scan also suggests showing
+  "Documented as intentional (no reason text)" when it's null.
+
+**Next:** the low-priority items (S26–S29, S31).
+
+---
+
 ### 2026-10-26 · Arnav · arnav/s16
 
 **Did:** Scan **S16**. `output.recommendations` used to be the first five task strings,
