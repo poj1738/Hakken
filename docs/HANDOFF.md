@@ -27,6 +27,23 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 16:30 AEDT · Anshu · anshu/ui-design-a
+
+**Did:** Restyled `web/` to the team's "Clinical Navy" design (design A). The branch also carries `anshu/live-mode` and `anshu/ui-polish`, which were not on `main` yet.
+- **Layout:** navy header; patient banner; four summary cards counted from the response; tabs (Discrepancies, Medication History, Actions Required, Source Confidence); identity review in place of the tabs while `needs_review`; a Record Sources sidebar (with data quality notices) and a Processing Log; stacks at phone width.
+- **Wording and IDs:** formal wording and enum labels throughout (e.g. Therapeutic duplication, Possibly discontinued, "Unresolved — verify with patient"). API prose is cleaned for display, with the original kept on hover and under "Technical details". Record keys, query IDs, tool names, per-step routed models and the trace path live behind that toggle.
+- **From the merged branches:** live mode checked against the `SAMPLE_MODE` API, including the learning demo P0003 → P0007 via grid-cell "Mark … as outdated".
+- **Checks:** checked in mock and live mode with Playwright. `make test` 738 passed / 45 skipped; build and secret scan clean.
+
+**Changed shared files:** none on the list. `PROGRESS.md` and `docs/AI_TOOLS_USAGE.md` updated.
+**Broken:** nothing in the UI. IBM Plex loads from Google Fonts; offline it falls back to system fonts.
+**Needs from teammates:**
+- Arnav — still open from my 12:16 entry: `evidence_index` lacks grid rows, so most Medication History cells show "No source record cited". The dose unit is also still missing.
+- Note: there is no undo for feedback in the API, so the design's "Undo" button is not shown.
+**Next:** demo rehearsal against the `SAMPLE_MODE` API. The UI build in CI still needs a team OK (`.github/workflows/ci.yml`).
+
+---
+
 ### 2026-10-26 · Arnav · arnav/docker
 
 **Did:** **The Docker run path is verified**, plus scan **S18** and **S30**.
