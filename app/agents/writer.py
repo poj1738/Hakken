@@ -31,7 +31,7 @@ _WHAT = {
     DT.ROUTE: "is charted by a different route than before admission",
     DT.DUPLICATION: "appears more than once when combination products are split into their ingredients",
     DT.STALE_LISTING: "is listed as current but its supply ran out long ago",
-    DT.DOSE_UNCONFIRMABLE: "has a dose the sources disagree on, and it changes without a new script",
+    DT.DOSE_UNCONFIRMABLE: "has a dose that changes without a new script, so it cannot be confirmed from the records",
     DT.UNPROPAGATED_DISCHARGE_CHANGE: "was changed at a previous discharge, but another source still shows the old state",
     DT.IDENTITY_UNCERTAIN: "rests on a record whose link to this patient is uncertain",
 }

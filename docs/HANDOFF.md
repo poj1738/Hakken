@@ -74,6 +74,98 @@ fresh SAMPLE_MODE run).
 
 ---
 
+### 2026-10-26 · Arnav · arnav/s36
+
+**Did:** Scan **S36**, plus a retry once on Nightshift HTTP 499.
+- **`detail.by_source`** on every dose_unconfirmable, dose, frequency, formulation and
+  route finding: `{gp | pharmacy | patient | emr: "<the words as written>"}`. Each value
+  comes from the rows the finding cites:
+  - **GP:** dose and directions ("as directed").
+  - **Pharmacy:** "N fills, latest <strength>, <qty> per <days> days, no dose stated".
+    The silo has no directions column, so it says so.
+  - **Patient:** their words ("up 2 units every three days").
+  - **Chart:** dose, unit (taken from the strength) and frequency ("5 mg variable per
+    INR"; insulin "11 units tds with meals").
+- **`detail.statement`**, where the detector wrote none:
+  - dose_unconfirmable: "No source confirms the current dose: GP as directed · pharmacy … ·
+    patient '…' · chart …". When the sources do disagree, it leads with "The sources
+    disagree on the dose".
+  - Formulation, route and PRN findings: "charted X against Y before admission".
+  - Dose and frequency findings keep their existing statement.
+- **Template:** dose_unconfirmable now reads "has a dose that changes without a new script,
+  so it cannot be confirmed from the records". The old "the sources disagree on" was
+  false when no source states a dose. Every template still passes the verifier.
+- **Differs from the brief:** this is built in the evaluator (`_what_each_source_says`),
+  not in `detect.py`. `detect` sees `MedStatement`s, which keep the parsed dose but not the
+  words each source wrote; for the chart, only the generic name. The raw Q2 rows are in
+  the evaluator. The scored pack is untouched.
+- **Guardrail:** `scripts/eval.py --split tune` before and after: `ALL 145 17 5 precision
+  0.90 recall 0.97 F1 0.93`, high-risk 34/34, 0 false merges.
+- **HTTP 499 ("Fetch is aborted")** is retried exactly once, outside `MAX_RETRIES`. A
+  second 499 is an upstream failure, so it's recorded in `model_calls` (S9) and the step
+  falls back.
+- Tests: 10 in `tests/unit/test_what_each_source_says.py`, 2 in the adapter tests.
+  `output_examples/sample_mode/` regenerated.
+
+**Changed shared files:** none.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Anshu (S37):** `detail.statement` and `detail.by_source` are live on the
+  dose-unconfirmable and chart-comparison cards. `by_source` keys are `gp`, `pharmacy`,
+  `patient` and `emr` (label it "Admission chart"). They're in SAMPLE_MODE after your next
+  pull, and in Docker after a rebuild.
+
+**Next:** S41 and S42, the backend halves.
+
+---
+
+### 2026-10-26 · Arnav · arnav/s35
+
+**Did:** Scan **S35**. The generator wrote the insulin **concentration** into the chart's
+dose: "100 units/mL" became `dose="100.0"` with `dose_unit="mg"`, i.e. "100.0 tds with
+meals", 300 units a day.
+- **`chart_dose(p, med)`** in `scripts/generate_synthetic.py` returns `dose` and
+  `dose_unit` for every EMR row (admission chart, commission, prior discharge):
+  - **mass products:** mg, unchanged;
+  - **unit-based products** (the two insulins): units per dose, `dose_unit="units"`.
+    Glargine is drawn inside its own regimen's range (10–40 units). Aspart is 4–20.
+- **Differs from the brief:** the units come from `random.Random("chart-units:<patient>:
+  <generic>")`, not from the patient's main `rng`. One extra draw there would shift every
+  later value for that patient and rewrite their GP, pharmacy and interview rows. As it
+  is, the ground truth is byte-identical, and the only committed fixture change is
+  P0006's insulin aspart chart row (`"100.0"` → `"11"`).
+- **P0015:** its insulin aspart is an *omission* (not charted), so its card has no chart
+  row. Arpon's "100.0 tds" came from the old data. All 44 unit-based EMR rows are now in
+  range, and no insulin row carries a mg strength.
+- **Zetaris:** `make synth` → `make refresh` (re-cache only; nothing created or dropped)
+  → `make verify`: 6/6 patients, 0 mismatches. A live Q3 read returns EMR-000055 as
+  `dose 11 · tds with meals` and EMR-000167 as `dose 19 · 10 to 40 units nocte`.
+- **Guardrail, `scripts/eval.py --split tune`:**
+  - before: `ALL 145 17 5 precision 0.90 recall 0.97 F1 0.93`
+  - after: `ALL 145 17 5 precision 0.90 recall 0.97 F1 0.93`
+  - High-risk 34/34 and 0 false merges, both times. Held-out not touched; no floor
+    changed.
+- **`output_examples/`:** none of the five example patients has a unit-based chart row,
+  so neither the sample nor the live outputs change. Not re-recorded.
+- 1 test in `tests/unit/test_generator.py`.
+
+**Changed shared files:** **`scripts/generate_synthetic.py`** and the committed fixture
+`tests/fixtures/medtrace/Q2__P0006.json`.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Everyone with local data:** run `make synth`. If your Zetaris is registered, also run
+  `make refresh`, or your silos still have the old insulin doses.
+
+**Next:** S36 (`by_source` and `statement` on the dose findings, for Anshu's S37), plus a
+single retry on Nightshift's HTTP 499. S9 (failed calls in `model_calls`) was already
+merged in #50.
+
+---
+
 ### 2026-10-26 · Arnav · arnav/s17
 
 **Did:** Scan **S17** (the backend half). A `documented_intentional` finding now carries

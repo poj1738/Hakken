@@ -193,6 +193,19 @@ def test_no_rendered_identifier_looks_like_a_real_ihi(silo_rows) -> None:
         assert not re.search(r"\b\d{16}\b", blob), f"{source}: 16-digit run"
 
 
+def test_a_unit_based_chart_dose_is_units_per_dose_not_the_concentration(silo_rows) -> None:
+    """Scan S35: "100 units/mL" is a concentration. The chart used to copy it into the dose,
+    so insulin aspart read "100.0 tds with meals" -- 300 units a day."""
+    rows = [r for r in silo_rows["emr"] if "unit" in (r.get("strength") or "").lower()]
+    assert rows, "no unit-based products charted"
+    for r in rows:
+        assert r["dose_unit"] == "units" and r["dose"].isdigit(), r
+        low, high = (10, 40) if "10 to 40 units" in r["frequency"] else (4, 20)
+        assert low <= int(r["dose"]) <= high, r
+    masses = [r for r in silo_rows["emr"] if r.get("dose") and "unit" not in (r.get("strength") or "").lower()]
+    assert masses and all(r["dose_unit"] == "mg" for r in masses)
+
+
 def test_prescribers_are_marked_synthetic(silo_rows) -> None:
     for row in silo_rows["pharmacy"]:
         if row.get("prescriber"):
