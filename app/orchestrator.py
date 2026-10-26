@@ -296,6 +296,10 @@ class Orchestrator:
             state.caveats.append(f"Nightshift unavailable for {name} ({exc.kind}); that step used the grounded "
                                  "template and is labelled offline-heuristic.")
             agent, action = name.split()
+            # Every request the failure spent is a model call: in model_calls and the trace, with
+            # the model that answered where there was one (scan S9, CLAUDE.md rule 3).
+            state.ctx.record(agent.capitalize(), action, _STEP_OF.get(action), exc.calls,  # type: ignore[arg-type]
+                             f"{name}: request failed ({exc.kind}).")
             state.ctx.tracer.emit(agent.capitalize(), "fallback", step=_STEP_OF.get(action), status="degraded",
                                   error=str(exc),
                                   message=f"{name}: Nightshift failed ({exc.kind}); used the grounded template.")
@@ -338,9 +342,8 @@ class Orchestrator:
         """Trace the hand-off: the Planner's need -> the template the Executor fills -> Zetaris."""
         need = state.plan.need(tool) if state.plan else planner.DEFAULT_NEED[tool]
         template = planner.TEMPLATE_FOR[tool]
-        how = (f"the Executor fills template {template} and the Zetaris adapter sends it (read-only check, "
-               "Bearer key, X-Org-ID, fresh X-Request-ID)" if template else "the lexicon plus one Nemotron "
-               "choice from a closed candidate list; no SQL")
+        how = (f"the Executor runs verified query {template} on Zetaris, read-only" if template else
+               "matched against the medicines lexicon, with Nemotron choosing only from a closed list; no SQL")
         step = {"find_identities": "FIND_IDENTITY"}.get(tool, tool.upper())
         state.ctx.tracer.emit("Executor", "route", step=step, message=f'Planner need "{need}" -> {how}.')
 

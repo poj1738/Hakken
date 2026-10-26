@@ -311,3 +311,48 @@ def test_auto_detect_none_when_nothing_answers(make_settings) -> None:
         raise httpx.ConnectError("refused")
 
     assert auto_detect(make_settings(), transport=httpx.MockTransport(handler)) is None
+
+
+# -- failed calls stay visible (scan S9, CLAUDE.md rule 3) -------------------------
+
+
+def test_invalid_json_keeps_both_answered_calls(make_settings) -> None:
+    rec = Recorder(httpx.Response(200, json=chat_body("not json at all", model="nvidia/nemotron-a")))
+    with pytest.raises(MeterlessError) as exc:
+        client(make_settings, rec).chat_json("Writer", MSG, Pick)
+    calls = exc.value.calls
+    assert len(calls) == 2 and {c.routed_model for c in calls} == {"nvidia/nemotron-a"}
+    assert all(c.model_call().role == "Writer" for c in calls)
+
+
+def test_a_truncated_call_is_recorded_as_truncated_with_its_model(make_settings) -> None:
+    rec = Recorder(httpx.Response(200, json=chat_body("cut", completion=MIN_MAX_TOKENS, model="nvidia/nemotron-b")))
+    with pytest.raises(TruncatedResponse) as exc:
+        client(make_settings, rec).chat("Writer", MSG, max_tokens=MIN_MAX_TOKENS)
+    (call,) = exc.value.calls
+    mc = call.model_call()
+    assert mc.truncated and mc.routed_model == "nvidia/nemotron-b" and mc.tokens["completion_tokens"] == MIN_MAX_TOKENS
+    assert call.trace_fields()["status"] == "error"
+
+
+def test_an_upstream_failure_is_recorded_without_inventing_a_model(make_settings) -> None:
+    rec = Recorder(httpx.Response(502, json={"error": "x"}))
+    with pytest.raises(MeterlessError) as exc:
+        client(make_settings, rec).chat("Evaluator", MSG)
+    (call,) = exc.value.calls
+    assert call.routed_model is None and call.error and call.model_call().role == "Evaluator"
+
+
+def test_a_failure_on_the_repair_keeps_the_first_answer_too(make_settings) -> None:
+    rec = Recorder(httpx.Response(200, json=chat_body("not json", model="nvidia/nemotron-a")),
+                   httpx.Response(502, json={"error": "x"}))
+    with pytest.raises(MeterlessError) as exc:
+        client(make_settings, rec).chat_json("Writer", MSG, Pick)
+    assert [c.routed_model for c in exc.value.calls] == ["nvidia/nemotron-a", None]
+
+
+def test_nothing_sent_means_no_call_recorded(make_settings) -> None:
+    c = MeterlessClient(make_settings(meterless_runtime_token=""), sleep=lambda _s: None)
+    with pytest.raises(MeterlessError) as exc:
+        c.chat("Writer", MSG)
+    assert exc.value.kind == "not_configured" and exc.value.calls == []

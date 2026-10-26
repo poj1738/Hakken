@@ -248,7 +248,10 @@ def test_live_nightshift_failure_degrades_visibly(make_settings, tmp_path) -> No
     r = o.start(RunRequest(patient_id="MRN0000089"))
     assert r.status == "partial" and r.findings
     assert any("Nightshift unavailable" in c for c in r.output.caveats)
-    assert any(e.status == "degraded" for e in r.trace) and r.model_calls == []
+    assert any(e.status == "degraded" for e in r.trace)
+    # Every request that reached Nightshift is listed (scan S9); none was answered, so no model is named.
+    assert r.model_calls and all(c.routed_model is None for c in r.model_calls)
+    assert {c.role for c in r.model_calls} >= {"Planner", "Writer", "Evaluator"}
     assert all(claim_problems(f) == [] for f in r.findings)
 
 
@@ -260,7 +263,8 @@ def test_each_planned_need_is_traced_to_its_template(orch) -> None:
     routes = [e for e in r.trace if e.action == "route"]
     assert [e.step for e in routes] == ["FIND_IDENTITY", "FETCH_MEDS", "RESOLVE_FREE_TEXT", "VERIFY"]
     assert all('Planner need "' in e.message for e in routes)
-    assert "template Q1" in routes[0].message and "template Q3" in routes[-1].message
+    assert "verified query Q1" in routes[0].message and "verified query Q3" in routes[-1].message
+    assert "Bearer" not in routes[0].message  # judge-facing text, not developer notes (Anshu, 26 Oct)
     assert "no SQL" in routes[2].message
     sent = [e for e in r.trace if e.sql]
     assert [e.sql_template_id for e in sent] == ["Q1", "Q2", "Q3"] and all(e.query_id for e in sent)
@@ -377,3 +381,26 @@ def test_a_zero_finding_run_has_a_summary(orch) -> None:
     r = orch.resume(first.run_id, IdentityDecisionRequest(candidate_id="patient:INT00013", same_person=True))
     assert r.status == "success" and not r.findings
     assert r.output.summary.startswith("No discrepancies found for") and "MRN0000013" in r.output.summary
+
+
+def test_a_failed_model_step_still_shows_its_calls(orch) -> None:
+    """Scan S9: a live step that fails after reaching Nightshift keeps its calls in model_calls and
+    the trace, then falls back -- the trace still says which model handled each request."""
+    from app.adapters.meterless import ChatResult, MeterlessError
+
+    run_id = orch.create(RunRequest(patient_id="MRN0000089"))
+    state = orch.runs[run_id]
+    orch.settings = orch.settings.model_copy(update={"sample_mode": False})
+
+    def failing():
+        exc = MeterlessError("invalid_json", "Writer: no valid JSON after one repair retry")
+        exc.calls = [ChatResult(text="{bad", role="Writer", requested_route="meterless/deep",
+                                routed_model="nvidia/nemotron-3.5-lightning-30b-a3b") for _ in range(2)]
+        raise exc
+
+    assert orch._llm_step(state, "writer draft", failing, lambda: "fallback") == "fallback"
+    assert [c.routed_model for c in state.ctx.model_calls] == ["nvidia/nemotron-3.5-lightning-30b-a3b"] * 2
+    assert all(c.role == "Writer" for c in state.ctx.model_calls)
+    models = [e.model for e in state.ctx.tracer.events if e.agent_name == "Writer" and e.action == "draft"]
+    assert models == ["nvidia/nemotron-3.5-lightning-30b-a3b"] * 2
+    assert state.ctx.tracer.events[-1].action == "fallback" and state.degraded

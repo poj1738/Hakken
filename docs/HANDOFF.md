@@ -27,6 +27,41 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 · Arnav · arnav/s9
+
+**Did:** Scan **S9**, plus Anshu's two text fixes.
+- **Failed Nightshift requests now show in `model_calls` and the trace** (rule 3).
+  `MeterlessError.calls` carries every request a failure spent:
+  - **invalid JSON:** both answered calls, with the model that answered each;
+  - **truncated:** `truncated: true`, the model and the completion tokens;
+  - **upstream 502 or timeout after retries:** `routed_model: null`, because no model
+    answered and none is invented;
+  - **failure on the repair:** the first, unvalidated answer as well.
+
+  `_llm_step` records them before falling back. Nothing is recorded when nothing was
+  sent (`not_configured`). Before, a step that failed looked as if it had never called
+  a model.
+- **Anshu's strings:** the duplication template now reads "appears more than once when
+  combination products are split into their ingredients". The route log step now reads
+  `Planner need "…" -> the Executor runs verified query Q1 on Zetaris, read-only.` (no
+  header names).
+- **Changed test:** `test_live_nightshift_failure_degrades_visibly` used to assert
+  `model_calls == []` on a run where Nightshift answered 502. That was the S9 bug, so it
+  now asserts the requests are listed with no model named. Six new tests (five adapter,
+  one orchestrator). `output_examples/sample_mode/` regenerated.
+
+**Changed shared files:** none.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Anshu:** both strings are fixed. You can clear the "Scene 1, text" and "Processing
+  Log" items in `docs/DEMO_SCRIPT.md`; I haven't edited your file.
+
+**Next:** S15 (free-text resolution accepts any candidate), S16, S17.
+
+---
+
 ### 2026-10-26 17:40 AEDT · Anshu · anshu/demo-rehearsal
 
 **Did:** Demo rehearsal.

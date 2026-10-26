@@ -89,6 +89,9 @@ class MeterlessError(RuntimeError):
         self.kind = kind
         self.status = status
         self.detail = detail
+        #: Every request this failure spent, answered or not (scan S9: rule 3 wants each one in
+        #: the trace). Filled by `chat`/`chat_json`; empty when nothing was sent.
+        self.calls: list[ChatResult] = []
 
 
 class TruncatedResponse(MeterlessError):
@@ -99,6 +102,7 @@ class TruncatedResponse(MeterlessError):
                          detail=routed_model)
         self.completion_tokens = completion_tokens
         self.max_tokens = max_tokens
+        self.routed_model = routed_model
 
 
 @dataclass(frozen=True)
@@ -127,6 +131,9 @@ class ChatResult:
     #: HTTP attempts this answer took. >1 means upstream failures were retried --
     #: usually `<model>_empty_response`, i.e. reasoning exhausted the budget.
     attempts: int = 1
+    #: A request that failed (`MeterlessError.calls`): why, and whether it was cut off.
+    error: str | None = None
+    truncated: bool = False
 
     def model_call(self) -> ModelCall:
         """The `RunResponse.model_calls` entry for this call."""
@@ -137,7 +144,7 @@ class ChatResult:
             routed_model=self.routed_model,
             request_id=self.request_id,
             tokens=dict(self.usage),
-            truncated=False,  # a truncated call raises; it never becomes a ChatResult
+            truncated=self.truncated,
         )
 
     def trace_fields(self) -> dict[str, Any]:
@@ -149,6 +156,7 @@ class ChatResult:
             "latency_ms": self.latency_ms,
             "retry_count": self.attempts - 1,
             "meterless": receipt_summary(self.receipt) or None,
+            **({"error": self.error, "status": "error"} if self.error else {}),
         }
 
 
@@ -299,8 +307,21 @@ class MeterlessClient:
         payload: dict[str, Any] = {"model": route, "messages": messages, "max_tokens": max_tokens, "stream": False}
         if temperature is not None:
             payload["temperature"] = temperature
-        response, latency_ms, attempts = self._post_with_retry(payload)
-        result = self._parse_chat(response, role=role, route=route, max_tokens=max_tokens, latency_ms=latency_ms)
+        start = time.monotonic()
+        try:
+            response, latency_ms, attempts = self._post_with_retry(payload)
+            result = self._parse_chat(response, role=role, route=route, max_tokens=max_tokens,
+                                      latency_ms=latency_ms)
+        except MeterlessError as exc:
+            # The request was sent, so it is a model call: keep it, with whatever is known of who
+            # answered (a truncated reply names its model; an upstream failure may name none).
+            routed = exc.routed_model if isinstance(exc, TruncatedResponse) else None
+            exc.calls = [ChatResult(text="", role=role, requested_route=route, routed_model=routed,
+                                    latency_ms=int((time.monotonic() - start) * 1000), max_tokens=max_tokens,
+                                    error=str(exc)[:300], truncated=isinstance(exc, TruncatedResponse),
+                                    usage={"completion_tokens": exc.completion_tokens}
+                                    if isinstance(exc, TruncatedResponse) else {})]
+            raise
         result.attempts = attempts
         return result
 
@@ -379,7 +400,11 @@ class MeterlessClient:
         calls: list[ChatResult] = []
         error = ""
         for attempt in range(2):
-            result = self.chat(role, convo, route=route, max_tokens=max_tokens)
+            try:
+                result = self.chat(role, convo, route=route, max_tokens=max_tokens)
+            except MeterlessError as exc:
+                exc.calls = [*calls, *exc.calls]  # the first, unvalidated answer was a real call too
+                raise
             calls.append(result)
             try:
                 return schema.model_validate(_extract_json(result.text)), calls
@@ -389,7 +414,9 @@ class MeterlessClient:
                     convo = [*convo, {"role": "assistant", "content": result.text},
                              {"role": "user", "content": "That reply did not validate against the schema: "
                               f"{error}\nReply with ONLY the corrected JSON object."}]
-        raise MeterlessError("invalid_json", f"{role}: no valid JSON after one repair retry", detail=error)
+        exc = MeterlessError("invalid_json", f"{role}: no valid JSON after one repair retry", detail=error)
+        exc.calls = calls  # both answered by a model: they belong in model_calls (scan S9)
+        raise exc
 
 
 def auto_detect(settings: Settings | None = None, *, timeout: float = 1.5,
