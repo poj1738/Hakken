@@ -159,7 +159,9 @@ LEARNING_PAIR = {"P0003": "teach", "P0007": "learn"}
 #: conflicts, an insulin omission and an antiplatelet duplication; P0089 -- an
 #: opioid duplication and frequency error, straight through; P0013 -- two of four
 #: sources found, so the history is declared unconfirmable rather than guessed.
-SHOWCASE = ("P0013", "P0015", "P0089")
+#: Demo patients (26 Oct): P0083 insulin left off the chart, P0132 double opioid,
+#: P0194 a stopped opioid charted -- one unmistakable high-risk finding each.
+SHOWCASE = ("P0013", "P0015", "P0089", "P0083", "P0132", "P0194")
 LEARNING_GP_AGE_DAYS = 380
 LEARNING_FILL_AGE_DAYS = 6
 

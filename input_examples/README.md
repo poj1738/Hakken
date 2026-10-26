@@ -23,3 +23,15 @@ recorded in the ground truth as `learning_demo`. It is not presented as chance.
 
 `output_examples/` must come from real runs of these inputs (`make examples`),
 never written by hand.
+
+## Demo patients (for the video)
+
+Three more patients with one unmistakable, high-risk discrepancy each. They work live and,
+via their replay fixtures, in `SAMPLE_MODE`. Pick them in the UI or post
+`{"patient_id": "<MRN>"}` to `POST /run`.
+
+| Patient | What the pharmacist should catch |
+|---|---|
+| MRN0000194 | **Oxycodone is charted at admission, but the patient had stopped it** (commission, high risk). One finding, nothing else. |
+| MRN0000083 | **Insulin aspart is missing from the admission chart**, and its dose can't be confirmed (omission + dose, high risk). |
+| MRN0000132 | **Two oxycodone products at once**: a duplication (high risk). |
