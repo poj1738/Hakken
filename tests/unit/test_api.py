@@ -160,3 +160,21 @@ def test_serve_binds_loopback_unless_host_is_set(monkeypatch) -> None:
     monkeypatch.setenv("HOST", "0.0.0.0")
     assert run.main(["serve"]) == 0
     assert seen == ["127.0.0.1", "0.0.0.0"]
+
+
+def test_a_background_run_that_throws_is_reported_not_left_running(make_settings, tmp_path, monkeypatch) -> None:
+    """Scan S11, over HTTP with the real background thread: the UI's poll ends."""
+    import app.orchestrator as orch_mod
+
+    def boom(*_a, **_kw):
+        raise TypeError("unexpected response shape")
+
+    monkeypatch.setattr(orch_mod.evaluator, "analyse", boom)
+    with _client(make_settings, tmp_path, background=True) as c:
+        run_id = c.post("/run", json={"patient_id": "MRN0000089"}).json()["run_id"]
+        for _ in range(100):
+            body = c.get(f"/run/{run_id}").json()
+            if body["status"] != "running":
+                break
+            time.sleep(0.05)
+        assert body["status"] == "error" and body["error"]["type"] == "TypeError"
