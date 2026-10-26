@@ -3,7 +3,7 @@
 
     python3 run.py --input input_examples/example_2.json   # one run, RunResponse JSON to stdout
     python3 run.py --input input_examples/example_1.json --confirm patient:INT00015
-    python3 run.py serve                                   # the API on 0.0.0.0:$PORT
+    python3 run.py serve                                   # the API on $HOST:$PORT (127.0.0.1)
 
 `SAMPLE_MODE=true` runs the real agent logic on the recorded Zetaris data with offline
 agents: no Zetaris, no Nightshift, no network.
@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -37,7 +38,9 @@ def main(argv: list[str] | None = None) -> int:
         import uvicorn
 
         from app.config import get_settings
-        uvicorn.run("app.main:app", host="0.0.0.0", port=get_settings().port)
+        # Loopback by default: the API has no auth, so it should not answer the venue's
+        # Wi-Fi (scan S30). The Docker image sets HOST=0.0.0.0 inside the container.
+        uvicorn.run("app.main:app", host=os.environ.get("HOST", "127.0.0.1"), port=get_settings().port)
         return 0
     if not args.input:
         parser.print_help()

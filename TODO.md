@@ -75,7 +75,7 @@ submission. **Hard deadline 2026-10-27 23:45 UTC** (Wed 28 Oct 10:45 AEDT).
 ## Phase 5 — entry points, Docker, UI
 
 - [x] `run.py --input` and `run.py serve` for real.
-- [ ] **Actually build and run the Docker image** — the Dockerfile and compose file are
+- [x] **Actually build and run the Docker image** (verified 26 Oct) — the Dockerfile and compose file are
       written but have never been executed.
 - [ ] `web/`: question box, live agent timeline, evidence table linking each number to
       its SQL, "what memory was used" panel, Nightshift status pill, feedback thumbs.

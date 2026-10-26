@@ -27,6 +27,51 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 · Arnav · arnav/docker
+
+**Did:** **The Docker run path is verified**, plus scan **S18** and **S30**.
+- **Fresh clone, no `.env`:** `SAMPLE_MODE=true docker compose up --build`. example_2
+  succeeds with 5 findings (offline-heuristic). example_1 pauses at needs_review and
+  succeeds after `POST /run/{id}/identity`.
+- **Live in Docker (`~/Hakken`, real `.env`):** Zetaris connected, and Nightshift is
+  online through `host.docker.internal`. example_3 paused, was confirmed, and succeeded,
+  with every call answered by `nvidia/nemotron-3.5-lightning-30b-a3b`. The trace landed
+  in `./logs`, and H-MEM and World Model state in the volume.
+- **Compose fixes** (without them a fresh clone could not run):
+  - `env_file` is optional, and `SAMPLE_MODE` comes from the shell, else `.env`.
+  - datasvc mounts `./data` read-only (the silos are kept out of the image, so it
+    served 503 before).
+  - `.state` is a named volume (`hakken-state`): a bind mount of an untracked directory
+    is created root-owned on a fresh clone.
+- **S18:** `create_app` mounts `web/dist` at `/` when a build exists, after every API
+  route. The image builds the UI with `VITE_API_MODE=live VITE_API_URL=`, so it calls
+  the API on the same origin. I checked the bundle: no `localhost:8000`, no mock data.
+- **S30:** `run.py serve` binds `127.0.0.1` unless `HOST` is set. The image sets
+  `HOST=0.0.0.0`, and compose publishes the app on `127.0.0.1:8000` only. datasvc
+  stays on every interface: the Zetaris containers reach it through
+  `host.docker.internal`, and it serves only synthetic data.
+- Three tests in `tests/unit/test_api.py`.
+
+**Changed shared files:** **`Dockerfile`**, **`docker-compose.yml`**, `run.py`, and
+`app/main.py` (mine). **`run.py serve` now listens on 127.0.0.1 by default.** If you
+reach a host-run API from another machine, set `HOST=0.0.0.0`.
+
+**Broken:** nothing. Unit tests pass. On my machine the compose stack is what's
+running now: it replaced the host API server and host datasvc on 8000/8100.
+
+**Needs from teammates:**
+- **Anshu:** the image now serves your UI in **live** mode at http://localhost:8000.
+  It has never been reviewed against the real API. Your six open questions in
+  HANDOFF still stand. Note that `requested_route` in `model_calls` comes from
+  `METERLESS_MODEL_FAST`/`_DEEP`: `.env.example` says `meterless/fast`, but
+  `app/config.py` defaults to `nvidia/*` ids, which is what a no-`.env` SAMPLE_MODE
+  run shows.
+
+**Next:** the remaining scan items. S14 (SAMPLE_MODE `/patients` lists 200 patients,
+but only 13 are replayable) is the next one a judge would hit in Docker.
+
+---
+
 ### 2026-10-26 · Arnav · arnav/s23-docs
 
 **Did:** Scan **S23**: the judge-facing docs now describe the code as it is.

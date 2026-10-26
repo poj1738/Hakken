@@ -120,3 +120,36 @@ def test_errors(api, method, path, body, code) -> None:
 def test_cors_allows_the_vite_dev_server(api) -> None:
     r = api.options("/status", headers={"Origin": "http://localhost:5173", "Access-Control-Request-Method": "GET"})
     assert r.headers.get("access-control-allow-origin") == "http://localhost:5173"
+
+
+def test_the_built_ui_is_served_on_the_same_origin(make_settings, tmp_path, monkeypatch) -> None:
+    """Scan S18: the Docker image serves web/dist itself, and every API route still wins."""
+    dist = tmp_path / "dist"
+    dist.mkdir()
+    (dist / "index.html").write_text("<!doctype html><title>MedTrace</title>")
+    monkeypatch.setattr("app.main.WEB_DIST", dist)
+    with _client(make_settings, tmp_path, background=False) as c:
+        assert "MedTrace" in c.get("/").text
+        assert c.get("/status").json()["sample_mode"] is True
+        assert c.get("/patients").status_code == 200
+
+
+def test_no_ui_route_without_a_build(make_settings, tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr("app.main.WEB_DIST", tmp_path / "missing")
+    with _client(make_settings, tmp_path, background=False) as c:
+        assert c.get("/").status_code == 404
+
+
+def test_serve_binds_loopback_unless_host_is_set(monkeypatch) -> None:
+    """Scan S30: no auth, so not on the venue's Wi-Fi by default; the image sets HOST."""
+    import uvicorn
+
+    import run
+
+    seen: list[str] = []
+    monkeypatch.setattr(uvicorn, "run", lambda *a, **kw: seen.append(kw["host"]))
+    monkeypatch.delenv("HOST", raising=False)
+    assert run.main(["serve"]) == 0
+    monkeypatch.setenv("HOST", "0.0.0.0")
+    assert run.main(["serve"]) == 0
+    assert seen == ["127.0.0.1", "0.0.0.0"]
