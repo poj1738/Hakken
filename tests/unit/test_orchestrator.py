@@ -353,3 +353,27 @@ def test_tracer_masks_secrets(make_settings, tmp_path) -> None:
     line = (tmp_path / "trace-r1.jsonl").read_text()
     assert "example-secret-value-123" not in line and "abcdefghijkl" not in line
     assert json.loads(line)["message"].count("***") == 2
+
+
+def test_an_unexpected_error_ends_the_run_as_error_not_running(orch, monkeypatch) -> None:
+    """Scan S11: a bug in any step used to leave a background run `running` forever."""
+    def boom(*_a, **_kw):
+        raise KeyError("detail")
+
+    monkeypatch.setattr(orch_mod.evaluator, "analyse", boom)
+    run_id = orch.create(RunRequest(patient_id="MRN0000089"))
+    r = orch.execute(run_id)
+    assert r.status == "error" and r.error is not None and r.error.type == "KeyError"
+    assert orch.get(run_id).status == "error"
+    last = r.trace[-1]
+    assert last.step == "ERROR" and "KeyError" in last.message
+    assert "boom" in (last.error or "")  # where it failed, for whoever debugs it
+
+
+def test_a_zero_finding_run_has_a_summary(orch) -> None:
+    """Scan S12: example_3 (P0013) used to return an empty summary."""
+    first = run(orch, "MRN0000013")
+    assert first.status == "needs_review"
+    r = orch.resume(first.run_id, IdentityDecisionRequest(candidate_id="patient:INT00013", same_person=True))
+    assert r.status == "success" and not r.findings
+    assert r.output.summary.startswith("No discrepancies found for") and "MRN0000013" in r.output.summary

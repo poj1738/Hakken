@@ -67,6 +67,36 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 - Show `dose_units` (from #47) in the grid's reconciled column.
 - The `anshu/ui-judges` pass.
 
+---
+
+### 2026-10-26 · Arnav · arnav/s11-s12
+
+**Did:** Scan **S11** and **S12**.
+- **S11:** `_guard` now ends with `except Exception`. Any unexpected error (a bug, or an
+  odd response shape) ends the run as `status: "error"` with `ErrorInfo(type, message,
+  recoverable=False)`, plus an `ERROR` trace event. The event names the exception and
+  the last three frames (file:line function), masked with the tracer's secret mask.
+  Before, a background run stayed `running` forever and the UI polled until it gave up.
+  `POST /run?wait=true` now returns that error response instead of a 500.
+- **S12:** a zero-finding run gets a summary. `writer.draft` returns the grounded
+  summary when there's nothing to explain. `_offline_summary` says "No discrepancies
+  found for <patient> among the sources found; see the notices and tasks." plus the
+  coverage banner, deliberately not "nothing to worry about". example_3 (P0013) now
+  shows it.
+- Tests: an orchestrator test and an HTTP test with the real background thread (S11),
+  and a P0013 test (S12). `output_examples/sample_mode/` regenerated.
+
+**Changed shared files:** none.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:** nothing.
+
+**Next:** S9 (Nemotron calls that fail validation are missing from `model_calls`), then
+S15–S17.
+
+---
+
 ### 2026-10-26 · Arnav · arnav/grid-evidence
 
 **Did:** Anshu's two asks from 12:16.

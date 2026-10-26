@@ -14,6 +14,7 @@ marks the run `partial` -- it never invents text and never hides the degradation
 from __future__ import annotations
 
 import time
+import traceback
 import uuid
 from dataclasses import dataclass, field
 from typing import Any
@@ -229,6 +230,18 @@ class Orchestrator:
             state.response = self._respond(state, "error", summary=f"The run could not complete: {exc}",
                                            error=ErrorInfo(type=type(exc).__name__, message=str(exc),
                                                            recoverable=getattr(exc, "recoverable", False)))
+        except Exception as exc:
+            # Anything else -- a bug, an unexpected response shape -- still ends the run (scan S11).
+            # Without this, a background run stayed `running` forever and the UI polled without end.
+            mask = state.ctx.tracer.mask
+            where = " <- ".join(f"{Path(f.filename).name}:{f.lineno} {f.name}"
+                                for f in reversed(traceback.extract_tb(exc.__traceback__)[-3:]))
+            message = mask(f"{type(exc).__name__}: {exc}")
+            state.ctx.tracer.emit("Evaluator", "error", step="ERROR", status="error", error=mask(f"{message} at {where}"),
+                                  message=f"Run failed with an unexpected error: {message}")
+            state.response = self._respond(state, "error", summary=f"The run could not complete: {message}",
+                                           error=ErrorInfo(type=type(exc).__name__, message=message,
+                                                           recoverable=False))
         finally:
             state.running = False
         return state.response
