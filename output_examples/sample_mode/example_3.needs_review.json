@@ -1,5 +1,5 @@
 {
-  "run_id": "run-88df8a0cca3d",
+  "run_id": "run-e26f2c6e9c08",
   "status": "needs_review",
   "output": {
     "summary": "Waiting for identity review: 1 near-miss record(s).",
@@ -49,8 +49,8 @@
       "status": "ok"
     }
   ],
-  "trace_id": "run-88df8a0cca3d",
-  "log_file": "/tmp/hakken-traces-h5v3zjpx/trace-run-88df8a0cca3d.jsonl",
+  "trace_id": "run-e26f2c6e9c08",
+  "log_file": "/tmp/hakken-traces-fyfbpj1r/trace-run-e26f2c6e9c08.jsonl",
   "execution_time_seconds": 0.01,
   "error": null,
   "memory_used": [],
@@ -523,8 +523,8 @@
   ],
   "trace": [
     {
-      "timestamp": "2026-10-26T07:08:44.121193+00:00",
-      "run_id": "run-88df8a0cca3d",
+      "timestamp": "2026-10-26T07:36:47.117106+00:00",
+      "run_id": "run-e26f2c6e9c08",
       "agent_name": "Planner",
       "action": "start",
       "input_summary": null,
@@ -548,8 +548,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.122426+00:00",
-      "run_id": "run-88df8a0cca3d",
+      "timestamp": "2026-10-26T07:36:47.118435+00:00",
+      "run_id": "run-e26f2c6e9c08",
       "agent_name": "Planner",
       "action": "recall",
       "input_summary": null,
@@ -573,8 +573,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.122790+00:00",
-      "run_id": "run-88df8a0cca3d",
+      "timestamp": "2026-10-26T07:36:47.118853+00:00",
+      "run_id": "run-e26f2c6e9c08",
       "agent_name": "Planner",
       "action": "plan",
       "input_summary": null,
@@ -598,8 +598,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.123031+00:00",
-      "run_id": "run-88df8a0cca3d",
+      "timestamp": "2026-10-26T07:36:47.119048+00:00",
+      "run_id": "run-e26f2c6e9c08",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -623,8 +623,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.126839+00:00",
-      "run_id": "run-88df8a0cca3d",
+      "timestamp": "2026-10-26T07:36:47.122864+00:00",
+      "run_id": "run-e26f2c6e9c08",
       "agent_name": "Executor",
       "action": "find_identities",
       "input_summary": null,
@@ -647,13 +647,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q1",
-      "query_id": "2b417441-c2a2-4de4-8f68-9d0ee1113f5e",
+      "query_id": "8080dfad-7a11-4b40-a1f2-608179545e31",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T07:08:44.127494+00:00",
-      "run_id": "run-88df8a0cca3d",
+      "timestamp": "2026-10-26T07:36:47.123400+00:00",
+      "run_id": "run-e26f2c6e9c08",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -664,7 +664,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query 2b417441-c2a2-4de4-8f68-9d0ee1113f5e); audit seq 21-25.",
+      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query 8080dfad-7a11-4b40-a1f2-608179545e31); audit seq 21-25.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -677,8 +677,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.127772+00:00",
-      "run_id": "run-88df8a0cca3d",
+      "timestamp": "2026-10-26T07:36:47.123677+00:00",
+      "run_id": "run-e26f2c6e9c08",
       "agent_name": "Executor",
       "action": "needs_review",
       "input_summary": null,
