@@ -3,7 +3,7 @@
 One file, current state only. Overwrite it as things change — the history lives in
 `docs/HANDOFF.md` and in git. Read this first at session start.
 
-**Last updated:** 2026-10-25 by Anshu
+**Last updated:** 2026-10-26 by Arnav
 
 > **On `main`:** consultant rulings applied, population 200, held-out F1 0.95, high-risk 35/37 (core APINCHS 30/32, extended 5/5). **Arpon's section is done**, including demo data: 5 `input_examples/` with replay fixtures, a staged learning-demo pair (P0003 → P0007, `docs/DECISIONS.md`), and sample data in the Docker image. Everything left is in Arnav's and Anshu's layers.
 
@@ -13,22 +13,22 @@ One file, current state only. Overwrite it as things change — the history live
 Roles and contracts: `docs/PLAN_2026-10-24.md`.
 
 **The clinical domain pack is complete.** Every function in
-`app/domain/packs/medtrace/` has a real body except `queries.q_shortages` (Q4, the
+`app/domain/packs/medtrace/` has a real body, including `queries.q_shortages` (Q4, the
 optional TGA overlay). It is scored end to end by `scripts/eval.py` against the
 planted ground truth.
 
-**The critical path is now the agent layer, and every unmet disqualification rule
-sits in it.** Both adapters, the four agents, the orchestrator, the API, tracing
-and both engines are still stubs. That means: no model call goes through Nightshift
-yet (rules 2 and 3), no Meterless engine or conformance test exists (rule 2),
-`POST /run`, `run.py`, Docker and `SAMPLE_MODE` do not work (rule 8), and no agent
-queries Zetaris yet (rule 1 — though the registration itself is live and verified).
+**The agent layer is built and runs end to end, live and in `SAMPLE_MODE`** (26 Oct).
+Both adapters, the four agents, the orchestrator, tracing, the API and both Meterless
+engines (conformance 8/8 and 13/13) work, and `output_examples/` holds real runs of all
+five inputs. **Still open:** the Docker run path has never been built (rule 8), the
+UI has never run against the live API, and the remaining items in
+`docs/SCAN_2026-10-25.md`.
 
 | Area | Owner | State |
 |---|---|---|
 | Tests | — | **584 green.** No services needed; CI runs Python 3.11 on a fresh clone and the suite changes 0 tracked files |
 | **MedTrace contract** (`types.py`) | Arpon | **frozen, on `main`.** Shared file — changes need sign-off, a HANDOFF entry and a PR line |
-| SQL templates (`queries.py`) | Arpon | **done, run live.** Q0–Q3 and Q_REF; `q_shortages` (Q4) deliberately unwritten |
+| SQL templates (`queries.py`) | Arpon | **done, run live.** Q0–Q3 and Q_REF; `q_shortages` (Q4) written, run only if the TGA view is registered |
 | Clinical logic — all 11 modules | Arpon | **done.** `fuse` (trust-weighted BPMH), `detect` (9 of 11 types emitted; 2 deliberately not — see `docs/DECISIONS.md` 25 Oct), `triage` (ranking with an absolute APINCHS floor) |
 | **Detector scorecard** (`scripts/eval.py`) | Arpon | **200 patients, held-out: precision 0.95, recall 0.95, F1 0.95, high-risk 35/37 — core APINCHS 30/32 [0.80, 0.98], extended 5/5** (simulated review); 0.93 F1 with no human review. Tune 0.93 (one deliberate miss: the learning-demo chart error, visible only after feedback), high-risk 34/34. Consultant rulings 11–14 applied. Pinned by `tests/eval/test_scorecard.py` |
 | Identity linkage | Arpon | 200 patients: 0 false merges; 535 true links auto-merge, 31 go to review, 2 lost |
@@ -41,8 +41,8 @@ queries Zetaris yet (rule 1 — though the registration itself is live and verif
 | API example fixtures for the UI | Arnav | **done, regenerated for the 25 Oct data.** Every UI state; the review example is now P0015 (file name unchanged for `web/`) |
 | **`output_examples/` from real runs** (scan S2) | Arnav | **done.** `make examples` / `scripts/generate_examples.py`. All five inputs in **SAMPLE_MODE and live**. Live: every model call answered by `nvidia/nemotron-3.5-lightning-30b-a3b`; 4 success, example_2 `partial` (Nightshift timed out once and returned one upstream error, so those steps degraded to the template, labelled). A test checks the outputs differ by input and still match the code |
 | Run length | Arnav | `MAX_AGENT_ITERATIONS` default **2** (was 3): live runs now 30-527 s against the 10-min budget |
-| Meterless adapter (Nightshift) | Arnav | **done, verified live on Arnav's machine, 25 Oct** — status, chat and JSON answered by `nvidia/nemotron-3.5-lightning-30b-a3b`; 33 tests. SAMPLE_MODE uses `offline-heuristic`, never replayed text. Not yet called by any agent |
-| Zetaris adapter | Arnav | **done.** Read-only guard, budget of 8 per run, a query record for the trace, SAMPLE_MODE replay of `tests/fixtures/medtrace/` by MRN, Q_REF lexicon load; 41 tests. Live `SELECT 1` / `SHOW LIGHTNING DATABASES` OK on Arnav's machine (MedTrace views are not registered there — fixtures until Arpon says otherwise). Not yet called by any agent |
+| Meterless adapter (Nightshift) | Arnav | **done, verified live on Arnav's machine, 25 Oct** — status, chat and JSON answered by `nvidia/nemotron-3.5-lightning-30b-a3b`; 33 tests. SAMPLE_MODE uses `offline-heuristic`, never replayed text. Called by all four agents |
+| Zetaris adapter | Arnav | **done.** Read-only guard, budget of 8 per run, a query record for the trace, SAMPLE_MODE replay of `tests/fixtures/medtrace/` by MRN, Q_REF lexicon load; 41 tests. MedTrace views registered and queried live on Arnav's machine. Called by the Executor and Evaluator |
 | Orchestrator, agents, trace | Arnav | **done.** `app/orchestrator.py` and four agents, wired to the pack in `reconcile()` order. Planner, free-text resolution, Writer and critique go through Nightshift; verification is one Q3; the identity pause/resume works; budget and timeout end the run as `partial`. SAMPLE_MODE results match `input_examples/README.md` for P0089, P0015 and P0001. **Live P0089 on Arnav's machine:** every model call answered by `nvidia/nemotron-3.5-lightning-30b-a3b`, 5 findings verified. 19 tests |
 | API and `run.py` | Arnav | **done.** `POST /run` (background thread; the UI polls `GET /run/{id}`; `?wait=true` runs synchronously), `POST /run/{id}/identity`, `GET /status`, `GET /patients`, `POST /feedback` (trust and acceptance per PLAN 5.7, incl. `grid:<generic>:<attribute>` targets). **The learning demo works over HTTP.** Live server verified on Arnav's machine: Zetaris connected, Nightshift online. 14 tests |
 | Feedback learning | Arnav | **durable, through H-MEM** (`app/feedback.py`, `app/agents/memory.py`). The learning demo survives a restart |
