@@ -1,5 +1,5 @@
 import type { Notice } from "../types";
-import { NOTICE_LABEL, cleanText, medName } from "../format";
+import { NOTICE_LABEL, cleanText, medName, scopeNote } from "../format";
 import { InfoTip } from "./InfoTip";
 import { TechDetails } from "./TechDetails";
 
@@ -39,12 +39,29 @@ export function Notices({ notices }: { notices: Notice[] }) {
             {NOTICE_LABEL[n.type] ?? n.type}
             {n.generic ? ` · ${medName(n.generic)}` : ""}
           </div>
-          <div className="notice-text">{cleanText(n.detail)}</div>
+          <div className="notice-text">{typeof n.detail === "string" ? cleanText(n.detail) : ""}</div>
         </div>
       ))}
       <div className="sec-pad">
         <TechDetails items={notices.map((n, i): [string, string | null] => [`Notice ${i + 1} records`, n.row_ids.length ? n.row_ids.join(", ") : null])} />
       </div>
     </>
+  );
+}
+
+/** S41: scope notes one per line, each with its short label (One pharmacy only · Private scripts · Old GP list). */
+export function ScopeNotes({ notes, className = "scope-notes" }: { notes: string[]; className?: string }) {
+  if (!notes.length) return null;
+  return (
+    <ul className={className}>
+      {notes.map((n) => {
+        const { label, text } = scopeNote(n);
+        return (
+          <li key={n} title={n}>
+            {label && <span className="scope-label">{label}</span>} {text}
+          </li>
+        );
+      })}
+    </ul>
   );
 }

@@ -118,6 +118,23 @@ export const withUnit = (v: unknown, unit: string | null | undefined) => {
   return unit && s !== "—" ? `${s} ${unit}` : s;
 };
 
+/**
+ * S41: a scope note is "<prefix>: <text>" (coverage.py's SCOPE_* constants).
+ * Show the prefix as a short label and the text on its own line; never join notes.
+ */
+export function scopeNote(raw: string): { label: string; text: string } {
+  const m = /^([a-z][a-z ]+):\s*(.*)$/is.exec(raw.trim());
+  if (!m) return { label: "", text: cleanText(raw) };
+  const [, prefix, rest] = m;
+  const p = prefix.toLowerCase();
+  const text = cleanText(rest).replace(/\b(\d{4}-\d{2}-\d{2})\b/g, (d) => fmtDate(d));
+  let label = humanize(prefix);
+  if (p === "single pharmacy") label = /^\d+\s+pharmacies/i.test(rest.trim()) ? "Several pharmacies" : "One pharmacy only";
+  else if (p === "dispensing incomplete") label = "Private scripts";
+  else if (p === "stale document") label = /\bGP\b/.test(rest) ? "Old GP list" : "Old document";
+  return { label, text: text.charAt(0).toUpperCase() + text.slice(1) };
+}
+
 /** The first sentence of API prose, for a one-line view; the full text stays one click away. */
 export function firstSentence(s: string): string {
   const m = /^(.+?[.!?])(\s+[A-Z(]|$)/.exec(s.trim());

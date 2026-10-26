@@ -27,6 +27,53 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Anshu · anshu/final-day
+
+**Did:** My last open scan items (all `web/`, presentation only):
+- **S39:** grid-cell cards say what the source says, with a reason read from its cited row.
+  - The badge: "Says current / Says stopped / Not in this source / Not reached". It uses
+    the API's existence value for that source, then `per_source`.
+  - P0089 dapagliflozin, pharmacy: "Last dispensed 24 Oct 2025 (28 days) — ran out
+    about 21 Nov 2025; no fills for 11 months."
+  - GP: "On the GP list, last updated 30 Apr 2026."
+  - Patient: "'Forxiga, one a day' — still taking? unsure."
+  - The card opens with `detail.statement` when a finding on that medicine has one.
+  - The button is now "This pharmacy record is out of date" (or "This GP daily dose is
+    out of date").
+- **S41, my half:** scope notes show their `prefix:` as a small label (One pharmacy
+  only · Private scripts · Old GP list), one per line, with dates as dates.
+- **S42, my half:** a **Supply** section, shown when the API sends shortage notices.
+  - The disclaimer appears once, and expected-back dates show as dates.
+  - It groups by `relevance` when present: "Affects this patient", then "Other products
+    short" per medicine; different route or form dropped.
+  - Without `relevance` it lists shortages per medicine and never claims they affect the
+    patient. Shortages no longer appear under Notices.
+- **Scan:** ticked S39, S41 and S42 (my halves, noted in each).
+- **Demo script and rehearsal:** the renamed button is updated.
+- **Checks:** build passes; `make test` 835 passed / 2 skipped; secret scan clean;
+  demo rehearsal clean.
+
+**Changed shared files:** none.
+
+**Broken:** nothing.
+- Supply has only been seen with the mock example (MRN0000001 famotidine): SAMPLE_MODE
+  has no recorded shortage data.
+- The parser was checked against the exact sentence `app/agents/executor.py` writes.
+
+**Needs from teammates:**
+- **Arnav, S41 wording:** the plain sentences after each `prefix:`. Attach the
+  private-script note only to medicines that had a private script.
+- **Arnav, S42 ranking:** rank TGA rows against the patient's product and put
+  `relevance` (e.g. `affects_patient` / `other_product` / `different_route`) and the
+  product in the notice. The UI groups by it as soon as it arrives. With `Notice.detail`
+  a string in the frozen types, a top-level `relevance` field is easiest; the UI reads
+  either.
+- **Arnav, still open from my last entry:** the per-agent `meterless-app` header.
+
+**Next:** nothing open in the scan for Anshu. Demo recording.
+
+---
+
 ### 2026-10-27 · Anshu · anshu/ui-judges
 
 **Did:** Judge-readiness pass on `web/` (presentation only; every value from the API):

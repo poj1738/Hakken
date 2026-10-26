@@ -15,6 +15,7 @@ import { Stepper } from "./components/Stepper";
 import { Timeline } from "./components/Timeline";
 import { IdentityReview } from "./components/IdentityReview";
 import { BpmhBanner, Notices } from "./components/Coverage";
+import { Supply } from "./components/Supply";
 import { Grid, gridFeedbackKey } from "./components/Grid";
 import { Flags, type FeedbackChoice, type FeedbackState } from "./components/Flags";
 import { Tasks } from "./components/Tasks";
@@ -27,7 +28,7 @@ import { SectionNav, type NavItem } from "./components/SectionNav";
 import { InfoTip } from "./components/InfoTip";
 import { cleanText, medName, targetLabel, typeLabel } from "./format";
 
-type Section = "identity" | "findings" | "meds" | "actions" | "notices" | "trust" | "log";
+type Section = "identity" | "findings" | "meds" | "actions" | "notices" | "supply" | "trust" | "log";
 const PANEL = "section-panel";
 
 // Approved wording and sources from docs/PITCH_CLAIMS.md (claims 1 and 2), verbatim.
@@ -277,6 +278,9 @@ export default function App() {
     requestAnimationFrame(() => panelRef.current?.scrollIntoView({ block: "start", behavior: "smooth" }));
   };
 
+  const shortages = run ? run.notices.filter((n) => n.type === "known_shortage") : [];
+  const otherNotices = run ? run.notices.filter((n) => n.type !== "known_shortage") : [];
+
   const nav: NavItem<Section>[] = run
     ? [
         ...(review ? [{ id: "identity" as const, label: "Identity review", count: run.identity_review?.candidates.length ?? null, alert: true }] : []),
@@ -289,7 +293,9 @@ export default function App() {
         },
         { id: "meds", label: "Medication history", count: hasResult ? run.grid.length : null, disabled: !hasResult },
         { id: "actions", label: "Actions", count: hasResult ? run.tasks.length - doneCount : null, disabled: !hasResult },
-        { id: "notices", label: "Notices", count: hasResult ? run.notices.length : null, disabled: !hasResult },
+        { id: "notices", label: "Notices", count: hasResult ? otherNotices.length : null, disabled: !hasResult },
+        // S42: shortages get their own section, shown only when the API sent any.
+        ...(shortages.length ? [{ id: "supply" as const, label: "Supply", count: shortages.length }] : []),
         { id: "trust", label: "Source confidence", count: trustUpdates.length || null, disabled: !hasResult },
         { id: "log", label: "Processing log", count: run.trace.length },
       ]
@@ -426,6 +432,8 @@ export default function App() {
                   evidenceIndex={run.evidence_index}
                   coverage={run.coverage}
                   doseUnits={run.dose_units ?? {}}
+                  findings={run.findings}
+                  admissionDate={patient?.admission_date}
                   feedback={feedback}
                   onRejectCell={rejectCell}
                 />
@@ -439,7 +447,8 @@ export default function App() {
                   onToggle={(i, d) => setActionsDone((s) => ({ ...s, [i]: d }))}
                 />
               )}
-              {hasResult && shownSection === "notices" && <Notices notices={run.notices} />}
+              {hasResult && shownSection === "notices" && <Notices notices={otherNotices} />}
+              {hasResult && shownSection === "supply" && <Supply notices={shortages} />}
               {hasResult && shownSection === "trust" && <TrustPanel trust={run.trust} runId={run.run_id} updates={trustUpdates} acceptance={acceptance} />}
             </div>
           )}

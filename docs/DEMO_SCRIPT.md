@@ -158,8 +158,8 @@ record ID and SQL template; the 8 actions.
 2. **Medication history**: Candesartan reads **Unresolved · Daily dose: GP 16.0 vs
    Pharmacy 8.0**. The GP tile's (i) says the GP list is about
    12 months old.
-3. Click Candesartan's **GP** cell → **Mark outdated** (its accessible name is "Mark
-   GP daily dose as outdated"). The panel shows "Marked outdated · confidence 0.70 →
+3. Click Candesartan's **GP** cell. The card reads **Says current**, "On the GP list,
+   last updated 9 Oct 2025". Click **This GP daily dose is out of date**. The panel shows "Marked outdated · confidence 0.70 →
    0.50", and the **System learned** card appears above the workspace: "GP daily dose
    0.70 → 0.50" with a before/after bar.
 4. **Source confidence**: the box at the top reads "GP · Daily dose: 0.70 → 0.50
