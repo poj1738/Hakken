@@ -27,6 +27,47 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 · Arnav · arnav/s5-s6
+
+**Did:** Three scan items (ticked in `docs/SCAN_2026-10-25.md`).
+- **S5, a late timeout kept nothing.** Finished work (analysis, findings with grounded
+  explanations ready, the Writer's text, verification, revisions) now lives on `RunState`
+  as each stage completes. A `RunTimeout` or `QueryBudgetExceeded` returns **partial
+  with the grid, coverage, findings, notices and tasks**. If Q3 hadn't run, a caveat says
+  the findings aren't re-verified. **No model call starts with less time left than one
+  call may take** (`METERLESS_TIMEOUT_S`): `_llm_step` uses the grounded fallback and
+  traces it as `skipped` with its step.
+- **S6, unidentified lines vanished.** Every unmapped line ("spray under the tongue") is
+  now a notice: `PATIENT_ONLY_ITEM` for the patient, `COVERAGE_GAP` for other sources,
+  since `types.py` is frozen. It carries its row, its raw text in `evidence_index`, and an
+  "Identify … with the patient" task.
+- **S21, ranges read as tablet counts** (`normalise.py`, Arpon's guardrails followed).
+  A number or range with a unit is now a stated dose: methotrexate is 2.14 mg/day, not
+  5.36. A per-mL concentration is no longer a strength: no more 7500 "mg/day" insulin.
+  **Honest caveat:** P0066's false methotrexate `dose_unconfirmable` remains, because the
+  pharmacy's qty/days estimate still disagrees. Fixing weekly-regimen inference from
+  dispensing is a bigger change, and it's left documented.
+
+**Guardrails:** the scorecard `--split tune` is identical:
+`ALL 145 17 5 precision 0.90 recall 0.97 F1 0.93`, high-risk 34/34, 0 false merges.
+Held-out was not looked at. 3 new S5 tests. Full suite: 769 passed.
+
+**Changed shared files:** none on the list. `app/domain/packs/medtrace/normalise.py`
+changed (private helpers only).
+
+**Broken:** nothing. **The committed `output_examples/sample_mode/` will need regenerating**
+after this merges, because S6 adds notices and tasks and S21 changes grid doses. The
+output-examples PR does that.
+
+**Needs from teammates:**
+- **Anshu:** unidentified lines arrive as notices whose detail starts "Could not identify",
+  plus an "Identify …" task. Skipped model steps show as trace events with
+  `status: "skipped"`.
+
+**Next:** finish S2: live output examples (generating now), then the output-examples PR.
+
+---
+
 ### 2026-10-25 · Arnav · arnav/scan-items
 
 **Did:** Arpon's four main handed-over scan items (TODO_ARNAV §5; ticked there and in
