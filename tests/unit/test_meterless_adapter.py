@@ -356,3 +356,21 @@ def test_nothing_sent_means_no_call_recorded(make_settings) -> None:
     with pytest.raises(MeterlessError) as exc:
         c.chat("Writer", MSG)
     assert exc.value.kind == "not_configured" and exc.value.calls == []
+
+
+# -- HTTP 499 "Fetch is aborted" (live, 26 Oct) --------------------------------------
+
+
+def test_a_499_is_retried_once_even_with_no_retries_configured(make_settings) -> None:
+    rec = Recorder(httpx.Response(499, json={"error": "Fetch is aborted"}),
+                   httpx.Response(200, json=chat_body("ok", model="nvidia/nemotron-a")))
+    result = client(make_settings, rec, max_retries=0).chat("Writer", MSG)
+    assert result.text == "ok" and len(rec.requests) == 2 and result.attempts == 2
+
+
+def test_a_second_499_is_a_recorded_failure_not_a_loop(make_settings) -> None:
+    rec = Recorder(httpx.Response(499, json={"error": "Fetch is aborted"}))
+    with pytest.raises(MeterlessError) as exc:
+        client(make_settings, rec, max_retries=2).chat("Writer", MSG)
+    assert exc.value.status == 499 and len(rec.requests) == 2
+    assert exc.value.calls and exc.value.calls[0].routed_model is None  # S9: still in model_calls

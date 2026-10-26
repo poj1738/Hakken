@@ -65,6 +65,10 @@ OFFLINE_MODEL = "offline-heuristic"
 AUTO_DETECT_HOSTS = ("127.0.0.1", "localhost", "[::1]")
 AUTO_DETECT_PORTS = (8088, 8090, 8787, 11434)
 _RETRYABLE_STATUS = {502, 503, 504}
+#: Nightshift's "Fetch is aborted": the upstream request was cut off mid-answer. Seen live on
+#: 26 Oct on three long calls (Writer draft, Writer revise, a critique) in one example_2 run.
+#: Retried exactly once, whatever MAX_RETRIES says -- each attempt was already a long wait.
+_ABORTED_STATUS = 499
 _ROLES = ("Planner", "Executor", "Evaluator", "Writer")
 
 ProviderState = Literal["online", "unauthorized", "offline"]
@@ -326,11 +330,14 @@ class MeterlessClient:
         return result
 
     def _post_with_retry(self, payload: dict[str, Any]) -> tuple[httpx.Response, int, int]:
-        """Bounded retries on connection failures and 502/503/504 only. A read timeout is not
-        retried: three 180 s waits would spend the whole run budget."""
+        """Bounded retries on connection failures and 502/503/504, plus one retry on a 499. A
+        read timeout is not retried: three 180 s waits would spend the whole run budget."""
         attempts = 1 + self.settings.max_retries
         last: MeterlessError | None = None
-        for attempt in range(attempts):
+        aborted_retried = False
+        attempt = -1
+        while attempt + 1 < attempts:
+            attempt += 1
             if attempt:
                 self._sleep(min(2.0 * attempt, 5.0))
             start = time.monotonic()
@@ -347,6 +354,14 @@ class MeterlessClient:
             latency_ms = int((time.monotonic() - start) * 1000)
             if response.status_code in (401, 403):
                 raise MeterlessError("unauthorized", "the Runtime token was rejected", status=response.status_code)
+            if response.status_code == _ABORTED_STATUS:
+                last = MeterlessError("upstream", "HTTP 499 (fetch aborted)", status=499,
+                                      detail=_error_detail(response))
+                if aborted_retried:
+                    raise last
+                aborted_retried = True
+                attempts += 1  # one extra try for the abort, outside the MAX_RETRIES budget
+                continue
             if response.status_code in _RETRYABLE_STATUS:
                 last = MeterlessError("upstream", f"HTTP {response.status_code}", status=response.status_code,
                                       detail=_error_detail(response))
