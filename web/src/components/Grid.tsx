@@ -97,7 +97,7 @@ function RowText({ e }: { e: Evidence }) {
           </div>
         ))}
       </dl>
-      <TechDetails items={[["Query", e.query_id ?? null]]} />
+      <TechDetails label="Query ID" items={[["Query", e.query_id ?? null]]} />
     </div>
   );
 }
