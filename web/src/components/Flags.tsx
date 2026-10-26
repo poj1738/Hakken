@@ -177,12 +177,21 @@ function Detail({ d }: { d: Record<string, unknown> }) {
             ATC <code>{str("atc_class")}</code>
           </span>
         )}
-        {other.map((k) => (
-          <span key={k}>
-            {k} {typeof d[k] === "object" ? JSON.stringify(d[k]) : String(d[k])}
-          </span>
-        ))}
       </div>
+      {other.length > 0 && (
+        // Every other key the API sent, kept but folded away: never dropped.
+        <details className="more-detail small">
+          <summary>More detail ({other.length})</summary>
+          <dl>
+            {other.map((k) => (
+              <div key={k}>
+                <dt>{k.replace(/_/g, " ")}</dt>
+                <dd>{typeof d[k] === "object" ? JSON.stringify(d[k]) : String(d[k])}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      )}
     </>
   );
 }
@@ -276,7 +285,7 @@ export function Flags({ findings, feedback, onFeedback }: Props) {
       {mustSorted.length > 0 && (
         <div className="tier must">
           <h3>Must review ({mustSorted.length})</h3>
-          {mustSorted.map((f) => card(f, true))}
+          {mustSorted.map((f) => card(f))}
         </div>
       )}
       {rest.length > 0 && (

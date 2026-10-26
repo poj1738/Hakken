@@ -215,18 +215,19 @@ export function Grid({ grid, evidenceIndex, coverage, feedback, onRejectCell }: 
                       <td
                         key={s}
                         tabIndex={0}
-                        className={`state-cell state-${st} ${dissent.has(s) ? "dissent" : ""} ${same(pinned, cell) ? "pinned" : ""}`}
+                        className={`state-cell cell-${st} ${dissent.has(s) ? "dissent" : ""} ${same(pinned, cell) ? "pinned" : ""}`}
                         onMouseEnter={() => setHover(cell)}
                         onMouseLeave={() => setHover(null)}
                         onFocus={() => setHover(cell)}
                         onClick={() => setPinned(same(pinned, cell) ? null : cell)}
                         onKeyDown={(e) => e.key === "Enter" && setPinned(same(pinned, cell) ? null : cell)}
                       >
-                        <span className="glyph">{GLYPH[st]}</span> {STATE_LABEL[st]}
+                        <span className={`state state-${st}`}>
+                          <span className="glyph">{GLYPH[st]}</span> {STATE_LABEL[st]}
+                        </span>
                         {st === "present" && !rowsFor(med, s, evidenceIndex).length && (
                           <span className="no-row" title="No cited row from this source">
-                            {" "}
-                            · no row
+                            no row
                           </span>
                         )}
                         {dissent.has(s) && (
