@@ -91,6 +91,11 @@ Both persist under `STATE_DIR` in live mode. `SAMPLE_MODE` keeps them in memory.
 - **Clinical decisions are code, not prompts.** Linkage, fusion, detection and triage
   live in `app/domain/packs/medtrace/` and are scored by `scripts/eval.py`. The model
   plans, resolves free text, explains, and checks the explanation.
+- **No model text is shown unchecked.** Each explanation and the patient summary pass code
+  checks: cited rows must be the finding's own, every number must be in the evidence,
+  no "not taking" where a source is unknown, and no instruction to stop, start or
+  change a medicine. A summary that fails is replaced with the grounded one, and the
+  trace records why.
 - **Bounded.** Critique rounds are capped by `MAX_AGENT_ITERATIONS` (default 2). The run
   is capped by `RUN_TIMEOUT_S` (600) and by 8 Zetaris queries. A model step is skipped
   when too little time is left for it. Hitting any limit returns `status: "partial"`
