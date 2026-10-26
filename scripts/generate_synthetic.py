@@ -365,6 +365,30 @@ def strength_mg(strength: str) -> float | None:
     return value
 
 
+def chart_dose(p: "Patient", med: "Med", strength: str | None = None) -> dict[str, str]:
+    """The chart row's `dose` and `dose_unit` for one administration.
+
+    For a mass product that is the strength in mg. For a unit-based product (the
+    insulins, "100 units/mL") the strength is a CONCENTRATION, not a dose: writing it
+    made P0015's insulin aspart chart read "100.0 tds with meals", 300 units a day
+    (scan S35). Those get a plausible units-per-dose instead -- inside the regimen's own
+    stated range when it has one ("10 to 40 units nocte"), else 4-20 units.
+
+    The units come from a generator seeded by the patient and the medicine, NOT from
+    `p.rng`: one extra draw there would shift every later value for that patient, and
+    the fix would rewrite their GP, pharmacy and interview rows along with the dose.
+    """
+    import re
+
+    strength = strength or med.strength
+    if "unit" not in (strength or "").lower():
+        return {"dose": f"{strength_mg(strength) or ''}", "dose_unit": "mg"}
+    rng = random.Random(f"chart-units:{p.key}:{med.generic}")
+    stated = re.search(r"(\d+)\s*to\s*(\d+)\s*units", med.regimen or "")
+    low, high = (int(stated.group(1)), int(stated.group(2))) if stated else (4, 20)
+    return {"dose": str(rng.randint(low, high)), "dose_unit": "units"}
+
+
 def choose_medicines(rng: random.Random, bundles: dict[str, list[Product]], sex: str,
                      target: int) -> list[Product]:
     chosen: list[Product] = []
@@ -833,8 +857,8 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
                                       record_date=iso(AS_OF), med_name=med.generic,
                                       amt_mp_code=code_for(med, "amt_mp"),
                                       strength=charted_strength,
-                                      dose=f"{strength_mg(charted_strength) or ''}",
-                                      dose_unit="mg", route=med.route, frequency=charted_freq,
+                                      **chart_dose(p, med, charted_strength),
+                                      route=med.route, frequency=charted_freq,
                                       chart_note=note, discharge_action="", action_reason=""))
         charted[med.generic] = row_id
 
@@ -845,7 +869,7 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
         row_id = rows.add("emr", dict(emr_base, record_kind="admission_chart",
                                       record_date=iso(AS_OF), med_name=med.generic,
                                       amt_mp_code=code_for(med, "amt_mp"), strength=med.strength,
-                                      dose=f"{strength_mg(med.strength) or ''}", dose_unit="mg",
+                                      **chart_dose(p, med),
                                       route=med.route, frequency=med.regimen, chart_note="",
                                       discharge_action="", action_reason=""))
         plant("commission", med, ["emr"], [row_id],
@@ -868,8 +892,8 @@ def render(p: Patient, rows: Rows, codes: dict[tuple[str, str, str], dict[str, s
                 ["dose reduced: eGFR 28", "ceased: dizziness", "started: new AF"])
             rows.add("emr", dict(emr_base, record_kind="prior_discharge", record_date=iso(d_date),
                                  med_name=med.generic, amt_mp_code=code_for(med, "amt_mp"),
-                                 strength=med.strength, dose=f"{strength_mg(med.strength) or ''}",
-                                 dose_unit="mg", route=med.route, frequency=med.regimen,
+                                 strength=med.strength,
+                                 **chart_dose(p, med), route=med.route, frequency=med.regimen,
                                  chart_note="", discharge_action=str(action), action_reason=reason))
 
     # -- GP -----------------------------------------------------------------
