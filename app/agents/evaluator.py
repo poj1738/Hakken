@@ -59,6 +59,8 @@ class Analysis:
     bpmh_confirmable: bool
     banner: str | None
     blocked: list[str] = field(default_factory=list)
+    #: rows cited by notices (e.g. an unidentified line), so the UI can show their text
+    notice_evidence: dict[str, Evidence] = field(default_factory=dict)
 
 
 def is_current(med: FusedMed) -> bool:
@@ -101,6 +103,28 @@ def _notices(cov, fused, stmts, as_of, confirmable, banner) -> list[Notice]:
         for note in c.scope_notes:
             if "updated" in note.casefold() and "month" in note.casefold():
                 out.append(Notice(type=NoticeType.STALE_DOCUMENT, source=source, detail=note))
+    out.extend(_unidentified(stmts))
+    return out
+
+
+def _unidentified(stmts: list[MedStatement]) -> list[Notice]:
+    """A line no step could pin to a medicine is shown, never dropped (scan S6).
+
+    "Spray under the tongue" or "my blue puffer" stays unmapped (always offline; live when
+    the model answers null), and fusion and detection skip a statement with no generic --
+    so before this the pharmacist never saw that the patient mentioned a GTN spray. Each
+    becomes a notice with its row and a task to identify it. A patient's line is a
+    PATIENT_ONLY_ITEM; any other source's is a COVERAGE_GAP, because it is something in that
+    source we can see but cannot read. (`types.py` is frozen, so no new notice type.)
+    """
+    out = []
+    for s in stmts:
+        if s.generic or s.resolution != "unmapped":
+            continue
+        kind = NoticeType.PATIENT_ONLY_ITEM if s.source == "patient" else NoticeType.COVERAGE_GAP
+        out.append(Notice(type=kind, source=s.source, row_ids=[s.row_id],
+                          detail=f'Could not identify "{s.raw_text}" ({s.source}, {s.row_id}); kept for review.',
+                          tasks=[f'Identify "{s.raw_text}" ({s.source}, {s.row_id}) with the patient']))
     return out
 
 
@@ -158,8 +182,12 @@ def analyse(ctx: AgentContext, links: list[IdentityLink], rows: list[SourceRow],
     dose_lane = [t for m in fused if _current(m) and (t := forced_confirm(m.generic, m.atc))]
     tasks = list(dict.fromkeys([*dose_lane, *(t for f in findings for t in f.tasks),
                                 *(t for n in notices for t in n.tasks)]))
+    notice_evidence = {r: Evidence(source=raw[r].get("source") or "", row_id=r, sql_template_id="Q2",
+                                   query_id=q2_query_id, fields=raw[r])
+                       for n in notices for r in n.row_ids if r in raw}
     return Analysis(cov=cov, evidence=evidence, fused=fused, findings=findings, notices=notices, tasks=tasks,
-                    bpmh_confirmable=confirmable, banner=banner or None, blocked=blocked)
+                    bpmh_confirmable=confirmable, banner=banner or None, blocked=blocked,
+                    notice_evidence=notice_evidence)
 
 
 # --------------------------------------------------------------------------- #

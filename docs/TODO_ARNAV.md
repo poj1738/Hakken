@@ -186,7 +186,9 @@ to hand to Anshu if she has room after the Docker fix (S3).
 4. [x] **S22** `identity.py:448`: the "held back because" guard text is false in both demo
    pauses (P0015, P0013), and judges see it. *(Arnav, 25 Oct: names the real other person.)*
 5. **S21, S20, S32, S33**: range directions, the dead safety-gate rule, zero-trust fusion,
-   anchor coverage state. Lower priority.
+   anchor coverage state. Lower priority. *(Arnav, 26 Oct: **S21 done**. Grid doses are
+   right now, but P0066's false methotrexate finding remains: the pharmacy's qty/days estimate
+   still disagrees. S20, S32, S33 still open.)*
 
 **Guardrails for `app/domain/` (the pack is scored, so changes can regress silently):**
 - Run `.venv/bin/python scripts/eval.py --split tune` before and after, and paste both
