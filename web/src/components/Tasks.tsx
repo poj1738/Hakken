@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Finding, Notice } from "../types";
-import { NOTICE_LABEL, TYPE_LABEL } from "../format";
+import { NOTICE_LABEL, cleanText, medName, typeLabel } from "../format";
 
 interface Props {
   tasks: string[];
@@ -22,7 +22,7 @@ function originsOf(task: string, findings: Finding[], notices: Notice[]): Origin
     if (f.tasks.includes(task)) {
       out.push({
         key: f.id,
-        label: `${f.id} ${f.generic} · ${TYPE_LABEL[f.type] ?? f.type}`,
+        label: `${medName(f.generic)} · ${typeLabel(f.type)}`,
         highRisk: f.high_risk_class,
         mustReview: f.needs_pharmacist,
       });
@@ -42,28 +42,29 @@ export function Tasks({ tasks, findings, notices }: Props) {
   const ticked = tasks.filter((_, i) => done[i]).length;
   return (
     <section className="card tasks">
-      <h2>
-        Tasks{" "}
-        <span className="muted small">
-          {ticked} of {tasks.length} ticked
+      <div className="section-head">
+        <h2>Tasks</h2>
+        <span className="section-note">
+          {ticked} of {tasks.length} done
         </span>
-      </h2>
-      <p className="muted small">Ticks are a checklist for this screen only. They are not saved or sent.</p>
+      </div>
+      <p className="section-sub">A checklist for this screen only. Ticks are not saved or sent.</p>
       <ul>
         {tasks.map((t, i) => {
           const origins = originsOf(t, findings, notices);
           return (
             <li key={i}>
               <label className={done[i] ? "done" : ""}>
-                <input type="checkbox" checked={!!done[i]} onChange={(e) => setDone({ ...done, [i]: e.target.checked })} /> {t}
+                <input type="checkbox" checked={!!done[i]} onChange={(e) => setDone({ ...done, [i]: e.target.checked })} />{" "}
+                <span>{cleanText(t)}</span>
               </label>
               <div className="task-origin small muted">
                 {origins.length ? (
                   origins.map((o) => (
                     <span key={o.key}>
                       {o.label}
-                      {o.highRisk && <span className="badge apinchs">APINCHS {o.highRisk}</span>}
-                      {o.mustReview && <span className="badge warn">must review</span>}
+                      {o.highRisk && <span className="badge risk">APINCHS {o.highRisk}</span>}
+                      {o.mustReview && <span className="badge warn">Pharmacist review</span>}
                     </span>
                   ))
                 ) : (

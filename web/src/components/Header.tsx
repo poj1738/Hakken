@@ -1,16 +1,34 @@
 import type { HealthResponse } from "../types";
 import { API_MODE } from "../api";
+import { humanize } from "../format";
 
 interface Props {
   health: HealthResponse | null;
   error: string | null;
 }
 
-const NIGHTSHIFT_TONE: Record<string, string> = { online: "ok", unauthorized: "warn", offline: "bad", sample_mode: "info" };
-// In SAMPLE_MODE the API replays recorded Zetaris responses and makes no model
-// calls, and says so as "sample_mode": neither up nor down.
-const ZETARIS_TONE: Record<string, string> = { connected: "ok", sample_mode: "info" };
-const said = (v: string) => (v === "sample_mode" ? "sample mode" : v);
+// GET /status values, as words and a tone. In SAMPLE_MODE the API replays
+// recorded Zetaris responses and makes no model calls, and says "sample_mode":
+// neither up nor down.
+const TONE: Record<string, string> = {
+  connected: "ok",
+  online: "ok",
+  unauthorized: "warn",
+  offline: "bad",
+  sample_mode: "info",
+};
+const LABEL: Record<string, string> = { sample_mode: "Sample mode", connected: "Connected", online: "Online" };
+const said = (v: string) => LABEL[v] ?? humanize(v);
+
+function Status({ name, value, title }: { name: string; value: string; title: string }) {
+  return (
+    <span className={`status-item tone-${TONE[value] ?? "bad"}`} title={title}>
+      <i className="dot" aria-hidden />
+      <span className="status-name">{name}</span>
+      <span className="status-value">{said(value)}</span>
+    </span>
+  );
+}
 
 export function Header({ health, error }: Props) {
   const zetaris = health?.zetaris ?? "unknown";
@@ -20,46 +38,41 @@ export function Header({ health, error }: Props) {
     <header className="header">
       <div className="brand">
         <span className="logo" aria-hidden>
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 12h4l2-5 4 10 2-5h6" />
           </svg>
         </span>
         <div>
           <h1>MedTrace</h1>
-          <p className="tagline">Medication reconciliation across four siloed systems</p>
+          <p className="tagline">Medication reconciliation</p>
         </div>
       </div>
-      <div className="pills" aria-live="polite">
-        <span className="pill tone-disclaimer" title="A pharmacist must confirm every item.">
-          Synthetic data · Not medical advice
-        </span>
-        {API_MODE === "mock" && (
-          <span className="pill tone-mock" title="Replaying tests/fixtures/api/*.json — hand-written examples, not real runs">
-            Mock data
-          </span>
-        )}
-        {health?.sample_mode && (
-          <span className="pill tone-info" title="SAMPLE_MODE: recorded Zetaris responses, no network">
-            SAMPLE_MODE
-          </span>
-        )}
+      <div className="header-right">
         {error ? (
-          <span className="pill tone-bad" title={error}>
-            API unreachable
+          <span className="status-group">
+            <span className="status-item tone-bad" title={error}>
+              <i className="dot" aria-hidden />
+              <span className="status-value">Service unreachable</span>
+            </span>
           </span>
         ) : (
-          <>
-            <span className={`pill tone-${ZETARIS_TONE[zetaris] ?? "bad"}`} title="Zetaris data layer">
-              <i className="dot" /> Zetaris: {said(zetaris)}
+          <span className="status-group" aria-live="polite">
+            <Status name="Data" value={zetaris} title={`Zetaris data layer: ${zetaris}`} />
+            <Status name="AI" value={nightshift} title={`Meterless Nightshift (GET /v1/models): ${nightshift}`} />
+            <span className="status-item" title="The model that actually answered most recently (meterless.routed_model)">
+              <span className="status-name">Model</span>
+              <span className="status-value">{model ?? "None yet"}</span>
             </span>
-            <span className={`pill tone-${NIGHTSHIFT_TONE[nightshift] ?? "bad"}`} title="Meterless Nightshift (GET /v1/models)">
-              <i className="dot" /> Nightshift: {said(nightshift)}
-            </span>
-            <span className="pill tone-model" title="The model that actually answered (meterless.routed_model)">
-              Model: <code>{model ?? "none yet"}</code>
-            </span>
-          </>
+          </span>
         )}
+        {API_MODE === "mock" && (
+          <span className="badge-mock" title="Replaying tests/fixtures/api/*.json: hand-written examples, not real runs">
+            Example data
+          </span>
+        )}
+        <span className="badge-disclaimer" title="A pharmacist must confirm every item.">
+          Synthetic data · Not medical advice
+        </span>
       </div>
     </header>
   );

@@ -1,5 +1,6 @@
 import type { PatientSummary } from "../types";
 import { API_MODE, MOCK_RUN_PATIENTS } from "../api";
+import { fmtDate } from "../format";
 
 export type PatientsState = { kind: "loading" } | { kind: "ready" } | { kind: "error"; message: string };
 
@@ -14,11 +15,13 @@ interface Props {
   error: string | null;
 }
 
+const SEX: Record<string, string> = { F: "Female", M: "Male" };
+
 function label(p: PatientSummary) {
   const name = [p.name_given, p.name_family].filter(Boolean).join(" ") || "(no name)";
   // Mock mode only has example runs for two patients; say so before Run, not after.
   const example = API_MODE === "mock" && MOCK_RUN_PATIENTS.includes(p.patient_id) ? " · example run" : "";
-  return `${name} · ${p.patient_id}${example}`;
+  return `${name} — ${p.patient_id}${example}`;
 }
 
 export function Picker({ patients, patientsState, onRetryPatients, selected, onSelect, onRun, running, error }: Props) {
@@ -51,21 +54,21 @@ export function Picker({ patients, patientsState, onRetryPatients, selected, onS
       {p && (
         <dl className="demo">
           <div>
-            <dt>DOB</dt>
-            <dd>{p.dob ?? "—"}</dd>
+            <dt>Date of birth</dt>
+            <dd>{fmtDate(p.dob)}</dd>
           </div>
           <div>
             <dt>Sex</dt>
-            <dd>{p.sex ?? "—"}</dd>
+            <dd>{p.sex ? SEX[p.sex] ?? p.sex : "—"}</dd>
           </div>
           <div>
             <dt>Admitted</dt>
-            <dd>{p.admission_date ?? "—"}</dd>
+            <dd>{fmtDate(p.admission_date)}</dd>
           </div>
         </dl>
       )}
       <button className="primary" onClick={onRun} disabled={running || !ready || !selected}>
-        {running ? "Running…" : "Run reconciliation"}
+        {running ? "Reconciling…" : "Run reconciliation"}
       </button>
       {error && <p className="error">{error}</p>}
     </section>

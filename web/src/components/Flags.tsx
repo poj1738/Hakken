@@ -1,7 +1,8 @@
 import { useState } from "react";
 import type { DiscrepancyType, FeedbackReason, FeedbackResponse, Finding, Source, TrustAttribute } from "../types";
 import { FEEDBACK_REASONS, SOURCES, TRUST_ATTRIBUTES } from "../types";
-import { REASON_LABEL, ROW_TEXT_FIELDS, TYPE_LABEL, attributeLabel, sourceLabel } from "../format";
+import { REASON_LABEL, ROW_TEXT_FIELDS, attributeLabel, cleanText, fmtDate, humanize, medName, plural, sourceLabel, typeLabel } from "../format";
+import { TechDetails } from "./TechDetails";
 
 export interface FeedbackState {
   busy?: boolean;
@@ -56,7 +57,7 @@ function FeedbackControls({ f, state, onFeedback }: { f: Finding; state?: Feedba
     return (
       <div className="fb-done">
         <span className={`badge ${r.verdict === "confirm" ? "ok" : "neutral"}`}>
-          {r.verdict === "confirm" ? "Confirmed" : `Rejected · ${REASON_LABEL[r.reason ?? "other"]}`}
+          {r.verdict === "confirm" ? "Confirmed" : `Rejected — ${REASON_LABEL[r.reason ?? "other"]}`}
         </span>
         {r.trust_updates.map((u) => (
           <span key={u.hmem_record_id} className="small">
@@ -73,7 +74,7 @@ function FeedbackControls({ f, state, onFeedback }: { f: Finding; state?: Feedba
     <div className="fb">
       {!rejecting ? (
         <>
-          <button className="ok" disabled={state?.busy} onClick={() => onFeedback(f, { verdict: "confirm" })}>
+          <button className="confirm" disabled={state?.busy} onClick={() => onFeedback(f, { verdict: "confirm" })}>
             Confirm
           </button>
           <button disabled={state?.busy} onClick={() => setRejecting(true)}>
@@ -139,7 +140,7 @@ function FeedbackControls({ f, state, onFeedback }: { f: Finding; state?: Feedba
             Reject
           </button>
           <button className="link" onClick={() => setRejecting(false)}>
-            cancel
+            Cancel
           </button>
         </>
       )}
@@ -149,12 +150,11 @@ function FeedbackControls({ f, state, onFeedback }: { f: Finding; state?: Feedba
   );
 }
 
-const DETAIL_SHOWN_ELSEWHERE = new Set(["conflict", "statement", "atc_class", "bpmh_single_source", "subtype", "daily_dose_ratio"]);
+const DETAIL_SHOWN_ELSEWHERE = new Set(["conflict", "statement", "bpmh_single_source"]);
 
-/** `Finding.detail`, rendered as the API sent it. Unknown keys are listed, not dropped. */
+/** `Finding.detail`: the clinical sentences stay in view; every other key goes to Technical details, never dropped. */
 function Detail({ d }: { d: Record<string, unknown> }) {
   const str = (k: string) => (d[k] === undefined || d[k] === null || d[k] === "" ? null : String(d[k]));
-  const other = Object.keys(d).filter((k) => !DETAIL_SHOWN_ELSEWHERE.has(k));
   return (
     <>
       {d.conflict === "confirm" && (
@@ -163,55 +163,41 @@ function Detail({ d }: { d: Record<string, unknown> }) {
           the medicine.
         </p>
       )}
-      {str("statement") && <p className="statement small">{str("statement")}</p>}
+      {str("statement") && <p className="statement">{cleanText(str("statement"))}</p>}
       {str("bpmh_single_source") && (
-        <p className="small warn-text">
-          Single source: only {sourceLabel(str("bpmh_single_source"))} supports this, so it is not a verified BPMH.
+        <p className="note warn-text">
+          Single source: only {sourceLabel(str("bpmh_single_source"))} supports this, so it is not a verified medication
+          history.
         </p>
-      )}
-      <div className="detail-tags small muted">
-        {str("subtype") && <span>subtype {str("subtype")}</span>}
-        {str("daily_dose_ratio") && <span>daily-dose ratio {str("daily_dose_ratio")}</span>}
-        {str("atc_class") && (
-          <span>
-            ATC <code>{str("atc_class")}</code>
-          </span>
-        )}
-      </div>
-      {other.length > 0 && (
-        // Every other key the API sent, kept but folded away: never dropped.
-        <details className="more-detail small">
-          <summary>More detail ({other.length})</summary>
-          <dl>
-            {other.map((k) => (
-              <div key={k}>
-                <dt>{k.replace(/_/g, " ")}</dt>
-                <dd>{typeof d[k] === "object" ? JSON.stringify(d[k]) : String(d[k])}</dd>
-              </div>
-            ))}
-          </dl>
-        </details>
       )}
     </>
   );
 }
 
+const detailItems = (d: Record<string, unknown>): [string, string][] =>
+  Object.keys(d)
+    .filter((k) => !DETAIL_SHOWN_ELSEWHERE.has(k) || k === "conflict")
+    .map((k) => [k === "atc_class" ? "ATC class" : humanize(k), typeof d[k] === "object" ? JSON.stringify(d[k]) : String(d[k])]);
+
 function FlagCard({ f, state, onFeedback, evidenceOpen }: { f: Finding; state?: FeedbackState; onFeedback: Props["onFeedback"]; evidenceOpen: boolean }) {
   return (
     <article className={`flag sev-${f.severity}`}>
       <header>
-        <span className={`badge sev-${f.severity}`}>{f.severity}</span>
-        <span className="flag-type">{TYPE_LABEL[f.type] ?? f.type}</span>
-        <strong className="flag-med">{f.generic}</strong>
-        {f.high_risk_class && (
-          <span className="badge apinchs" title="APINCHS high-risk class">
-            APINCHS {f.high_risk_class}
-          </span>
-        )}
-        {f.needs_pharmacist && <span className="badge warn">Pharmacist must review</span>}
-        <span className="muted small flag-id">{f.id}</span>
+        <strong className="flag-med">{medName(f.generic)}</strong>
+        <span className="flag-type">{typeLabel(f.type)}</span>
+        <span className="flag-badges">
+          <span className={`badge sev-${f.severity}`}>{humanize(f.severity)} priority</span>
+          {f.high_risk_class && (
+            <span className="badge risk" title={`APINCHS high-risk medicine, class ${f.high_risk_class}`}>
+              APINCHS {f.high_risk_class}
+            </span>
+          )}
+          {f.needs_pharmacist && <span className="badge warn">Pharmacist review</span>}
+        </span>
       </header>
-      <p className="explanation">{f.explanation}</p>
+      <p className="explanation" title={f.explanation}>
+        {cleanText(f.explanation)}
+      </p>
       <Detail d={f.detail ?? {}} />
       {f.intent_status === "documented_intentional" && f.intent_reason && (
         <p className="intent small">Documented as intentional: {f.intent_reason}</p>
@@ -220,48 +206,47 @@ function FlagCard({ f, state, onFeedback, evidenceOpen }: { f: Finding; state?: 
       {f.tasks.length > 0 && (
         <ul className="tasks-inline">
           {f.tasks.map((t) => (
-            <li key={t}>☐ {t}</li>
+            <li key={t}>{t}</li>
           ))}
         </ul>
       )}
-      <details open={evidenceOpen}>
-        <summary>Evidence ({f.evidence.length} {f.evidence.length === 1 ? "row" : "rows"})</summary>
+      <details className="evidence-toggle" open={evidenceOpen}>
+        <summary>Evidence · {plural(f.evidence.length, "source record")}</summary>
         <table className="evidence">
           <thead>
             <tr>
-              <th>Row</th>
               <th>Source</th>
-              <th>Original text</th>
-              <th>Template</th>
+              <th>As recorded</th>
+              <th>Date</th>
             </tr>
           </thead>
           <tbody>
             {f.evidence.map((e) => (
-              <tr key={e.row_id}>
-                <td>
-                  <code>{e.row_id}</code>
-                </td>
+              <tr key={e.row_id} title={`Row ${e.row_id} · template ${e.sql_template_id}`}>
                 <td>{sourceLabel(e.source)}</td>
                 <td>
-                  {ROW_TEXT_FIELDS.filter((k) => e.fields[k])
+                  {ROW_TEXT_FIELDS.filter((k) => k !== "doc_date" && e.fields[k])
                     .map((k) => e.fields[k])
                     .join(" · ")}
                 </td>
-                <td>
-                  <code>{e.sql_template_id}</code>
-                </td>
+                <td className="nowrap">{fmtDate(e.fields.doc_date)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        {f.trust_explanation.length > 0 && (
-          <ul className="small muted">
-            {f.trust_explanation.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
-        )}
       </details>
+      <TechDetails
+        items={[
+          ["Finding", f.id],
+          ["Original explanation", f.explanation !== cleanText(f.explanation) ? f.explanation : null],
+          ["Source rows", f.evidence.map((e) => `${e.row_id} (${e.sql_template_id})`).join(", ")],
+          ["Priority score", f.priority.toFixed(2)],
+          ["Intent", humanize(f.intent_status)],
+          ...detailItems(f.detail ?? {}),
+          ["Trust", f.trust_explanation.length ? f.trust_explanation.join("; ") : null],
+          ["Memory records", f.hmem_record_ids.length ? f.hmem_record_ids.join(", ") : null],
+        ]}
+      />
       <FeedbackControls f={f} state={state} onFeedback={onFeedback} />
     </article>
   );
@@ -280,11 +265,14 @@ export function Flags({ findings, feedback, onFeedback }: Props) {
 
   return (
     <section className="card flags">
-      <h2>Flags</h2>
+      <div className="section-head">
+        <h2>Findings</h2>
+        <span className="section-note">{plural(findings.length, "finding")}</span>
+      </div>
       {!findings.length && <p className="muted">No discrepancies found.</p>}
       {mustSorted.length > 0 && (
         <div className="tier must">
-          <h3>Must review ({mustSorted.length})</h3>
+          <h3>Pharmacist Review First · {mustSorted.length}</h3>
           {mustSorted.map((f) => card(f))}
         </div>
       )}
@@ -292,20 +280,20 @@ export function Flags({ findings, feedback, onFeedback }: Props) {
         // Open when nothing needs a pharmacist first, so a run's only findings are never hidden.
         <details className="tier" open={mustSorted.length === 0}>
           <summary>
-            <h3>Other findings ({rest.length})</h3>
+            <h3>Other Findings · {rest.length}</h3>
           </summary>
           {rest.map((f) => card(f))}
         </details>
       )}
       {intentional.length > 0 && (
         <div className="tier">
-          <h3>Documented as intentional ({intentional.length})</h3>
+          <h3>Documented as Intentional · {intentional.length}</h3>
           {/* Collapsed, never hidden: the reason is visible without opening it,
               because a documented reason can still be the wrong decision. */}
           {intentional.map((f) => (
             <details key={f.id} className="intentional">
               <summary>
-                <strong>{f.generic}</strong> · {TYPE_LABEL[f.type] ?? f.type}
+                <strong>{medName(f.generic)}</strong> · {typeLabel(f.type)}
                 <span className="muted"> — {f.intent_reason ?? "no reason recorded"}</span>
               </summary>
               {card(f)}

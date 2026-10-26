@@ -1,6 +1,6 @@
 import type { AcceptanceUpdate, FeedbackReason, TrustEntry, TrustUpdate } from "../types";
 import { SOURCES } from "../types";
-import { REASON_LABEL, TYPE_LABEL, attributeLabel, sourceLabel } from "../format";
+import { REASON_LABEL, TYPE_LABEL, attributeLabel, sourceLabel, targetLabel } from "../format";
 
 /** A trust move from POST /feedback, with the run and finding it came from. */
 export interface AppliedTrustUpdate extends TrustUpdate {
@@ -76,14 +76,14 @@ export function TrustPanel({ trust, runId, updates, acceptance }: Props) {
 
   return (
     <section className="card trust" id="trust-panel">
-      <h2>How much each source is trusted</h2>
-      <p className="muted small">
-        Learned from pharmacist feedback (H-MEM). The shaded band is the uncertainty. Reject a finding as "source outdated" to
-        see the bar move.
+      <h2>Source Reliability</h2>
+      <p className="section-sub">
+        How much each source is trusted for each kind of information, learned from pharmacist feedback. The shaded band is
+        the uncertainty. Marking a source's value as outdated lowers its bar.
       </p>
       {updates.length > 0 && (
         <div className="trust-changes" role="status">
-          <h3>What your feedback changed</h3>
+          <h3>What Your Feedback Changed</h3>
           <ul>
             {updates.map((u, i) => (
               <li key={i}>
@@ -94,7 +94,7 @@ export function TrustPanel({ trust, runId, updates, acceptance }: Props) {
                 <span className={u.delta < 0 ? "down" : "up"}>({signed(u.delta)})</span>
                 <span className="muted small">
                   {" "}
-                  — {u.targetId}
+                  — <span title={u.targetId}>{targetLabel(u.targetId)}</span>
                   {u.reason ? `, ${REASON_LABEL[u.reason].toLowerCase()}` : ""}
                   {u.runId !== runId ? ", on an earlier run" : ""}
                 </span>
@@ -120,7 +120,7 @@ export function TrustPanel({ trust, runId, updates, acceptance }: Props) {
       </div>
       {acceptance.length > 0 && (
         <div className="acceptance small">
-          <h3>Learned acceptance</h3>
+          <h3>Learned Acceptance</h3>
           {acceptance.map((a, i) => (
             <div key={i}>
               {TYPE_LABEL[a.type] ?? a.type} in <code>{a.atc_class}</code>: {a.before.toFixed(2)} → <strong>{a.after.toFixed(2)}</strong>
