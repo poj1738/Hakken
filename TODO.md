@@ -21,9 +21,9 @@ submission. **Hard deadline 2026-10-27 23:45 UTC** (Wed 28 Oct 10:45 AEDT).
 - [x] **Synthetic-only data.** The sponsor's `NY_TAXI` and `TPCDS_DB` are declared in
       `docs/PREEXISTING.md` and not used.
 
-## Phase 2 — adapters (next to build; both now fully unblocked)
+## Phase 2 — adapters (done, 25 Oct)
 
-- [ ] `app/adapters/meterless.py` — the contract is fully known:
+- [x] `app/adapters/meterless.py` — the contract is fully known:
       - URL normalisation is already implemented and tested in `app/config.py`; reuse it.
       - `Authorization: Bearer`, `meterless-app` on every call, `meterless-scope: user`
         on chat, 180 s timeout.
@@ -35,12 +35,12 @@ submission. **Hard deadline 2026-10-27 23:45 UTC** (Wed 28 Oct 10:45 AEDT).
         degrade to `response.model` if absent.
       - Structured JSON by prompt + pydantic validation + exactly one repair retry;
         do not rely on native tool-calling.
-- [ ] `app/adapters/zetaris.py` — parse `headers` + `data` into dicts, cast strings,
+- [x] `app/adapters/zetaris.py` — parse `headers` + `data` into dicts, cast strings,
       read-only guard (`SELECT`/`SHOW`/`DESCRIBE`/`WITH` only, enforced `LIMIT`),
       schema discovery via `SHOW LIGHTNING DATABASES` **and** `SHOW TABLES IN <db>`
       (not `SHOW DATASOURCES`, which returns 0 rows), timeouts, bounded retries,
       typed `ZetarisError`. Unit-test against `tests/fixtures/zetaris/`.
-- [ ] Offline reasoner for `SAMPLE_MODE`: real rule-based work on cached data,
+- [x] Offline reasoner for `SAMPLE_MODE`: real rule-based work on cached data,
       labelled `offline-heuristic`. Must not replay saved model text.
 
 ## Phase 3 — data layer (done, 24–25 Oct)
@@ -55,26 +55,26 @@ submission. **Hard deadline 2026-10-27 23:45 UTC** (Wed 28 Oct 10:45 AEDT).
 - [x] Spike: the Zetaris containers reach `datasvc` on the host.
 - [x] `scripts/eval.py` — detector scorecard against the ground truth.
 
-## Phase 4 — engines and agent loop
+## Phase 4 — engines and agent loop (done, 25–26 Oct)
 
-- [ ] H-MEM in Python + the 13 ported conformance checks + a memory-carries-over
+- [x] H-MEM in Python + the 13 ported conformance checks + a memory-carries-over
       feature test (run 1 learns, run 2 visibly uses it).
-- [ ] World Model in Python + the 8 ported conformance checks. Merge band **0.85**,
+- [x] World Model in Python + the 8 ported conformance checks. Merge band **0.85**,
       per the runner and against its own prose spec.
-- [ ] Orchestrator: bounded Planner → Executor → Evaluator → Writer with at least one
+- [x] Orchestrator: bounded Planner → Executor → Evaluator → Writer with at least one
       real critique → revise loop; `RUN_TIMEOUT_S` returns `status: "partial"`.
-- [ ] Evaluator independently re-queries Zetaris to re-derive every cited number and
+- [x] Evaluator independently re-queries Zetaris to re-derive every cited number and
       blocks unsupported claims. **Cast the strings first**, and **batch the checks into
       one query** — a 2-table join was measured at 91 s, so one query per claim blows
       the 5-10 min judging budget (see `docs/DECISIONS.md`).
-- [ ] Orchestrator needs a **per-run Zetaris query budget**, not just an iteration cap:
+- [x] Orchestrator needs a **per-run Zetaris query budget**, not just an iteration cap:
       ~4 s per trivial query warm means 30 queries is 2 minutes before any model call.
-- [ ] `app/tracing.py` — JSONL per run, official fields + our extensions + the receipt,
+- [x] `app/tracing.py` — JSONL per run, official fields + our extensions + the receipt,
       with secret masking.
 
 ## Phase 5 — entry points, Docker, UI
 
-- [ ] `run.py --input` and `run.py serve` for real.
+- [x] `run.py --input` and `run.py serve` for real.
 - [ ] **Actually build and run the Docker image** — the Dockerfile and compose file are
       written but have never been executed.
 - [ ] `web/`: question box, live agent timeline, evidence table linking each number to
@@ -83,13 +83,15 @@ submission. **Hard deadline 2026-10-27 23:45 UTC** (Wed 28 Oct 10:45 AEDT).
 
 ## Phase 6 — judge-proofing
 
-- [ ] ≥3 genuinely different `input_examples/`; `scripts/generate_examples.py` writing
+- [x] ≥3 genuinely different `input_examples/`; `scripts/generate_examples.py` writing
       `output_examples/` from real runs; a test asserting the outputs differ.
 - [ ] `scripts/validate_submission.sh` — the full disqualification checklist, including
       the step people skip: fresh clone, no `.env`, both services unreachable,
       `SAMPLE_MODE=true`, and a run must still succeed with real logic.
 - [ ] Finish `README.md`, `docs/SPONSOR_TECH.md`, `metadata.json`,
       `docs/DATA_SOURCES.md`, `docs/ARCHITECTURE.md` (mermaid from real code).
+      README architecture + agents, `docs/ARCHITECTURE.md` and `docs/SPONSOR_TECH.md`
+      done 26 Oct (scan S23); `metadata.json` done (#39). Re-check all of them before submitting.
 - [ ] Keep `docs/AI_TOOLS_USAGE.md` current — one row per session, whichever tool.
 - [ ] **Make the repo public before submission** (it is private now).
 

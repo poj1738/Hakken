@@ -44,6 +44,46 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 - **The server learns and remembers identity decisions in memory.** Restart it, or use a fresh `STATE_DIR`, before recording the demo, or P0015 won't ask for review and trust starts already lowered.
 **Next:** script the 30-second demo rehearsal against the `SAMPLE_MODE` API. The UI build in CI is waiting on a team OK, because it touches `.github/workflows/ci.yml`.
 
+### 2026-10-26 · Arnav · arnav/s23-docs
+
+**Did:** Scan **S23**: the judge-facing docs now describe the code as it is.
+- **`docs/ARCHITECTURE.md`**: a mermaid diagram drawn from `app/orchestrator.py`, using
+  the trace step names. It shows recall → PLAN → identity (World Model, the review
+  pause) → fetch/normalise/free text → analyse → shortages → Writer draft → one Q3
+  verify → critique ⇄ revise → template fallback → DONE/PARTIAL, with Zetaris on the
+  query steps and Nightshift on the five model steps. Below it: an agents and handoffs
+  table, what the engines do in the product, and the boundaries.
+- **`README.md`**: the Architecture and Agents sections are filled in (a short
+  diagram plus a four-row table: role, model route, handoff). Also fixed the stale
+  status lines: the opening banner, the engines row, the speed note (30 s–9 min), the
+  Limitations line and `GET /run/{id}/trace`. The H-MEM threshold now states both
+  values: the spec's 0.35, and the 0.15 the Planner's recall uses.
+- **`docs/SPONSOR_TECH.md`**: the *pending* markers are replaced with what's verified.
+  The feature → engine service → test table is filled in, and "What was unique" is
+  written.
+- **`PROGRESS.md`** and **`TODO.md`**: the "agent layer is all stubs" paragraph is
+  gone, the adapters are no longer marked "not yet called", Q4 is no longer marked
+  unwritten, and the Phase 2/4 items are ticked.
+
+**Differs from the scan:** S23 said to mark the engines as not yet built. They are
+built (8/8 and 13/13) and wired in, so the docs say that instead.
+
+**Changed shared files:** none. All changes are docs.
+
+**Broken:** nothing. Unit tests pass. **The mermaid diagrams were not rendered
+locally** (no Node on this machine), so check them on GitHub.
+
+**Needs from teammates:**
+- **Anshu:** skim README "Agents and roles" and the Web UI row. I left the UI text as
+  "mock mode only, never run against the live API". Update it when that changes.
+- **Arpon:** I updated your `queries.py` row in PROGRESS: Q4 is written, and runs only
+  if the TGA view is registered. Correct it if that's wrong.
+
+**Next:** the Docker run path check, then the remaining scan items (S9–S18, S20,
+S26–S33).
+
+---
+
 ### 2026-10-26 · Arnav · arnav/output-examples
 
 **Did:** Scan **S2** and **S34**.
