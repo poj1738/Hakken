@@ -93,7 +93,10 @@ class Settings(BaseSettings):
     # -- Runtime behaviour ---------------------------------------------------
     sample_mode: bool = False
     domain_pack: str = "demo"
-    max_agent_iterations: int = Field(default=3, ge=1)
+    # Critique rounds per run. 2 = one revise round. 3 made live runs 8-11 min against
+    # the 10-min budget (one hit RUN_TIMEOUT_S, 26 Oct); anything still objected to after
+    # the last round gets the grounded template, so fewer rounds cost no safety.
+    max_agent_iterations: int = Field(default=2, ge=1)
     max_retries: int = Field(default=2, ge=0)
     run_timeout_s: float = Field(default=600.0, gt=0)
     state_dir: Path = Path(".state")

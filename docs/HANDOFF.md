@@ -44,6 +44,82 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 - **The server learns and remembers identity decisions in memory.** Restart it, or use a fresh `STATE_DIR`, before recording the demo, or P0015 won't ask for review and trust starts already lowered.
 **Next:** script the 30-second demo rehearsal against the `SAMPLE_MODE` API. The UI build in CI is waiting on a team OK, because it touches `.github/workflows/ci.yml`.
 
+### 2026-10-26 · Arnav · arnav/output-examples
+
+**Did:** Scan **S2** and **S34**.
+- **`scripts/generate_examples.py`** (`make examples`, `--mode sample|live|both`) runs the
+  orchestrator on every input example with fresh in-memory engines. Examples 1 and 3 save
+  the paused `needs_review` response, then apply the confirmation `input_examples/README.md`
+  documents. Example 4 is followed by the documented verdict (reject the GP daily dose as
+  `source_outdated`) and then example 5. Each run writes its RunResponse and JSONL trace,
+  plus a README table generated from the files.
+- **Committed:** `output_examples/sample_mode/` and **`output_examples/live/`**. Live, every
+  model call was answered by `nvidia/nemotron-3.5-lightning-30b-a3b`. Four runs were
+  `success`. **example_2 was `partial`**: Nightshift's Writer call got no answer within
+  180 s, and the critique returned an upstream `empty_response`. Both steps degraded to
+  the grounded template, the caveats say so, and the findings are still verified. Live
+  findings match sample findings exactly.
+- **`MAX_AGENT_ITERATIONS` default changed 3 → 2**, agreed with Arnav. Three rounds made
+  live runs 8–11 min, and one hit `RUN_TIMEOUT_S`. They now take 30–527 s. I also changed
+  that one line in my own `.env`.
+- **S34:** `make run` now uses example_2. example_1 stops at review.
+- `tests/unit/test_output_examples.py`: the outputs differ by input, committed sample
+  outputs still match a fresh regeneration, and every live model call is an
+  `nvidia/*` model.
+
+**Changed shared files:** **`app/config.py`** (`max_agent_iterations` default 2),
+**`.env.example`** (`MAX_AGENT_ITERATIONS=2`) and **`Makefile`** (`run` target). **If your
+`.env` was copied from the old template, it pins `MAX_AGENT_ITERATIONS=3`; change it to 2.**
+
+**Broken:** nothing. Unit tests pass, secret scan clean.
+
+**Needs from teammates:**
+- **Anyone with a `.env`:** set `MAX_AGENT_ITERATIONS=2` (see above).
+
+**Next:** the remaining scan items (S9–S18, S20, S26–S33), and S23 (the stale judge-facing
+docs: README Architecture/Agents TBD, ARCHITECTURE.md, SPONSOR_TECH.md).
+
+---
+
+### 2026-10-26 · Arnav · arnav/s5-s6
+
+**Did:** Three scan items (ticked in `docs/SCAN_2026-10-25.md`).
+- **S5, a late timeout kept nothing.** Finished work (analysis, findings with grounded
+  explanations ready, the Writer's text, verification, revisions) now lives on `RunState`
+  as each stage completes. A `RunTimeout` or `QueryBudgetExceeded` returns **partial
+  with the grid, coverage, findings, notices and tasks**. If Q3 hadn't run, a caveat says
+  the findings aren't re-verified. **No model call starts with less time left than one
+  call may take** (`METERLESS_TIMEOUT_S`): `_llm_step` uses the grounded fallback and
+  traces it as `skipped` with its step.
+- **S6, unidentified lines vanished.** Every unmapped line ("spray under the tongue") is
+  now a notice: `PATIENT_ONLY_ITEM` for the patient, `COVERAGE_GAP` for other sources,
+  since `types.py` is frozen. It carries its row, its raw text in `evidence_index`, and an
+  "Identify … with the patient" task.
+- **S21, ranges read as tablet counts** (`normalise.py`, Arpon's guardrails followed).
+  A number or range with a unit is now a stated dose: methotrexate is 2.14 mg/day, not
+  5.36. A per-mL concentration is no longer a strength: no more 7500 "mg/day" insulin.
+  **Honest caveat:** P0066's false methotrexate `dose_unconfirmable` remains, because the
+  pharmacy's qty/days estimate still disagrees. Fixing weekly-regimen inference from
+  dispensing is a bigger change, and it's left documented.
+
+**Guardrails:** the scorecard `--split tune` is identical:
+`ALL 145 17 5 precision 0.90 recall 0.97 F1 0.93`, high-risk 34/34, 0 false merges.
+Held-out was not looked at. 3 new S5 tests. Full suite: 769 passed.
+
+**Changed shared files:** none on the list. `app/domain/packs/medtrace/normalise.py`
+changed (private helpers only).
+
+**Broken:** nothing. **The committed `output_examples/sample_mode/` will need regenerating**
+after this merges, because S6 adds notices and tasks and S21 changes grid doses. The
+output-examples PR does that.
+
+**Needs from teammates:**
+- **Anshu:** unidentified lines arrive as notices whose detail starts "Could not identify",
+  plus an "Identify …" task. Skipped model steps show as trace events with
+  `status: "skipped"`.
+
+**Next:** finish S2: live output examples (generating now), then the output-examples PR.
+
 ---
 
 ### 2026-10-25 · Arnav · arnav/scan-items
