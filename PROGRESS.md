@@ -20,9 +20,9 @@ planted ground truth.
 **The agent layer is built and runs end to end, live and in `SAMPLE_MODE`** (26 Oct).
 Both adapters, the four agents, the orchestrator, tracing, the API and both Meterless
 engines (conformance 8/8 and 13/13) work, and `output_examples/` holds real runs of all
-five inputs. **Still open:** the Docker run path has never been built (rule 8), the
-UI has never run against the live API, and the remaining items in
-`docs/SCAN_2026-10-25.md`.
+five inputs. Docker works from a fresh clone (`SAMPLE_MODE=true docker compose up
+--build`) and live. **Still open:** a review of the UI's screens against the live API
+(the image serves it at :8000), and the remaining items in `docs/SCAN_2026-10-25.md`.
 
 | Area | Owner | State |
 |---|---|---|
@@ -49,7 +49,7 @@ UI has never run against the live API, and the remaining items in
 | **World Model + 8 conformance checks** | Arnav | **done: 8/8 green** (`make conformance`). A Python port of the Meterless reference. `identity.decide` now delegates to it, and the scorecard is unchanged (tune `ALL 145 17 5 P 0.90 R 0.97 F1 0.93`). **In the product:** linked patient records written with provenance; the medicine fetch reads the linked set from the graph; pharmacist identity decisions remembered across runs (persisted under `STATE_DIR`) |
 | **H-MEM + 13 conformance vectors** | Arnav | **done: 13/13 green** (`make conformance` runs 22 checks with World Model). A Python port of the Meterless reference. **In the product:** trust records seeded from the priors; verdicts are `HMEM.feedback()` with ledger entries; verdict memories recalled by the Planner (`memory_used`); findings cite `hmem_record_ids`; persisted under `STATE_DIR/hmem` |
 | Web UI | Anshu | **on `main` (#22); review of all 10 PLAN §6 items done on `anshu/ui-review`**, mock mode only. Follows #23 (`detail`, `source_outdated` names its record) and #24 (identity verdict prefixes). Never run against a live API. Six open questions for Arnav in HANDOFF (dose unit, `TraceEvent.model`, task order …) |
-| Docker run path | — | not started — the Dockerfile has never been built |
+| Docker run path | Arnav | **verified 26 Oct.** A fresh clone with no `.env` runs `SAMPLE_MODE=true docker compose up --build`: example_2 success, example_1 pauses then resumes. Live in Docker: Zetaris connected, Nightshift online through `host.docker.internal`, example_3 success. The image serves the UI built in live mode at :8000 (S18). The API is on 127.0.0.1 only (S30) |
 
 ## Sunday's goal
 

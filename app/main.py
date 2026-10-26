@@ -18,10 +18,12 @@ from __future__ import annotations
 import threading
 import time
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.feedback import FeedbackError, apply_feedback
 from app.orchestrator import Orchestrator, UnknownPatient
@@ -36,6 +38,8 @@ from app.schemas import (
 )
 
 STATUS_TTL_S = 20.0
+#: The built UI (`npm run build` in web/; the Docker image builds it in live mode).
+WEB_DIST = Path(__file__).resolve().parent.parent / "web" / "dist"
 
 
 class _Health:
@@ -141,6 +145,9 @@ def create_app(orchestrator: Orchestrator | None = None, *, background: bool = T
         except FeedbackError as exc:
             raise HTTPException(404, str(exc)) from exc
 
+    if (WEB_DIST / "index.html").is_file():
+        # Same origin as the API (scan S18). Mounted last, so every API route above wins.
+        app.mount("/", StaticFiles(directory=WEB_DIST, html=True), name="web")
     return app
 
 

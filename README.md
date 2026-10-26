@@ -3,9 +3,9 @@
 > **Work in progress: Open Agent Hackathon 2026, team Hakken. Track 1.**
 >
 > **The data pipeline, the clinical logic, the agent loop, both Meterless engines and
-> the API are built and run end to end, live and in `SAMPLE_MODE`. The Docker run path
-> is not verified yet, and the UI has not yet been pointed at the live API.** Everything
-> below says which is which.
+> the API are built and run end to end, live and in `SAMPLE_MODE`, on the host and in
+> Docker. The UI's screens have so far been reviewed only against example responses.**
+> Everything below says which is which.
 
 Team Hakken (Anshuman, Arpon, Arnav).
 
@@ -39,10 +39,9 @@ source to trust.
 
 ### Not finished
 
-- **The Docker run path.** The API exists now, but the image has not been built and
-  run end to end.
-- **The web UI** (`web/`) is built but has only run in mock mode, against hand-written
-  example responses in `tests/fixtures/api/`. It has not yet been pointed at the API.
+- **The web UI against the live API.** The Docker image now serves the UI built in live
+  mode, on the same origin as the API. Its screens have so far been reviewed only in
+  mock mode, against the hand-written examples in `tests/fixtures/api/`.
 - **Speed.** A live run takes 30 s to 9 min (`output_examples/live/`), almost all of it
   Nemotron's hidden reasoning. That's inside the 10-minute limit. When time runs short, a
   model step is skipped and the run returns `partial` with what it has already verified.
@@ -76,14 +75,26 @@ SAMPLE_MODE=true .venv/bin/python run.py --input input_examples/example_1.json -
 .venv/bin/python run.py serve        # the API on :8000, live against your Zetaris and Nightshift
 ```
 
-Docker: **not verified yet.** The API now exists, but nobody has built and run the
-image end to end. The intended commands:
+### Docker
+
+**Verified 26 Oct on Arnav's machine**, in both modes. Docker brings up the API and the
+UI at **http://localhost:8000**, plus the synthetic silo service on `:8100`.
+
+**No services, no `.env`** (a fresh clone):
 
 ```bash
-docker compose up --build
-curl -X POST localhost:8000/run -H 'content-type: application/json' \
-     -d @input_examples/example_1.json
+SAMPLE_MODE=true docker compose up --build
+curl -X POST 'localhost:8000/run?wait=true' -H 'content-type: application/json' \
+     -d @input_examples/example_2.json
 ```
+
+**Live**, against your Zetaris and Nightshift: fill in `.env`, run `make lexicon && make synth`
+(the silo service serves `./data`, mounted read-only), then `docker compose up --build`.
+Inside the containers, both services are reached at `host.docker.internal`.
+
+The API has no auth, so it's published on `127.0.0.1` only. `run.py serve` also binds
+loopback unless `HOST` is set. World Model and H-MEM state persist in the `hakken-state`
+volume, and traces go to `./logs`.
 
 ## Setup: Zetaris and Nightshift
 
@@ -245,7 +256,8 @@ it rests on, or the safety gate blocks it. The UI shows the disclaimer on every 
 ## Limitations
 
 - **The product is not finished.** The data layer, clinical logic, agent loop, engines
-  and API work. Docker is unverified, and the UI has only run against example responses.
+  and API work, on the host and in Docker. The UI has been reviewed only against example
+  responses.
 - Scores come from synthetic patients and a simulated pharmacist review. They show the
   logic does what it was designed to do, not how it performs on real records. 32 core
   high-risk cases cannot support a "100% recall" claim, and we don't make one.

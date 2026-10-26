@@ -21,7 +21,8 @@ services:
       # different compose project and cannot resolve "datasvc".
       DATASVC_INTERNAL_URL: http://datasvc:8100
       PORT: "8000"
-    ports: ["8000:8000"]
+    # Loopback only: the API has no auth (scan S30).
+    ports: ["127.0.0.1:8000:8000"]
     extra_hosts: ["host.docker.internal:host-gateway"]
     volumes:
       - ./logs:/app/logs
