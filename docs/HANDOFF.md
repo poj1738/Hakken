@@ -27,6 +27,37 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 · Arnav · arnav/s16
+
+**Did:** Scan **S16**. `output.recommendations` used to be the first five task strings,
+each with confidence 0.5 and no rationale. Each recommendation now comes from a ranked
+finding, in triage order:
+- **`text`:** the finding's first task.
+- **`rationale`:** its verified explanation.
+- **`confidence`:** triage's evidence strength: 0.6 + 0.2 per independent pre-admission
+  source it cites, capped at 1 (the `triage.prioritise` formula). In example_2 it's 0.8
+  for a one-source finding and 1.0 for the others.
+
+Notice and dose-lane tasks have no honest confidence, so they aren't put in
+`recommendations` with an invented one. They're still all in `RunResponse.tasks`. A
+zero-finding run (example_3) therefore has no recommendations, and its tasks are
+unchanged.
+- 2 tests in `tests/unit/test_orchestrator.py`. `output_examples/sample_mode/`
+  regenerated.
+
+**Changed shared files:** none (`Recommendation` is unchanged).
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Anshu:** if the UI reads `output.recommendations`, it now has one entry per finding,
+  each with a rationale. The UI's task list should keep reading `tasks`.
+
+**Next:** S17 (documented-intentional findings lose their chart reason). It touches
+`detect.py`, so it needs the eval guardrail.
+
+---
+
 ### 2026-10-26 · Arnav · arnav/s15
 
 **Did:** Scan **S15**. Free text is resolved only when it names a medicine and the model
