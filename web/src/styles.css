@@ -290,6 +290,9 @@ select {
 .resolved-list > div { display: grid; grid-template-columns: 72px 1fr; gap: var(--s2); }
 .resolved-list dt { color: var(--muted); font-size: var(--fs-xs); line-height: 20px; }
 .resolved-list dd { margin: 0; color: var(--ink); line-height: 20px; }
+.resolved-list dd { overflow-wrap: anywhere; }
+/* A conflict is the line that matters most in the row: give it the full width. */
+.resolved-list > div.abstained { grid-column: 1 / -1; }
 .abstained dd strong { color: var(--warn); font-weight: 600; }
 .row-abstained > th { box-shadow: inset 3px 0 0 #fdb022; }
 
