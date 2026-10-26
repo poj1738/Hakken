@@ -1,5 +1,5 @@
 {
-  "run_id": "run-c731bd675352",
+  "run_id": "run-6850a34c9c3e",
   "status": "success",
   "output": {
     "summary": "No discrepancies found for Jennifer Young (MRN0000013) among the sources found; see the notices and tasks. Only 1 of 3 pre-admission sources found (patient). ACSQHC Standard 4 expects at least two independent sources besides the admission chart, so this is a draft medication history and is not confirmable. No record found in: gp, pharmacy.",
@@ -53,8 +53,8 @@
       "status": "ok"
     }
   ],
-  "trace_id": "run-c731bd675352",
-  "log_file": "/tmp/hakken-traces-h9wa0w1y/trace-run-c731bd675352.jsonl",
+  "trace_id": "run-6850a34c9c3e",
+  "log_file": "/tmp/hakken-traces-atsotsjg/trace-run-6850a34c9c3e.jsonl",
   "execution_time_seconds": 0.02,
   "error": null,
   "memory_used": [],
@@ -747,7 +747,7 @@
       "source": "emr",
       "row_id": "EMR-000108",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000108",
@@ -780,7 +780,7 @@
       "source": "emr",
       "row_id": "EMR-000109",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000109",
@@ -813,7 +813,7 @@
       "source": "emr",
       "row_id": "EMR-000110",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000110",
@@ -846,7 +846,7 @@
       "source": "emr",
       "row_id": "EMR-000111",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000111",
@@ -879,7 +879,7 @@
       "source": "emr",
       "row_id": "EMR-000112",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000112",
@@ -912,7 +912,7 @@
       "source": "emr",
       "row_id": "EMR-000113",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000113",
@@ -945,7 +945,7 @@
       "source": "emr",
       "row_id": "EMR-000114",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000114",
@@ -978,7 +978,7 @@
       "source": "emr",
       "row_id": "EMR-000115",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000115",
@@ -1011,7 +1011,7 @@
       "source": "emr",
       "row_id": "EMR-000116",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000116",
@@ -1044,7 +1044,7 @@
       "source": "patient",
       "row_id": "PAT-000114",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000114",
@@ -1077,7 +1077,7 @@
       "source": "patient",
       "row_id": "PAT-000117",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000117",
@@ -1110,7 +1110,7 @@
       "source": "patient",
       "row_id": "PAT-000118",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000118",
@@ -1143,7 +1143,7 @@
       "source": "patient",
       "row_id": "PAT-000119",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000119",
@@ -1176,7 +1176,7 @@
       "source": "patient",
       "row_id": "PAT-000120",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000120",
@@ -1209,7 +1209,7 @@
       "source": "patient",
       "row_id": "PAT-000121",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000121",
@@ -1242,7 +1242,7 @@
       "source": "patient",
       "row_id": "PAT-000115",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000115",
@@ -1275,7 +1275,7 @@
       "source": "patient",
       "row_id": "PAT-000116",
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000116",
@@ -1568,8 +1568,8 @@
   ],
   "trace": [
     {
-      "timestamp": "2026-10-26T07:46:01.936870+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.195172+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Planner",
       "action": "start",
       "input_summary": null,
@@ -1593,8 +1593,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.938314+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.196216+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Planner",
       "action": "recall",
       "input_summary": null,
@@ -1618,8 +1618,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.938657+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.196491+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Planner",
       "action": "plan",
       "input_summary": null,
@@ -1643,8 +1643,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.938818+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.196631+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1668,8 +1668,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.942653+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.199998+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "find_identities",
       "input_summary": null,
@@ -1692,13 +1692,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q1",
-      "query_id": "a3710a61-44d8-4f0b-bd77-cb535e615a6c",
+      "query_id": "d2a039d2-ecaa-4428-9fad-6e2cf1434719",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T07:46:01.943265+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.200470+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1709,7 +1709,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query a3710a61-44d8-4f0b-bd77-cb535e615a6c); audit seq 21-25.",
+      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query d2a039d2-ecaa-4428-9fad-6e2cf1434719); audit seq 21-25.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -1722,8 +1722,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.943535+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.200666+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "needs_review",
       "input_summary": null,
@@ -1747,8 +1747,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.946320+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.202790+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "identity_decision",
       "input_summary": null,
@@ -1772,8 +1772,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.947008+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.203115+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1797,8 +1797,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.947238+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.203302+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1822,8 +1822,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.947383+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.203419+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1847,8 +1847,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.948933+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.204773+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "fetch_meds",
       "input_summary": null,
@@ -1871,13 +1871,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q2",
-      "query_id": "55e19ecd-a53b-49e2-800e-9a930dbb398b",
+      "query_id": "d1d61d3a-d5f0-4455-b7e2-710d21eb64ac",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T07:46:01.951902+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.207535+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "normalise",
       "input_summary": null,
@@ -1901,8 +1901,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.952187+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.207782+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1926,8 +1926,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.953611+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.209137+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "resolve_free_text",
       "input_summary": null,
@@ -1951,8 +1951,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.954055+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.209414+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "resolve_free_text",
       "input_summary": null,
@@ -1976,8 +1976,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.956038+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.211402+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Evaluator",
       "action": "fuse",
       "input_summary": null,
@@ -2001,8 +2001,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.956644+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.212047+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Evaluator",
       "action": "detect",
       "input_summary": null,
@@ -2026,8 +2026,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.956819+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.212184+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Evaluator",
       "action": "prioritise",
       "input_summary": null,
@@ -2051,8 +2051,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.957525+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.212749+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -2076,8 +2076,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.957687+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.212889+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Evaluator",
       "action": "verify",
       "input_summary": null,
@@ -2101,8 +2101,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:46:01.957818+00:00",
-      "run_id": "run-c731bd675352",
+      "timestamp": "2026-10-26T07:55:19.213039+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Writer",
       "action": "done",
       "input_summary": null,

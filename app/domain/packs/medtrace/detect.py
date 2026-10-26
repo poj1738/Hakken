@@ -209,6 +209,11 @@ def detect_discrepancies(
         if forced and forced not in tasks:
             tasks.append(forced)
         detail = {**detail, "atc": med.atc, "atc_class": _atc_class(med.atc)}
+        if intent == "documented_intentional":
+            # The chart note that made it intentional, so the pharmacist can read it (scan S17).
+            note = next((c.note_text for c in chart_rows(med.generic) if c.note_text), None)
+            if note:
+                detail["chart_note"] = note
         found.append(DiscrepancyCandidate(
             id=f"{kind.value}:{med.generic}", type=kind, generic=med.generic,
             sources_involved=sorted(dict.fromkeys(sources)), row_ids=rows, detail=detail,
