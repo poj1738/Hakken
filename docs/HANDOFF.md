@@ -27,6 +27,53 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 · Arnav · arnav/s36
+
+**Did:** Scan **S36**, plus a retry once on Nightshift HTTP 499.
+- **`detail.by_source`** on every dose_unconfirmable, dose, frequency, formulation and
+  route finding: `{gp | pharmacy | patient | emr: "<the words as written>"}`. Each value
+  comes from the rows the finding cites:
+  - **GP:** dose and directions ("as directed").
+  - **Pharmacy:** "N fills, latest <strength>, <qty> per <days> days, no dose stated".
+    The silo has no directions column, so it says so.
+  - **Patient:** their words ("up 2 units every three days").
+  - **Chart:** dose, unit (taken from the strength) and frequency ("5 mg variable per
+    INR"; insulin "11 units tds with meals").
+- **`detail.statement`**, where the detector wrote none:
+  - dose_unconfirmable: "No source confirms the current dose: GP as directed · pharmacy … ·
+    patient '…' · chart …". When the sources do disagree, it leads with "The sources
+    disagree on the dose".
+  - Formulation, route and PRN findings: "charted X against Y before admission".
+  - Dose and frequency findings keep their existing statement.
+- **Template:** dose_unconfirmable now reads "has a dose that changes without a new script,
+  so it cannot be confirmed from the records". The old "the sources disagree on" was
+  false when no source states a dose. Every template still passes the verifier.
+- **Differs from the brief:** this is built in the evaluator (`_what_each_source_says`),
+  not in `detect.py`. `detect` sees `MedStatement`s, which keep the parsed dose but not the
+  words each source wrote; for the chart, only the generic name. The raw Q2 rows are in
+  the evaluator. The scored pack is untouched.
+- **Guardrail:** `scripts/eval.py --split tune` before and after: `ALL 145 17 5 precision
+  0.90 recall 0.97 F1 0.93`, high-risk 34/34, 0 false merges.
+- **HTTP 499 ("Fetch is aborted")** is retried exactly once, outside `MAX_RETRIES`. A
+  second 499 is an upstream failure, so it's recorded in `model_calls` (S9) and the step
+  falls back.
+- Tests: 10 in `tests/unit/test_what_each_source_says.py`, 2 in the adapter tests.
+  `output_examples/sample_mode/` regenerated.
+
+**Changed shared files:** none.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Anshu (S37):** `detail.statement` and `detail.by_source` are live on the
+  dose-unconfirmable and chart-comparison cards. `by_source` keys are `gp`, `pharmacy`,
+  `patient` and `emr` (label it "Admission chart"). They're in SAMPLE_MODE after your next
+  pull, and in Docker after a rebuild.
+
+**Next:** S41 and S42, the backend halves.
+
+---
+
 ### 2026-10-26 · Arnav · arnav/s35
 
 **Did:** Scan **S35**. The generator wrote the insulin **concentration** into the chart's
