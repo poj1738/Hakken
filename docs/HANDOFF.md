@@ -66,6 +66,9 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 **Next:**
 - Show `dose_units` (from #47) in the grid's reconciled column.
 - The `anshu/ui-judges` pass.
+
+---
+
 ### 2026-10-26 · Arnav · arnav/s11-s12
 
 **Did:** Scan **S11** and **S12**.
