@@ -170,6 +170,10 @@ explanations are built only from each finding's own rows. It does real work on t
 cached data, linkage, fusion, detection and verification included, and does **not**
 replay saved model text.
 
+Thirteen patients have a recorded run (P0001–P0010, P0013, P0015, P0089), covering every
+example in `input_examples/`. In this mode, `GET /patients` lists only those 13. Any other
+patient gets a 404 that names the recorded ones, instead of failing partway through a run.
+
 ## Engines used
 
 **World Model: implemented, 8/8 official conformance checks green** (`make conformance`).
