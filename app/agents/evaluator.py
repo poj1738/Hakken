@@ -46,6 +46,15 @@ _ROW_ID = re.compile(r"\b(?:EMR|GP|PHM|PAT)-[A-Za-z0-9]+\b")
 _NUMBER = re.compile(r"(?<![A-Za-z])\d+(?:\.\d+)?")
 _NOT_TAKING = re.compile(r"\b(not taking|no longer tak|stopped taking|has stopped|discontinued by the patient)",
                          re.IGNORECASE)
+#: An instruction to change therapy (scan S10). MedTrace says what to confirm, never what to do.
+#: Matches an imperative opening a sentence ("Stop warfarin.") and a modal or advice form
+#: ("should be stopped", "recommend switching"). A negation ("do not stop it") is not an instruction.
+_VERBS = "stop|start|restart|cease|discontinu|withh[oe]ld|increas|decreas|reduc|switch|chang"
+_INSTRUCTION = re.compile(
+    rf"(?:^|[.;:!?]\s+|\n)\s*(?:{_VERBS})(?:e|ing)?\b"
+    rf"|\b(?:should|must|needs? to|please|recommend(?:ed|s)?|advise[ds]?|consider)\s+(?:to\s+)?(?:be\s+)?"
+    rf"(?:{_VERBS})\w*",
+    re.IGNORECASE)
 
 
 @dataclass
@@ -216,6 +225,34 @@ def claim_problems(f: Finding) -> list[str]:
         problems.append(f"numbers not in the evidence: {unsupported}")
     if any(s == EvidenceState.UNKNOWN for s in f.evidence_states.values()) and _NOT_TAKING.search(text):
         problems.append("says 'not taking' where a source is UNKNOWN")
+    if m := _INSTRUCTION.search(text):
+        problems.append(f"instructs a therapy change ('{m.group(0).strip(' .;:!?')}'); say what to confirm instead")
+    return problems
+
+
+def summary_problems(summary: str, findings: list[Finding], anchor: SourceRow, banner: str | None) -> list[str]:
+    """The same code checks for the Writer's patient summary (scan S10), against all findings at once.
+
+    Numbers may come from any finding's evidence or detail, the coverage banner, the
+    patient's own identifiers and dates, or the counts a summary naturally states.
+    """
+    problems: list[str] = []
+    own = {e.row_id for f in findings for e in f.evidence}
+    if stray := set(_ROW_ID.findall(summary)) - own:
+        problems.append(f"cites rows no finding rests on: {sorted(stray)}")
+    allowed = _numbers(" ".join(
+        [json.dumps([e.fields for f in findings for e in f.evidence]),
+         json.dumps([f.detail for f in findings], default=str), " ".join(f.generic for f in findings),
+         banner or "", anchor.source_patient_id, anchor.record_key or "", str(anchor.dob or ""),
+         str(anchor.doc_date or "")]))
+    allowed |= {float(n) for n in (len(findings), sum(f.needs_pharmacist for f in findings), 3, 4)}
+    if unsupported := sorted(n for n in _numbers(summary) if n not in allowed):
+        problems.append(f"numbers not in the evidence: {unsupported}")
+    if any(s == EvidenceState.UNKNOWN for f in findings for s in f.evidence_states.values()) \
+            and _NOT_TAKING.search(summary):
+        problems.append("says 'not taking' where a source is UNKNOWN")
+    if m := _INSTRUCTION.search(summary):
+        problems.append(f"instructs a therapy change ('{m.group(0).strip(' .;:!?')}')")
     return problems
 
 

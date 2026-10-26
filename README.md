@@ -255,7 +255,11 @@ human before any of that record is read; a missing source is shown as *unknown*,
 never as "not taking"; high-risk (APINCHS) medicines are ranked first; a dose that
 can't be confirmed (warfarin, insulin, prednisolone, methotrexate) becomes a task to
 confirm with the patient, not a guess; and every finding must cite the source rows
-it rests on, or the safety gate blocks it. The UI shows the disclaimer on every screen.
+it rests on, or the safety gate blocks it. Every piece of model text, including the
+patient summary, is checked in code before it is shown: cited rows, numbers, no "not
+taking" where a source is unknown, and no instruction to stop, start or change a
+medicine. Text that fails is replaced with a grounded template. The UI shows the
+disclaimer on every screen.
 
 ## Limitations
 

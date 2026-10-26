@@ -376,11 +376,14 @@ class Orchestrator:
                                         lambda: writer.draft(ctx, findings, state.anchor, analysis.banner),
                                         offline_draft)
         findings = [f.model_copy(update={"explanation": texts.get(f.id) or writer.template(f)}) for f in findings]
+        summary = self._checked_summary(state, summary, findings, analysis.banner)
         state.findings, state.summary = findings, summary
 
         self._route(state, "verify")
         findings, blocked, q3_sql = evaluator.verify(ctx, findings, state.anchor)
         state.findings, state.verified, state.q3_sql = findings, True, q3_sql
+        if blocked:  # the summary may describe a finding that verification just removed
+            summary = state.summary = self._checked_summary(state, summary, findings, analysis.banner)
 
         rounds = max(1, self.settings.max_agent_iterations)
         for round_no in range(1, rounds + 1):
@@ -417,6 +420,21 @@ class Orchestrator:
                                 f"{len(analysis.tasks)} tasks.")
         return self._respond(state, status, summary=summary, analysis=analysis, findings=findings, q3_sql=q3_sql,
                              blocked=[*analysis.blocked, *blocked])
+
+    @staticmethod
+    def _checked_summary(state: RunState, summary: str | None, findings: list[Finding],
+                         banner: str | None) -> str | None:
+        """Scan S10: the summary is the UI's headline, so it gets the same code checks as an
+        explanation. One that fails is replaced with the grounded summary, never shown."""
+        if not summary:
+            return summary
+        issues = evaluator.summary_problems(summary, findings, state.anchor, banner)
+        if not issues:
+            return summary
+        state.ctx.tracer.emit("Evaluator", "verify", step="VERIFY", status="blocked",
+                              message=f"Verifier blocked the Writer's summary: {'; '.join(issues)[:300]}. "
+                                      "Replaced with the grounded summary.")
+        return writer._offline_summary(findings, state.anchor, banner)
 
     def _hmem_ids(self, f: Finding) -> list[str]:
         """The H-MEM trust records a verdict on this finding would move (feedback, PLAN 5.7)."""

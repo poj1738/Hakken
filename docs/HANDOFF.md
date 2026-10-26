@@ -27,6 +27,42 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 · Arnav · arnav/s10
+
+**Did:** Scan **S10**. Also ticked **S1** and **S13**, both already resolved by earlier
+work, with the evidence noted in the scan doc.
+- **The patient summary is no longer shown unchecked.** `evaluator.summary_problems`
+  checks it against all of the run's findings:
+  - every cited row must belong to some finding;
+  - every number must appear in the evidence, the detail, the banner or the patient's
+    identifiers and dates, or be one of the counts;
+  - no "not taking" while any source is unknown;
+  - no instruction to change therapy.
+
+  It runs after the draft, and again after verification if that dropped a finding. A
+  failing summary is replaced with `writer._offline_summary`, and the trace records a
+  `blocked` event saying why.
+- **Instructions are now a code problem in explanations too.** `_INSTRUCTION` flags an
+  imperative opening a sentence ("Stop warfarin.") or a modal or advice form ("should be
+  reduced", "recommend switching", "consider withholding"). Negations ("do not stop it",
+  which the template itself uses) and past tense ("the GP stopped it") pass.
+- **Checked against real output:** all four committed live summaries and every live
+  explanation pass the new checks. No false positives.
+- 11 tests in `tests/unit/test_summary_verify.py`, including a full run in which the
+  Writer returns "Stop oxycodone/naloxone now (GP-999999); 987 mg." and the response
+  shows the grounded summary.
+
+**Changed shared files:** none. `app/agents/` and `app/orchestrator.py` are mine, and
+`app/domain/` is not touched.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:** nothing.
+
+**Next:** S11 (a background run that throws stays `running` forever), then S12.
+
+---
+
 ### 2026-10-26 · Arnav · arnav/s14
 
 **Did:** Scan **S14**. In SAMPLE_MODE, `GET /patients` listed all 200 admissions from Q0,
