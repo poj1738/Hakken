@@ -4,6 +4,7 @@ import type { FeedbackState } from "./Flags";
 import { SOURCES } from "../types";
 import { ROW_TEXT_FIELDS, STATE_LABEL, STATE_SHORT, attributeLabel, cleanText, fieldLabel, medName, sourceLabel, withUnit } from "../format";
 import { InfoTip } from "./InfoTip";
+import { Compare } from "./Compare";
 import { TechDetails } from "./TechDetails";
 
 export const gridFeedbackKey = (generic: string, attribute: string, source: string) => `grid:${generic}:${attribute}:${source}`;
@@ -169,6 +170,9 @@ function Inspector({ cell, idx, coverage, unit, pinned, onClose, feedback, onRej
   const rows = rowsFor(med, source, idx);
   const cov = coverage[source];
   const uncited = uncitedIds(med, idx);
+  // Sources disagree or a value is unresolved: open with the side-by-side view of every source.
+  const disputed = dissentingSources(med).size > 0 || med.abstained.length > 0 || Object.values(med.attributes).some((v) => v.abstained);
+  const allRows = med.row_ids.map((id) => idx[id]).filter((e): e is Evidence => !!e);
   return (
     <aside className="insp" aria-live="polite">
       <div className="insp-head">
@@ -184,19 +188,27 @@ function Inspector({ cell, idx, coverage, unit, pinned, onClose, feedback, onRej
           </button>
         )}
       </div>
+      {pinned && disputed && <Compare generic={med.generic} rows={allRows} med={med} coverage={coverage} unit={unit} />}
       {state === "unknown" && (
-        <p className="insp-note">
-          <strong>No record available does not mean "not taking".</strong> This source cannot be seen for this medicine
-          {cov?.state === "not_found" ? ": no record was found." : "."}
+        <p className="insp-note" title="This source cannot be seen for this medicine.">
+          <strong>No record</strong> — not the same as "not taking".
         </p>
       )}
-      {state === "absent_in_scope" && <p className="insp-note">The source was located, and the part of it that would list this medicine does not.</p>}
-      {cov?.state === "near_miss_pending" && <p className="insp-note">This source's link to the patient is under review.</p>}
-      {cov?.scope_notes.length ? <p className="insp-note muted">Scope: {cov.scope_notes.map(cleanText).join("; ")}</p> : null}
+      {state === "absent_in_scope" && <p className="insp-note">Source found; this medicine isn't in it.</p>}
+      {cov?.state === "near_miss_pending" && <p className="insp-note">Link to the patient under review.</p>}
+      {cov?.scope_notes.length ? (
+        <ul className="insp-scope">
+          {cov.scope_notes.map((n) => (
+            <li key={n} title={n}>
+              {cleanText(n)}
+            </li>
+          ))}
+        </ul>
+      ) : null}
       {/* Buttons only on a pinned (clicked) cell, so a hover never fires feedback. */}
       {pinned && <CellFeedback med={med} source={source} unit={unit} feedback={feedback} onRejectCell={onRejectCell} />}
       {!pinned && sourceValues(med, source).some((x) => x.dissents || x.v.abstained) && (
-        <p className="insp-note muted">Select the cell to mark this source's value as outdated.</p>
+        <p className="insp-note muted">Click to compare or mark outdated.</p>
       )}
       {rows.length > 0 && (
         <div className="insp-section">
@@ -234,7 +246,9 @@ function Reconciled({ med, unit }: { med: FusedMed; unit?: string }) {
       .flatMap((v) => Object.entries(v.dissenting).map(([s, val]) => `${sourceLabel(s)} ${val}`));
     return (
       <div className="recon">
-        <div className="recon-main warn-text">Unresolved — verify with patient</div>
+        <div className="recon-main warn-text" title="Sources disagree and no value won: verify with the patient.">
+          Unresolved
+        </div>
         <div className="recon-basis">
           {unresolved.map(attributeLabel).join(", ")}
           {disagreeing.length ? `: ${disagreeing.join(" vs ")}` : ""}
@@ -291,9 +305,9 @@ export function Grid({ grid, evidenceIndex, coverage, doseUnits, feedback, onRej
           <span className="dot" />
           Not listed
         </span>
-        <span className="cell c-unknown" title="No record available does not mean &quot;not taking&quot;">
+        <span className="cell c-unknown" title="No record available: not the same as &quot;not taking&quot;">
           <span className="dot" />
-          No record available
+          No record
         </span>
         {kinds.has("conflict") && (
           <span className="cell c-conflict">

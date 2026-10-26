@@ -98,8 +98,10 @@ clinical use".
    pill. **More** opens the full text and the "Verify before acting" callout.
 7. Point at the **Powered by** strip: Zetaris 3 SQL queries → 4 agents → Meterless
    engines H-MEM · World Model → Nightshift → Nemotron.
-8. Optional: **Processing log** in the sidebar shows the **World Model** and **H-MEM**
-   tags on the steps that used them.
+8. Optional: **Processing log** in the sidebar: one line per step (repeats shown as
+   "×3"), each with its agent (Planner, Executor, Evaluator, Writer, each a colour
+   plus its name) and the **World Model** / **H-MEM** tags on the steps that used them.
+   "Show details" opens a step's full messages.
 
 **Must be visible:** the 84% match, the withheld reason naming Malcolm Walker, the
 Same patient / Different patients buttons, then the four tiles all **Found**, the
@@ -120,18 +122,21 @@ aspart and warfarin rows with APINCHS badges under "Pharmacist review 3".
 1. Click **Dorothy Nguyen · MRN 0000089** → **Run reconciliation**. No review is needed.
 2. **Discrepancies**: point at **Oxycodone/Naloxone · APINCHS · N · Therapeutic
    duplication**, **Gliclazide · APINCHS · Ext · Omission** and **Dapagliflozin ·
-   Possibly discontinued**. Click **More** on oxycodone/naloxone and hover a record
-   chip (GP-000684) to show its original text and SQL template.
+   Possibly discontinued**. Click **More** on dapagliflozin: the side-by-side table
+   (one column per source, disagreeing cells highlighted), then **View source
+   records** for the rows as written.
 3. **Medication history** in the sidebar: the four sources side by side. Point at the legend:
-   **No record available** (hatched violet) is not **Not listed** (grey).
-4. Click Dapagliflozin's **Patient interview** cell. The panel shows the source
-   record `PAT-000725`, "Forxiga · one a day · unsure", **SQL template Q2**.
+   **No record** (hatched violet) is not **Not listed** (grey).
+4. Click Dapagliflozin's **Patient interview** cell. The panel opens with the
+   **side-by-side** view: GP "active" and the pharmacy's last fill (24 Oct 2025)
+   highlighted as disagreeing, the patient "unsure". Below it, the source record
+   `PAT-000725`, "Forxiga · one a day · unsure", **SQL template Q2**.
 5. Point at Turmeric's Pharmacy cell: **No record**.
 6. **Actions** in the sidebar: the checklist (8 actions), each naming the discrepancy it
    came from.
 
 **Must be visible:** the three discrepancies with priority and APINCHS pills;
-"Unresolved — verify with patient" on dapagliflozin's row; the provenance panel with
+"Unresolved" on dapagliflozin's row; the side-by-side view; the provenance panel with
 record ID and SQL template; the 8 actions.
 
 > "Every line traces back to a record. The duplication is flagged because the
@@ -139,7 +144,7 @@ record ID and SQL template; the 8 actions.
 > GP list, but the sources disagree, so it is left for the pharmacist rather than
 > guessed.
 >
-> Where a source can't be seen, it says 'No record available', which is not 'not
+> Where a source can't be seen, it says 'No record', which is not 'not
 > taking'. That difference is how these tools tell a patient to stop a medicine they
 > still take.
 >
@@ -150,8 +155,8 @@ record ID and SQL template; the 8 actions.
 
 **Clicks:**
 1. Click **Christine O'Brien · MRN 0000003** → **Run reconciliation**.
-2. **Medication history**: Candesartan reads **Unresolved — verify with patient ·
-   Daily dose: GP 16.0 vs Pharmacy 8.0**. The GP tile's (i) says the GP list is about
+2. **Medication history**: Candesartan reads **Unresolved · Daily dose: GP 16.0 vs
+   Pharmacy 8.0**. The GP tile's (i) says the GP list is about
    12 months old.
 3. Click Candesartan's **GP** cell → **Mark outdated** (its accessible name is "Mark
    GP daily dose as outdated"). The panel shows "Marked outdated · confidence 0.70 →

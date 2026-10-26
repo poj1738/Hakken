@@ -26,7 +26,7 @@ const STATE: Record<string, { label: string; cls: string }> = {
   not_found: { label: "Not found", cls: "s-none" },
   near_miss_pending: { label: "Under review", cls: "s-review" },
   unreported: { label: "Not reported", cls: "s-idle" },
-  idle: { label: "Not searched yet", cls: "s-idle" },
+  idle: { label: "Not searched", cls: "s-idle" },
   searching: { label: "Searching…", cls: "s-idle" },
 };
 

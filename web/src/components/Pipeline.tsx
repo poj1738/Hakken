@@ -1,5 +1,7 @@
 import type { HealthResponse, RunResponse } from "../types";
+import type { ReactNode } from "react";
 import { OFFLINE_MODEL, engineLabel, humanize, plural } from "../format";
+import { AgentTag } from "./Agent";
 
 /**
  * "Powered by": Zetaris → agents → Meterless Nightshift → NVIDIA Nemotron, read
@@ -10,7 +12,7 @@ import { OFFLINE_MODEL, engineLabel, humanize, plural } from "../format";
 const STATUS: Record<string, string> = { sample_mode: "sample mode", connected: "connected", online: "online", offline: "offline", unauthorized: "unauthorised" };
 const said = (v: string | undefined) => (v ? STATUS[v] ?? humanize(v).toLowerCase() : "unknown");
 
-function Stage({ name, value, title, tone = "" }: { name: string; value: string; title?: string; tone?: string }) {
+function Stage({ name, value, title, tone = "" }: { name: string; value: ReactNode; title?: string; tone?: string }) {
   return (
     <li className={`pipe-stage ${tone}`} title={title}>
       <span className="pipe-name">{name}</span>
@@ -47,7 +49,17 @@ export function Pipeline({ run, health }: { run: RunResponse | null; health: Hea
         />
         <Stage
           name={agents.length ? plural(agents.length, "agent") : "Agents"}
-          value={agents.length ? agents.join(" · ") : "ready"}
+          value={
+            agents.length ? (
+              <span className="pipe-agents">
+                {agents.map((a) => (
+                  <AgentTag key={a} name={a} small />
+                ))}
+              </span>
+            ) : (
+              "ready"
+            )
+          }
           title={engines.length ? `Meterless engines used: ${engines.map(engineLabel).join(", ")}` : undefined}
         />
         {engines.length > 0 && <Stage name="Meterless engines" value={engines.map(engineLabel).join(" · ")} tone="pipe-engine" />}

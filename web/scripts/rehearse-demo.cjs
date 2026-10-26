@@ -58,9 +58,10 @@ const note = (scene, s) => notes.push(`[${scene}] ${s}`);
   note('2', `run settled in ${await run('MRN0000089')} s`);
   note('2', `findings: ${(await p.locator('.finding-title').allInnerTexts()).map((s) => s.replace(/\n/g, ' ')).join(' || ')}`);
   // Evidence lives behind "More" on each finding.
-  const first = p.locator('.finding').first();
+  // Dapagliflozin's finding spans several sources, so its More opens with the side-by-side table.
+  const first = p.locator('.finding', { hasText: 'Dapagliflozin' }).first();
   await first.getByRole('button', { name: 'More' }).click();
-  note('2', `first finding's records: ${(await first.locator('.chip').allInnerTexts()).join(', ')}`);
+  note('2', `dapagliflozin finding's side by side: ${(await first.locator('.cmp-table thead th').allInnerTexts()).filter(Boolean).join(' | ') || 'none (one source)'}; ${await first.locator('.src-records > summary').innerText()}`);
   await shot('scene2a-discrepancies');
   await first.getByRole('button', { name: 'Less' }).click();
   await tab('Medication history');
@@ -72,7 +73,8 @@ const note = (scene, s) => notes.push(`[${scene}] ${s}`);
   const cited = p.locator('.row', { hasText: 'Dapagliflozin' }).locator('.gcell').nth(3);
   if (await cited.locator('.no-row').count()) note('2', 'Dapagliflozin interview cell has NO cited record: provenance cannot be shown');
   await cited.click(); await p.mouse.move(0, 0);
-  note('2', `provenance panel: ${(await p.locator('.insp').innerText()).replace(/\n/g, ' | ').slice(0, 220)}`);
+  note('2', `side by side in the cell panel: ${await p.locator('.insp .cmp-diff').count()} highlighted cells`);
+  note('2', `provenance panel: ${(await p.locator('.insp .rec').first().innerText()).replace(/\n/g, ' | ').slice(0, 200)}`);
   await shot('scene2b-medication-history');
   await tab('Actions');
   note('2', `actions: ${await p.locator('.action').count()}`);

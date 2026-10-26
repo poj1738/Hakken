@@ -17,7 +17,7 @@ export const sourceLabel = (s: string | null | undefined) => (s ? SOURCE_LABEL[s
 export const STATE_LABEL: Record<EvidenceState, string> = {
   present: "Listed",
   absent_in_scope: "Not listed",
-  unknown: "No record available",
+  unknown: "No record",
 };
 /** The shorter in-grid form; the full label is the cell's tooltip and the legend. */
 export const STATE_SHORT: Record<EvidenceState, string> = {
@@ -46,7 +46,7 @@ export const NOTICE_LABEL: Record<NoticeType, string> = {
   bpmh_not_confirmable: "Medication history not confirmable",
   possible_second_pharmacy: "Possible second pharmacy",
   patient_only_item: "Patient-only item",
-  conflict_abstained: "Unresolved — verify with patient",
+  conflict_abstained: "Unresolved",
   stale_document: "Stale document",
   known_shortage: "Known shortage",
 };
@@ -179,7 +179,7 @@ export function cleanText(raw: string | null | undefined): string {
   s = s.replace(RECORD_KEY, (key: string, src: string) => (src === "emr" ? `admission chart ${key.slice(4)}` : sourceLabel(src)));
   s = s.replace(/\b[a-z]+(?:_[a-z]+)+\b/g, (w) => (w in TYPE_LABEL ? typeLabel(w).toLowerCase() : w.replace(/_/g, " ")));
   s = s.replace(/\b[A-Z]{2,}(?:_[A-Z]+)+\b/g, (w) => humanize(w));
-  s = s.replace(/Conflict:\s*ask patient\.?/gi, "Unresolved — verify with patient.");
+  s = s.replace(/Conflict:\s*ask patient\.?/gi, "Unresolved.");
   s = s.replace(/^([a-z])/, (c) => c.toUpperCase());
   return s.replace(/\s+([.,;:])/g, "$1").replace(/\s{2,}/g, " ").trim();
 }

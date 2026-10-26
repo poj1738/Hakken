@@ -419,7 +419,7 @@ export default function App() {
                 </div>
               )}
 
-              {hasResult && shownSection === "findings" && <Flags findings={run.findings} feedback={feedback} onFeedback={sendFeedback} />}
+              {hasResult && shownSection === "findings" && <Flags findings={run.findings} grid={run.grid} coverage={run.coverage} doseUnits={run.dose_units ?? {}} feedback={feedback} onFeedback={sendFeedback} />}
               {hasResult && shownSection === "meds" && (
                 <Grid
                   grid={run.grid}
