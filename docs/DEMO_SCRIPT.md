@@ -189,19 +189,20 @@ compliance (Arpon, HANDOFF 25 Oct).
   "< 0.1 s". MRN0000015 shows ~1.9 s because the clock includes the identity pause.
 
 **Not UI: needs the API or the data (Arnav)**
-- **Scene 2, provenance:** 18 of 36 listed cells on MRN0000089 cite no source record
-  (dashed-circle icon). `evidence_index` still holds only rows cited by findings and
-  notices (`app/orchestrator.py:506`), not every row behind the grid, as `schemas.py`
-  promises. Click a cell **without** the icon on camera.
 - **Scene 1, text:** the aspirin/clopidogrel explanation reads "appears more than once
   once combination products are decomposed" (doubled word in the API text).
 - **Every scene, Processing Log:** the identity-resolution step reads "…the Zetaris
   adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID)".
   That's developer prose on a judge-facing screen. Scroll past it or ask Arnav to
   reword it.
-- **Scenes 2–3:** doses still have no unit ("Daily dose 10", "Daily dose 3990").
 - **Scene 4:** PLAN §8 lists "false-cessation 0". `eval.py` prints no such line, so
   don't say it.
+
+**Fixed by Arnav in #47 (merged 26 Oct, re-rehearsed on this branch)**
+- Scene 2, provenance: every listed cell on MRN0000089 now cites its source record
+  (was 18 of 36 uncited). `evidence_index` covers every grid row.
+- Doses: the API now sends `dose_units`. The UI does not show it yet ("Daily dose
+  10"); that is a follow-up UI change.
 
 **PLAN §8 beats these patients cannot show**
 - "Lipitor vs atorvastatin NOT flagged": the brand-vs-generic suppression has no

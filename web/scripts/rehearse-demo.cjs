@@ -54,9 +54,11 @@ const note = (scene, s) => notes.push(`[${scene}] ${s}`);
   const noRow = await p.locator('.gcell .no-row').count();
   const listed = await p.locator('.gcell .c-listed, .gcell .c-conflict').count();
   note('2', `grid rows ${rows}; listed/disagree cells ${listed}; cells with no cited record ${noRow}; unknown cells ${await p.locator('.gcell .c-unknown').count()}`);
-  const cited = p.locator('.gcell:not(:has(.no-row)):has(.c-listed)').first();
-  if (await cited.count()) { await cited.click(); await p.mouse.move(0, 0); note('2', `provenance panel: ${(await p.locator('.insp').innerText()).replace(/\n/g, ' | ').slice(0, 220)}`); }
-  else note('2', 'NO listed cell has a cited record: provenance on hover cannot be shown');
+  // The cell DEMO_SCRIPT.md scene 2 clicks: Dapagliflozin, Patient interview (columns: chart, GP, pharmacy, interview).
+  const cited = p.locator('.row', { hasText: 'Dapagliflozin' }).locator('.gcell').nth(3);
+  if (await cited.locator('.no-row').count()) note('2', 'Dapagliflozin interview cell has NO cited record: provenance cannot be shown');
+  await cited.click(); await p.mouse.move(0, 0);
+  note('2', `provenance panel: ${(await p.locator('.insp').innerText()).replace(/\n/g, ' | ').slice(0, 220)}`);
   await shot('scene2b-medication-history');
   await tab('Actions Required');
   note('2', `actions: ${await p.locator('.action').count()}`);

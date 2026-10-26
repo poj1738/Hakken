@@ -27,6 +27,46 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 17:40 AEDT · Anshu · anshu/demo-rehearsal
+
+**Did:** Demo rehearsal.
+- **`docs/DEMO_SCRIPT.md`:** the 3-minute narration for PLAN §8. External facts are
+  word for word from `docs/PITCH_CLAIMS.md`. For each scene it gives the patient,
+  the exact clicks and what must be visible:
+  - MRN0000015, identity review, then warfarin "Verify before acting";
+  - MRN0000089, discrepancies, provenance and actions;
+  - MRN0000003 → MRN0000007, the learning pair;
+  - the scorecard.
+  It also has a sample-vs-live table and a per-scene issues list.
+- **`web/scripts/rehearse-demo.cjs`:** Playwright walks that click path against a
+  fresh `SAMPLE_MODE` API, screenshots each scene and fails on any page or HTTP
+  error. Re-run after merging #47: clean, every MRN0000089 cell cites its record.
+- **UI fixes found while rehearsing (presentation only):**
+  - the Processing Log footer no longer counts `offline-heuristic` steps as
+    Nightshift calls;
+  - sub-0.1 s runs read "< 0.1 s";
+  - `emr:` record keys keep their MRN in cleaned text;
+  - dates read "Sep", not the locale's "Sept";
+  - the cell panel's second toggle is now "Query ID".
+
+**Changed shared files:** none.
+
+**Broken:** nothing in the UI. Still wrong in API text, so on screen:
+- "appears more than once once combination products are decomposed";
+- the identity-resolution log step reads like developer notes ("Bearer key,
+  X-Org-ID, fresh X-Request-ID").
+
+**Needs from teammates:**
+- Arnav: reword those two strings.
+- Everyone: PLAN §8's "false-cessation 0" isn't printed by `eval.py`, so the
+  script doesn't say it.
+- Scene 2 should be recorded **live**: the header Model pill shows "Not yet called"
+  in sample mode.
+
+**Next:**
+- Show `dose_units` (from #47) in the grid's reconciled column.
+- The `anshu/ui-judges` pass.
+
 ### 2026-10-26 · Arnav · arnav/grid-evidence
 
 **Did:** Anshu's two asks from 12:16.
