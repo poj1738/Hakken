@@ -1,0 +1,1550 @@
+{
+  "run_id": "run-b7c87edb79a0",
+  "status": "success",
+  "output": {
+    "summary": "",
+    "recommendations": [
+      {
+        "text": "Call GP practice",
+        "rationale": null,
+        "confidence": 0.5,
+        "requires_human_review": true
+      },
+      {
+        "text": "Ask the patient which pharmacy they use",
+        "rationale": null,
+        "confidence": 0.5,
+        "requires_human_review": true
+      },
+      {
+        "text": "Verify the glucosamine dose",
+        "rationale": null,
+        "confidence": 0.5,
+        "requires_human_review": true
+      }
+    ],
+    "evidence": [],
+    "caveats": [
+      "Synthetic data. Not medical advice. A pharmacist must confirm every item.",
+      "SAMPLE_MODE: recorded Zetaris data and offline-heuristic agents; no model was called."
+    ],
+    "artifacts": []
+  },
+  "agents": [
+    {
+      "name": "Planner",
+      "role": "plan the investigation",
+      "iterations": 1,
+      "models_used": [
+        "offline-heuristic"
+      ],
+      "routes_requested": [
+        "meterless/fast"
+      ],
+      "status": "ok"
+    },
+    {
+      "name": "Executor",
+      "role": "fetch, link, normalise, resolve free text",
+      "iterations": 1,
+      "models_used": [
+        "offline-heuristic"
+      ],
+      "routes_requested": [
+        "meterless/fast"
+      ],
+      "status": "ok"
+    },
+    {
+      "name": "Evaluator",
+      "role": "fuse, detect, gate, verify, critique",
+      "iterations": 0,
+      "models_used": [],
+      "routes_requested": [],
+      "status": "ok"
+    },
+    {
+      "name": "Writer",
+      "role": "explain and summarise",
+      "iterations": 0,
+      "models_used": [],
+      "routes_requested": [],
+      "status": "ok"
+    }
+  ],
+  "trace_id": "run-b7c87edb79a0",
+  "log_file": "/tmp/hakken-traces-2afp62bq/trace-run-b7c87edb79a0.jsonl",
+  "execution_time_seconds": 0.02,
+  "error": null,
+  "memory_used": [],
+  "sample_mode": true,
+  "provider_state": "sample_mode",
+  "patient_id": "MRN0000013",
+  "coverage": {
+    "emr": {
+      "source": "emr",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "emr:MRN0000013",
+      "doc_date": "2026-10-24"
+    },
+    "gp": {
+      "source": "gp",
+      "state": "not_found",
+      "scope_notes": [],
+      "record_key": null,
+      "doc_date": null
+    },
+    "pharmacy": {
+      "source": "pharmacy",
+      "state": "not_found",
+      "scope_notes": [],
+      "record_key": null,
+      "doc_date": null
+    },
+    "patient": {
+      "source": "patient",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "patient:INT00013",
+      "doc_date": null
+    }
+  },
+  "bpmh_confirmable": false,
+  "banner": "Only 1 of 3 pre-admission sources found (patient). ACSQHC Standard 4 expects at least two independent sources besides the admission chart, so this is a draft medication history and is not confirmable. No record found in: gp, pharmacy.",
+  "grid": [
+    {
+      "generic": "amlodipine",
+      "atc": "C08CA01",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "present",
+        "gp": "unknown",
+        "pharmacy": "unknown",
+        "patient": "absent_in_scope"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 0.6378,
+          "runner_up": "absent",
+          "runner_up_score": 0.4,
+          "margin": 0.2292,
+          "abstained": false,
+          "supporting": [
+            "emr"
+          ],
+          "dissenting": {
+            "patient": "absent"
+          },
+          "row_ids": [
+            "EMR-000116"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 5.0,
+          "score": 0.6869,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000116"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1/day",
+          "score": 0.785,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000116"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "IR",
+          "score": 0.736,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000116"
+          ]
+        },
+        "route": {
+          "attribute": "route",
+          "value": "PO",
+          "score": 0.8831,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000116"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000108",
+        "EMR-000116"
+      ]
+    },
+    {
+      "generic": "atorvastatin",
+      "atc": "C10AA05",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "present",
+        "gp": "unknown",
+        "pharmacy": "unknown",
+        "patient": "unknown"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 0.6378,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000113"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 40.0,
+          "score": 0.6869,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000113"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1/day",
+          "score": 0.785,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000113"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "IR",
+          "score": 0.736,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000113"
+          ]
+        },
+        "route": {
+          "attribute": "route",
+          "value": "PO",
+          "score": 0.8831,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000113"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000109",
+        "EMR-000113"
+      ]
+    },
+    {
+      "generic": "candesartan",
+      "atc": "C09CA06",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "absent_in_scope",
+        "gp": "unknown",
+        "pharmacy": "unknown",
+        "patient": "absent_in_scope"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "absent",
+          "score": 0.8,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000114"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "PAT-000114"
+      ]
+    },
+    {
+      "generic": "esomeprazole",
+      "atc": "A02BC05",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "present",
+        "gp": "unknown",
+        "pharmacy": "unknown",
+        "patient": "present"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 0.8,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000117"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1/day",
+          "score": 0.45,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000117"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "IR",
+          "score": 0.2,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000117"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000110",
+        "PAT-000117"
+      ]
+    },
+    {
+      "generic": "gliclazide",
+      "atc": "A10BB09",
+      "high_risk_class": "Ext",
+      "per_source": {
+        "emr": "present",
+        "gp": "unknown",
+        "pharmacy": "unknown",
+        "patient": "present"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 1.4378,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr",
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000114",
+            "PAT-000119"
+          ]
+        },
+        "daily_dose": {
+          "attribute": "daily_dose",
+          "value": 45.0,
+          "score": 0.6869,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000114"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1.5/day",
+          "score": 1.235,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr",
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000114",
+            "PAT-000119"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "MR",
+          "score": 0.2,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000119"
+          ]
+        },
+        "route": {
+          "attribute": "route",
+          "value": "PO",
+          "score": 0.8831,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000114"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000112",
+        "EMR-000114",
+        "PAT-000119"
+      ]
+    },
+    {
+      "generic": "glucosamine",
+      "atc": null,
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "absent_in_scope",
+        "gp": "unknown",
+        "pharmacy": "unknown",
+        "patient": "present"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 0.8,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000121"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "1/day",
+          "score": 0.45,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000121"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "IR",
+          "score": 0.2,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000121"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "PAT-000121"
+      ]
+    },
+    {
+      "generic": "oxycodone",
+      "atc": "N02AA05",
+      "high_risk_class": "N",
+      "per_source": {
+        "emr": "present",
+        "gp": "unknown",
+        "pharmacy": "unknown",
+        "patient": "present"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "present",
+          "score": 0.8,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000118"
+          ]
+        },
+        "frequency": {
+          "attribute": "frequency",
+          "value": "2/day",
+          "score": 0.45,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000118"
+          ]
+        },
+        "release": {
+          "attribute": "release",
+          "value": "MR",
+          "score": 0.2,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "PAT-000118"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000111",
+        "PAT-000118"
+      ]
+    },
+    {
+      "generic": "sertraline",
+      "atc": "N06AB06",
+      "high_risk_class": null,
+      "per_source": {
+        "emr": "absent_in_scope",
+        "gp": "unknown",
+        "pharmacy": "unknown",
+        "patient": "absent_in_scope"
+      },
+      "attributes": {
+        "existence": {
+          "attribute": "existence",
+          "value": "absent",
+          "score": 1.4378,
+          "runner_up": null,
+          "runner_up_score": 0.0,
+          "margin": 1.0,
+          "abstained": false,
+          "supporting": [
+            "emr",
+            "patient"
+          ],
+          "dissenting": {},
+          "row_ids": [
+            "EMR-000115",
+            "PAT-000120"
+          ]
+        }
+      },
+      "abstained": [],
+      "row_ids": [
+        "EMR-000115",
+        "PAT-000120"
+      ]
+    }
+  ],
+  "findings": [],
+  "notices": [
+    {
+      "type": "coverage_gap",
+      "detail": "gp: no record found.",
+      "source": "gp",
+      "generic": null,
+      "row_ids": [],
+      "tasks": [
+        "Call GP practice"
+      ]
+    },
+    {
+      "type": "coverage_gap",
+      "detail": "pharmacy: no record found.",
+      "source": "pharmacy",
+      "generic": null,
+      "row_ids": [],
+      "tasks": [
+        "Ask the patient which pharmacy they use"
+      ]
+    },
+    {
+      "type": "bpmh_not_confirmable",
+      "detail": "Only 1 of 3 pre-admission sources found (patient). ACSQHC Standard 4 expects at least two independent sources besides the admission chart, so this is a draft medication history and is not confirmable. No record found in: gp, pharmacy.",
+      "source": null,
+      "generic": null,
+      "row_ids": [],
+      "tasks": []
+    },
+    {
+      "type": "patient_only_item",
+      "detail": "glucosamine is reported only by the patient; kept, verify the dose.",
+      "source": "patient",
+      "generic": "glucosamine",
+      "row_ids": [
+        "PAT-000121"
+      ],
+      "tasks": [
+        "Verify the glucosamine dose"
+      ]
+    }
+  ],
+  "tasks": [
+    "Call GP practice",
+    "Ask the patient which pharmacy they use",
+    "Verify the glucosamine dose"
+  ],
+  "identity_review": null,
+  "evidence_index": {},
+  "trust": [
+    {
+      "source": "emr",
+      "attribute": "actually_taking",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-1"
+    },
+    {
+      "source": "emr",
+      "attribute": "admission_chart",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-2"
+    },
+    {
+      "source": "emr",
+      "attribute": "daily_dose",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-3"
+    },
+    {
+      "source": "emr",
+      "attribute": "existence",
+      "value": 0.65,
+      "uncertainty": null,
+      "hmem_record_id": "mem-4"
+    },
+    {
+      "source": "emr",
+      "attribute": "frequency",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-5"
+    },
+    {
+      "source": "emr",
+      "attribute": "intended_dose",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-6"
+    },
+    {
+      "source": "emr",
+      "attribute": "name",
+      "value": 0.9,
+      "uncertainty": null,
+      "hmem_record_id": "mem-7"
+    },
+    {
+      "source": "emr",
+      "attribute": "release",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-8"
+    },
+    {
+      "source": "emr",
+      "attribute": "route",
+      "value": 0.9,
+      "uncertainty": null,
+      "hmem_record_id": "mem-9"
+    },
+    {
+      "source": "emr",
+      "attribute": "strength",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-10"
+    },
+    {
+      "source": "gp",
+      "attribute": "actually_taking",
+      "value": 0.45,
+      "uncertainty": null,
+      "hmem_record_id": "mem-11"
+    },
+    {
+      "source": "gp",
+      "attribute": "daily_dose",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-12"
+    },
+    {
+      "source": "gp",
+      "attribute": "existence",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-13"
+    },
+    {
+      "source": "gp",
+      "attribute": "frequency",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-14"
+    },
+    {
+      "source": "gp",
+      "attribute": "intended_dose",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-15"
+    },
+    {
+      "source": "gp",
+      "attribute": "name",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-16"
+    },
+    {
+      "source": "gp",
+      "attribute": "release",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-17"
+    },
+    {
+      "source": "gp",
+      "attribute": "route",
+      "value": 0.5,
+      "uncertainty": null,
+      "hmem_record_id": "mem-18"
+    },
+    {
+      "source": "gp",
+      "attribute": "strength",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-19"
+    },
+    {
+      "source": "patient",
+      "attribute": "actually_taking",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-20"
+    },
+    {
+      "source": "patient",
+      "attribute": "daily_dose",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-21"
+    },
+    {
+      "source": "patient",
+      "attribute": "existence",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-22"
+    },
+    {
+      "source": "patient",
+      "attribute": "frequency",
+      "value": 0.45,
+      "uncertainty": null,
+      "hmem_record_id": "mem-23"
+    },
+    {
+      "source": "patient",
+      "attribute": "intended_dose",
+      "value": 0.35,
+      "uncertainty": null,
+      "hmem_record_id": "mem-24"
+    },
+    {
+      "source": "patient",
+      "attribute": "name",
+      "value": 0.5,
+      "uncertainty": null,
+      "hmem_record_id": "mem-25"
+    },
+    {
+      "source": "patient",
+      "attribute": "release",
+      "value": 0.2,
+      "uncertainty": null,
+      "hmem_record_id": "mem-26"
+    },
+    {
+      "source": "patient",
+      "attribute": "route",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-27"
+    },
+    {
+      "source": "patient",
+      "attribute": "strength",
+      "value": 0.3,
+      "uncertainty": null,
+      "hmem_record_id": "mem-28"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "actually_taking",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-29"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "daily_dose",
+      "value": 0.55,
+      "uncertainty": null,
+      "hmem_record_id": "mem-30"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "existence",
+      "value": 0.85,
+      "uncertainty": null,
+      "hmem_record_id": "mem-31"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "frequency",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-32"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "intended_dose",
+      "value": 0.5,
+      "uncertainty": null,
+      "hmem_record_id": "mem-33"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "name",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-34"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "release",
+      "value": 0.85,
+      "uncertainty": null,
+      "hmem_record_id": "mem-35"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "route",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-36"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "strength",
+      "value": 0.9,
+      "uncertainty": null,
+      "hmem_record_id": "mem-37"
+    }
+  ],
+  "trace": [
+    {
+      "timestamp": "2026-10-26T02:05:26.112570+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Planner",
+      "action": "start",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "START",
+      "message": "Reconciling Jennifer Young (MRN0000013), admitted 2026-10-24. SAMPLE_MODE: recorded Zetaris data, offline agents.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.113950+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Planner",
+      "action": "recall",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PLAN",
+      "message": "H-MEM recalled 0 memories for the plan.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": "hmem",
+      "engine_op": "query",
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.114311+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Planner",
+      "action": "plan",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": "offline-heuristic",
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PLAN",
+      "message": "Plan: find_identities (\"find this patient's records in the GP, pharmacy and interview systems\"); fetch_meds (\"get every medicine line, dispensing and interview answer for those records\"); resolve_free_text (\"work out what any free-text medicine lines refer to\"); verify (\"re-read every row the findings cite before anyone sees them\"). Standard reconciliation for Jennifer Young: link the patient across GP, pharmacy and interview records, read their medicines in one query, resolve any free-text lines from the lexicon, then verify every cited row. 8 queries available.",
+      "route": "meterless/fast",
+      "latency_ms": 0,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.114472+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "route",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "Planner need \"find this patient's records in the GP, pharmacy and interview systems\" -> the Executor fills template Q1 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.118191+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "find_identities",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "Found Jennifer Young in 0 other record(s): none. 1 near-miss(es) need your confirmation: patient:INT00013 0.84 (held: this record carries no IHI, and it falls in a group of matching records that includes Joseph Young (DOB 1956-12-13, emr:MRN0000009), who carries a different IHI — confirm it is this patient).",
+      "route": null,
+      "latency_ms": 0,
+      "tokens": null,
+      "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date FROM medtrace.all_sources WHERE ihi_syn = 'SYN-306753773813' OR dob_text IN ('13/02/1956', '1956-02-13') OR (dob_text LIKE '%1956%' AND (UPPER(name_family) LIKE 'YOUN%' OR UPPER(name_previous) LIKE 'YOUN%' OR UPPER(name_given) LIKE 'YOUN%')) OR (source = 'emr' AND source_patient_id = 'MRN0000013')",
+      "row_count": 57,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null,
+      "sql_template_id": "Q1",
+      "query_id": "aa5f54b9-d8ee-47dd-a52a-ef4d5ef314b9",
+      "request_id": null,
+      "replayed": true
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.118707+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "world_model",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query aa5f54b9-d8ee-47dd-a52a-ef4d5ef314b9); audit seq 21-25.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": "world_model",
+      "engine_op": "upsert+relate",
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.118921+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "needs_review",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "waiting",
+      "step": "NEEDS_REVIEW",
+      "message": "Paused: 1 identity near-miss(es) need your confirmation.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.120999+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "identity_decision",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "Pharmacist decided patient:INT00013 is the same person.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.121277+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "world_model",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "World Model: decision recorded with provenance (audit seq 26); future runs for this patient reuse it.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": "world_model",
+      "engine_op": "relate",
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.121463+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "world_model",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FETCH_MEDS",
+      "message": "Linked set read from the World Model graph: emr:MRN0000013, patient:INT00013.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": "world_model",
+      "engine_op": "neighborsOf",
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.121627+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "route",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FETCH_MEDS",
+      "message": "Planner need \"get every medicine line, dispensing and interview answer for those records\" -> the Executor fills template Q2 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.123832+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "fetch_meds",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FETCH_MEDS",
+      "message": "Fetched 17 medicine rows in one query: emr 9, patient 8.",
+      "route": null,
+      "latency_ms": 0,
+      "tokens": null,
+      "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE (source = 'emr' AND source_patient_id = 'MRN0000013') OR (source = 'patient' AND source_patient_id = 'INT00013')",
+      "row_count": 17,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null,
+      "sql_template_id": "Q2",
+      "query_id": "d813c700-f6d1-4d67-829f-4a462f912927",
+      "request_id": null,
+      "replayed": true
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.127025+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "normalise",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "NORMALISE",
+      "message": "Normalised 17 lines: 9 by code, 6 by lexicon, 2 by unmapped.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.127224+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "route",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "RESOLVE_FREE_TEXT",
+      "message": "Planner need \"work out what any free-text medicine lines refer to\" -> the lexicon plus one Nemotron choice from a closed candidate list; no SQL.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.129479+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "resolve_free_text",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": "offline-heuristic",
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "RESOLVE_FREE_TEXT",
+      "message": "Resolved 0 of 2 free-text lines from the lexicon candidates.",
+      "route": "meterless/fast",
+      "latency_ms": 0,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.131699+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Evaluator",
+      "action": "fuse",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FUSE",
+      "message": "Built the BPMH grid: 8 medicines.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.132306+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Evaluator",
+      "action": "detect",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "DETECT",
+      "message": "0 candidate discrepancies; 0 blocked by the safety gate (no citable rows).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.132446+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Evaluator",
+      "action": "prioritise",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PRIORITISE",
+      "message": "Ranked 0 findings; 0 need a pharmacist's tick.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.132740+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Executor",
+      "action": "route",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "VERIFY",
+      "message": "Planner need \"re-read every row the findings cite before anyone sees them\" -> the Executor fills template Q3 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.132881+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Evaluator",
+      "action": "verify",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "VERIFY",
+      "message": "Nothing to verify: no cited rows.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T02:05:26.133085+00:00",
+      "run_id": "run-b7c87edb79a0",
+      "agent_name": "Writer",
+      "action": "done",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "DONE",
+      "message": "Done: 0 findings, 4 notices, 3 tasks.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    }
+  ],
+  "query_count": 2,
+  "zetaris_ms": 0,
+  "model_calls": [
+    {
+      "role": "Planner",
+      "requested_route": "meterless/fast",
+      "routed_model": "offline-heuristic",
+      "request_id": null,
+      "tokens": {},
+      "truncated": false
+    },
+    {
+      "role": "Executor",
+      "requested_route": "meterless/fast",
+      "routed_model": "offline-heuristic",
+      "request_id": null,
+      "tokens": {},
+      "truncated": false
+    }
+  ]
+}
