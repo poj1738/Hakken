@@ -6,17 +6,20 @@ import type {
   HealthResponse,
   PatientSummary,
   RunResponse,
+  Source,
+  TrustAttribute,
 } from "./types";
 import { Header } from "./components/Header";
 import { Picker, type PatientsState } from "./components/Picker";
 import { Timeline } from "./components/Timeline";
 import { IdentityReview } from "./components/IdentityReview";
 import { CoverageStrip, Notices } from "./components/Coverage";
-import { Grid } from "./components/Grid";
+import { Grid, gridFeedbackKey } from "./components/Grid";
 import { Flags, type FeedbackChoice, type FeedbackState } from "./components/Flags";
 import { Tasks } from "./components/Tasks";
 import { TrustPanel, type AppliedTrustUpdate } from "./components/TrustPanel";
 import { DISCLAIMER, Footer } from "./components/Footer";
+import { cleanText } from "./format";
 
 /** The API's caveats about this result, minus the fixed disclaimer shown in the header and footer. */
 function Caveats({ caveats }: { caveats: string[] }) {
@@ -25,7 +28,9 @@ function Caveats({ caveats }: { caveats: string[] }) {
   return (
     <ul className="caveats small">
       {shown.map((c) => (
-        <li key={c}>{c}</li>
+        <li key={c} title={c}>
+          {cleanText(c)}
+        </li>
       ))}
     </ul>
   );
@@ -172,25 +177,36 @@ export default function App() {
     }
   };
 
-  const sendFeedback = async (f: Finding, c: FeedbackChoice) => {
+  // `key` is where the UI shows the result (a finding id, or one grid cell);
+  // `targetId` is what the API is told: a finding id, or grid:<generic>:<attribute>.
+  const sendFeedbackFor = async (key: string, targetId: string, c: FeedbackChoice) => {
     if (!run) return;
-    setFeedback((s) => ({ ...s, [f.id]: { busy: true } }));
+    setFeedback((s) => ({ ...s, [key]: { busy: true } }));
     try {
       const r = await api.feedback({
         run_id: run.run_id,
-        target_id: f.id,
+        target_id: targetId,
         verdict: c.verdict,
         reason: c.reason ?? null,
         // Only a source_outdated reject names a record; the API rejects them elsewhere.
         ...(c.reason === "source_outdated" ? { source: c.source, attribute: c.attribute } : {}),
       });
-      setFeedback((s) => ({ ...s, [f.id]: { result: r } }));
+      setFeedback((s) => ({ ...s, [key]: { result: r } }));
       setTrustUpdates((u) => [...u, ...r.trust_updates.map((t) => ({ ...t, runId: r.run_id, targetId: r.target_id, reason: r.reason }))]);
       setAcceptance((a) => [...a, ...r.acceptance_updates]);
     } catch (e) {
-      setFeedback((s) => ({ ...s, [f.id]: { error: msg(e) } }));
+      setFeedback((s) => ({ ...s, [key]: { error: msg(e) } }));
     }
   };
+  const sendFeedback = (f: Finding, c: FeedbackChoice) => sendFeedbackFor(f.id, f.id, c);
+  // The learning demo's step 1: a source's value for one grid attribute is outdated.
+  const rejectCell = (generic: string, attribute: TrustAttribute, source: Source) =>
+    sendFeedbackFor(gridFeedbackKey(generic, attribute, source), `grid:${generic}:${attribute}`, {
+      verdict: "reject",
+      reason: "source_outdated",
+      source,
+      attribute,
+    });
 
   const finished = run && (isTerminal(run.status) || run.status === "needs_review");
 
@@ -198,9 +214,8 @@ export default function App() {
     <div className="app">
       <Header health={health} error={healthError} />
       {API_MODE === "mock" && (
-        <div className="mock-note">
-          Mock mode: replaying hand-written example responses from <code>tests/fixtures/api/</code>. These are not results
-          of a real run.
+        <div className="mock-note" title="VITE_API_MODE=mock: replaying tests/fixtures/api/*.json">
+          Example data: these screens replay hand-written examples, not the results of a real run.
         </div>
       )}
       <main className="layout">
@@ -231,16 +246,16 @@ export default function App() {
           {run?.status === "needs_review" && <Caveats caveats={run.output.caveats} />}
           {run?.status === "needs_review" && !run.identity_review && (
             <section className="card">
-              <h2>Identity review needed</h2>
+              <h2>Identity Review Needed</h2>
               <p className="error">
-                The run paused for identity review, but the API sent no <code>identity_review</code> to show. Nothing can be
-                decided from this screen.
+                The run paused for an identity review, but no review details were sent, so nothing can be decided from this
+                screen.
               </p>
             </section>
           )}
           {run?.status === "error" && (
             <section className="card">
-              <h2>Run failed</h2>
+              <h2>Reconciliation Failed</h2>
               <p className="error">{run.error?.message ?? "The run ended with an error."}</p>
             </section>
           )}
@@ -248,11 +263,11 @@ export default function App() {
             <>
               <section className="card summary">
                 <h2>Summary</h2>
-                <p>{run.output.summary}</p>
+                <p title={run.output.summary}>{cleanText(run.output.summary)}</p>
                 {/* The API's caveats qualify this result, so they sit with it. The
                     fixed disclaimer is already in the header and footer. */}
                 <Caveats caveats={run.output.caveats} />
-                {run.status === "partial" && <p className="banner small">Status: partial. Read every caveat before relying on it.</p>}
+                {run.status === "partial" && <p className="banner banner-warn">Partial result. Read every caveat before relying on it.</p>}
               </section>
               {/* A result with no coverage and no grid (an early stop, or the mock
                   placeholder) shows only its summary: an empty grid and "No
@@ -260,7 +275,7 @@ export default function App() {
               {(Object.keys(run.coverage).length > 0 || run.grid.length > 0) && (
                 <>
                   <CoverageStrip coverage={run.coverage} banner={run.banner} bpmhConfirmable={run.bpmh_confirmable} />
-                  <Grid grid={run.grid} evidenceIndex={run.evidence_index} coverage={run.coverage} />
+                  <Grid grid={run.grid} evidenceIndex={run.evidence_index} coverage={run.coverage} feedback={feedback} onRejectCell={rejectCell} />
                   <Flags findings={run.findings} feedback={feedback} onFeedback={sendFeedback} />
                   <div className="two-col">
                     <Tasks tasks={run.tasks} findings={run.findings} notices={run.notices} />
@@ -273,7 +288,7 @@ export default function App() {
           )}
           {!run && !polling && (
             <section className="card empty-state">
-              <h2>Reconcile a patient's medicines</h2>
+              <h2>Reconcile a Patient's Medicines</h2>
               <p>
                 MedTrace finds the patient in the admission chart, GP list, pharmacy dispensing history and patient
                 interview, lines up every medicine side by side, and flags what a pharmacist must check.
