@@ -63,6 +63,23 @@ work, with the evidence noted in the scan doc.
 
 ---
 
+### 2026-10-26 16:30 AEDT · Anshu · anshu/ui-design-a
+
+**Did:** Restyled `web/` to the team's "Clinical Navy" design (design A). The branch also carries `anshu/live-mode` and `anshu/ui-polish`, which were not on `main` yet.
+- **Layout:** navy header; patient banner; four summary cards counted from the response; tabs (Discrepancies, Medication History, Actions Required, Source Confidence); identity review in place of the tabs while `needs_review`; a Record Sources sidebar (with data quality notices) and a Processing Log; stacks at phone width.
+- **Wording and IDs:** formal wording and enum labels throughout (e.g. Therapeutic duplication, Possibly discontinued, "Unresolved — verify with patient"). API prose is cleaned for display, with the original kept on hover and under "Technical details". Record keys, query IDs, tool names, per-step routed models and the trace path live behind that toggle.
+- **From the merged branches:** live mode checked against the `SAMPLE_MODE` API, including the learning demo P0003 → P0007 via grid-cell "Mark … as outdated".
+- **Checks:** checked in mock and live mode with Playwright. `make test` 738 passed / 45 skipped; build and secret scan clean.
+
+**Changed shared files:** none on the list. `PROGRESS.md` and `docs/AI_TOOLS_USAGE.md` updated.
+**Broken:** nothing in the UI. IBM Plex loads from Google Fonts; offline it falls back to system fonts.
+**Needs from teammates:**
+- Arnav — still open from my 12:16 entry: `evidence_index` lacks grid rows, so most Medication History cells show "No source record cited". The dose unit is also still missing.
+- Note: there is no undo for feedback in the API, so the design's "Undo" button is not shown.
+**Next:** demo rehearsal against the `SAMPLE_MODE` API. The UI build in CI still needs a team OK (`.github/workflows/ci.yml`).
+
+---
+
 ### 2026-10-26 · Arnav · arnav/s14
 
 **Did:** Scan **S14**. In SAMPLE_MODE, `GET /patients` listed all 200 admissions from Q0,
@@ -133,6 +150,23 @@ running now: it replaced the host API server and host datasvc on 8000/8100.
 but only 13 are replayable) is the next one a judge would hit in Docker.
 
 ---
+
+### 2026-10-26 12:16 AEDT · Anshu · anshu/live-mode
+
+**Did:** Ran the UI in live mode against the real API in `SAMPLE_MODE` for the first time. P0001, the P0015 identity review → resume (14 rows, 5 findings), and the learning demo P0003 → P0007 all work in the browser, with no page or HTTP errors. Fixes:
+- **The learning demo couldn't be done from the UI.** Step 1 rejects a grid value (P0003 candesartan GP dose), not a finding. Click a cell, and the inspector now offers "<source> <attribute> is outdated" on values that disagree or conflict. It sends `grid:<generic>:<attribute>` with `source`/`attribute`.
+- `zetaris`/`meterless: "sample_mode"` shows as a blue "sample mode" pill, not a red "down".
+- "Other findings" opens when nothing is must-review, so P0007's new dose finding is visible.
+- `web/README.md` explains how to run the UI against the `SAMPLE_MODE` API and rehearse the learning demo.
+
+**Changed shared files:** none.
+**Broken:** nothing in the UI. **One backend bug, see Arnav 1.**
+**Needs from teammates:**
+- **Arnav 1 — `evidence_index` only holds rows cited by findings.** `app/orchestrator.py:424` builds it as `{e.row_id: e for f in findings for e in f.evidence}`, but `schemas.py` says it holds "every row cited by a finding **or a grid cell**". On P0001, 78 of the 101 rows behind the grid are missing. The UI therefore marks most present cells "no row" and can't show provenance on hover, which is a PLAN §8 demo beat. The fix is to add the grid's `row_ids` (from the rows Q2 already fetched) to the index.
+- Arnav 2 — answered, thanks: the real trace puts what answered in `model` (`offline-heuristic` in sample mode) and the requested model in `route`. The UI already shows it that way.
+- Arnav 3 — still open: resolved doses have no unit ("Daily dose: 16.0").
+- **The server learns and remembers identity decisions in memory.** Restart it, or use a fresh `STATE_DIR`, before recording the demo, or P0015 won't ask for review and trust starts already lowered.
+**Next:** script the 30-second demo rehearsal against the `SAMPLE_MODE` API. The UI build in CI is waiting on a team OK, because it touches `.github/workflows/ci.yml`.
 
 ### 2026-10-26 · Arnav · arnav/s23-docs
 

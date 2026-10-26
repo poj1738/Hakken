@@ -1,131 +1,161 @@
 import { useEffect, useRef } from "react";
-import type { ModelCall, RunResponse, TraceEvent } from "../types";
-import { fmtTime } from "../format";
+import type { RunResponse, TraceEvent } from "../types";
+import { cleanText, fmtTime, humanize, plural } from "../format";
+import { TechDetails } from "./TechDetails";
+
+// Step names from the orchestrator, as a reader would say them.
+const STEP_LABEL: Record<string, string> = {
+  START: "Started",
+  PLAN: "Planning",
+  FIND_IDENTITY: "Identity resolution",
+  NEEDS_REVIEW: "Identity review required",
+  COVERAGE: "Source coverage",
+  FETCH_MEDS: "Record retrieval",
+  NORMALISE: "Normalisation",
+  RESOLVE_FREE_TEXT: "Free-text resolution",
+  FUSE: "Comparison",
+  DETECT: "Discrepancy detection",
+  PRIORITISE: "Prioritisation",
+  DRAFT: "Report drafting",
+  VERIFY: "Verification",
+  CRITIQUE: "Review",
+  DONE: "Report prepared",
+};
+const stepLabel = (e: TraceEvent) => STEP_LABEL[e.step ?? ""] ?? humanize(e.step ?? e.action);
 
 // The model that answered: the Meterless receipt's routed_model when the event
-// carries one, else `model`, which the API examples fill with the routed model.
+// carries one, else `model`, which the API fills with the model that answered.
 function routedModel(e: TraceEvent): string | null {
   const m = e.meterless?.["routed_model"];
   return typeof m === "string" ? m : e.model ?? null;
 }
 
-function Event({ e }: { e: TraceEvent }) {
-  const blocked = e.status === "blocked";
-  const failed = e.status === "error" || !!e.error;
-  const model = routedModel(e);
-  return (
-    <li className={`event ${blocked ? "blocked" : ""} ${failed ? "failed" : ""}`}>
-      <div className="event-head">
-        <span className="step">{e.step ?? e.action}</span>
-        <span className="agent">{e.agent_name}</span>
-        {blocked && <span className="badge blocked-badge">Blocked</span>}
-        {failed && <span className="badge failed-badge">Error</span>}
-        {e.retry_count > 0 && <span className="badge warn">retry {e.retry_count}</span>}
-        <time>{fmtTime(e.timestamp)}</time>
-      </div>
-      <p className="event-msg">
-        {e.message ?? e.output_summary ?? e.action}
-      </p>
-      {e.error && <p className="event-err">{e.error}</p>}
-      {(model || e.engine || e.row_count != null || e.latency_ms != null) && (
-        <div className="event-meta">
-          {model && (
-            <span>
-              answered by <code>{model}</code>
-              {e.route && <span className="muted"> · asked for {e.route}</span>}
-            </span>
-          )}
-          {e.engine && (
-            <span>
-              ⚙ {e.engine}
-              {e.engine_op ? `.${e.engine_op}` : ""}
-            </span>
-          )}
-          {e.row_count != null && <span>{e.row_count} rows</span>}
-          {e.latency_ms != null && <span>{(e.latency_ms / 1000).toFixed(1)} s</span>}
-        </div>
-      )}
-      {e.sql && (
-        <details className="sql">
-          <summary>SQL sent to Zetaris</summary>
-          <pre>{e.sql}</pre>
-        </details>
-      )}
-    </li>
-  );
-}
-
-function ModelCalls({ calls }: { calls: ModelCall[] }) {
-  if (!calls.length) return null;
-  return (
-    <details className="model-calls">
-      <summary>{calls.length} model calls through Nightshift</summary>
-      <table>
-        <thead>
-          <tr>
-            <th>Agent</th>
-            <th>Requested</th>
-            <th>Answered by</th>
-            <th>Tokens</th>
-          </tr>
-        </thead>
-        <tbody>
-          {calls.map((c, i) => (
-            <tr key={c.request_id ?? i}>
-              <td>{c.role}</td>
-              <td>
-                <code>{c.requested_route}</code>
-              </td>
-              <td>
-                <code>{c.routed_model ?? "—"}</code>
-                {c.truncated && <span className="badge warn">truncated</span>}
-              </td>
-              <td>
-                {c.tokens.prompt_tokens ?? "?"} → {c.tokens.completion_tokens ?? "?"}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </details>
-  );
-}
-
 export function Timeline({ run, polling, warning }: { run: RunResponse | null; polling: boolean; warning: string | null }) {
-  const end = useRef<HTMLLIElement>(null);
+  const end = useRef<HTMLDivElement>(null);
   const n = run?.trace.length ?? 0;
   useEffect(() => {
     if (polling) end.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [n, polling]);
 
   return (
-    <section className="card timeline">
-      <h2>
-        Agent timeline {polling && <span className="spinner" aria-label="running" />}
-      </h2>
-      {!run && <p className="muted">Pick a patient and run. Each agent step appears here as it happens.</p>}
+    <div className="card side-card">
+      <div className="side-head">
+        <h2 className="side-title">Processing Log</h2>
+        {polling ? <span className="spinner" aria-label="running" /> : run && <span className="side-meta">{run.execution_time_seconds.toFixed(1)} s</span>}
+      </div>
+      {!run && !polling && <p className="side-empty">Select a patient and run a reconciliation. Each step is logged here as it happens.</p>}
       {run && (
-        <>
-          <ol className="events">
-            {run.trace.map((e, i) => (
-              <Event key={`${e.timestamp}-${i}`} e={e} />
-            ))}
-            {polling && (
-              <li className="event pending" ref={end}>
-                <p className="muted">Working…</p>
-                {warning && <p className="event-err">{warning}</p>}
-              </li>
-            )}
-          </ol>
-          {!polling && (
-            <p className="run-stats muted">
-              {run.query_count} Zetaris queries · {(run.zetaris_ms / 1000).toFixed(1)} s in Zetaris ·{" "}
-              {run.execution_time_seconds.toFixed(1)} s total · trace <code>{run.log_file}</code>
-            </p>
-          )}
-          <ModelCalls calls={run.model_calls} />
-        </>
+        <div className="log">
+          {run.trace.map((e, i) => {
+            const warn = e.status === "blocked" || e.status === "error" || !!e.error;
+            const raw = e.message ?? e.output_summary ?? e.action;
+            return (
+              <div key={`${e.timestamp}-${i}`} className="log-item">
+                <span className={`tl-dot ${warn ? "warn" : ""}`} aria-hidden />
+                <div className="log-body">
+                  <div className="log-head">
+                    <span className="log-step">
+                      {stepLabel(e)}
+                      {e.status === "blocked" && <span className="log-flag"> · Withheld</span>}
+                      {e.retry_count > 0 && <span className="log-flag"> · Retried {e.retry_count}×</span>}
+                    </span>
+                    <time dateTime={e.timestamp} title={new Date(e.timestamp).toLocaleString()}>
+                      {fmtTime(e.timestamp)}
+                    </time>
+                  </div>
+                  <div className="log-text" title={raw}>
+                    {cleanText(raw)}
+                  </div>
+                  {e.error && <div className="log-err">{e.error}</div>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
-    </section>
+      {polling && (
+        <div className="log-item" ref={end}>
+          <span className="tl-dot tl-pending" aria-hidden />
+          <div className="log-body">
+            <div className="log-text muted">Processing…</div>
+            {warning && <div className="log-err">{warning}</div>}
+          </div>
+        </div>
+      )}
+      {run && !polling && (
+        <div className="side-foot">
+          {plural(run.query_count, "data query", "data queries")} · {plural(run.model_calls.length, "model call")} via Nightshift
+        </div>
+      )}
+      {run && (
+        <TechDetails
+          items={[
+            ["Run", run.run_id],
+            ["Trace file", run.log_file],
+            ["Time in Zetaris", `${(run.zetaris_ms / 1000).toFixed(1)} s`],
+            ["Provider state", run.provider_state ?? null],
+          ]}
+        >
+          <table className="mini-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Step</th>
+                <th>Agent</th>
+                <th>Answered by</th>
+                <th>Requested</th>
+                <th>Tool</th>
+              </tr>
+            </thead>
+            <tbody>
+              {run.trace.map((e, i) => (
+                <tr key={i} title={e.message ?? ""}>
+                  <td className="nowrap">{fmtTime(e.timestamp)}</td>
+                  <td>{e.step ?? e.action}</td>
+                  <td>{e.agent_name}</td>
+                  <td>{routedModel(e) ?? "—"}</td>
+                  <td>{e.route ?? "—"}</td>
+                  <td>{e.engine ? `${e.engine}${e.engine_op ? `.${e.engine_op}` : ""}` : "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {run.model_calls.length > 0 && (
+            <table className="mini-table">
+              <thead>
+                <tr>
+                  <th>Model call</th>
+                  <th>Requested</th>
+                  <th>Answered by</th>
+                  <th>Tokens in → out</th>
+                </tr>
+              </thead>
+              <tbody>
+                {run.model_calls.map((c, i) => (
+                  <tr key={c.request_id ?? i}>
+                    <td>{c.role}</td>
+                    <td>{c.requested_route}</td>
+                    <td>
+                      {c.routed_model ?? "—"}
+                      {c.truncated ? " (truncated)" : ""}
+                    </td>
+                    <td>
+                      {c.tokens.prompt_tokens ?? "?"} → {c.tokens.completion_tokens ?? "?"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          {run.trace
+            .filter((e) => e.sql)
+            .map((e, i) => (
+              <pre key={i} className="code">
+                {e.sql}
+              </pre>
+            ))}
+        </TechDetails>
+      )}
+    </div>
   );
 }
