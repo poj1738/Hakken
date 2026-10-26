@@ -1,0 +1,772 @@
+{
+  "run_id": "run-8d2f1e9bc537",
+  "status": "needs_review",
+  "output": {
+    "summary": "Waiting for identity review: 1 near-miss record(s).",
+    "recommendations": [],
+    "evidence": [],
+    "caveats": [
+      "Synthetic data. Not medical advice. A pharmacist must confirm every item.",
+      "SAMPLE_MODE: recorded Zetaris data and offline-heuristic agents; no model was called."
+    ],
+    "artifacts": []
+  },
+  "agents": [
+    {
+      "name": "Planner",
+      "role": "plan the investigation",
+      "iterations": 1,
+      "models_used": [
+        "offline-heuristic"
+      ],
+      "routes_requested": [
+        "meterless/fast"
+      ],
+      "status": "ok"
+    },
+    {
+      "name": "Executor",
+      "role": "fetch, link, normalise, resolve free text",
+      "iterations": 0,
+      "models_used": [],
+      "routes_requested": [],
+      "status": "ok"
+    },
+    {
+      "name": "Evaluator",
+      "role": "fuse, detect, gate, verify, critique",
+      "iterations": 0,
+      "models_used": [],
+      "routes_requested": [],
+      "status": "ok"
+    },
+    {
+      "name": "Writer",
+      "role": "explain and summarise",
+      "iterations": 0,
+      "models_used": [],
+      "routes_requested": [],
+      "status": "ok"
+    }
+  ],
+  "trace_id": "run-8d2f1e9bc537",
+  "log_file": "/tmp/hakken-traces-2qvw88n1/trace-run-8d2f1e9bc537.jsonl",
+  "execution_time_seconds": 0.06,
+  "error": null,
+  "memory_used": [],
+  "sample_mode": true,
+  "provider_state": "sample_mode",
+  "patient_id": "MRN0000015",
+  "coverage": {
+    "emr": {
+      "source": "emr",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "emr:MRN0000015",
+      "doc_date": "2026-10-24"
+    },
+    "gp": {
+      "source": "gp",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "gp:GPP000015",
+      "doc_date": null
+    },
+    "pharmacy": {
+      "source": "pharmacy",
+      "state": "found",
+      "scope_notes": [],
+      "record_key": "pharmacy:C000015",
+      "doc_date": null
+    },
+    "patient": {
+      "source": "patient",
+      "state": "near_miss_pending",
+      "scope_notes": [
+        "waiting for identity review"
+      ],
+      "record_key": null,
+      "doc_date": null
+    }
+  },
+  "bpmh_confirmable": true,
+  "banner": null,
+  "grid": [],
+  "findings": [],
+  "notices": [],
+  "tasks": [],
+  "identity_review": {
+    "anchor": {
+      "source": "emr",
+      "row_id": "EMR-000124",
+      "source_patient_id": "MRN0000015",
+      "ihi_syn": "SYN-711049414380",
+      "name_given": "Nichoolas",
+      "name_family": "Walker",
+      "name_previous": null,
+      "dob": "1965-06-18",
+      "dob_raw": "1965-06-18",
+      "sex": "M",
+      "postcode": "2204",
+      "record_kind": "admission_chart",
+      "doc_date": "2026-10-24",
+      "med_text": null,
+      "med_code": null,
+      "code_system": null,
+      "strength_text": null,
+      "dose_text": null,
+      "route_text": null,
+      "freq_text": null,
+      "status_text": null,
+      "note_text": null,
+      "qty": null,
+      "days_supply": null,
+      "pharmacy_id": null,
+      "script_type": null
+    },
+    "candidates": [
+      {
+        "anchor_id": "emr:MRN0000015",
+        "candidate_id": "patient:INT00015",
+        "match_weight": 21.47,
+        "probability": 0.84,
+        "band": "review",
+        "tier": "probabilistic",
+        "field_evidence": {
+          "given": "partial: given name differs slightly (0.98)",
+          "surname": "agrees: surname matches exactly",
+          "dob": "agrees: date of birth matches exactly",
+          "guard": "held: this record carries no IHI, and it falls in a group of matching records that includes Malcolm Walker (DOB 1965-06-10, emr:MRN0000159), who carries a different IHI — confirm it is this patient"
+        },
+        "guards": [
+          "ihi_ambiguous_in_cluster"
+        ]
+      }
+    ],
+    "records": {
+      "gp:GPP000015": {
+        "source": "gp",
+        "row_id": "GP-000098",
+        "source_patient_id": "GPP000015",
+        "ihi_syn": "SYN-711049414380",
+        "name_given": "Nick",
+        "name_family": "Walker",
+        "name_previous": null,
+        "dob": "1965-06-18",
+        "dob_raw": "18/06/1965",
+        "sex": "Male",
+        "postcode": "3500",
+        "record_kind": "gp_list",
+        "doc_date": "2026-09-08",
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "pharmacy:C000015": {
+        "source": "pharmacy",
+        "row_id": "PHM-000711",
+        "source_patient_id": "C000015",
+        "ihi_syn": "SYN-711049414380",
+        "name_given": "WALKER, Nicholas",
+        "name_family": null,
+        "name_previous": null,
+        "dob": "1965-06-18",
+        "dob_raw": "1965-06-18",
+        "sex": null,
+        "postcode": "2204",
+        "record_kind": "dispense",
+        "doc_date": "2026-06-22",
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "patient:INT00015": {
+        "source": "patient",
+        "row_id": "PAT-000130",
+        "source_patient_id": "INT00015",
+        "ihi_syn": null,
+        "name_given": "Nicholas Walker",
+        "name_family": null,
+        "name_previous": null,
+        "dob": "1965-06-18",
+        "dob_raw": "1965-06-18",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "gp:GPP000159": {
+        "source": "gp",
+        "row_id": "GP-001213",
+        "source_patient_id": "GPP000159",
+        "ihi_syn": null,
+        "name_given": "Malcolm",
+        "name_family": "Walker",
+        "name_previous": null,
+        "dob": "1965-06-10",
+        "dob_raw": "10/06/1965",
+        "sex": "Male",
+        "postcode": "2939",
+        "record_kind": "gp_list",
+        "doc_date": "2026-05-24",
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "emr:MRN0000159": {
+        "source": "emr",
+        "row_id": "EMR-001252",
+        "source_patient_id": "MRN0000159",
+        "ihi_syn": "SYN-374818752047",
+        "name_given": "Malcolm",
+        "name_family": "Walker",
+        "name_previous": null,
+        "dob": "1965-06-10",
+        "dob_raw": "1965-06-10",
+        "sex": "M",
+        "postcode": "2939",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      },
+      "pharmacy:C000159": {
+        "source": "pharmacy",
+        "row_id": "PHM-007237",
+        "source_patient_id": "C000159",
+        "ihi_syn": "SYN-374818752047",
+        "name_given": "WALKER, Malcolm",
+        "name_family": null,
+        "name_previous": null,
+        "dob": "1965-06-10",
+        "dob_raw": "1965-06-10",
+        "sex": null,
+        "postcode": "2939",
+        "record_kind": "dispense",
+        "doc_date": "2025-10-24",
+        "med_text": null,
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": null,
+        "status_text": null,
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    }
+  },
+  "evidence_index": {},
+  "trust": [
+    {
+      "source": "emr",
+      "attribute": "actually_taking",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-1"
+    },
+    {
+      "source": "emr",
+      "attribute": "admission_chart",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-2"
+    },
+    {
+      "source": "emr",
+      "attribute": "daily_dose",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-3"
+    },
+    {
+      "source": "emr",
+      "attribute": "existence",
+      "value": 0.65,
+      "uncertainty": null,
+      "hmem_record_id": "mem-4"
+    },
+    {
+      "source": "emr",
+      "attribute": "frequency",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-5"
+    },
+    {
+      "source": "emr",
+      "attribute": "intended_dose",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-6"
+    },
+    {
+      "source": "emr",
+      "attribute": "name",
+      "value": 0.9,
+      "uncertainty": null,
+      "hmem_record_id": "mem-7"
+    },
+    {
+      "source": "emr",
+      "attribute": "release",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-8"
+    },
+    {
+      "source": "emr",
+      "attribute": "route",
+      "value": 0.9,
+      "uncertainty": null,
+      "hmem_record_id": "mem-9"
+    },
+    {
+      "source": "emr",
+      "attribute": "strength",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-10"
+    },
+    {
+      "source": "gp",
+      "attribute": "actually_taking",
+      "value": 0.45,
+      "uncertainty": null,
+      "hmem_record_id": "mem-11"
+    },
+    {
+      "source": "gp",
+      "attribute": "daily_dose",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-12"
+    },
+    {
+      "source": "gp",
+      "attribute": "existence",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-13"
+    },
+    {
+      "source": "gp",
+      "attribute": "frequency",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-14"
+    },
+    {
+      "source": "gp",
+      "attribute": "intended_dose",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-15"
+    },
+    {
+      "source": "gp",
+      "attribute": "name",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-16"
+    },
+    {
+      "source": "gp",
+      "attribute": "release",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-17"
+    },
+    {
+      "source": "gp",
+      "attribute": "route",
+      "value": 0.5,
+      "uncertainty": null,
+      "hmem_record_id": "mem-18"
+    },
+    {
+      "source": "gp",
+      "attribute": "strength",
+      "value": 0.75,
+      "uncertainty": null,
+      "hmem_record_id": "mem-19"
+    },
+    {
+      "source": "patient",
+      "attribute": "actually_taking",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-20"
+    },
+    {
+      "source": "patient",
+      "attribute": "daily_dose",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-21"
+    },
+    {
+      "source": "patient",
+      "attribute": "existence",
+      "value": 0.8,
+      "uncertainty": null,
+      "hmem_record_id": "mem-22"
+    },
+    {
+      "source": "patient",
+      "attribute": "frequency",
+      "value": 0.45,
+      "uncertainty": null,
+      "hmem_record_id": "mem-23"
+    },
+    {
+      "source": "patient",
+      "attribute": "intended_dose",
+      "value": 0.35,
+      "uncertainty": null,
+      "hmem_record_id": "mem-24"
+    },
+    {
+      "source": "patient",
+      "attribute": "name",
+      "value": 0.5,
+      "uncertainty": null,
+      "hmem_record_id": "mem-25"
+    },
+    {
+      "source": "patient",
+      "attribute": "release",
+      "value": 0.2,
+      "uncertainty": null,
+      "hmem_record_id": "mem-26"
+    },
+    {
+      "source": "patient",
+      "attribute": "route",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-27"
+    },
+    {
+      "source": "patient",
+      "attribute": "strength",
+      "value": 0.3,
+      "uncertainty": null,
+      "hmem_record_id": "mem-28"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "actually_taking",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-29"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "daily_dose",
+      "value": 0.55,
+      "uncertainty": null,
+      "hmem_record_id": "mem-30"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "existence",
+      "value": 0.85,
+      "uncertainty": null,
+      "hmem_record_id": "mem-31"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "frequency",
+      "value": 0.4,
+      "uncertainty": null,
+      "hmem_record_id": "mem-32"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "intended_dose",
+      "value": 0.5,
+      "uncertainty": null,
+      "hmem_record_id": "mem-33"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "name",
+      "value": 0.6,
+      "uncertainty": null,
+      "hmem_record_id": "mem-34"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "release",
+      "value": 0.85,
+      "uncertainty": null,
+      "hmem_record_id": "mem-35"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "route",
+      "value": 0.7,
+      "uncertainty": null,
+      "hmem_record_id": "mem-36"
+    },
+    {
+      "source": "pharmacy",
+      "attribute": "strength",
+      "value": 0.9,
+      "uncertainty": null,
+      "hmem_record_id": "mem-37"
+    }
+  ],
+  "trace": [
+    {
+      "timestamp": "2026-10-26T03:34:32.050560+00:00",
+      "run_id": "run-8d2f1e9bc537",
+      "agent_name": "Planner",
+      "action": "start",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "START",
+      "message": "Reconciling Nichoolas Walker (MRN0000015), admitted 2026-10-24. SAMPLE_MODE: recorded Zetaris data, offline agents.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:34:32.060013+00:00",
+      "run_id": "run-8d2f1e9bc537",
+      "agent_name": "Planner",
+      "action": "recall",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PLAN",
+      "message": "H-MEM recalled 0 memories for the plan.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": "hmem",
+      "engine_op": "query",
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:34:32.061660+00:00",
+      "run_id": "run-8d2f1e9bc537",
+      "agent_name": "Planner",
+      "action": "plan",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": "offline-heuristic",
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "PLAN",
+      "message": "Plan: find_identities (\"find this patient's records in the GP, pharmacy and interview systems\"); fetch_meds (\"get every medicine line, dispensing and interview answer for those records\"); resolve_free_text (\"work out what any free-text medicine lines refer to\"); verify (\"re-read every row the findings cite before anyone sees them\"). Standard reconciliation for Nichoolas Walker: link the patient across GP, pharmacy and interview records, read their medicines in one query, resolve any free-text lines from the lexicon, then verify every cited row. 8 queries available.",
+      "route": "meterless/fast",
+      "latency_ms": 0,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:34:32.062208+00:00",
+      "run_id": "run-8d2f1e9bc537",
+      "agent_name": "Executor",
+      "action": "route",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "Planner need \"find this patient's records in the GP, pharmacy and interview systems\" -> the Executor fills template Q1 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:34:32.090350+00:00",
+      "run_id": "run-8d2f1e9bc537",
+      "agent_name": "Executor",
+      "action": "find_identities",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "Found Nichoolas Walker in 2 other record(s): gp:GPP000015, pharmacy:C000015. 1 near-miss(es) need your confirmation: patient:INT00015 0.84 (held: this record carries no IHI, and it falls in a group of matching records that includes Malcolm Walker (DOB 1965-06-10, emr:MRN0000159), who carries a different IHI — confirm it is this patient).",
+      "route": null,
+      "latency_ms": 0,
+      "tokens": null,
+      "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date FROM medtrace.all_sources WHERE ihi_syn = 'SYN-711049414380' OR dob_text IN ('18/06/1965', '1965-06-18') OR (dob_text LIKE '%1965%' AND (UPPER(name_family) LIKE 'WALK%' OR UPPER(name_previous) LIKE 'WALK%' OR UPPER(name_given) LIKE 'WALK%')) OR (source = 'emr' AND source_patient_id = 'MRN0000015')",
+      "row_count": 219,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null,
+      "sql_template_id": "Q1",
+      "query_id": "ac28213c-2d88-42e7-bf1e-86d63be3b386",
+      "request_id": null,
+      "replayed": true
+    },
+    {
+      "timestamp": "2026-10-26T03:34:32.095272+00:00",
+      "run_id": "run-8d2f1e9bc537",
+      "agent_name": "Executor",
+      "action": "world_model",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "FIND_IDENTITY",
+      "message": "World Model: recorded 7 patient records and 2 same-person link(s), each with provenance (Zetaris query ac28213c-2d88-42e7-bf1e-86d63be3b386); audit seq 1-9.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": "world_model",
+      "engine_op": "upsert+relate",
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T03:34:32.095827+00:00",
+      "run_id": "run-8d2f1e9bc537",
+      "agent_name": "Executor",
+      "action": "needs_review",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "waiting",
+      "step": "NEEDS_REVIEW",
+      "message": "Paused: 1 identity near-miss(es) need your confirmation.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    }
+  ],
+  "query_count": 1,
+  "zetaris_ms": 0,
+  "model_calls": [
+    {
+      "role": "Planner",
+      "requested_route": "meterless/fast",
+      "routed_model": "offline-heuristic",
+      "request_id": null,
+      "tokens": {},
+      "truncated": false
+    }
+  ]
+}

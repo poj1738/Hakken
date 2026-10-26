@@ -27,6 +27,43 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 · Arnav · arnav/output-examples
+
+**Did:** Scan **S2** and **S34**.
+- **`scripts/generate_examples.py`** (`make examples`, `--mode sample|live|both`) runs the
+  orchestrator on every input example with fresh in-memory engines. Examples 1 and 3 save
+  the paused `needs_review` response, then apply the confirmation `input_examples/README.md`
+  documents. Example 4 is followed by the documented verdict (reject the GP daily dose as
+  `source_outdated`) and then example 5. Each run writes its RunResponse and JSONL trace,
+  plus a README table generated from the files.
+- **Committed:** `output_examples/sample_mode/` and **`output_examples/live/`**. Live, every
+  model call was answered by `nvidia/nemotron-3.5-lightning-30b-a3b`. Four runs were
+  `success`. **example_2 was `partial`**: Nightshift's Writer call got no answer within
+  180 s, and the critique returned an upstream `empty_response`. Both steps degraded to
+  the grounded template, the caveats say so, and the findings are still verified. Live
+  findings match sample findings exactly.
+- **`MAX_AGENT_ITERATIONS` default changed 3 → 2**, agreed with Arnav. Three rounds made
+  live runs 8–11 min, and one hit `RUN_TIMEOUT_S`. They now take 30–527 s. I also changed
+  that one line in my own `.env`.
+- **S34:** `make run` now uses example_2. example_1 stops at review.
+- `tests/unit/test_output_examples.py`: the outputs differ by input, committed sample
+  outputs still match a fresh regeneration, and every live model call is an
+  `nvidia/*` model.
+
+**Changed shared files:** **`app/config.py`** (`max_agent_iterations` default 2),
+**`.env.example`** (`MAX_AGENT_ITERATIONS=2`) and **`Makefile`** (`run` target). **If your
+`.env` was copied from the old template, it pins `MAX_AGENT_ITERATIONS=3`; change it to 2.**
+
+**Broken:** nothing. Unit tests pass, secret scan clean.
+
+**Needs from teammates:**
+- **Anyone with a `.env`:** set `MAX_AGENT_ITERATIONS=2` (see above).
+
+**Next:** the remaining scan items (S9–S18, S20, S26–S33), and S23 (the stale judge-facing
+docs: README Architecture/Agents TBD, ARCHITECTURE.md, SPONSOR_TECH.md).
+
+---
+
 ### 2026-10-26 · Arnav · arnav/s5-s6
 
 **Did:** Three scan items (ticked in `docs/SCAN_2026-10-25.md`).

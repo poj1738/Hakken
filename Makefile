@@ -26,8 +26,8 @@ conformance: ## Run only the ported engine conformance tests (none ported yet)
 scan: ## Scan every tracked file for secrets
 	$(PY) scripts/secret_scan.py --all
 
-run: ## One run against the first example input
-	$(VENV_PY) run.py --input input_examples/example_1.json
+run: ## One run straight through (example_2; example_1 stops at the identity review)
+	$(VENV_PY) run.py --input input_examples/example_2.json
 
 serve: ## Start the API server
 	$(VENV_PY) run.py serve
