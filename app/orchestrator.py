@@ -424,6 +424,7 @@ class Orchestrator:
         evidence_index = {e.row_id: e for f in findings for e in f.evidence}
         if analysis is not None:
             coverage, banner, confirmable = analysis.cov, analysis.banner, analysis.bpmh_confirmable
+            evidence_index = {**analysis.notice_evidence, **evidence_index}
         return RunResponse(
             run_id=state.run_id, status=status,  # type: ignore[arg-type]
             output=RunOutput(
