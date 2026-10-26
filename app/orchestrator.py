@@ -296,6 +296,10 @@ class Orchestrator:
             state.caveats.append(f"Nightshift unavailable for {name} ({exc.kind}); that step used the grounded "
                                  "template and is labelled offline-heuristic.")
             agent, action = name.split()
+            # Every request the failure spent is a model call: in model_calls and the trace, with
+            # the model that answered where there was one (scan S9, CLAUDE.md rule 3).
+            state.ctx.record(agent.capitalize(), action, _STEP_OF.get(action), exc.calls,  # type: ignore[arg-type]
+                             f"{name}: request failed ({exc.kind}).")
             state.ctx.tracer.emit(agent.capitalize(), "fallback", step=_STEP_OF.get(action), status="degraded",
                                   error=str(exc),
                                   message=f"{name}: Nightshift failed ({exc.kind}); used the grounded template.")
