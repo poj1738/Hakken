@@ -1,13 +1,7 @@
-import type { Coverage as Cov, Notice } from "../types";
-import { SOURCES } from "../types";
-import { NOTICE_LABEL, cleanText, fmtDate, medName, sourceLabel } from "../format";
+import type { Notice } from "../types";
+import { NOTICE_LABEL, cleanText, medName } from "../format";
+import { InfoTip } from "./InfoTip";
 import { TechDetails } from "./TechDetails";
-
-const STATE_TEXT: Record<string, string> = {
-  found: "Located",
-  near_miss_pending: "Possible match — linkage under review",
-  not_found: "No record available",
-};
 
 /**
  * The BPMH banner follows the API's `bpmh_confirmable`; `banner` is also used
@@ -30,52 +24,27 @@ export function BpmhBanner({ banner, bpmhConfirmable }: { banner?: string | null
   );
 }
 
-/** Record Sources: every one of the four sources, always listed; one the API left out is "Not reported". */
-export function RecordSources({ coverage, notices }: { coverage: Partial<Record<string, Cov>>; notices: Notice[] }) {
+/** Data quality notices from the API (stale documents, patient-only items, unresolved conflicts…), as sent. */
+export function Notices({ notices }: { notices: Notice[] }) {
   return (
-    <div className="card side-card">
-      <h2 className="side-title">Record Sources</h2>
-      {SOURCES.map((s) => {
-        const c = coverage[s];
-        const state = c?.state ?? "unreported";
-        return (
-          <div key={s} className="src">
-            <span className={`src-dot src-${state}`} aria-hidden />
-            <div className="src-body">
-              <div className="src-head">
-                <span className="src-name">{sourceLabel(s)}</span>
-                <span className="src-date">{c?.doc_date ? fmtDate(c.doc_date) : ""}</span>
-              </div>
-              <div className="src-note">{c ? STATE_TEXT[c.state] ?? c.state : "Not reported"}</div>
-              {c?.scope_notes.map((n) => (
-                <div key={n} className="src-note">
-                  {cleanText(n)}
-                </div>
-              ))}
-            </div>
+    <>
+      <div className="sec-head">
+        <h2 className="sec-title">Notices</h2>
+        <InfoTip text="Data quality notices: what the sources could not show or did not agree on. They are not discrepancies." />
+      </div>
+      {!notices.length && <p className="sec-empty">✓ No data quality notices.</p>}
+      {notices.map((n, i) => (
+        <div key={i} className="notice" title={n.row_ids.length ? `Records: ${n.row_ids.join(", ")}` : undefined}>
+          <div className="notice-type">
+            {NOTICE_LABEL[n.type] ?? n.type}
+            {n.generic ? ` · ${medName(n.generic)}` : ""}
           </div>
-        );
-      })}
-      {notices.length > 0 && (
-        <div className="notices">
-          <div className="eyebrow">Data quality notices</div>
-          {notices.map((n, i) => (
-            <div key={i} className="notice" title={n.row_ids.length ? `Records: ${n.row_ids.join(", ")}` : undefined}>
-              <div className="notice-type">
-                {NOTICE_LABEL[n.type] ?? n.type}
-                {n.generic ? ` · ${medName(n.generic)}` : ""}
-              </div>
-              <div className="notice-text">{cleanText(n.detail)}</div>
-            </div>
-          ))}
+          <div className="notice-text">{cleanText(n.detail)}</div>
         </div>
-      )}
-      <TechDetails
-        items={[
-          ...SOURCES.map((s): [string, string | null] => [`${sourceLabel(s)} record`, coverage[s]?.record_key ?? null]),
-          ...notices.map((n, i): [string, string | null] => [`Notice ${i + 1} records`, n.row_ids.length ? n.row_ids.join(", ") : null]),
-        ]}
-      />
-    </div>
+      ))}
+      <div className="sec-pad">
+        <TechDetails items={notices.map((n, i): [string, string | null] => [`Notice ${i + 1} records`, n.row_ids.length ? n.row_ids.join(", ") : null])} />
+      </div>
+    </>
   );
 }

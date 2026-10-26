@@ -1,7 +1,9 @@
 import { useState } from "react";
-import type { DiscrepancyType, Evidence, FeedbackReason, FeedbackResponse, Finding, Source, TrustAttribute } from "../types";
+import type { Coverage, DiscrepancyType, Evidence, FeedbackReason, FeedbackResponse, Finding, FusedMed, Source, TrustAttribute } from "../types";
 import { FEEDBACK_REASONS, SOURCES, TRUST_ATTRIBUTES } from "../types";
-import { REASON_LABEL, ROW_TEXT_FIELDS, attributeLabel, cleanText, fmtDate, humanize, medName, sourceLabel, typeLabel } from "../format";
+import { REASON_LABEL, ROW_TEXT_FIELDS, attributeLabel, cleanText, firstSentence, humanize, medName, sourceLabel, typeLabel } from "../format";
+import { InfoTip } from "./InfoTip";
+import { Compare, SourceRecords } from "./Compare";
 import { TechDetails } from "./TechDetails";
 
 export interface FeedbackState {
@@ -19,7 +21,10 @@ export interface FeedbackChoice {
 
 interface Props {
   findings: Finding[];
-  summary: string;
+  /** The run's grid and coverage, so a card's side-by-side view can use the API's own disagreement flags. */
+  grid: FusedMed[];
+  coverage: Partial<Record<string, Coverage>>;
+  doseUnits: Record<string, string>;
   feedback: Record<string, FeedbackState>;
   onFeedback: (f: Finding, choice: FeedbackChoice) => void;
 }
@@ -82,8 +87,8 @@ function FeedbackControls({ f, state, onFeedback }: { f: Finding; state?: Feedba
         <button type="button" className="btn btn-primary" disabled={state?.busy} onClick={() => onFeedback(f, { verdict: "confirm" })}>
           Confirm
         </button>
-        <button type="button" className="btn btn-quiet" disabled={state?.busy} onClick={() => setRejecting(true)}>
-          Reject with reason
+        <button type="button" className="btn btn-line" disabled={state?.busy} onClick={() => setRejecting(true)}>
+          Reject
         </button>
         {state?.error && <p className="error">{state.error}</p>}
       </div>
@@ -147,9 +152,9 @@ function FeedbackControls({ f, state, onFeedback }: { f: Finding; state?: Feedba
             })
           }
         >
-          Submit rejection
+          Submit
         </button>
-        <button type="button" className="btn btn-quiet" onClick={() => setRejecting(false)}>
+        <button type="button" className="btn btn-line" onClick={() => setRejecting(false)}>
           Cancel
         </button>
       </div>
@@ -164,142 +169,196 @@ const detailItems = (d: Record<string, unknown>): [string, string][] =>
     .filter((k) => !DETAIL_SHOWN.has(k) || k === "conflict")
     .map((k) => [k === "atc_class" ? "ATC class" : humanize(k), typeof d[k] === "object" ? JSON.stringify(d[k]) : String(d[k])]);
 
-function FindingRow({ f, state, onFeedback }: { f: Finding; state?: FeedbackState; onFeedback: Props["onFeedback"] }) {
+/** S37: "what each source says" from detail.by_source, one row per source, the words highlighted. */
+function BySource({ by }: { by: Record<string, unknown> }) {
+  const order = [...SOURCES, ...Object.keys(by).filter((k) => !(SOURCES as string[]).includes(k))];
+  const rows = order.filter((s) => by[s] !== undefined && by[s] !== null && by[s] !== "");
+  if (!rows.length) return null;
+  return (
+    <dl className="by-source" aria-label="What each source says">
+      {rows.map((s) => (
+        <div key={s}>
+          <dt>{s === "emr" ? "Chart" : sourceLabel(s)}</dt>
+          <dd>
+            <mark>{String(by[s])}</mark>
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function FindingRow({ f, state, onFeedback, med, coverage, unit }: { f: Finding; state?: FeedbackState; onFeedback: Props["onFeedback"]; med?: FusedMed; coverage: Props["coverage"]; unit?: string }) {
+  const [open, setOpen] = useState(false);
   const d = f.detail ?? {};
   const str = (k: string) => (d[k] === undefined || d[k] === null || d[k] === "" ? null : String(d[k]));
+  const text = cleanText(f.explanation);
+  const verify = d.conflict === "confirm";
+  const panel = `more-${f.id}`;
+  // S37: lead with the API's one-line statement and its per-source words when it sends them.
+  const by = d.by_source && typeof d.by_source === "object" ? (d.by_source as Record<string, unknown>) : null;
+  const statement = by ? str("statement") : null;
+  const sources = new Set(f.evidence.map((e) => e.source));
+  const rest = statement ? text : text.slice(firstSentence(text).length).trim();
   return (
-    <article className="finding">
+    <article className={`finding ${f.high_risk_class ? "finding-alert" : ""} sev-edge-${f.severity}`}>
       <div className="finding-head">
         <div className="finding-title">
           <h3>{medName(f.generic)}</h3>
-          <span className="finding-type">{typeLabel(f.type)}</span>
           {f.high_risk_class && (
             <span className="pill apinchs" title={`APINCHS high-alert medicine, class ${f.high_risk_class}`}>
               APINCHS · {f.high_risk_class}
             </span>
           )}
-        </div>
-        <div className="finding-pills">
-          {f.needs_pharmacist && <span className="pill pill-review">Pharmacist review required</span>}
-          <span className={`pill sev-${f.severity}`}>{PRIORITY[f.severity] ?? humanize(f.severity)} priority</span>
-        </div>
-      </div>
-      <p className="finding-text" title={f.explanation}>
-        {cleanText(f.explanation)}
-      </p>
-      {d.conflict === "confirm" && (
-        <p className="callout callout-warn">
-          <strong>Verify before acting.</strong> Confirm with the patient or prescriber first. This is not an instruction to
-          stop the medicine.
-        </p>
-      )}
-      {str("statement") && <p className="finding-note">{cleanText(str("statement"))}</p>}
-      {str("bpmh_single_source") && (
-        <p className="finding-note warn-text">
-          Single source: only {sourceLabel(str("bpmh_single_source"))} supports this, so the medication history is not
-          verified.
-        </p>
-      )}
-      {f.intent_status === "documented_intentional" && f.intent_reason && (
-        <p className="finding-note">Documented as intentional: {f.intent_reason}</p>
-      )}
-      {f.intent_status === "possibly_intentional" && <p className="finding-note">May be intentional; check before acting.</p>}
-      {f.evidence.length > 0 && (
-        <div className="evidence-chips">
-          <span className="chips-label">Supporting records</span>
-          {f.evidence.map((e) => (
-            <span key={e.row_id} className="chip" title={rowTitle(e)} tabIndex={0}>
-              {e.row_id}
+          <span className="finding-type">{typeLabel(f.type)}</span>
+          {verify && (
+            <span className="pill pill-verify" title="Confirm with the patient or prescriber first. Not an instruction to stop the medicine.">
+              Verify first
             </span>
-          ))}
+          )}
         </div>
+        <span className={`pill sev-${f.severity}`} title={`Priority: ${PRIORITY[f.severity] ?? humanize(f.severity)}`}>
+          {PRIORITY[f.severity] ?? humanize(f.severity)}
+        </span>
+      </div>
+      {statement ? (
+        <>
+          <p className="finding-text" title={f.explanation}>
+            {cleanText(statement)}
+          </p>
+          <BySource by={by!} />
+        </>
+      ) : (
+        <p className="finding-text" title={f.explanation}>
+          {firstSentence(text)}
+        </p>
       )}
-      <details className="src-records">
-        <summary>View source records</summary>
-        <table>
-          <thead>
-            <tr>
-              <th>Record</th>
-              <th>Source</th>
-              <th>As recorded</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {f.evidence.map((e) => (
-              <tr key={e.row_id}>
-                <td>
-                  <span className="mono-id">{e.row_id}</span>
-                </td>
-                <td>{sourceLabel(e.source)}</td>
-                <td>
-                  {ROW_TEXT_FIELDS.filter((k) => k !== "doc_date" && e.fields[k])
-                    .map((k) => e.fields[k])
-                    .join(" · ")}
-                </td>
-                <td className="nowrap">{fmtDate(e.fields.doc_date)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </details>
       <div className="finding-foot">
         <div className="finding-action">
           {f.tasks.length > 0 && (
             <>
-              Recommended action: <span>{f.tasks.map(cleanText).join("; ")}</span>
+              <span className="arrow" aria-hidden>
+                →
+              </span>{" "}
+              <span title={f.tasks.join("; ")}>{cleanText(f.tasks[0])}</span>
             </>
           )}
         </div>
-        <FeedbackControls f={f} state={state} onFeedback={onFeedback} />
+        <div className="finding-ctrl">
+          <FeedbackControls f={f} state={state} onFeedback={onFeedback} />
+          <button type="button" className="btn btn-ghost" aria-expanded={open} aria-controls={panel} onClick={() => setOpen((o) => !o)}>
+            {open ? "Less" : "More"}
+          </button>
+        </div>
       </div>
-      <TechDetails
-        items={[
-          ["Finding", f.id],
-          ["Original explanation", f.explanation !== cleanText(f.explanation) ? f.explanation : null],
-          ["Source rows", f.evidence.map((e) => `${e.row_id} (${e.sql_template_id})`).join(", ")],
-          ["Priority score", f.priority.toFixed(2)],
-          ["Intent", humanize(f.intent_status)],
-          ...detailItems(d),
-          ["Trust", f.trust_explanation.length ? f.trust_explanation.join("; ") : null],
-          ["Memory records", f.hmem_record_ids.length ? f.hmem_record_ids.join(", ") : null],
-        ]}
-      />
+      {open && (
+        <div className="finding-more" id={panel}>
+          {sources.size > 1 && <Compare generic={f.generic} rows={f.evidence} med={med} coverage={coverage} unit={unit} />}
+          {/* Only what the card line didn't already say: the rest of the API's explanation. */}
+          {rest && <p className="finding-full">{rest}</p>}
+          {verify && !rest && (
+            <p className="callout callout-warn">
+              <strong>Verify before acting.</strong> Not an instruction to stop it.
+            </p>
+          )}
+          {!by && str("statement") && <p className="finding-note">{cleanText(str("statement"))}</p>}
+          {str("bpmh_single_source") && (
+            <p className="finding-note warn-text" title="The medication history is not verified from one source.">
+              Single source: {sourceLabel(str("bpmh_single_source"))} only.
+            </p>
+          )}
+          {f.intent_status === "documented_intentional" && f.intent_reason && <p className="finding-note">Documented as intentional: {f.intent_reason}</p>}
+          {f.intent_status === "possibly_intentional" && <p className="finding-note">May be intentional.</p>}
+          {f.tasks.length > 1 && (
+            <ul className="finding-tasks">
+              {f.tasks.slice(1).map((t) => (
+                <li key={t}>{cleanText(t)}</li>
+              ))}
+            </ul>
+          )}
+          <SourceRecords rows={f.evidence} />
+          <TechDetails
+            items={[
+              ["Finding", f.id],
+              ["Original explanation", f.explanation !== text ? f.explanation : null],
+              ["Source rows", f.evidence.map((e) => `${e.row_id} (${e.sql_template_id})`).join(", ")],
+              ["Row hover text", f.evidence.slice(0, 1).map(rowTitle).join("")],
+              ["Priority score", f.priority.toFixed(2)],
+              ["Intent", humanize(f.intent_status)],
+              ...detailItems(d),
+              ["Trust", f.trust_explanation.length ? f.trust_explanation.join("; ") : null],
+              ["Memory records", f.hmem_record_ids.length ? f.hmem_record_ids.join(", ") : null],
+            ]}
+          />
+        </div>
+      )}
     </article>
   );
 }
 
 /**
- * Order comes from the API (needs_pharmacist, priority). The UI only puts
- * pharmacist-review items first, high-alert (APINCHS) ones at the top, as PLAN
- * 6.7 asks; documented-intentional items go last, never hidden.
+ * Order comes from the API (needs_pharmacist, priority). The UI only groups
+ * pharmacist-review items first and puts high-alert (APINCHS) ones at the top of
+ * each group, as PLAN 6.7 asks; documented-intentional items go last, never hidden.
  */
-export function Flags({ findings, summary, feedback, onFeedback }: Props) {
+function Group({ title, tip, items, feedback, onFeedback, ctx }: { title: string; tip?: string; items: Finding[]; feedback: Props["feedback"]; onFeedback: Props["onFeedback"]; ctx: Pick<Props, "grid" | "coverage" | "doseUnits"> }) {
+  if (!items.length) return null;
+  return (
+    <div className="fgroup">
+      <h3 className="fgroup-title">
+        {title} <span className="count">{items.length}</span>
+        {tip && <InfoTip text={tip} />}
+      </h3>
+      {items.map((f) => (
+        <FindingRow
+          key={f.id}
+          f={f}
+          state={feedback[f.id]}
+          onFeedback={onFeedback}
+          med={ctx.grid.find((m) => m.generic === f.generic)}
+          coverage={ctx.coverage}
+          unit={ctx.doseUnits[f.generic]}
+        />
+      ))}
+    </div>
+  );
+}
+
+export function Flags({ findings, grid, coverage, doseUnits, feedback, onFeedback }: Props) {
+  const ctx = { grid, coverage, doseUnits };
   const must = findings.filter((f) => f.needs_pharmacist);
-  const ordered = [
-    ...must.filter((f) => f.high_risk_class),
-    ...must.filter((f) => !f.high_risk_class),
-    ...findings.filter((f) => !f.needs_pharmacist && f.intent_status !== "documented_intentional"),
-    ...findings.filter((f) => !f.needs_pharmacist && f.intent_status === "documented_intentional"),
-  ];
   const reviewed = findings.filter((f) => feedback[f.id]?.result).length;
   return (
     <>
-      {summary && (
-        <p className="tab-summary" title={summary}>
-          {cleanText(summary)}
-        </p>
-      )}
-      <div className="tab-intro">
-        <div>Ranked by clinical risk. High-alert (APINCHS) medicines are listed first.</div>
-        <div className="tab-intro-count">
+      <div className="sec-head">
+        <h2 className="sec-title">Discrepancies</h2>
+        <span className="sec-meta">
           {reviewed} of {findings.length} reviewed
-        </div>
+        </span>
       </div>
-      {!findings.length && <p className="tab-empty">No discrepancies were identified.</p>}
-      {ordered.map((f) => (
-        <FindingRow key={f.id} f={f} state={feedback[f.id]} onFeedback={onFeedback} />
-      ))}
+      {!findings.length && <p className="sec-empty">✓ No discrepancies found across the sources located.</p>}
+      <Group
+        title="Pharmacist review"
+        tip="Ranked by clinical risk. High-alert (APINCHS) medicines first."
+        items={[...must.filter((f) => f.high_risk_class), ...must.filter((f) => !f.high_risk_class)]}
+        feedback={feedback}
+        onFeedback={onFeedback}
+        ctx={ctx}
+      />
+      <Group
+        title={must.length ? "Other discrepancies" : "Discrepancies found"}
+        items={[...findings.filter((f) => !f.needs_pharmacist && f.intent_status !== "documented_intentional")].sort((a, b) => Number(!!b.high_risk_class) - Number(!!a.high_risk_class))}
+        feedback={feedback}
+        onFeedback={onFeedback}
+        ctx={ctx}
+      />
+      <Group
+        title="Documented as intentional"
+        items={findings.filter((f) => !f.needs_pharmacist && f.intent_status === "documented_intentional")}
+        feedback={feedback}
+        onFeedback={onFeedback}
+        ctx={ctx}
+      />
     </>
   );
 }

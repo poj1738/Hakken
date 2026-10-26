@@ -336,6 +336,8 @@ export interface RunResponse {
   bpmh_confirmable: boolean;
   banner?: string | null;
   grid: FusedMed[];
+  /** generic -> unit of the grid's resolved daily_dose ("mg", "units", "mL"). Absent where the rows state none or disagree (#47). */
+  dose_units?: Record<string, string>;
   findings: Finding[];
   notices: Notice[];
   tasks: string[];

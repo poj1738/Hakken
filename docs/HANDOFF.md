@@ -27,6 +27,60 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Anshu · anshu/ui-judges
+
+**Did:** Judge-readiness pass on `web/` (presentation only; every value from the API):
+- **Design B, "Calm Workspace":** teal accent, Public Sans, a white sidebar (patient
+  list, section links with counts, status) and soft rounded panels.
+- **For a 5-second look:**
+  - a 3-step flow;
+  - a "Four silos, one view" strip;
+  - a "Powered by" strip (Zetaris → agents → Meterless engines → Nightshift →
+    Nemotron, naming a model only if the API says it answered);
+  - a "Why it matters" line using PITCH_CLAIMS claim 1, cited.
+- **Learning card:** "System learned 0.70 → 0.50", prominent on the feedback run, and
+  on a later run only where its grid shows the changed source disagreeing
+  (MRN0000007). Elsewhere a quiet "Earlier feedback on file" line.
+- **Findings:** one line each, high-alert first and loudest; full text, a
+  side-by-side table (one column per source, highlights from the API's
+  `dissenting`/`abstained`) and grouped source records (S38) behind **More**.
+- **`detail.by_source` strip (S37):** dose findings lead with `detail.statement` and
+  one row per source. It renders from Arnav's S36 (#60), merged here.
+- **Grid:** `dose_units` shown after resolved doses; the cell panel opens with the
+  same side-by-side table; Technical details IDs on one line with a Copy button.
+- **Processing log:** condensed to one line per step (repeats "×n"), full text
+  behind "Show details"; a colour per agent (dot plus name) wherever an agent is
+  named.
+- **Accessibility:** keyboard navigation, focus rings, contrast ≥ 4.5:1, labelled
+  controls and phone width all checked with a Playwright script.
+- **Scan:** ticked S4, S24, S25, S37, S38 and S40. S4 and S24 already worked
+  (`anshu/live-mode`) and are re-proved here.
+- **Checks:** main merged (through #60). Build passes; `make test` passed (835 passed,
+  2 skipped) after `make synth`; secret scan clean; demo rehearsal clean.
+
+**Changed shared files:** none. `docs/DEMO_SCRIPT.md`, `web/scripts/rehearse-demo.cjs`
+and `docs/SCAN_2026-10-25.md` (ticks) changed.
+
+**Broken:** nothing.
+- The "once once" duplication text is gone since #50, checked on a fresh SAMPLE_MODE run.
+- **After pulling #59 (S35), run `make synth`.** The new generator test reads your local
+  gitignored silos and fails on the old ones; rebuilding changes no tracked file.
+
+**Needs from teammates:**
+- **Arnav:** Please send the agent name in the meterless-app header
+  (hakken-agent/planner, /executor, /evaluator, /writer) in
+  app/adapters/meterless.py:255, passing the role the adapter already has for the
+  trace, so Nightshift shows a separate job per agent. Experiment: check with one
+  live call.
+- **Still open for Anshu:**
+  - S39 (cell cards: "Says current/stopped" with a reason);
+  - S41's display half (strip the `prefix:` from scope notes, show it as a small label);
+  - S42's display half.
+
+**Next:** S39, then S41/S42 display.
+
+---
+
 ### 2026-10-26 · Arnav · arnav/s36
 
 **Did:** Scan **S36**, plus a retry once on Nightshift HTTP 499.

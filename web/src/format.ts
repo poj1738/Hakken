@@ -17,7 +17,7 @@ export const sourceLabel = (s: string | null | undefined) => (s ? SOURCE_LABEL[s
 export const STATE_LABEL: Record<EvidenceState, string> = {
   present: "Listed",
   absent_in_scope: "Not listed",
-  unknown: "No record available",
+  unknown: "No record",
 };
 /** The shorter in-grid form; the full label is the cell's tooltip and the legend. */
 export const STATE_SHORT: Record<EvidenceState, string> = {
@@ -46,7 +46,7 @@ export const NOTICE_LABEL: Record<NoticeType, string> = {
   bpmh_not_confirmable: "Medication history not confirmable",
   possible_second_pharmacy: "Possible second pharmacy",
   patient_only_item: "Patient-only item",
-  conflict_abstained: "Unresolved — verify with patient",
+  conflict_abstained: "Unresolved",
   stale_document: "Stale document",
   known_shortage: "Known shortage",
 };
@@ -101,6 +101,28 @@ export function humanize(s: string): string {
 export const medName = (g: string) => g.replace(/(^|[\s/(-])([a-z])/g, (_, sep: string, c: string) => sep + c.toUpperCase());
 
 export const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
+/** Meterless engine names as the trace sends them (`TraceEvent.engine`). */
+export const ENGINE_LABEL: Record<string, string> = { world_model: "World Model", hmem: "H-MEM" };
+export const engineLabel = (e: string) => ENGINE_LABEL[e] ?? humanize(e);
+
+/** What the API records when an agent step was answered by the offline fallback, not a model. */
+export const OFFLINE_MODEL = "offline-heuristic";
+
+/**
+ * A daily dose with the unit the API sent for it (`RunResponse.dose_units`, #47).
+ * No unit field, no unit: the number is shown as sent, never labelled by guess.
+ */
+export const withUnit = (v: unknown, unit: string | null | undefined) => {
+  const s = fmtValue(v);
+  return unit && s !== "—" ? `${s} ${unit}` : s;
+};
+
+/** The first sentence of API prose, for a one-line view; the full text stays one click away. */
+export function firstSentence(s: string): string {
+  const m = /^(.+?[.!?])(\s+[A-Z(]|$)/.exec(s.trim());
+  return m ? m[1] : s.trim();
+}
 
 export const fmtValue = (v: unknown) => (v === null || v === undefined || v === "" ? "—" : String(v));
 
@@ -157,7 +179,7 @@ export function cleanText(raw: string | null | undefined): string {
   s = s.replace(RECORD_KEY, (key: string, src: string) => (src === "emr" ? `admission chart ${key.slice(4)}` : sourceLabel(src)));
   s = s.replace(/\b[a-z]+(?:_[a-z]+)+\b/g, (w) => (w in TYPE_LABEL ? typeLabel(w).toLowerCase() : w.replace(/_/g, " ")));
   s = s.replace(/\b[A-Z]{2,}(?:_[A-Z]+)+\b/g, (w) => humanize(w));
-  s = s.replace(/Conflict:\s*ask patient\.?/gi, "Unresolved — verify with patient.");
+  s = s.replace(/Conflict:\s*ask patient\.?/gi, "Unresolved.");
   s = s.replace(/^([a-z])/, (c) => c.toUpperCase());
   return s.replace(/\s+([.,;:])/g, "$1").replace(/\s{2,}/g, " ").trim();
 }

@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RunResponse, TraceEvent } from "../types";
-import { cleanText, fmtTime, humanize, plural } from "../format";
+import { OFFLINE_MODEL, cleanText, engineLabel, fmtTime, humanize, plural } from "../format";
 import { TechDetails } from "./TechDetails";
+import { AgentTag } from "./Agent";
 
 // Step names from the orchestrator, as a reader would say them.
 const STEP_LABEL: Record<string, string> = {
@@ -23,7 +24,7 @@ const STEP_LABEL: Record<string, string> = {
 };
 // The API records an agent step its offline fallback answered with
 // routed_model "offline-heuristic"; only the rest reached Nightshift.
-const OFFLINE = "offline-heuristic";
+const OFFLINE = OFFLINE_MODEL;
 function footModels(calls: RunResponse["model_calls"]): string {
   const live = calls.filter((c) => c.routed_model && c.routed_model !== OFFLINE).length;
   const offline = calls.length - live;
@@ -42,7 +43,123 @@ function routedModel(e: TraceEvent): string | null {
   return typeof m === "string" ? m : e.model ?? null;
 }
 
-export function Timeline({ run, polling, warning }: { run: RunResponse | null; polling: boolean; warning: string | null }) {
+/** One step's tags: the Meterless engine it used, and the model that answered it, both from the trace. */
+function StepTags({ e }: { e: TraceEvent }) {
+  const m = routedModel(e);
+  return (
+    <>
+      {e.engine && (
+        <span className="tag tag-engine" title={`Meterless ${engineLabel(e.engine)}${e.engine_op ? `: ${e.engine_op}` : ""}`}>
+          {engineLabel(e.engine)}
+        </span>
+      )}
+      {m &&
+        (m === OFFLINE ? (
+          <span className="tag tag-off" title="Answered by the offline fallback; no model was called">
+            Offline
+          </span>
+        ) : (
+          <span className="tag tag-model" title={`Answered by ${m}${e.route ? ` (requested ${e.route})` : ""}`}>
+            {m.replace(/^nvidia\//, "")}
+          </span>
+        ))}
+    </>
+  );
+}
+
+/** A one-line summary of a step's message: its first sentence, cut at a word to about 80 characters. */
+function short(raw: string): string {
+  const t = cleanText(raw);
+  const first = t.match(/^.+?[.!?](\s|$)/)?.[0].trim() ?? t;
+  if (first.length <= 80) return first;
+  const cut = first.slice(0, 80);
+  return `${cut.slice(0, cut.lastIndexOf(" ") > 50 ? cut.lastIndexOf(" ") : 80).replace(/[,;:]$/, "")}…`;
+}
+
+const raw = (e: TraceEvent) => e.message ?? e.output_summary ?? e.action;
+
+/** Consecutive events of the same step become one line ("Record retrieval ×3"). */
+function groupSteps(trace: TraceEvent[]): TraceEvent[][] {
+  const out: TraceEvent[][] = [];
+  for (const e of trace) {
+    const last = out[out.length - 1];
+    if (last && stepLabel(last[0]) === stepLabel(e) && e.status !== "blocked" && last[0].status !== "blocked") last.push(e);
+    else out.push([e]);
+  }
+  return out;
+}
+
+function StepLine({ g }: { g: TraceEvent[] }) {
+  const [open, setOpen] = useState(false);
+  const lastE = g[g.length - 1];
+  const warn = g.some((e) => e.status === "blocked" || e.status === "error" || !!e.error);
+  const summary = short(raw(lastE));
+  const more = g.length > 1 || cleanText(raw(lastE)) !== summary;
+  const agents = [...new Set(g.map((e) => e.agent_name).filter(Boolean))];
+  const tagged = g.filter((e) => e.engine || routedModel(e));
+  // One tag per distinct engine/model in the group.
+  const seen = new Set<string>();
+  const tags = tagged.filter((e) => {
+    const k = `${e.engine ?? ""}|${routedModel(e) ?? ""}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  return (
+    <div className="log-item">
+      <span className={`tl-dot ${warn ? "warn" : ""}`} aria-hidden />
+      <div className="log-body">
+        <div className="log-line">
+          <span className="log-step">
+            {stepLabel(lastE)}
+            {g.length > 1 && <span className="log-count"> ×{g.length}</span>}
+            {g.some((e) => e.status === "blocked") && <span className="log-flag"> · Withheld</span>}
+            {g.some((e) => e.retry_count > 0) && <span className="log-flag"> · Retried</span>}
+          </span>
+          <span className="log-sum" title={cleanText(raw(lastE))}>
+            {summary}
+          </span>
+          <span className="log-tags">
+            {agents.map((a) => (
+              <AgentTag key={a} name={a} small />
+            ))}
+            {tags.map((e, i) => (
+              <StepTags key={i} e={e} />
+            ))}
+            <time dateTime={lastE.timestamp} title={new Date(lastE.timestamp).toLocaleString()}>
+              {fmtTime(lastE.timestamp)}
+            </time>
+          </span>
+        </div>
+        {more && (
+          <button type="button" className="log-more" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+            {open ? "Hide details" : "Show details"}
+          </button>
+        )}
+        {open && (
+          <ul className="log-details">
+            {g.map((e, i) => (
+              <li key={i}>
+                <span className="log-dt">
+                  {fmtTime(e.timestamp)} · <AgentTag name={e.agent_name} small />
+                </span>{" "}
+                {cleanText(raw(e))}
+              </li>
+            ))}
+          </ul>
+        )}
+        {g.map((e, i) => e.error && <div key={i} className="log-err">{e.error}</div>)}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The processing log, condensed: one line per step (repeats collapsed), a short
+ * summary, and small agent / engine / model tags; each step's full messages sit
+ * behind "Show details". `compact` is the live view while a run is in progress.
+ */
+export function Timeline({ run, polling, warning, compact = false }: { run: RunResponse | null; polling: boolean; warning: string | null; compact?: boolean }) {
   const end = useRef<HTMLDivElement>(null);
   const n = run?.trace.length ?? 0;
   useEffect(() => {
@@ -50,39 +167,19 @@ export function Timeline({ run, polling, warning }: { run: RunResponse | null; p
   }, [n, polling]);
 
   return (
-    <div className="card side-card">
-      <div className="side-head">
-        <h2 className="side-title">Processing Log</h2>
-        {polling ? <span className="spinner" aria-label="running" /> : run && <span className="side-meta">{run.execution_time_seconds < 0.05 ? "< 0.1" : run.execution_time_seconds.toFixed(1)} s</span>}
-      </div>
-      {!run && !polling && <p className="side-empty">Select a patient and run a reconciliation. Each step is logged here as it happens.</p>}
+    <div className="timeline">
+      {!compact && (
+        <div className="sec-head">
+          <h2 className="sec-title">Processing log</h2>
+          {polling ? <span className="spinner" aria-label="running" /> : run && <span className="sec-meta">{run.execution_time_seconds < 0.05 ? "< 0.1" : run.execution_time_seconds.toFixed(1)} s</span>}
+        </div>
+      )}
+      {!run && !polling && <p className="sec-empty">Each step is logged here as it happens.</p>}
       {run && (
-        <div className="log">
-          {run.trace.map((e, i) => {
-            const warn = e.status === "blocked" || e.status === "error" || !!e.error;
-            const raw = e.message ?? e.output_summary ?? e.action;
-            return (
-              <div key={`${e.timestamp}-${i}`} className="log-item">
-                <span className={`tl-dot ${warn ? "warn" : ""}`} aria-hidden />
-                <div className="log-body">
-                  <div className="log-head">
-                    <span className="log-step">
-                      {stepLabel(e)}
-                      {e.status === "blocked" && <span className="log-flag"> · Withheld</span>}
-                      {e.retry_count > 0 && <span className="log-flag"> · Retried {e.retry_count}×</span>}
-                    </span>
-                    <time dateTime={e.timestamp} title={new Date(e.timestamp).toLocaleString()}>
-                      {fmtTime(e.timestamp)}
-                    </time>
-                  </div>
-                  <div className="log-text" title={raw}>
-                    {cleanText(raw)}
-                  </div>
-                  {e.error && <div className="log-err">{e.error}</div>}
-                </div>
-              </div>
-            );
-          })}
+        <div className={`log ${compact ? "log-compact" : ""}`}>
+          {groupSteps(run.trace).map((g, i) => (
+            <StepLine key={`${g[0].timestamp}-${i}`} g={g} />
+          ))}
         </div>
       )}
       {polling && (
@@ -94,12 +191,12 @@ export function Timeline({ run, polling, warning }: { run: RunResponse | null; p
           </div>
         </div>
       )}
-      {run && !polling && (
+      {run && !polling && !compact && (
         <div className="side-foot">
           {plural(run.query_count, "data query", "data queries")} · {footModels(run.model_calls)}
         </div>
       )}
-      {run && (
+      {run && !compact && (
         <TechDetails
           items={[
             ["Run", run.run_id],
@@ -124,7 +221,9 @@ export function Timeline({ run, polling, warning }: { run: RunResponse | null; p
                 <tr key={i} title={e.message ?? ""}>
                   <td className="nowrap">{fmtTime(e.timestamp)}</td>
                   <td>{e.step ?? e.action}</td>
-                  <td>{e.agent_name}</td>
+                  <td>
+                    <AgentTag name={e.agent_name} small />
+                  </td>
                   <td>{routedModel(e) ?? "—"}</td>
                   <td>{e.route ?? "—"}</td>
                   <td>{e.engine ? `${e.engine}${e.engine_op ? `.${e.engine_op}` : ""}` : "—"}</td>
@@ -145,7 +244,9 @@ export function Timeline({ run, polling, warning }: { run: RunResponse | null; p
               <tbody>
                 {run.model_calls.map((c, i) => (
                   <tr key={c.request_id ?? i}>
-                    <td>{c.role}</td>
+                    <td>
+                      <AgentTag name={c.role} small />
+                    </td>
                     <td>{c.requested_route}</td>
                     <td>
                       {c.routed_model ?? "—"}
