@@ -1,5 +1,5 @@
 {
-  "run_id": "run-6670df20943e",
+  "run_id": "run-6850a34c9c3e",
   "status": "needs_review",
   "output": {
     "summary": "Waiting for identity review: 1 near-miss record(s).",
@@ -49,8 +49,8 @@
       "status": "ok"
     }
   ],
-  "trace_id": "run-6670df20943e",
-  "log_file": "/tmp/hakken-traces-1h03g55f/trace-run-6670df20943e.jsonl",
+  "trace_id": "run-6850a34c9c3e",
+  "log_file": "/tmp/hakken-traces-atsotsjg/trace-run-6850a34c9c3e.jsonl",
   "execution_time_seconds": 0.01,
   "error": null,
   "memory_used": [],
@@ -523,8 +523,8 @@
   ],
   "trace": [
     {
-      "timestamp": "2026-10-26T06:34:47.435895+00:00",
-      "run_id": "run-6670df20943e",
+      "timestamp": "2026-10-26T07:55:19.195172+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Planner",
       "action": "start",
       "input_summary": null,
@@ -548,8 +548,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T06:34:47.437067+00:00",
-      "run_id": "run-6670df20943e",
+      "timestamp": "2026-10-26T07:55:19.196216+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Planner",
       "action": "recall",
       "input_summary": null,
@@ -573,8 +573,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T06:34:47.437495+00:00",
-      "run_id": "run-6670df20943e",
+      "timestamp": "2026-10-26T07:55:19.196491+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Planner",
       "action": "plan",
       "input_summary": null,
@@ -598,8 +598,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T06:34:47.437653+00:00",
-      "run_id": "run-6670df20943e",
+      "timestamp": "2026-10-26T07:55:19.196631+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -610,7 +610,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "Planner need \"find this patient's records in the GP, pharmacy and interview systems\" -> the Executor fills template Q1 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "message": "Planner need \"find this patient's records in the GP, pharmacy and interview systems\" -> the Executor runs verified query Q1 on Zetaris, read-only.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -623,8 +623,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T06:34:47.441333+00:00",
-      "run_id": "run-6670df20943e",
+      "timestamp": "2026-10-26T07:55:19.199998+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "find_identities",
       "input_summary": null,
@@ -647,13 +647,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q1",
-      "query_id": "fb2057bc-9771-4ac6-96c1-defdd2287337",
+      "query_id": "d2a039d2-ecaa-4428-9fad-6e2cf1434719",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T06:34:47.441870+00:00",
-      "run_id": "run-6670df20943e",
+      "timestamp": "2026-10-26T07:55:19.200470+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -664,7 +664,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query fb2057bc-9771-4ac6-96c1-defdd2287337); audit seq 21-25.",
+      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query d2a039d2-ecaa-4428-9fad-6e2cf1434719); audit seq 21-25.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -677,8 +677,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T06:34:47.442080+00:00",
-      "run_id": "run-6670df20943e",
+      "timestamp": "2026-10-26T07:55:19.200666+00:00",
+      "run_id": "run-6850a34c9c3e",
       "agent_name": "Executor",
       "action": "needs_review",
       "input_summary": null,

@@ -27,6 +27,130 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 · Arnav · arnav/s17
+
+**Did:** Scan **S17** (the backend half). A `documented_intentional` finding now carries
+the chart note that made it intentional:
+- `detect.emit` sets `detail["chart_note"]`, using the same note `detect` uses to decide
+  intent.
+- The evaluator sets `intent_reason` from it.
+- Before, `intent_reason` read `detail["reason"]`, which the chart comparisons never
+  set, so it was always null.
+- **Example_2:** `frequency:oxycodone/naloxone` now has `intent_reason: "withheld:
+  hypotension"`, from EMR-000737.
+- **Guardrail:** `scripts/eval.py --split tune` before and after is identical: `ALL 145
+  17 5 precision 0.90 recall 0.97 F1 0.93`, high-risk 34/34, 0 false merges. Held-out
+  was not touched.
+- 1 test in `tests/unit/test_orchestrator.py`. `output_examples/sample_mode/`
+  regenerated.
+
+**Changed shared files:** none on the list. **`app/domain/packs/medtrace/detect.py`
+(Arpon's pack)** gets one additive detail key. No detection logic changed.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Anshu (the UI half of S17):** `Flags.tsx` shows the intent line only when
+  `intent_reason` is set. It's now set for this case. The scan also suggests showing
+  "Documented as intentional (no reason text)" when it's null.
+
+**Next:** the low-priority items (S26–S29, S31).
+
+---
+
+### 2026-10-26 · Arnav · arnav/s16
+
+**Did:** Scan **S16**. `output.recommendations` used to be the first five task strings,
+each with confidence 0.5 and no rationale. Each recommendation now comes from a ranked
+finding, in triage order:
+- **`text`:** the finding's first task.
+- **`rationale`:** its verified explanation.
+- **`confidence`:** triage's evidence strength: 0.6 + 0.2 per independent pre-admission
+  source it cites, capped at 1 (the `triage.prioritise` formula). In example_2 it's 0.8
+  for a one-source finding and 1.0 for the others.
+
+Notice and dose-lane tasks have no honest confidence, so they aren't put in
+`recommendations` with an invented one. They're still all in `RunResponse.tasks`. A
+zero-finding run (example_3) therefore has no recommendations, and its tasks are
+unchanged.
+- 2 tests in `tests/unit/test_orchestrator.py`. `output_examples/sample_mode/`
+  regenerated.
+
+**Changed shared files:** none (`Recommendation` is unchanged).
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Anshu:** if the UI reads `output.recommendations`, it now has one entry per finding,
+  each with a rationale. The UI's task list should keep reading `tasks`.
+
+**Next:** S17 (documented-intentional findings lose their chart reason). It touches
+`detect.py`, so it needs the eval guardrail.
+
+---
+
+### 2026-10-26 · Arnav · arnav/s15
+
+**Did:** Scan **S15**. Free text is resolved only when it names a medicine and the model
+is sure.
+- **Not identifiable:** a line with more than 2 ingredient candidates and no class is
+  never sent to the model. The trace says "names no medicine" and lists the candidates.
+  In the five examples this stops only "a little white one" (5 unrelated candidates),
+  which is exactly the line the scan named.
+- **Not sure:** an ingredient answer below `MIN_RESOLVE_CONFIDENCE = 0.8` is discarded.
+  The line stays unmapped, and the trace names the answer and its confidence. The prompt
+  now asks for a confidence and states the bar.
+- **Differs from the scan:** it suggested adding a confirm task naming the candidates.
+  An unmapped line already gets "Identify … with the patient" from S6, so I didn't add a
+  second task for the same line. The candidates are in the trace instead.
+- 4 tests in `tests/unit/test_free_text_gate.py`, with mock Nightshift answers.
+  `output_examples/sample_mode/` regenerated (new trace lines only).
+
+**Changed shared files:** none.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:** nothing.
+
+**Next:** S16 (every recommendation has confidence 0.5 and no rationale), S17.
+
+---
+
+### 2026-10-26 · Arnav · arnav/s9
+
+**Did:** Scan **S9**, plus Anshu's two text fixes.
+- **Failed Nightshift requests now show in `model_calls` and the trace** (rule 3).
+  `MeterlessError.calls` carries every request a failure spent:
+  - **invalid JSON:** both answered calls, with the model that answered each;
+  - **truncated:** `truncated: true`, the model and the completion tokens;
+  - **upstream 502 or timeout after retries:** `routed_model: null`, because no model
+    answered and none is invented;
+  - **failure on the repair:** the first, unvalidated answer as well.
+
+  `_llm_step` records them before falling back. Nothing is recorded when nothing was
+  sent (`not_configured`). Before, a step that failed looked as if it had never called
+  a model.
+- **Anshu's strings:** the duplication template now reads "appears more than once when
+  combination products are split into their ingredients". The route log step now reads
+  `Planner need "…" -> the Executor runs verified query Q1 on Zetaris, read-only.` (no
+  header names).
+- **Changed test:** `test_live_nightshift_failure_degrades_visibly` used to assert
+  `model_calls == []` on a run where Nightshift answered 502. That was the S9 bug, so it
+  now asserts the requests are listed with no model named. Six new tests (five adapter,
+  one orchestrator). `output_examples/sample_mode/` regenerated.
+
+**Changed shared files:** none.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Anshu:** both strings are fixed. You can clear the "Scene 1, text" and "Processing
+  Log" items in `docs/DEMO_SCRIPT.md`; I haven't edited your file.
+
+**Next:** S15 (free-text resolution accepts any candidate), S16, S17.
+
+---
+
 ### 2026-10-26 17:40 AEDT · Anshu · anshu/demo-rehearsal
 
 **Did:** Demo rehearsal.

@@ -110,11 +110,31 @@ class Resolutions(BaseModel):
     items: list[Resolution] = Field(default_factory=list)
 
 
+#: A model answer below this stays unmapped (scan S15): a wrong medicine in the grid is worse
+#: than a line the pharmacist is asked to identify.
+MIN_RESOLVE_CONFIDENCE = 0.8
+#: More ingredient candidates than this, with no class to choose, means the text names no
+#: medicine ("a little white one" matched five unrelated ones) -- not something to pick from.
+MAX_UNANCHORED_CANDIDATES = 2
+
+
 def resolve_free_text(ctx: AgentContext, stmts: list[MedStatement]) -> tuple[list[MedStatement], list[str]]:
-    """Returns the statements (some now `resolution="llm"`) and any confirm tasks for class-level answers."""
+    """Returns the statements (some now `resolution="llm"`) and any confirm tasks for class-level answers.
+
+    A line the model may not resolve stays `unmapped`; the Evaluator then shows it as an
+    unidentified line with an "Identify ... with the patient" task (scan S6).
+    """
     ctx.check_time()
     pending = {s.row_id: (s, llm_candidates(s.raw_text, ctx.lex)) for s in stmts if s.resolution == "unmapped"}
     pending = {rid: (s, c) for rid, (s, c) in pending.items() if c.get("ingredients") or c.get("atc_classes")}
+    vague = {rid: (s, c) for rid, (s, c) in pending.items()
+             if not c.get("atc_classes") and len(c.get("ingredients", [])) > MAX_UNANCHORED_CANDIDATES}
+    for rid, (s, c) in vague.items():
+        ctx.tracer.emit("Executor", "resolve_free_text", step="RESOLVE_FREE_TEXT", status="skipped",
+                        message=f'"{s.raw_text}" ({s.source}, {rid}) names no medicine: it matched '
+                                f'{len(c["ingredients"])} unrelated candidates ({", ".join(c["ingredients"])}). '
+                                "Not sent to the model; left for the pharmacist to identify.")
+    pending = {rid: v for rid, v in pending.items() if rid not in vague}
     if not pending:
         ctx.tracer.emit("Executor", "resolve_free_text", step="RESOLVE_FREE_TEXT",
                         message="No free-text lines needed the model.")
@@ -126,7 +146,8 @@ def resolve_free_text(ctx: AgentContext, stmts: list[MedStatement]) -> tuple[lis
     messages = [{"role": "user", "content": (
         "Map each free-text medicine line to exactly ONE of its listed candidates, or null if none fits. "
         "Never answer with anything that is not in that line's list. Prefer an ingredient; choose an ATC "
-        "class only when the text names a class (e.g. 'blood thinner').\n" + lines)}]
+        "class only when the text names a class (e.g. 'blood thinner'). Give a confidence from 0 to 1; "
+        f"an ingredient answer below {MIN_RESOLVE_CONFIDENCE} is not used.\n" + lines)}]
     # Offline: no guessing -- every line stays unmapped and is shown as such.
     # 3,872 of 4,096 were used live for two lines; 8k leaves room for the hidden reasoning.
     result, calls = ctx.llm.chat_json("Executor", messages, Resolutions, max_tokens=8192,
@@ -134,14 +155,17 @@ def resolve_free_text(ctx: AgentContext, stmts: list[MedStatement]) -> tuple[lis
 
     by_row = {r.row_id: r for r in result.items}
     out: list[MedStatement] = []
-    resolved, rejected, tasks = 0, 0, []
+    resolved, rejected, unsure, tasks = 0, 0, [], []
     for s in stmts:
         res = by_row.get(s.row_id)
         cands = pending.get(s.row_id, (None, {}))[1]
         if res is None or res.choice is None or s.row_id not in pending:
             out.append(s)
             continue
-        if res.choice in cands.get("ingredients", []):
+        if res.choice in cands.get("ingredients", []) and res.confidence < MIN_RESOLVE_CONFIDENCE:
+            unsure.append(f'"{s.raw_text}" -> {res.choice} ({res.confidence:.2f})')
+            out.append(s)
+        elif res.choice in cands.get("ingredients", []):
             entry = ctx.lex.by_generic.get(res.choice.casefold())
             out.append(s.model_copy(update={"generic": res.choice, "resolution": "llm",
                                             "ingredients": [(res.choice, None)],
@@ -157,7 +181,9 @@ def resolve_free_text(ctx: AgentContext, stmts: list[MedStatement]) -> tuple[lis
     ctx.record("Executor", "resolve_free_text", "RESOLVE_FREE_TEXT", calls,
                f"Resolved {resolved} of {len(pending)} free-text lines from the lexicon candidates"
                + (f"; {len(tasks)} class-level answer(s) left for confirmation" if tasks else "")
-               + (f"; {rejected} answer(s) outside the candidate list discarded" if rejected else "") + ".")
+               + (f"; {rejected} answer(s) outside the candidate list discarded" if rejected else "")
+               + (f"; {len(unsure)} below confidence {MIN_RESOLVE_CONFIDENCE} left unmapped: {'; '.join(unsure)}"
+                  if unsure else "") + ".")
     return out, tasks
 
 

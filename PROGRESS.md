@@ -60,7 +60,7 @@ feedback loop by Monday morning at the latest.
 
 ## Next up
 
-**Codebase scan, 25 Oct: `docs/SCAN_2026-10-25.md`** — 34 verified items by owner. Blockers: Meterless engine + conformance (Arnav), `output_examples/` empty (anyone), Docker web-stage build (Anshu). **Arpon is out of credits for the week; his items moved to Arnav (`docs/TODO_ARNAV.md` §5).**
+**Codebase scan: `docs/SCAN_2026-10-25.md`** (41 items, tick them as you fix). Rule blockers all closed 26 Oct (engines, output_examples, Docker). **Anshu's open items:** S4 (learning demo from the UI — top for the demo), S40 (side-by-side compare view), S37/S39/S41 (cards say plainly what each source says), S24, S25, S38. **Arnav's:** S35 (insulin chart dose bug), S36 (per-source wording), S41 wording, S9 (failed Nemotron calls in the trace), plus the rest under Arnav. Arpon is out of credits; his items are Arnav's (`docs/TODO_ARNAV.md` §5).
 
 **Arnav's session: read `docs/TODO_ARNAV.md` first** — everything needed from Arpon's side, in order.
 

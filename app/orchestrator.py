@@ -296,6 +296,10 @@ class Orchestrator:
             state.caveats.append(f"Nightshift unavailable for {name} ({exc.kind}); that step used the grounded "
                                  "template and is labelled offline-heuristic.")
             agent, action = name.split()
+            # Every request the failure spent is a model call: in model_calls and the trace, with
+            # the model that answered where there was one (scan S9, CLAUDE.md rule 3).
+            state.ctx.record(agent.capitalize(), action, _STEP_OF.get(action), exc.calls,  # type: ignore[arg-type]
+                             f"{name}: request failed ({exc.kind}).")
             state.ctx.tracer.emit(agent.capitalize(), "fallback", step=_STEP_OF.get(action), status="degraded",
                                   error=str(exc),
                                   message=f"{name}: Nightshift failed ({exc.kind}); used the grounded template.")
@@ -338,9 +342,8 @@ class Orchestrator:
         """Trace the hand-off: the Planner's need -> the template the Executor fills -> Zetaris."""
         need = state.plan.need(tool) if state.plan else planner.DEFAULT_NEED[tool]
         template = planner.TEMPLATE_FOR[tool]
-        how = (f"the Executor fills template {template} and the Zetaris adapter sends it (read-only check, "
-               "Bearer key, X-Org-ID, fresh X-Request-ID)" if template else "the lexicon plus one Nemotron "
-               "choice from a closed candidate list; no SQL")
+        how = (f"the Executor runs verified query {template} on Zetaris, read-only" if template else
+               "matched against the medicines lexicon, with Nemotron choosing only from a closed list; no SQL")
         step = {"find_identities": "FIND_IDENTITY"}.get(tool, tool.upper())
         state.ctx.tracer.emit("Executor", "route", step=step, message=f'Planner need "{need}" -> {how}.')
 
@@ -449,6 +452,20 @@ class Orchestrator:
                                       "Replaced with the grounded summary.")
         return writer._offline_summary(findings, state.anchor, banner)
 
+    @staticmethod
+    def _recommendation(f: Finding) -> Recommendation:
+        """One per ranked finding, in triage order (scan S16).
+
+        `confidence` is triage's evidence strength for the finding -- 0.6 plus 0.2 per
+        independent pre-admission source it cites, capped at 1 (`triage.prioritise`) --
+        not a constant. Tasks from notices carry no such measure, so they stay in
+        `RunResponse.tasks` rather than appearing here with an invented number.
+        """
+        independent = {e.source for e in f.evidence if e.source and e.source != "emr"}
+        return Recommendation(text=f.tasks[0] if f.tasks else f"Review {f.generic} ({f.type.value.replace('_', ' ')})",
+                              rationale=f.explanation or None, confidence=min(1.0, 0.6 + 0.2 * len(independent)),
+                              requires_human_review=True)
+
     def _hmem_ids(self, f: Finding) -> list[str]:
         """The H-MEM trust records a verdict on this finding would move (feedback, PLAN 5.7)."""
         from app.feedback import _attribute_for
@@ -524,8 +541,7 @@ class Orchestrator:
             run_id=state.run_id, status=status,  # type: ignore[arg-type]
             output=RunOutput(
                 summary=summary or "",
-                recommendations=[Recommendation(text=t, requires_human_review=True)
-                                 for t in (analysis.tasks[:5] if analysis else [])],
+                recommendations=[self._recommendation(f) for f in findings[:5]],
                 evidence=[EvidenceItem(claim=f.explanation, sql=q3_sql, source=queries.ALL_SOURCES_VIEW,
                                        row_count=len(f.evidence), verified=True) for f in findings if q3_sql],
                 caveats=caveats),
