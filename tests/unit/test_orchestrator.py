@@ -172,7 +172,7 @@ def test_patients_list_comes_from_q0(orch) -> None:
     assert len(orch._load_anchors()) == 200
     pts = orch.patients()
     assert [p.patient_id for p in pts] == sorted(orch.zetaris.replayable())
-    assert len(pts) == 13 and pts[0].patient_id == "MRN0000001"
+    assert len(pts) == 16 and pts[0].patient_id == "MRN0000001"
 
 
 # -- bounded and honest under failure ------------------------------------------------
