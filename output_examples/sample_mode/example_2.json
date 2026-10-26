@@ -1,5 +1,5 @@
 {
-  "run_id": "run-b9ced79435c0",
+  "run_id": "run-549bcee17ab1",
   "status": "success",
   "output": {
     "summary": "5 finding(s) for Dorothy Nguyen (MRN0000089); 3 need a pharmacist first: oxycodone/naloxone (duplication), gliclazide (omission), oxycodone/naloxone (frequency).",
@@ -109,13 +109,9 @@
     {
       "name": "Executor",
       "role": "fetch, link, normalise, resolve free text",
-      "iterations": 1,
-      "models_used": [
-        "offline-heuristic"
-      ],
-      "routes_requested": [
-        "meterless/fast"
-      ],
+      "iterations": 0,
+      "models_used": [],
+      "routes_requested": [],
       "status": "ok"
     },
     {
@@ -143,8 +139,8 @@
       "status": "ok"
     }
   ],
-  "trace_id": "run-b9ced79435c0",
-  "log_file": "/tmp/hakken-traces-h5v3zjpx/trace-run-b9ced79435c0.jsonl",
+  "trace_id": "run-549bcee17ab1",
+  "log_file": "/tmp/hakken-traces-fyfbpj1r/trace-run-549bcee17ab1.jsonl",
   "execution_time_seconds": 0.04,
   "error": null,
   "memory_used": [],
@@ -1297,7 +1293,7 @@
           "source": "gp",
           "row_id": "GP-000684",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "gp",
             "row_id": "GP-000684",
@@ -1330,7 +1326,7 @@
           "source": "gp",
           "row_id": "GP-000680",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "gp",
             "row_id": "GP-000680",
@@ -1402,7 +1398,7 @@
           "source": "gp",
           "row_id": "GP-000682",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "gp",
             "row_id": "GP-000682",
@@ -1435,7 +1431,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004127",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004127",
@@ -1468,7 +1464,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004128",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004128",
@@ -1501,7 +1497,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004129",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004129",
@@ -1579,7 +1575,7 @@
           "source": "emr",
           "row_id": "EMR-000737",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "emr",
             "row_id": "EMR-000737",
@@ -1612,7 +1608,7 @@
           "source": "gp",
           "row_id": "GP-000684",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "gp",
             "row_id": "GP-000684",
@@ -1645,7 +1641,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004135",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004135",
@@ -1678,7 +1674,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004136",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004136",
@@ -1711,7 +1707,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004137",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004137",
@@ -1744,7 +1740,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004138",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004138",
@@ -1777,7 +1773,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004139",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004139",
@@ -1810,7 +1806,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004140",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004140",
@@ -1843,7 +1839,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004141",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004141",
@@ -1876,7 +1872,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004142",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004142",
@@ -1909,7 +1905,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004143",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004143",
@@ -1942,7 +1938,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004144",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004144",
@@ -1975,7 +1971,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004145",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004145",
@@ -2055,7 +2051,7 @@
           "source": "emr",
           "row_id": "EMR-000734",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "emr",
             "row_id": "EMR-000734",
@@ -2088,7 +2084,7 @@
           "source": "gp",
           "row_id": "GP-000679",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "gp",
             "row_id": "GP-000679",
@@ -2121,7 +2117,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004108",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004108",
@@ -2154,7 +2150,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004109",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004109",
@@ -2187,7 +2183,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004110",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004110",
@@ -2220,7 +2216,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004111",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004111",
@@ -2253,7 +2249,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004112",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004112",
@@ -2286,7 +2282,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004113",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004113",
@@ -2359,7 +2355,7 @@
           "source": "gp",
           "row_id": "GP-000681",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "gp",
             "row_id": "GP-000681",
@@ -2392,7 +2388,7 @@
           "source": "pharmacy",
           "row_id": "PHM-004126",
           "sql_template_id": "Q2",
-          "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+          "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
           "fields": {
             "source": "pharmacy",
             "row_id": "PHM-004126",
@@ -2510,7 +2506,7 @@
       "source": "emr",
       "row_id": "EMR-000731",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000731",
@@ -2543,7 +2539,7 @@
       "source": "emr",
       "row_id": "EMR-000732",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000732",
@@ -2576,7 +2572,7 @@
       "source": "emr",
       "row_id": "EMR-000733",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000733",
@@ -2609,7 +2605,7 @@
       "source": "emr",
       "row_id": "EMR-000734",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000734",
@@ -2642,7 +2638,7 @@
       "source": "emr",
       "row_id": "EMR-000735",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000735",
@@ -2675,7 +2671,7 @@
       "source": "emr",
       "row_id": "EMR-000736",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000736",
@@ -2708,7 +2704,7 @@
       "source": "emr",
       "row_id": "EMR-000737",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "emr",
         "row_id": "EMR-000737",
@@ -2741,7 +2737,7 @@
       "source": "gp",
       "row_id": "GP-000676",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "gp",
         "row_id": "GP-000676",
@@ -2774,7 +2770,7 @@
       "source": "gp",
       "row_id": "GP-000677",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "gp",
         "row_id": "GP-000677",
@@ -2807,7 +2803,7 @@
       "source": "gp",
       "row_id": "GP-000678",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "gp",
         "row_id": "GP-000678",
@@ -2840,7 +2836,7 @@
       "source": "gp",
       "row_id": "GP-000679",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "gp",
         "row_id": "GP-000679",
@@ -2873,7 +2869,7 @@
       "source": "gp",
       "row_id": "GP-000680",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "gp",
         "row_id": "GP-000680",
@@ -2906,7 +2902,7 @@
       "source": "gp",
       "row_id": "GP-000681",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "gp",
         "row_id": "GP-000681",
@@ -2939,7 +2935,7 @@
       "source": "gp",
       "row_id": "GP-000682",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "gp",
         "row_id": "GP-000682",
@@ -2972,7 +2968,7 @@
       "source": "gp",
       "row_id": "GP-000683",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "gp",
         "row_id": "GP-000683",
@@ -3005,7 +3001,7 @@
       "source": "gp",
       "row_id": "GP-000684",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "gp",
         "row_id": "GP-000684",
@@ -3038,7 +3034,7 @@
       "source": "patient",
       "row_id": "PAT-000722",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000722",
@@ -3071,7 +3067,7 @@
       "source": "patient",
       "row_id": "PAT-000723",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000723",
@@ -3104,7 +3100,7 @@
       "source": "patient",
       "row_id": "PAT-000724",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000724",
@@ -3137,7 +3133,7 @@
       "source": "patient",
       "row_id": "PAT-000725",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000725",
@@ -3170,7 +3166,7 @@
       "source": "patient",
       "row_id": "PAT-000727",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000727",
@@ -3203,7 +3199,7 @@
       "source": "patient",
       "row_id": "PAT-000728",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000728",
@@ -3236,7 +3232,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004091",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004091",
@@ -3269,7 +3265,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004092",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004092",
@@ -3302,7 +3298,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004093",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004093",
@@ -3335,7 +3331,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004094",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004094",
@@ -3368,7 +3364,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004095",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004095",
@@ -3401,7 +3397,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004096",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004096",
@@ -3434,7 +3430,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004097",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004097",
@@ -3467,7 +3463,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004098",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004098",
@@ -3500,7 +3496,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004099",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004099",
@@ -3533,7 +3529,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004100",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004100",
@@ -3566,7 +3562,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004101",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004101",
@@ -3599,7 +3595,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004102",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004102",
@@ -3632,7 +3628,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004103",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004103",
@@ -3665,7 +3661,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004104",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004104",
@@ -3698,7 +3694,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004105",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004105",
@@ -3731,7 +3727,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004106",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004106",
@@ -3764,7 +3760,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004107",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004107",
@@ -3797,7 +3793,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004108",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004108",
@@ -3830,7 +3826,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004109",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004109",
@@ -3863,7 +3859,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004110",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004110",
@@ -3896,7 +3892,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004111",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004111",
@@ -3929,7 +3925,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004112",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004112",
@@ -3962,7 +3958,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004113",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004113",
@@ -3995,7 +3991,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004114",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004114",
@@ -4028,7 +4024,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004115",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004115",
@@ -4061,7 +4057,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004116",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004116",
@@ -4094,7 +4090,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004117",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004117",
@@ -4127,7 +4123,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004118",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004118",
@@ -4160,7 +4156,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004119",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004119",
@@ -4193,7 +4189,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004120",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004120",
@@ -4226,7 +4222,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004121",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004121",
@@ -4259,7 +4255,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004122",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004122",
@@ -4292,7 +4288,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004123",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004123",
@@ -4325,7 +4321,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004124",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004124",
@@ -4358,7 +4354,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004125",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004125",
@@ -4391,7 +4387,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004126",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004126",
@@ -4424,7 +4420,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004127",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004127",
@@ -4457,7 +4453,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004128",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004128",
@@ -4490,7 +4486,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004129",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004129",
@@ -4523,7 +4519,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004130",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004130",
@@ -4556,7 +4552,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004131",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004131",
@@ -4589,7 +4585,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004132",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004132",
@@ -4622,7 +4618,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004133",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004133",
@@ -4655,7 +4651,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004134",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004134",
@@ -4688,7 +4684,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004135",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004135",
@@ -4721,7 +4717,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004136",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004136",
@@ -4754,7 +4750,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004137",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004137",
@@ -4787,7 +4783,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004138",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004138",
@@ -4820,7 +4816,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004139",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004139",
@@ -4853,7 +4849,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004140",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004140",
@@ -4886,7 +4882,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004141",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004141",
@@ -4919,7 +4915,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004142",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004142",
@@ -4952,7 +4948,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004143",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004143",
@@ -4985,7 +4981,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004144",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004144",
@@ -5018,7 +5014,7 @@
       "source": "pharmacy",
       "row_id": "PHM-004145",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "pharmacy",
         "row_id": "PHM-004145",
@@ -5051,7 +5047,7 @@
       "source": "patient",
       "row_id": "PAT-000721",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000721",
@@ -5084,7 +5080,7 @@
       "source": "patient",
       "row_id": "PAT-000726",
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000726",
@@ -5377,8 +5373,8 @@
   ],
   "trace": [
     {
-      "timestamp": "2026-10-26T07:08:44.064964+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.058600+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Planner",
       "action": "start",
       "input_summary": null,
@@ -5402,8 +5398,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.066525+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.059894+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Planner",
       "action": "recall",
       "input_summary": null,
@@ -5427,8 +5423,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.066956+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.060402+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Planner",
       "action": "plan",
       "input_summary": null,
@@ -5452,8 +5448,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.067167+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.060634+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -5477,8 +5473,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.073745+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.067737+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Executor",
       "action": "find_identities",
       "input_summary": null,
@@ -5501,13 +5497,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q1",
-      "query_id": "1e95f3a2-0bf2-4af1-8a20-25fe2eb7d536",
+      "query_id": "6d9dfad0-886c-49d0-886b-7bfaf438cfb9",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T07:08:44.074584+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.068889+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -5518,7 +5514,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "World Model: recorded 7 patient records and 3 same-person link(s), each with provenance (Zetaris query 1e95f3a2-0bf2-4af1-8a20-25fe2eb7d536); audit seq 11-20.",
+      "message": "World Model: recorded 7 patient records and 3 same-person link(s), each with provenance (Zetaris query 6d9dfad0-886c-49d0-886b-7bfaf438cfb9); audit seq 11-20.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -5531,8 +5527,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.074798+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.069274+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -5556,8 +5552,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.074932+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.069453+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -5581,8 +5577,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.079288+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.073855+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Executor",
       "action": "fetch_meds",
       "input_summary": null,
@@ -5605,13 +5601,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q2",
-      "query_id": "08381c5a-8f2e-4db1-826d-5da2ff34fcf8",
+      "query_id": "9d17cd31-51e3-496c-b7eb-12c03f61cc62",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T07:08:44.086019+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.081024+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Executor",
       "action": "normalise",
       "input_summary": null,
@@ -5635,8 +5631,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.086373+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.081375+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -5660,21 +5656,21 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.087568+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.082815+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Executor",
       "action": "resolve_free_text",
       "input_summary": null,
       "output_summary": null,
       "target_agent": null,
-      "model": "offline-heuristic",
+      "model": null,
       "confidence": null,
       "retry_count": 0,
-      "status": "ok",
+      "status": "skipped",
       "step": "RESOLVE_FREE_TEXT",
-      "message": "Resolved 0 of 2 free-text lines from the lexicon candidates.",
-      "route": "meterless/fast",
-      "latency_ms": 0,
+      "message": "\"a little white one\" (patient, PAT-000721) names no medicine: it matched 5 unrelated candidates (calcitriol, dapagliflozin, eplerenone, carvedilol, amlodipine). Not sent to the model; left for the pharmacist to identify.",
+      "route": null,
+      "latency_ms": null,
       "tokens": null,
       "sql": null,
       "row_count": null,
@@ -5685,8 +5681,58 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.092535+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.083125+00:00",
+      "run_id": "run-549bcee17ab1",
+      "agent_name": "Executor",
+      "action": "resolve_free_text",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "skipped",
+      "step": "RESOLVE_FREE_TEXT",
+      "message": "\"a little white one\" (patient, PAT-000726) names no medicine: it matched 5 unrelated candidates (calcitriol, dapagliflozin, eplerenone, carvedilol, amlodipine). Not sent to the model; left for the pharmacist to identify.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T07:36:47.083364+00:00",
+      "run_id": "run-549bcee17ab1",
+      "agent_name": "Executor",
+      "action": "resolve_free_text",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "RESOLVE_FREE_TEXT",
+      "message": "No free-text lines needed the model.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-26T07:36:47.088732+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Evaluator",
       "action": "fuse",
       "input_summary": null,
@@ -5710,8 +5756,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.094888+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.090891+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Evaluator",
       "action": "detect",
       "input_summary": null,
@@ -5735,8 +5781,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.096011+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.091873+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Evaluator",
       "action": "prioritise",
       "input_summary": null,
@@ -5760,8 +5806,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.098816+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.093705+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Writer",
       "action": "draft",
       "input_summary": null,
@@ -5785,8 +5831,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.100877+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.095679+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -5810,8 +5856,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.102616+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.097303+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Evaluator",
       "action": "verify",
       "input_summary": null,
@@ -5834,13 +5880,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q3",
-      "query_id": "1f8b54eb-2940-460c-a248-7ddc3483bf4e",
+      "query_id": "d1b6973e-8b37-4be5-9a9a-e02b760bf72f",
       "request_id": null,
       "replayed": true
     },
     {
-      "timestamp": "2026-10-26T07:08:44.104992+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.100209+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Evaluator",
       "action": "critique",
       "input_summary": null,
@@ -5864,8 +5910,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T07:08:44.105222+00:00",
-      "run_id": "run-b9ced79435c0",
+      "timestamp": "2026-10-26T07:36:47.100450+00:00",
+      "run_id": "run-549bcee17ab1",
       "agent_name": "Writer",
       "action": "done",
       "input_summary": null,
@@ -5894,14 +5940,6 @@
   "model_calls": [
     {
       "role": "Planner",
-      "requested_route": "meterless/fast",
-      "routed_model": "offline-heuristic",
-      "request_id": null,
-      "tokens": {},
-      "truncated": false
-    },
-    {
-      "role": "Executor",
       "requested_route": "meterless/fast",
       "routed_model": "offline-heuristic",
       "request_id": null,

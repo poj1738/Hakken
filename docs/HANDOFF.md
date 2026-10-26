@@ -27,6 +27,33 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 · Arnav · arnav/s15
+
+**Did:** Scan **S15**. Free text is resolved only when it names a medicine and the model
+is sure.
+- **Not identifiable:** a line with more than 2 ingredient candidates and no class is
+  never sent to the model. The trace says "names no medicine" and lists the candidates.
+  In the five examples this stops only "a little white one" (5 unrelated candidates),
+  which is exactly the line the scan named.
+- **Not sure:** an ingredient answer below `MIN_RESOLVE_CONFIDENCE = 0.8` is discarded.
+  The line stays unmapped, and the trace names the answer and its confidence. The prompt
+  now asks for a confidence and states the bar.
+- **Differs from the scan:** it suggested adding a confirm task naming the candidates.
+  An unmapped line already gets "Identify … with the patient" from S6, so I didn't add a
+  second task for the same line. The candidates are in the trace instead.
+- 4 tests in `tests/unit/test_free_text_gate.py`, with mock Nightshift answers.
+  `output_examples/sample_mode/` regenerated (new trace lines only).
+
+**Changed shared files:** none.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:** nothing.
+
+**Next:** S16 (every recommendation has confidence 0.5 and no rationale), S17.
+
+---
+
 ### 2026-10-26 · Arnav · arnav/s9
 
 **Did:** Scan **S9**, plus Anshu's two text fixes.
