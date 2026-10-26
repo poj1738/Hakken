@@ -16,6 +16,7 @@ from __future__ import annotations
 import time
 import uuid
 from dataclasses import dataclass, field
+from typing import Any
 from datetime import date
 from pathlib import Path
 
@@ -49,6 +50,9 @@ from app.schemas import (
 from app.tracing import LOG_DIR, Tracer
 
 DISCLAIMER = "Synthetic data. Not medical advice. A pharmacist must confirm every item."
+#: model step action -> the state-machine step its trace events belong to
+_STEP_OF = {"plan": "PLAN", "resolve_free_text": "RESOLVE_FREE_TEXT", "draft": "DRAFT", "revise": "DRAFT",
+            "critique": "CRITIQUE"}
 ROLES = {"Planner": "plan the investigation", "Executor": "fetch, link, normalise, resolve free text",
          "Evaluator": "fuse, detect, gate, verify, critique", "Writer": "explain and summarise"}
 
@@ -71,6 +75,12 @@ class RunState:
     degraded: bool = False
     running: bool = False
     memory_used: list = field(default_factory=list)
+    # Finished work, kept as each stage completes, so a late timeout returns it (scan S5).
+    analysis: Any = None
+    findings: list = field(default_factory=list)
+    summary: str | None = None
+    verified: bool = False
+    q3_sql: str = ""
     response: RunResponse | None = None
 
 
@@ -203,8 +213,7 @@ class Orchestrator:
             state.response = step(state)
         except (QueryBudgetExceeded, RunTimeout) as exc:
             state.ctx.tracer.emit("Evaluator", "stop", step="PARTIAL", status="partial", message=f"Stopped early: {exc}.")
-            state.response = self._respond(state, "partial", summary=f"Stopped early ({exc}); results are incomplete.",
-                                           error=ErrorInfo(type=type(exc).__name__, message=str(exc), recoverable=True))
+            state.response = self._partial(state, exc)
         except (ZetarisError, MeterlessError, ValueError) as exc:
             state.ctx.tracer.emit("Evaluator", "error", step="ERROR", status="error", error=str(exc),
                                   message=f"Run failed: {exc}")
@@ -215,8 +224,47 @@ class Orchestrator:
             state.running = False
         return state.response
 
+    def _partial(self, state: RunState, exc: Exception) -> RunResponse:
+        """A run stopped by the budget or the clock keeps what it finished (scan S5).
+
+        Before this, a timeout late in a live run returned an empty grid and no findings,
+        although fusion, detection and often verification had all completed.
+        """
+        error = ErrorInfo(type=type(exc).__name__, message=str(exc), recoverable=True)
+        if state.analysis is None:
+            return self._respond(state, "partial", summary=f"Stopped early ({exc}); results are incomplete.",
+                                 error=error)
+        findings = [f if f.explanation else f.model_copy(update={"explanation": writer.template(f)})
+                    for f in state.findings]
+        if not state.verified:
+            state.caveats.append("Stopped before every cited row was re-read from Zetaris: these findings are "
+                                 "not re-verified. Treat them as unconfirmed.")
+        summary = state.summary or writer._offline_summary(findings, state.anchor, state.analysis.banner)
+        return self._respond(state, "partial", summary=f"Stopped early ({exc}). {summary}", analysis=state.analysis,
+                             findings=findings, q3_sql=state.q3_sql if state.verified else "", error=error,
+                             blocked=list(state.analysis.blocked))
+
+    def _time_for_a_model_call(self, state: RunState, what: str) -> bool:
+        """False when less time is left than one model call may take: don't start what can't finish."""
+        if self.settings.sample_mode:
+            return True
+        left = state.ctx.deadline - time.monotonic()
+        if left >= self.settings.meterless_timeout_s:
+            return True
+        agent, _, action = what.partition(" ")
+        state.ctx.tracer.emit(agent.capitalize() or "Evaluator", "budget", step=_STEP_OF.get(action), status="skipped",
+                              message=f"Skipped {what}: {left:.0f}s left is less than one model call "
+                                      f"({self.settings.meterless_timeout_s:.0f}s); used the grounded fallback.")
+        return False
+
     def _llm_step(self, state: RunState, name: str, call, fallback):
-        """A model step with its fallback: live failures degrade, visibly, instead of failing the run."""
+        """A model step with its fallback: live failures degrade, visibly, instead of failing the run.
+
+        No model call starts with less time left than one call may take (scan S5): the
+        grounded fallback runs instead, and the trace says so.
+        """
+        if not self._time_for_a_model_call(state, name):
+            return fallback()
         try:
             return call()
         except MeterlessError as exc:
@@ -226,9 +274,8 @@ class Orchestrator:
             state.caveats.append(f"Nightshift unavailable for {name} ({exc.kind}); that step used the grounded "
                                  "template and is labelled offline-heuristic.")
             agent, action = name.split()
-            step = {"plan": "PLAN", "resolve_free_text": "RESOLVE_FREE_TEXT", "draft": "DRAFT",
-                    "revise": "DRAFT", "critique": "CRITIQUE"}.get(action)
-            state.ctx.tracer.emit(agent.capitalize(), "fallback", step=step, status="degraded", error=str(exc),
+            state.ctx.tracer.emit(agent.capitalize(), "fallback", step=_STEP_OF.get(action), status="degraded",
+                                  error=str(exc),
                                   message=f"{name}: Nightshift failed ({exc.kind}); used the grounded template.")
             return fallback()
 
@@ -309,16 +356,22 @@ class Orchestrator:
                                                  sorted({m.generic for m in analysis.fused if evaluator.is_current(m)}))
             analysis.notices = [*analysis.notices, *shortages]
             analysis.tasks = list(dict.fromkeys([*analysis.tasks, *(t for n in shortages for t in n.tasks)]))
-        findings = [f.model_copy(update={"hmem_record_ids": self._hmem_ids(f)}) for f in analysis.findings]
+        findings = [f.model_copy(update={"hmem_record_ids": self._hmem_ids(f), "explanation": writer.template(f)})
+                    for f in analysis.findings]
+        state.analysis, state.findings = analysis, findings
 
-        texts, summary = self._llm_step(
-            state, "writer draft", lambda: writer.draft(ctx, findings, state.anchor, analysis.banner),
-            lambda: ({f.id: writer.template(f) for f in findings},
-                     writer._offline_summary(findings, state.anchor, analysis.banner)))
+        def offline_draft():
+            return ({f.id: writer.template(f) for f in findings},
+                    writer._offline_summary(findings, state.anchor, analysis.banner))
+        texts, summary = self._llm_step(state, "writer draft",
+                                        lambda: writer.draft(ctx, findings, state.anchor, analysis.banner),
+                                        offline_draft)
         findings = [f.model_copy(update={"explanation": texts.get(f.id) or writer.template(f)}) for f in findings]
+        state.findings, state.summary = findings, summary
 
         self._route(state, "verify")
         findings, blocked, q3_sql = evaluator.verify(ctx, findings, state.anchor)
+        state.findings, state.verified, state.q3_sql = findings, True, q3_sql
 
         rounds = max(1, self.settings.max_agent_iterations)
         for round_no in range(1, rounds + 1):
@@ -346,7 +399,9 @@ class Orchestrator:
                                         lambda: ({fid: writer.template(f) for f in findings
                                                   if (fid := f.id) in problems}, None))
             findings = [f.model_copy(update={"explanation": revised.get(f.id, f.explanation)}) for f in findings]
+            state.findings = findings
 
+        state.findings = findings
         status = "partial" if state.degraded else "success"
         ctx.tracer.emit("Writer", "done", step="PARTIAL" if state.degraded else "DONE",
                         message=f"Done: {len(findings)} findings, {len(analysis.notices)} notices, "

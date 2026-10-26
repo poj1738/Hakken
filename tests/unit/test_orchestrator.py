@@ -189,6 +189,52 @@ def test_timeout_returns_partial(make_settings, tmp_path) -> None:
     assert r.status == "partial" and r.error and r.error.type == "RunTimeout"
 
 
+def test_a_late_timeout_keeps_the_finished_findings(orch, monkeypatch) -> None:
+    """Scan S5: a timeout after detection and verification returns partial WITH the findings."""
+    from app.agents import evaluator
+    from app.agents.base import RunTimeout
+
+    def times_out(ctx, findings):
+        raise RunTimeout("RUN_TIMEOUT_S reached")
+
+    monkeypatch.setattr(evaluator, "critique", times_out)
+    r = run(orch, "MRN0000089")
+    assert r.status == "partial" and r.error and r.error.type == "RunTimeout"
+    assert len(r.findings) == 5 and r.grid and r.coverage and r.tasks
+    assert all(f.explanation and claim_problems(f) == [] for f in r.findings)
+    assert r.output.evidence and all(e.verified for e in r.output.evidence)  # Q3 had finished
+
+
+def test_a_timeout_before_verification_says_the_findings_are_unverified(orch, monkeypatch) -> None:
+    from app.agents import evaluator
+    from app.agents.base import RunTimeout
+
+    def times_out(ctx, findings, anchor):
+        raise RunTimeout("RUN_TIMEOUT_S reached")
+
+    monkeypatch.setattr(evaluator, "verify", times_out)
+    r = run(orch, "MRN0000089")
+    assert r.status == "partial" and len(r.findings) == 5
+    assert any("not re-verified" in c for c in r.output.caveats) and r.output.evidence == []
+
+
+def test_no_model_call_starts_without_time_to_finish(make_settings, tmp_path) -> None:
+    """Live: with less time left than one model call, the Writer and critique fall back, traced."""
+    zs = make_settings(sample_mode=True)
+    ls = make_settings(meterless_runtime_token="example-runtime-token", meterless_timeout_s=10_000)
+
+    def nightshift(_request):
+        raise AssertionError("a model call started without time to finish")
+
+    o = Orchestrator(ls, llm=MeterlessClient(ls, transport=httpx.MockTransport(nightshift)),
+                     zetaris=ZetarisClient(zs), log_dir=tmp_path)
+    r = o.start(RunRequest(patient_id="MRN0000089"))
+    skipped = [e.message or "" for e in r.trace if e.status == "skipped" and e.action == "budget"]
+    for step in ("planner plan", "writer draft", "evaluator critique"):
+        assert any(step in m for m in skipped), step
+    assert len(r.findings) == 5 and all(claim_problems(f) == [] for f in r.findings)
+
+
 def test_live_nightshift_failure_degrades_visibly(make_settings, tmp_path) -> None:
     """Zetaris replayed, Nightshift returning 502 every time: the run still finishes, labelled."""
     zs = make_settings(sample_mode=True)
