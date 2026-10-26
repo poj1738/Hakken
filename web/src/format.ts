@@ -111,14 +111,17 @@ export function fmtTime(iso: string): string {
   return d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }).replace(/\s?([AP])M$/i, (_, p: string) => ` ${p.toLowerCase()}m`);
 }
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 /** "2026-10-24" -> "24 Oct 2026"; anything else (e.g. "08/09/2026" from a source row) is shown as sent. */
 export function fmtDate(s: string | null | undefined): string {
   if (!s) return "—";
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
   if (!m) return s;
-  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-  // Day-month-year, as in the design ("24 Feb 1951"): unambiguous for an Australian reader.
-  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  // Day-month-year with a three-letter month, as in the design ("24 Feb 1951"):
+  // unambiguous for an Australian reader. Built by hand because locales disagree
+  // on September ("Sep" vs "Sept").
+  return `${Number(m[3])} ${MONTHS[Number(m[2]) - 1] ?? m[2]} ${m[1]}`;
 }
 
 const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
@@ -151,7 +154,7 @@ export function cleanText(raw: string | null | undefined): string {
   });
   s = s.replace(/[;,]?\s*audit seq\s*[\d-]+/gi, "");
   s = s.replace(/\b(\d+)((?:\s+[A-Za-z-]+){0,2}?)\s+([A-Za-z-]+)\((es|s)\)/g, (_, n: string, mid: string, w: string, suf: string) => `${n}${mid} ${Number(n) === 1 ? w : w + suf}`);
-  s = s.replace(RECORD_KEY, (_, src: string) => sourceLabel(src));
+  s = s.replace(RECORD_KEY, (key: string, src: string) => (src === "emr" ? `admission chart ${key.slice(4)}` : sourceLabel(src)));
   s = s.replace(/\b[a-z]+(?:_[a-z]+)+\b/g, (w) => (w in TYPE_LABEL ? typeLabel(w).toLowerCase() : w.replace(/_/g, " ")));
   s = s.replace(/\b[A-Z]{2,}(?:_[A-Z]+)+\b/g, (w) => humanize(w));
   s = s.replace(/Conflict:\s*ask patient\.?/gi, "Unresolved — verify with patient.");
