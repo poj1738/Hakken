@@ -1,5 +1,6 @@
 import type { IdentityReview as Review, SourceRow } from "../types";
-import { sourceLabel } from "../format";
+import { cleanText, fmtDate, humanize, sourceLabel } from "../format";
+import { TechDetails } from "./TechDetails";
 
 // Rows of the side-by-side table. `show` is the text displayed (the raw DOB,
 // because a day/month swap is only visible in the raw text); `evidence` names
@@ -44,6 +45,14 @@ function agreement(sentences: string[]): Agreement {
   return "missing";
 }
 
+/** A record field for display: dates as dates; the raw DOB text is kept as written (a day/month swap is the point). */
+function show(r: SourceRow, k: keyof SourceRow) {
+  const v = r[k];
+  if (v === null || v === undefined || v === "") return <span className="muted">—</span>;
+  if (k === "dob_raw" && /^\d{4}-\d{2}-\d{2}$/.test(String(v))) return <span title={String(v)}>{fmtDate(String(v))}</span>;
+  return String(v);
+}
+
 interface Props {
   review: Review;
   banner?: string | null;
@@ -60,30 +69,30 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
   const otherKeys = [...new Set(candidates.flatMap((c) => Object.keys(c.field_evidence)))].filter((k) => !shownKeys.has(k));
   return (
     <section className="card identity">
-      <h2>Identity review needed</h2>
-      <p className="lead">
-        {banner ??
-          "These records could be this patient, but the match is not certain enough to merge automatically. A wrong merge mixes two people's medicines."}
-      </p>
-      <div className="table-scroll">
+      <div className="id-head">
+        <div className="eyebrow">Identity review required</div>
+        <h2>Confirm Patient Records</h2>
+        <p className="id-lead">
+          {cleanText(banner) ||
+            "These records may belong to this patient, but the match is not certain enough to link automatically. An incorrect link would combine two people's medicines."}
+        </p>
+      </div>
+      <div className="id-scroll">
         <table className="id-table">
           <thead>
             <tr>
               <th />
-              <th className="anchor-col">
+              <th className="anchor-col" title={`${anchor.source}:${anchor.source_patient_id}`}>
                 {sourceLabel(anchor.source)}
-                <div className="muted small">
-                  {anchor.source}:{anchor.source_patient_id} · this admission
-                </div>
+                <div className="score">This admission</div>
               </th>
               {candidates.map((c) => {
                 const r = records[c.candidate_id];
                 return (
-                  <th key={c.candidate_id}>
+                  <th key={c.candidate_id} title={c.candidate_id}>
                     {sourceLabel(r?.source ?? c.candidate_id.split(":")[0])}
-                    <div className="muted small">{c.candidate_id}</div>
                     <div className="score">
-                      p = {c.probability.toFixed(2)} · weight {c.match_weight.toFixed(1)} · {c.band}
+                      <span className="match">{Math.round(c.probability * 100)}% match</span> · {humanize(c.band)}
                     </div>
                   </th>
                 );
@@ -94,13 +103,13 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
             {FIELDS.map((f) => (
               <tr key={f.label}>
                 <th scope="row">{f.label}</th>
-                <td className="anchor-col">{anchor[f.show] ?? <span className="muted">—</span>}</td>
+                <td className="anchor-col">{show(anchor, f.show)}</td>
                 {candidates.map((c) => {
                   const r = records[c.candidate_id];
                   const ev = f.evidence.map((k) => c.field_evidence[k]).filter(Boolean);
                   return (
                     <td key={c.candidate_id} className={`agree-${agreement(ev)}`}>
-                      {r ? (r[f.show] ?? <span className="muted">—</span>) : <span className="muted">record not sent</span>}
+                      {r ? show(r, f.show) : <span className="muted">Record not sent</span>}
                       {ev.map((t) => (
                         <div key={t} className="why">
                           {stripVerdict(t)}
@@ -113,7 +122,7 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
             ))}
             {otherKeys.length > 0 && (
               <tr>
-                <th scope="row">Other evidence</th>
+                <th scope="row">Other matching evidence</th>
                 <td className="anchor-col" />
                 {candidates.map((c) => (
                   <td key={c.candidate_id} className="small">
@@ -121,7 +130,7 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
                       .filter((k) => c.field_evidence[k])
                       .map((k) => (
                         <div key={k}>
-                          <span className="muted">{k}:</span> {stripVerdict(c.field_evidence[k])}
+                          <span className="muted">{humanize(k)}:</span> {stripVerdict(c.field_evidence[k])}
                         </div>
                       ))}
                   </td>
@@ -129,32 +138,32 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
               </tr>
             )}
             <tr>
-              <th scope="row">Held back because</th>
+              <th scope="row">Withheld from automatic linkage</th>
               <td className="anchor-col" />
               {candidates.map((c) => (
                 <td key={c.candidate_id} className="guard">
-                  {c.field_evidence.guard ? stripVerdict(c.field_evidence.guard) : c.guards.join(", ") || "—"}
+                  {c.field_evidence.guard ? cleanText(stripVerdict(c.field_evidence.guard)) : c.guards.map(humanize).join(", ") || "—"}
                 </td>
               ))}
             </tr>
             <tr>
-              <th scope="row">Your decision</th>
+              <th scope="row">Pharmacist decision</th>
               <td className="anchor-col" />
               {candidates.map((c) => {
                 const d = decided[c.candidate_id];
                 return (
                   <td key={c.candidate_id}>
                     {d ? (
-                      <span className={`badge ${d === "same" ? "ok" : "neutral"}`}>
-                        {d === "same" ? "Same person" : "Different people"}
+                      <span className={`pill ${d === "same" ? "pill-ok" : "sev-low"}`}>
+                        {d === "same" ? "Confirmed: same patient" : "Recorded: different patients"}
                       </span>
                     ) : (
                       <div className="btn-row">
-                        <button disabled={!!busy} onClick={() => onDecide(c.candidate_id, true)}>
-                          Same person
+                        <button type="button" className="btn btn-primary" disabled={!!busy} onClick={() => onDecide(c.candidate_id, true)}>
+                          Same patient
                         </button>
-                        <button disabled={!!busy} onClick={() => onDecide(c.candidate_id, false)}>
-                          Different people
+                        <button type="button" className="btn btn-quiet" disabled={!!busy} onClick={() => onDecide(c.candidate_id, false)}>
+                          Different patients
                         </button>
                       </div>
                     )}
@@ -165,11 +174,22 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
           </tbody>
         </table>
       </div>
-      <p className="legend small">
-        <span className="swatch agree-agree" /> agrees <span className="swatch agree-partial" /> partial match{" "}
-        <span className="swatch agree-differ" /> differs <span className="swatch agree-missing" /> not compared. Colours
-        are the matcher's own verdict; the sentence under each value is its reason.
+      <p className="id-legend">
+        <span className="swatch agree-agree" /> Agrees <span className="swatch agree-partial" /> Partial match{" "}
+        <span className="swatch agree-differ" /> Differs <span className="swatch agree-missing" /> Not compared. Colours show
+        the matching engine's own verdict; the text under each value is its reason.
       </p>
+      <TechDetails
+        items={[
+          ["This admission", `${anchor.source}:${anchor.source_patient_id} (row ${anchor.row_id})`],
+          ...candidates.map(
+            (c): [string, string] => [
+              sourceLabel(records[c.candidate_id]?.source ?? c.candidate_id.split(":")[0]),
+              `${c.candidate_id} · probability ${c.probability.toFixed(2)} · match weight ${c.match_weight.toFixed(1)} · band ${c.band} · tier ${c.tier}${c.guards.length ? ` · guards ${c.guards.join(", ")}` : ""}`,
+            ],
+          ),
+        ]}
+      />
       {error && <p className="error">{error}</p>}
     </section>
   );

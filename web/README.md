@@ -33,6 +33,20 @@ acknowledged with no trust change.
 (polled), `POST /run/{id}/identity` and `POST /feedback` on `VITE_API_URL`. Every
 request has a 30 s timeout and polling stops after 15 minutes.
 
+To try it with no Zetaris, no Nightshift and no network, run the API in
+`SAMPLE_MODE` (from the repo root) and point the UI at it:
+
+```bash
+SAMPLE_MODE=true STATE_DIR=/tmp/medtrace-state python3 run.py serve   # API on :8000
+VITE_API_MODE=live VITE_API_URL=http://localhost:8000 npm run dev       # in web/
+```
+
+The server learns from feedback and remembers identity decisions, so restart it
+(or use a fresh `STATE_DIR`) to rehearse the demo from the start. The learning
+demo: run MRN0000003, click candesartan's **GP** cell, press "GP daily dose is
+outdated" (GP daily-dose trust 0.70 → 0.50), then run MRN0000007: rosuvastatin
+now resolves to the pharmacy dose and a dose finding appears.
+
 `src/types.ts` is hand-copied from `app/schemas.py` and
 `app/domain/packs/medtrace/types.py`. Update it when a schema change is announced
 in `docs/HANDOFF.md`.

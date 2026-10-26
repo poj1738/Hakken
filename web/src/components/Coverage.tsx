@@ -1,94 +1,81 @@
 import type { Coverage as Cov, Notice } from "../types";
 import { SOURCES } from "../types";
-import { NOTICE_LABEL, sourceLabel } from "../format";
+import { NOTICE_LABEL, cleanText, fmtDate, medName, sourceLabel } from "../format";
+import { TechDetails } from "./TechDetails";
 
 const STATE_TEXT: Record<string, string> = {
-  found: "found",
-  near_miss_pending: "possible match, pending review",
-  not_found: "no record found",
+  found: "Located",
+  near_miss_pending: "Possible match — linkage under review",
+  not_found: "No record available",
 };
 
-export function CoverageStrip({
-  coverage,
-  banner,
-  bpmhConfirmable,
-}: {
-  coverage: Partial<Record<string, Cov>>;
-  banner?: string | null;
-  bpmhConfirmable: boolean;
-}) {
-  // All four sources are always listed: one the API left out is "not reported",
-  // never silently missing from the strip.
-  const found = SOURCES.filter((s) => coverage[s]?.state === "found");
-  const missing = SOURCES.filter((s) => coverage[s]?.state !== "found");
-  const stateText = (s: string) => (coverage[s] ? STATE_TEXT[coverage[s]!.state] ?? coverage[s]!.state : "not reported");
-  return (
-    <section className="coverage-wrap">
-      {/* The BPMH heading follows bpmh_confirmable; `banner` is also used for
-          other messages (e.g. identity review), which show without it. */}
-      {!bpmhConfirmable ? (
-        <div className="banner" role="alert">
-          <strong>BPMH cannot be confirmed.</strong> {banner ?? "Fewer than 2 pre-admission sources were found."}
-        </div>
-      ) : (
-        banner && (
-          <div className="banner banner-warn" role="status">
-            {banner}
-          </div>
-        )
-      )}
-      <div className="card coverage">
-        <p className="coverage-line">
-          Found in <strong>{found.length}</strong> of {SOURCES.length} sources
-          {coverage.emr?.state === "found" ? ", including the admission chart" : ""}.
-          {missing.map((s) => (
-            <span key={s}>
-              {" "}
-              {sourceLabel(s)}: {stateText(s)}.
-            </span>
-          ))}
-        </p>
-        <ul className="coverage-chips">
-          {SOURCES.map((s) => {
-            const c = coverage[s];
-            return (
-              <li key={s} className={`cov cov-${c?.state ?? "unreported"}`}>
-                <div className="cov-head">
-                  <span className="dot" /> {sourceLabel(s)}
-                  <span className="muted small"> {c?.record_key ?? ""}</span>
-                </div>
-                <div className="small">
-                  {stateText(s)}
-                  {c?.doc_date ? ` · dated ${c.doc_date}` : ""}
-                </div>
-                {c?.scope_notes.map((n) => (
-                  <div key={n} className="small muted">
-                    {n}
-                  </div>
-                ))}
-              </li>
-            );
-          })}
-        </ul>
+/**
+ * The BPMH banner follows the API's `bpmh_confirmable`; `banner` is also used
+ * for other messages (e.g. identity review), which show without the heading.
+ */
+export function BpmhBanner({ banner, bpmhConfirmable }: { banner?: string | null; bpmhConfirmable: boolean }) {
+  if (!bpmhConfirmable) {
+    return (
+      <div className="alert alert-high" role="alert">
+        <strong>Best possible medication history cannot be confirmed.</strong>{" "}
+        {cleanText(banner) || "Fewer than two pre-admission sources were located."}
       </div>
-    </section>
+    );
+  }
+  if (!banner) return null;
+  return (
+    <div className="alert alert-medium" role="status">
+      {cleanText(banner)}
+    </div>
   );
 }
 
-export function Notices({ notices }: { notices: Notice[] }) {
-  if (!notices.length) return null;
+/** Record Sources: every one of the four sources, always listed; one the API left out is "Not reported". */
+export function RecordSources({ coverage, notices }: { coverage: Partial<Record<string, Cov>>; notices: Notice[] }) {
   return (
-    <section className="card notices">
-      <h2>About our evidence</h2>
-      <p className="muted small">Notices describe gaps in the records, not the patient's medicines.</p>
-      <ul>
-        {notices.map((n, i) => (
-          <li key={i} className={`notice notice-${n.type}`}>
-            <span className="badge neutral">{NOTICE_LABEL[n.type] ?? n.type}</span> {n.detail}
-            {n.row_ids.length > 0 && <span className="rowids"> {n.row_ids.join(", ")}</span>}
-          </li>
-        ))}
-      </ul>
-    </section>
+    <div className="card side-card">
+      <h2 className="side-title">Record Sources</h2>
+      {SOURCES.map((s) => {
+        const c = coverage[s];
+        const state = c?.state ?? "unreported";
+        return (
+          <div key={s} className="src">
+            <span className={`src-dot src-${state}`} aria-hidden />
+            <div className="src-body">
+              <div className="src-head">
+                <span className="src-name">{sourceLabel(s)}</span>
+                <span className="src-date">{c?.doc_date ? fmtDate(c.doc_date) : ""}</span>
+              </div>
+              <div className="src-note">{c ? STATE_TEXT[c.state] ?? c.state : "Not reported"}</div>
+              {c?.scope_notes.map((n) => (
+                <div key={n} className="src-note">
+                  {cleanText(n)}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+      {notices.length > 0 && (
+        <div className="notices">
+          <div className="eyebrow">Data quality notices</div>
+          {notices.map((n, i) => (
+            <div key={i} className="notice" title={n.row_ids.length ? `Records: ${n.row_ids.join(", ")}` : undefined}>
+              <div className="notice-type">
+                {NOTICE_LABEL[n.type] ?? n.type}
+                {n.generic ? ` · ${medName(n.generic)}` : ""}
+              </div>
+              <div className="notice-text">{cleanText(n.detail)}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      <TechDetails
+        items={[
+          ...SOURCES.map((s): [string, string | null] => [`${sourceLabel(s)} record`, coverage[s]?.record_key ?? null]),
+          ...notices.map((n, i): [string, string | null] => [`Notice ${i + 1} records`, n.row_ids.length ? n.row_ids.join(", ") : null]),
+        ]}
+      />
+    </div>
   );
 }
