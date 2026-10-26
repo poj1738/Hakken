@@ -42,8 +42,15 @@ def test_status_reports_sample_mode_without_touching_a_service(api) -> None:
 
 
 def test_patients(api) -> None:
+    """SAMPLE_MODE lists only the patients with a recorded run (scan S14), every one runnable."""
     pts = api.get("/patients").json()["patients"]
-    assert len(pts) == 200 and pts[0]["patient_id"].startswith("MRN")
+    assert len(pts) == 13 and {"MRN0000001", "MRN0000015", "MRN0000089"} <= {p["patient_id"] for p in pts}
+
+
+def test_a_patient_without_a_recording_is_a_clear_404_in_sample_mode(api) -> None:
+    r = api.post("/run?wait=true", json={"patient_id": "MRN0000020"})
+    assert r.status_code == 404
+    assert "no recorded data in SAMPLE_MODE" in r.json()["detail"] and "MRN0000089" in r.json()["detail"]
 
 
 def test_post_run_wait_returns_the_final_response(api) -> None:

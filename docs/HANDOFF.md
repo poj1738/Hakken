@@ -44,6 +44,32 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-26 · Arnav · arnav/s14
+
+**Did:** Scan **S14**. In SAMPLE_MODE, `GET /patients` listed all 200 admissions from Q0,
+but only 13 have recorded Q1–Q3. A judge picking any of the other 187 got a replay-miss
+error partway through a run.
+- `ZetarisClient.replayable()` returns the MRNs that have a full recording (Q1, Q2 and
+  Q3). It uses the existing fixture-verified index plus a check that the files exist.
+- `Orchestrator.patients()` lists only those 13 in SAMPLE_MODE. `create()` refuses any
+  other patient with `UnknownPatient`, which the API turns into a **404** naming the
+  recorded patients. Live mode is unchanged and still lists all 200.
+- Tests updated (`test_api.py`, `test_orchestrator.py`), plus a new 404 test. A note
+  added to the README "Sample mode" section.
+
+**Changed shared files:** none. `PatientSummary` is unchanged: the list is filtered, not
+flagged.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Anshu:** in SAMPLE_MODE the picker now gets 13 patients instead of 200. No UI change
+  is needed.
+
+**Next:** the remaining scan items (S9–S13, S15–S17, S20, S26–S29, S31–S33).
+
+---
+
 ### 2026-10-26 · Arnav · arnav/docker
 
 **Did:** **The Docker run path is verified**, plus scan **S18** and **S30**.
