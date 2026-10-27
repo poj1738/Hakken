@@ -17,7 +17,7 @@ from app.orchestrator import MODEL_BATCH, Orchestrator
 from app.schemas import RunRequest
 
 
-def _nightshift(log: list[tuple[str, int]], fail_draft_call: int | None = None):
+def _nightshift(log: list[tuple[str, int]], fail_draft_call: int | None = None, unfaithful: bool = False):
     """A mock Runtime. Logs (kind, findings in the request); can fail one Writer draft batch with 499s."""
     drafts = {"n": 0}
 
@@ -35,7 +35,8 @@ def _nightshift(log: list[tuple[str, int]], fail_draft_call: int | None = None):
         if text.startswith("You check TEXT against DATA"):
             items = json.loads(brief)
             log.append(("critique", len(items)))
-            return {"verdicts": [{"id": f["id"], "faithful": True} for f in items]}
+            return {"verdicts": [{"id": f["id"], "faithful": not unfaithful, "issue": "test objection"}
+                                 for f in items]}
         if text.startswith("Map each free-text"):
             return {"items": []}
         return {"steps": [{"tool": t, "need": t} for t in ("find_identities", "fetch_meds", "verify")],
@@ -86,3 +87,17 @@ def test_a_failed_batch_loses_only_its_own_explanations(make_settings, tmp_path)
     assert sum("Nightshift unavailable for writer draft" in c for c in r.output.caveats) == 1
     failed = [c for c in r.model_calls if c.role == "Writer" and c.routed_model is None]
     assert len(failed) == 1  # the 499'd batch is still listed (S9)
+
+
+def test_a_request_can_ask_for_fewer_critique_rounds(make_settings, tmp_path) -> None:
+    """Scan S26: max_iterations=1 is honoured (capped by the server's setting, never raised).
+    The critique objects to everything, so with one round nothing is revised: every
+    explanation falls back to the grounded template, and no revise call is made."""
+    log: list[tuple[str, int]] = []
+    o = _orch(make_settings, tmp_path, _nightshift(log, unfaithful=True))
+    r = o.start(RunRequest(patient_id="MRN0000089", max_iterations=1))
+    assert [k for k, _ in log].count("draft") == 3  # the first drafts only; no revise round
+    assert not any(f.explanation.startswith("Confirm ") for f in r.findings)
+    log.clear()
+    o.start(RunRequest(patient_id="MRN0000089"))  # the server default (2) does revise
+    assert [k for k, _ in log].count("draft") > 3

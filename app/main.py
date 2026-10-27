@@ -26,7 +26,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.feedback import FeedbackError, apply_feedback
-from app.orchestrator import Orchestrator, UnknownPatient
+from app.orchestrator import InvalidRequest, Orchestrator, UnknownPatient
 from app.schemas import (
     FeedbackRequest,
     FeedbackResponse,
@@ -108,6 +108,8 @@ def create_app(orchestrator: Orchestrator | None = None, *, background: bool = T
             run_id = orch.create(req)
         except UnknownPatient as exc:
             raise HTTPException(404, str(exc)) from exc
+        except InvalidRequest as exc:
+            raise HTTPException(422, str(exc)) from exc
         if wait:
             return orch.execute(run_id)
         _run_async(orch.execute, run_id)

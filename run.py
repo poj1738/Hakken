@@ -46,7 +46,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.print_help()
         return 2
 
-    from app.orchestrator import Orchestrator, UnknownPatient
+    from app.orchestrator import InvalidRequest, Orchestrator, UnknownPatient
     from app.schemas import IdentityDecisionRequest, RunRequest
 
     try:
@@ -57,7 +57,7 @@ def main(argv: list[str] | None = None) -> int:
     orch = Orchestrator()
     try:
         response = orch.start(request)
-    except UnknownPatient as exc:
+    except (UnknownPatient, InvalidRequest) as exc:
         print(str(exc), file=sys.stderr)
         return 2
     decisions = [(c, True) for c in args.confirm] + [(c, False) for c in args.reject]

@@ -118,6 +118,15 @@ def test_feedback_on_a_finding_and_acceptance(api) -> None:
     ("post", "/feedback", {"run_id": "run-nope", "target_id": "F1", "verdict": "confirm"}, 404),
     ("post", "/feedback", {"run_id": "r", "target_id": "F1", "verdict": "reject"}, 422),
     ("post", "/run", {"patient_id": "MRN0000089", "surprise": 1}, 422),
+    # Scan S26: controls the API cannot honour are refused, never silently ignored.
+    ("post", "/run", {}, 422),
+    ("post", "/run", {"patient_id": "MRN0000089", "domain_pack": "nonsense"}, 422),
+    ("post", "/run", {"patient_id": "MRN0000089", "sample_mode": False}, 422),  # this server is SAMPLE_MODE
+    # Scan S29: a malformed grid target is the caller's format error, not "not found".
+    ("post", "/feedback", {"run_id": "r", "target_id": "grid:candesartan", "verdict": "confirm"}, 422),
+    ("post", "/feedback", {"run_id": "r", "target_id": "grid:candesartan:colour", "verdict": "confirm"}, 422),
+    ("post", "/feedback", {"run_id": "run-nope", "target_id": "grid:candesartan:daily_dose",
+                           "verdict": "confirm"}, 404),
 ])
 def test_errors(api, method, path, body, code) -> None:
     r = getattr(api, method)(path, json=body) if body is not None else getattr(api, method)(path)

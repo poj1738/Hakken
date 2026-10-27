@@ -27,6 +27,41 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Arnav · arnav/s26-s28-s29
+
+**Did:** Scan **S26**, **S28** and **S29**. That closes every scan item assigned to me;
+the 3 still open are Arpon's domain items, S20, S32 and S33.
+- **S26: `RunRequest` refuses what it can't honour, instead of ignoring it.**
+  - `patient_id` is required, so `POST /run {}` is a 422.
+  - `domain_pack` must be `"medtrace"`, or a 422.
+  - `max_iterations` is honoured: it can lower the critique rounds for a run, never raise
+    them above `MAX_AGENT_ITERATIONS`.
+  - A `sample_mode` that differs from the server's mode is a 422 (`InvalidRequest`),
+    because a request can't switch a live server offline. `run.py` exits 2 on it.
+- **S28: the identity pause isn't run time.** `RunState.paused_at` and `paused_s`:
+  `execution_time_seconds` no longer includes the wait for the pharmacist. The run's
+  deadline already excluded it.
+- **S29: malformed grid targets are a 422.** A grid target must be `grid:<generic>:
+  <attribute>`, with a known attribute. Unknown run, finding or generic stays 404.
+- Tests: 6 new error cases in `test_errors`, 2 orchestrator tests (the S28 pause, the mode
+  switch), 1 batched-calls test (`max_iterations=1` makes no revise call when the
+  critique objects).
+
+**Changed shared files:** **`app/schemas.py`**:
+- `RunRequest.patient_id` is now required;
+- `domain_pack` is `Literal["medtrace"] | None`;
+- `FeedbackRequest` validates grid targets.
+
+All the input examples and the UI already send a `patient_id`.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:** nothing.
+
+**Next:** none of mine left in the scan.
+
+---
+
 ### 2026-10-27 · Anshu · anshu/final-check
 
 **Did:** feature-freeze check of the UI on main. Bug fixes only, all in `web/`.
