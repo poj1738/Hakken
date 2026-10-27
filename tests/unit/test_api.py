@@ -200,3 +200,19 @@ def test_a_different_verdict_on_the_same_target_still_applies(api) -> None:
     confirm = api.post("/feedback", json=base | {"verdict": "confirm"}).json()
     assert reject["trust_updates"][0]["after"] == 0.5
     assert confirm["trust_updates"][0]["before"] == 0.5 and confirm["trust_updates"][0]["after"] > 0.5
+
+
+def test_run_py_confirm_with_an_unknown_candidate_is_bad_usage(monkeypatch, capsys) -> None:
+    """Scan S27: a wrong --confirm used to end in a ValueError traceback with no JSON."""
+    import run
+    from app.config import get_settings
+
+    monkeypatch.setenv("SAMPLE_MODE", "true")
+    get_settings.cache_clear()
+    try:
+        code = run.main(["--input", "input_examples/example_1.json", "--confirm", "patient:WRONG"])
+    finally:
+        get_settings.cache_clear()
+    err = capsys.readouterr().err
+    assert code == 2
+    assert "patient:WRONG is not awaiting review" in err and "Awaiting review: patient:INT00015" in err
