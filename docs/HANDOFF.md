@@ -27,6 +27,41 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Arnav · arnav/validate
+
+**Did:** **`make validate` works and passes**: 24 passed, 0 failed, 0 skipped.
+`scripts/validate_submission.sh` checks CLAUDE.md's hard rules on what is **committed**, from
+a fresh local clone of HEAD. The clone has no `.env`, Zetaris and Nightshift point at a closed
+port, and every HTTP proxy variable points at a dead one, so any network call from the app
+fails instead of quietly succeeding. That's the judge's path. It checks:
+- **Rule 5:** `.env` untracked, `.env.example` tracked, secret scan, and no NVIDIA key
+  pattern in any tracked file. The scanner's own tests, with deliberately fake keys, are
+  excluded from that last check.
+- **Rule 4:** CLAUDE.md is the only rules file, and the AI tools log exists.
+- **Rule 2:** World Model and H-MEM conformance, 22 passed.
+- **Rule 7:** the data, licence and pre-existing docs exist, and `metadata.json` parses.
+- **Rules 6, 8 and 9:** `run.py` succeeds on all five input examples in SAMPLE_MODE (with
+  the two documented identity confirmations). Every model call is `offline-heuristic`, the
+  disclaimer is present, and outputs differ by input (4 distinct finding sets).
+- **Rule 8:** `POST /run?wait=true` against a SAMPLE_MODE server started from the clone, and
+  the Docker image builds. The build is skipped with a warning when no Docker daemon is
+  reachable, and `VALIDATE_DOCKER=0` skips it.
+- **Rule 6:** `output_examples/` (the existing test), plus the full suite offline: 815
+  passed, 46 skipped. The skips are expected in a fresh clone, because the silos are
+  gitignored until `make synth`.
+
+It reuses this checkout's `.venv`; building a fresh one would need the network.
+
+**Changed shared files:** none (`Makefile` already called the script).
+
+**Broken:** nothing.
+
+**Needs from teammates:** run `make validate` before the final submission commit.
+
+**Next:** nothing of mine open, beyond merging #74 (Zetaris USL) and this PR.
+
+---
+
 ### 2026-10-27 · Arnav · arnav/s26-s28-s29
 
 **Did:** Scan **S26**, **S28** and **S29**. That closes every scan item assigned to me;
