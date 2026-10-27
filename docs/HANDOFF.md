@@ -27,6 +27,24 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Arnav · arnav/s27
+
+**Did:** Scan **S27**. `run.py --confirm` (or `--reject`) with a candidate the run isn't
+asking about used to end in a `ValueError` traceback with no JSON. It now prints the
+reason and the candidates awaiting review to stderr, and exits **2** (bad usage, as the
+docstring promises). For example: "patient:WRONG is not awaiting review in run-…. Awaiting
+review: patient:INT00015". 1 test in `tests/unit/test_api.py`.
+
+**Changed shared files:** none.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:** nothing.
+
+**Next:** S26, S28, S29.
+
+---
+
 ### 2026-10-27 · Arnav · arnav/s31
 
 **Did:** Scan **S31**. `POST /feedback` is idempotent.
