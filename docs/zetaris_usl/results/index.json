@@ -1,0 +1,189 @@
+{
+  "generated_at": "2026-10-27T07:39:39+00:00",
+  "results": [
+    {
+      "id": "1b_apinchs_1",
+      "part": "1b",
+      "source": "ACSQHC APINCHS",
+      "question": "Which high-risk classes are there, and how many ATC prefixes define each?",
+      "row_count": 7,
+      "error": null
+    },
+    {
+      "id": "1b_apinchs_2",
+      "part": "1b",
+      "source": "ACSQHC APINCHS",
+      "question": "Which ATC prefixes put a medicine in APINCHS class I (insulins) or H (heparin and anticoagulants)?",
+      "row_count": 9,
+      "error": null
+    },
+    {
+      "id": "1b_emr_1",
+      "part": "1b",
+      "source": "Hospital EMR",
+      "question": "How many patients and medicine lines does the EMR hold, by record kind?",
+      "row_count": 2,
+      "error": null
+    },
+    {
+      "id": "1b_emr_2",
+      "part": "1b",
+      "source": "Hospital EMR",
+      "question": "Which medicines are charted most often on admission?",
+      "row_count": 10,
+      "error": null
+    },
+    {
+      "id": "1b_emr_3",
+      "part": "1b",
+      "source": "Hospital EMR",
+      "question": "Which chart notes document a medicine as withheld, and how often?",
+      "row_count": 5,
+      "error": null
+    },
+    {
+      "id": "1b_gp_1",
+      "part": "1b",
+      "source": "GP",
+      "question": "How many patients does the GP silo cover, and what status are their medicines in?",
+      "row_count": 2,
+      "error": null
+    },
+    {
+      "id": "1b_gp_2",
+      "part": "1b",
+      "source": "GP",
+      "question": "Which GP directions give no dose a pharmacist could confirm?",
+      "row_count": 3,
+      "error": null
+    },
+    {
+      "id": "1b_gp_3",
+      "part": "1b",
+      "source": "GP",
+      "question": "How old are the GP medication lists (year of last update)?",
+      "row_count": 2,
+      "error": null
+    },
+    {
+      "id": "1b_lexicon_1",
+      "part": "1b",
+      "source": "PBS medicines lexicon",
+      "question": "How many products and generics per ATC anatomical group?",
+      "row_count": 11,
+      "error": null
+    },
+    {
+      "id": "1b_lexicon_2",
+      "part": "1b",
+      "source": "PBS medicines lexicon",
+      "question": "Which generics come in the most strengths (where a dose can go wrong)?",
+      "row_count": 10,
+      "error": null
+    },
+    {
+      "id": "1b_patient_1",
+      "part": "1b",
+      "source": "Patient interview",
+      "question": "How do patients answer 'are you taking this?'",
+      "row_count": 3,
+      "error": null
+    },
+    {
+      "id": "1b_patient_2",
+      "part": "1b",
+      "source": "Patient interview",
+      "question": "Which free-text descriptions do patients use most (no code at all)?",
+      "row_count": 10,
+      "error": null
+    },
+    {
+      "id": "1b_pharmacy_1",
+      "part": "1b",
+      "source": "Community pharmacy",
+      "question": "What are the most-dispensed products?",
+      "row_count": 10,
+      "error": null
+    },
+    {
+      "id": "1b_pharmacy_2",
+      "part": "1b",
+      "source": "Community pharmacy",
+      "question": "How many fills are PBS and how many private (no PBS code)?",
+      "row_count": 2,
+      "error": null
+    },
+    {
+      "id": "1b_pharmacy_3",
+      "part": "1b",
+      "source": "Community pharmacy",
+      "question": "How many patients fill at more than one pharmacy?",
+      "row_count": 1,
+      "error": null
+    },
+    {
+      "id": "1c_dq_fk",
+      "part": "1c",
+      "source": "USL data quality",
+      "question": "Run the foreign-key rule: does every resolved generic exist in medicine?",
+      "row_count": 1,
+      "error": null
+    },
+    {
+      "id": "1c_dq_invalid",
+      "part": "1c",
+      "source": "USL data quality",
+      "question": "Which records fail it?",
+      "row_count": 14,
+      "error": null
+    },
+    {
+      "id": "1c_dq_list",
+      "part": "1c",
+      "source": "USL data quality",
+      "question": "Which data-quality rules does the USL carry?",
+      "row_count": 5,
+      "error": null
+    },
+    {
+      "id": "1c_dq_run",
+      "part": "1c",
+      "source": "USL data quality",
+      "question": "Run the custom rule: is every charted strength a real product?",
+      "row_count": 1,
+      "error": null
+    },
+    {
+      "id": "1c_usl_1",
+      "part": "1c",
+      "source": "USL",
+      "question": "Is the USL active? Every line from four silos, resolved to a medicine, in one table.",
+      "row_count": 5,
+      "error": null
+    },
+    {
+      "id": "1c_usl_2",
+      "part": "1c",
+      "source": "USL",
+      "question": "Which high-risk classes appear in which source? (Without the USL: 4 silos x 3 coding systems + lexicon + APINCHS.)",
+      "row_count": 15,
+      "error": null
+    },
+    {
+      "id": "1c_usl_3",
+      "part": "1c",
+      "source": "USL",
+      "question": "For each strength that is not a real product, what strengths does the medicine come in?",
+      "row_count": 14,
+      "error": null
+    },
+    {
+      "id": "1c_usl_tables",
+      "part": "1c",
+      "source": "USL",
+      "question": "The USL's tables and activation state.",
+      "row_count": 1,
+      "error": null
+    }
+  ]
+}

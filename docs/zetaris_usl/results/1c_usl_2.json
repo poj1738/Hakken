@@ -1,0 +1,80 @@
+{
+  "id": "1c_usl_2",
+  "part": "1c",
+  "source": "USL",
+  "question": "Which high-risk classes appear in which source? (Without the USL: 4 silos x 3 coding systems + lexicon + APINCHS.)",
+  "sql": "SELECT high_risk_class, source_system, COUNT(*) AS lines, COUNT(DISTINCT patient_id) AS patients FROM lightning.metastore.medtrace.medtrace_usl.medication_statement WHERE high_risk_class IS NOT NULL GROUP BY high_risk_class, source_system ORDER BY high_risk_class, source_system",
+  "client": "app/adapters/zetaris.py (read-only)",
+  "executed_at": "2026-10-27T07:36:58+00:00",
+  "latency_ms": 18025,
+  "row_count": 15,
+  "headers": [
+    "high_risk_class",
+    "source_system",
+    "lines",
+    "patients"
+  ],
+  "first_rows": [
+    [
+      "C",
+      "emr",
+      "1",
+      "1"
+    ],
+    [
+      "C",
+      "gp",
+      "1",
+      "1"
+    ],
+    [
+      "C",
+      "pharmacy",
+      "20",
+      "2"
+    ],
+    [
+      "Ext",
+      "emr",
+      "44",
+      "38"
+    ],
+    [
+      "Ext",
+      "gp",
+      "40",
+      "39"
+    ],
+    [
+      "Ext",
+      "pharmacy",
+      "129",
+      "41"
+    ],
+    [
+      "H",
+      "emr",
+      "48",
+      "43"
+    ],
+    [
+      "H",
+      "gp",
+      "46",
+      "46"
+    ],
+    [
+      "H",
+      "pharmacy",
+      "247",
+      "49"
+    ],
+    [
+      "I",
+      "emr",
+      "44",
+      "39"
+    ]
+  ],
+  "error": null
+}

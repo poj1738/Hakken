@@ -1,0 +1,29 @@
+{
+  "id": "1b_gp_1",
+  "part": "1b",
+  "source": "GP",
+  "question": "How many patients does the GP silo cover, and what status are their medicines in?",
+  "sql": "SELECT status_text, COUNT(DISTINCT source_patient_id) AS patients, COUNT(*) AS lines FROM medtrace.GP GROUP BY status_text ORDER BY lines DESC",
+  "client": "app/adapters/zetaris.py (read-only)",
+  "executed_at": "2026-10-27T07:39:26+00:00",
+  "latency_ms": 936,
+  "row_count": 2,
+  "headers": [
+    "status_text",
+    "patients",
+    "lines"
+  ],
+  "first_rows": [
+    [
+      "active",
+      "183",
+      "1364"
+    ],
+    [
+      "ceased",
+      "104",
+      "163"
+    ]
+  ],
+  "error": null
+}

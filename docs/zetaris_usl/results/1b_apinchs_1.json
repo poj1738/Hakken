@@ -1,0 +1,46 @@
+{
+  "id": "1b_apinchs_1",
+  "part": "1b",
+  "source": "ACSQHC APINCHS",
+  "question": "Which high-risk classes are there, and how many ATC prefixes define each?",
+  "sql": "SELECT apinchs_class, COUNT(*) AS atc_prefixes FROM medtrace.APINCHS GROUP BY apinchs_class ORDER BY atc_prefixes DESC",
+  "client": "app/adapters/zetaris.py (read-only)",
+  "executed_at": "2026-10-27T07:39:39+00:00",
+  "latency_ms": 846,
+  "row_count": 7,
+  "headers": [
+    "apinchs_class",
+    "atc_prefixes"
+  ],
+  "first_rows": [
+    [
+      "N",
+      "11"
+    ],
+    [
+      "Ext",
+      "8"
+    ],
+    [
+      "C",
+      "6"
+    ],
+    [
+      "H",
+      "5"
+    ],
+    [
+      "A",
+      "4"
+    ],
+    [
+      "I",
+      "4"
+    ],
+    [
+      "P",
+      "4"
+    ]
+  ],
+  "error": null
+}

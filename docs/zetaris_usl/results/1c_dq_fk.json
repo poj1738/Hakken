@@ -1,0 +1,30 @@
+{
+  "id": "1c_dq_fk",
+  "part": "1c",
+  "source": "USL data quality",
+  "question": "Run the foreign-key rule: does every resolved generic exist in medicine?",
+  "sql": "RUN DQ generic TABLE lightning.metastore.medtrace.medtrace_usl.medication_statement",
+  "client": "scripts/register_sources.py (build-time)",
+  "executed_at": "2026-10-27T07:38:47+00:00",
+  "latency_ms": 35550,
+  "row_count": 1,
+  "headers": [
+    "name",
+    "table",
+    "type",
+    "total_record",
+    "valid_record",
+    "invalid_record"
+  ],
+  "first_rows": [
+    [
+      "generic",
+      "medication_statement",
+      "Foreign Key Constraint",
+      "13856",
+      "12304",
+      "1552"
+    ]
+  ],
+  "error": null
+}

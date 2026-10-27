@@ -1,0 +1,30 @@
+{
+  "id": "1b_gp_2",
+  "part": "1b",
+  "source": "GP",
+  "question": "Which GP directions give no dose a pharmacist could confirm?",
+  "sql": "SELECT freq_text AS directions, COUNT(*) AS lines FROM medtrace.GP WHERE lower(freq_text) LIKE '%as directed%' OR lower(freq_text) LIKE '%per inr%' OR lower(freq_text) LIKE '%variable%' GROUP BY freq_text ORDER BY lines DESC",
+  "client": "app/adapters/zetaris.py (read-only)",
+  "executed_at": "2026-10-27T07:39:27+00:00",
+  "latency_ms": 934,
+  "row_count": 3,
+  "headers": [
+    "directions",
+    "lines"
+  ],
+  "first_rows": [
+    [
+      "as directed",
+      "17"
+    ],
+    [
+      "variable per INR",
+      "8"
+    ],
+    [
+      "as directed per INR",
+      "2"
+    ]
+  ],
+  "error": null
+}

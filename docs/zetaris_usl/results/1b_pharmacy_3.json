@@ -1,0 +1,22 @@
+{
+  "id": "1b_pharmacy_3",
+  "part": "1b",
+  "source": "Community pharmacy",
+  "question": "How many patients fill at more than one pharmacy?",
+  "sql": "SELECT pharmacies, COUNT(*) AS patients FROM (SELECT source_patient_id, COUNT(DISTINCT pharmacy_id) AS pharmacies FROM medtrace.PHARMACY GROUP BY source_patient_id) p GROUP BY pharmacies ORDER BY pharmacies",
+  "client": "app/adapters/zetaris.py (read-only)",
+  "executed_at": "2026-10-27T07:39:34+00:00",
+  "latency_ms": 1770,
+  "row_count": 1,
+  "headers": [
+    "pharmacies",
+    "patients"
+  ],
+  "first_rows": [
+    [
+      "1",
+      "195"
+    ]
+  ],
+  "error": null
+}

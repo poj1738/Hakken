@@ -1,0 +1,29 @@
+{
+  "id": "1b_pharmacy_2",
+  "part": "1b",
+  "source": "Community pharmacy",
+  "question": "How many fills are PBS and how many private (no PBS code)?",
+  "sql": "SELECT script_type, COUNT(*) AS fills, COUNT(DISTINCT source_patient_id) AS patients FROM medtrace.PHARMACY GROUP BY script_type",
+  "client": "app/adapters/zetaris.py (read-only)",
+  "executed_at": "2026-10-27T07:38:13+00:00",
+  "latency_ms": 1347,
+  "row_count": 2,
+  "headers": [
+    "script_type",
+    "fills",
+    "patients"
+  ],
+  "first_rows": [
+    [
+      "PBS",
+      "8895",
+      "195"
+    ],
+    [
+      "private",
+      "321",
+      "48"
+    ]
+  ],
+  "error": null
+}
