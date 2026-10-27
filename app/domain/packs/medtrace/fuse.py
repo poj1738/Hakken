@@ -285,7 +285,9 @@ def _resolve(attribute: str, votes: dict[str, tuple[object, float, str]],
     top_value, top = ranked[0]
     second_value, second = ranked[1] if len(ranked) > 1 else (None, 0.0)
     share = (top - second) / (top + second) if second > 0 else 1.0
-    abstained = second > 0 and share < margin
+    # No weight behind the leader -- every voter distrusted to 0 -- is no answer at all, not a
+    # winner chosen by string order with margin 1.0 (scan S32).
+    abstained = top <= 0 or (second > 0 and share < margin)
 
     winner = None if abstained else top_value
     return FusedValue(

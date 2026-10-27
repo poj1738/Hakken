@@ -52,11 +52,15 @@ def _accepted(links: list[IdentityLink]) -> dict[str, tuple[str, str]]:
             if ":" not in key:
                 continue
             source = key.split(":", 1)[0]
-            if source not in SOURCES or link.band == "new":
+            # The anchor is this patient by definition: always found, whatever band the
+            # link to some other record has (scan S33 -- a review-band link used to make the
+            # anchor's own EMR near_miss_pending, so no omission could be detected).
+            band = "auto-merge" if key == link.anchor_id else link.band
+            if source not in SOURCES or band == "new":
                 continue
             current = best.get(source)
-            if current is None or (current[1] == "review" and link.band == "auto-merge"):
-                best[source] = (key, link.band)
+            if current is None or (current[1] == "review" and band == "auto-merge"):
+                best[source] = (key, band)
     return best
 
 
