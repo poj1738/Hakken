@@ -39,7 +39,7 @@ Scenes 1, 3 and 4 look the same in either mode. **These need live Nightshift**
 | On screen | Sample mode | Live |
 |---|---|---|
 | Sidebar **Model** | "Not yet called" | The Nemotron that answered (`last_routed_model`) |
-| **Powered by** strip, NVIDIA Nemotron stage | "not called · sample mode" | The model id(s) that answered this run, in green |
+| **Powered by** pipeline, Nightshift and Nemotron nodes | Dimmed, "not used · sample mode" | Lit on each model call, showing the model that answered |
 | Processing log, per-step tag | "Offline" | The Nemotron model id per step |
 | Summary and finding explanations | Grounded template text | Written by the Writer (Nemotron), checked by Q3 |
 | Caveat strip | "Sample mode: … no model was called." | Absent unless a step degraded |
@@ -50,23 +50,22 @@ PLAN §8's "Nemotron model ID in the pill" is therefore **live only**. Record sc
 live if you can, or a live run of MRN0000089 plus a cutaway to the sidebar status and the
 **Powered by** strip.
 
-**Layout (26 Oct, `anshu/ui-judges`, design B "Calm Workspace"):** a white sidebar
-holds the patient list, the **This reconciliation** section links (Discrepancies,
-Medication history, Actions, Notices, Source confidence, Processing log, each with
-its count) and the Data source / AI runtime / Model status. The main area shows
-the 3-step flow, the patient header with **Run reconciliation**, the **Overview**
-panel (summary, the **four silos, one view** strip and the **Powered by** strip),
-the **System learned** card when it applies, and one section at a time.
+**Layout (27 Oct, `anshu/ui-cleanup`, design B "Calm Workspace"):**
+- **Sidebar:** stays in view while the page scrolls. It holds **Welcome**, the
+  searchable patient list, the **This reconciliation** section links with counts,
+  and the Data source / AI runtime / Model status.
+- **Main area:** opens on the **Welcome** page.
+- **Once a patient is chosen:** the 3-step flow, the patient header, the live
+  **Powered by** pipeline, the **Overview** (summary and the four-silos strip), the
+  **System learned** card when it applies, and one section at a time.
 
 ---
 
 ## Scene 0 · 0:00–0:30 · The problem
 
-**Screen:** MedTrace with no patient run yet: the 3-step flow ("1 Select patient ·
-2 Run reconciliation · 3 Review discrepancies"), the four source tiles reading "Not
-searched yet" joined into the MedTrace tile, the **Powered by** strip, and the "Why it
-matters" line (claim 1, cited). The badge beside Run reads "Synthetic data · Not for
-clinical use".
+**Screen:** the **Welcome** page: the one-line brief, "The problem" (claim 1, cited),
+How it works, the four sources, what it checks, It learns, Powered by, the suggested
+demo patients, and Limitations.
 **Clicks:** none.
 
 > "In a landmark Canadian study, more than half of older inpatients had at least one
@@ -96,8 +95,11 @@ clinical use".
 6. On **Discrepancies**, the high-alert rows come first, tinted and edged in red. Point
    at **Warfarin · APINCHS · H · Dose cannot be confirmed** and its **Verify first**
    pill. **More** opens the full text and the "Verify before acting" callout.
-7. Point at the **Powered by** strip: Zetaris 3 SQL queries → 4 agents → Meterless
-   engines H-MEM · World Model → Nightshift → Nemotron.
+7. Point at the **Powered by** pipeline. During the run, each agent's node lights in
+   its colour as it works. It ends as Zetaris "3 SQL queries · 354 rows" → Planner ·
+   Executor · Evaluator · Writer with step counts → H-MEM, World Model → Nightshift
+   and Nemotron dimmed ("not used · sample mode"). Click **Executor** to filter the
+   processing log to its steps; click again to clear.
 8. Optional: **Processing log** in the sidebar: one line per step (repeats shown as
    "×3"), each with its agent (Planner, Executor, Evaluator, Writer, each a colour
    plus its name) and the **World Model** / **H-MEM** tags on the steps that used them.

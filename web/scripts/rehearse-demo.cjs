@@ -34,7 +34,8 @@ const note = (scene, s) => notes.push(`[${scene}] ${s}`);
 
   await p.goto(UI); await p.waitForSelector('[data-patient]');
   note('0', `status: ${(await p.locator('.side-status').innerText()).replace(/\n/g, ' | ')}`);
-  note('0', `steps: ${(await p.locator('.steps').innerText()).replace(/\n/g, ' ')}; why: ${(await p.locator('.why-line').innerText()).slice(0, 80)}…`);
+  // The app opens on the Welcome page; choosing a patient switches to the patient view.
+  note('0', `welcome: ${await p.locator('.wl-title').innerText()}; problem: ${(await p.locator('.wl-problem').innerText()).replace(/\n/g, ' ').slice(0, 80)}…`);
   await shot('scene0-landing');
 
   // Scene 1: identity (MRN0000015)
@@ -46,7 +47,7 @@ const note = (scene, s) => notes.push(`[${scene}] ${s}`);
   await settleResumed(p);
   note('1', `after confirm: silos ${(await p.locator('.silo').allInnerTexts()).map((s) => s.replace(/\n/g, ' ')).join(' / ')}`);
   note('1', `hub: ${(await p.locator('.hub').innerText()).replace(/\n/g, ' ')}; findings: ${(await p.locator('.finding-title h3').allInnerTexts()).join(', ')}`);
-  note('1', `powered by: ${(await p.locator('.pipe').innerText()).replace(/\n/g, ' ')}`);
+  note('1', `powered by (used nodes): ${(await p.locator('.pipe2 .pn-used .pn-text').allInnerTexts()).map((t) => t.replace(/\n/g, ' ')).join(' | ')}`);
   note('1', `"Verify first" pills: ${await p.locator('.pill-verify').count()}`);
   await shot('scene1b-confirmed-discrepancies');
   // The Meterless engines show as tags on the processing-log steps.

@@ -27,6 +27,62 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Anshu · anshu/ui-cleanup
+
+**Did:** UI cleanup from my review of the live UI (`web/` only, presentation only):
+- **Sidebar:**
+  - Stays in view while the page scrolls (sticky, full height, scrolls inside).
+  - The patient list has its own scroll area with a bottom fade, so the last name is
+    no longer cut off or run into the sections below.
+  - A search box filters by name or MRN, with a × button and Escape to clear, and
+    "No patients match" when nothing does.
+- **Overview tiles:** a fixed-height title row, so every tile's status line sits at the
+  same height.
+- **Header and footer:**
+  - "MedTrace" alone in the brand and the hub tile; no "Synthetic data" badge up top.
+  - The footer is one line: "Synthetic data. Not medical advice. A pharmacist must
+    confirm every item."
+  - The patient header is larger, with MRN, date of birth, sex and admission date as
+    label/value pairs.
+- **Welcome page:** the default view and the first sidebar item.
+  - Contents: the one-line brief, "The problem" (claim 1, cited), how it works with a
+    "Start with a patient" button, the four sources, what it checks, it learns,
+    Powered by, clickable demo patients and the PLAN §8 Limitations card.
+  - Wording only from README, metadata.json and PITCH_CLAIMS. "Why it matters" moved
+    here from the patient view.
+- **Processing log summaries:** fixed plain-English labels per step, plus counts only
+  from structured fields: the planned actions from `TraceEvent.action`, "N sources
+  found" from coverage, "N records" from `row_count`. The full message stays under
+  "Show details".
+- **Live Powered-by pipeline:**
+  - Zetaris → Planner · Executor · Evaluator · Writer → H-MEM, World Model →
+    Nightshift → Nemotron.
+  - Each node is dimmed until used, filled with a count once used, and pulses on the
+    current step.
+  - Connectors flow while data passes, and the query counter flashes on each new
+    query.
+  - In SAMPLE_MODE, Nightshift and Nemotron stay dimmed ("not used · sample mode").
+  - Click a node to filter the log; click again to clear. Respects reduced motion.
+- **Demo script and rehearsal:** updated for the Welcome landing and the pipeline.
+
+**Changed shared files:** none.
+
+**Broken:** nothing.
+- Build passes; `make test` 835 passed / 2 skipped; secret scan clean; rehearsal clean.
+- Contrast, labels, focus and phone width pass (my Playwright audit). The audit now
+  waits for colour transitions before measuring: mid-fade, the browser reports the
+  raw `color-mix()` and gave false failures.
+
+**Needs from teammates:**
+- **Arnav:** still open from my last two entries:
+  - the per-agent `meterless-app` header;
+  - S41 wording and S42 `relevance`. The Supply section groups by `relevance` as soon
+    as it arrives.
+
+**Next:** demo recording.
+
+---
+
 ### 2026-10-27 · Anshu · anshu/final-day
 
 **Did:** My last open scan items (all `web/`, presentation only):

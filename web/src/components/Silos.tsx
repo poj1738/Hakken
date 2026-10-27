@@ -11,7 +11,7 @@ import { TechDetails } from "./TechDetails";
  * record source with the state the API's `coverage` reports for it; the hub
  * counts what the API returned. Nothing here is decided by the screen.
  */
-const ICON: Record<string, ReactNode> = {
+export const ICON: Record<string, ReactNode> = {
   // Hospital: a building with a cross.
   emr: <path d="M4 21V8l8-4 8 4v13M9 21v-4h6v4M12 8v5M9.5 10.5h5" />,
   // GP: a stethoscope.
@@ -89,9 +89,9 @@ export function Silos({ run, searching }: { run: RunResponse | null; searching: 
               <path d="M3 12h4l3-7 4 14 3-7h4" />
             </svg>
           </span>
-          MedTrace · one view
+          MedTrace
         </div>
-        {result ? (
+        {result && (
           <>
             <div className="hub-stats">
               <span>
@@ -111,8 +111,6 @@ export function Silos({ run, searching }: { run: RunResponse | null; searching: 
               <InfoTip label="About confirmability" text={CLAIM_3} />
             </div>
           </>
-        ) : (
-          <div className="hub-idle">A pre-populated medication history for clinician verification</div>
         )}
       </div>
       {hasCov && (

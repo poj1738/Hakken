@@ -10,7 +10,7 @@ import type {
   TrustAttribute,
 } from "./types";
 import { Brand, SideStatus } from "./components/Header";
-import { PatientHead, PatientList, type PatientsState } from "./components/Picker";
+import { PatientHead, PatientList, fullName, type PatientsState } from "./components/Picker";
 import { Stepper } from "./components/Stepper";
 import { Timeline } from "./components/Timeline";
 import { IdentityReview } from "./components/IdentityReview";
@@ -25,26 +25,13 @@ import { Silos } from "./components/Silos";
 import { Pipeline } from "./components/Pipeline";
 import { LearningHero } from "./components/LearningHero";
 import { SectionNav, type NavItem } from "./components/SectionNav";
-import { InfoTip } from "./components/InfoTip";
+import { Welcome } from "./components/Welcome";
+import type { LogFilter } from "./trace";
+import { sameFilter } from "./trace";
 import { cleanText, medName, targetLabel, typeLabel } from "./format";
 
 type Section = "identity" | "findings" | "meds" | "actions" | "notices" | "supply" | "trust" | "log";
 const PANEL = "section-panel";
-
-// Approved wording and sources from docs/PITCH_CLAIMS.md (claims 1 and 2), verbatim.
-const WHY = "In a landmark Canadian study, more than half of older inpatients had at least one unintended medication discrepancy at admission.";
-const WHY_CITE = "Cornish et al. 2005, Arch Intern Med";
-const WHY_MORE =
-  "Medication-related problems cause about 250,000 hospital admissions in Australia each year, at a cost of $1.4 billion — and about half of that harm is preventable. (PSA, Medicine Safety: Take Care, 2019)";
-
-function WhyItMatters() {
-  return (
-    <p className="why-line">
-      <span className="why-k">Why it matters</span> {WHY} <cite>{WHY_CITE}</cite>
-      <InfoTip label="More evidence" text={WHY_MORE} />
-    </p>
-  );
-}
 
 /** The API's caveats about this result, minus the fixed disclaimer shown in the header and footer. */
 function Caveats({ caveats }: { caveats: string[] }) {
@@ -87,6 +74,10 @@ export default function App() {
   const [identityError, setIdentityError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Record<string, FeedbackState>>({});
   const [section, setSection] = useState<Section>("findings");
+  // Item 9: the Welcome page is the default view until a patient is chosen, and always one click away.
+  const [view, setView] = useState<"welcome" | "patient">("welcome");
+  // Item 11: a click on a Powered-by node filters the processing log.
+  const [logFilter, setLogFilter] = useState<LogFilter | null>(null);
   // Checklist ticks for this screen only; the summary card counts them live.
   const [actionsDone, setActionsDone] = useState<Record<number, boolean>>({});
   // Trust moves accumulate across runs in this session, so patient B shows what patient A taught.
@@ -138,11 +129,13 @@ export default function App() {
     setFeedback({});
     setActionsDone({});
     setSection("findings");
+    setLogFilter(null);
   };
 
   // A result stays on screen only while its patient is selected, so one
   // patient's medicines can never sit under another patient's name.
   const selectPatient = (id: string) => {
+    setView("patient");
     if (id === selected) return;
     pollToken.current++;
     setSelected(id);
@@ -310,6 +303,9 @@ export default function App() {
       </a>
       <aside className="side" aria-label="Workspace">
         <Brand />
+        <button type="button" className={`snav-item side-welcome ${view === "welcome" ? "on" : ""}`} aria-current={view === "welcome" ? "page" : undefined} onClick={() => setView("welcome")}>
+          <span>Welcome</span>
+        </button>
         <PatientList
           patients={patients}
           patientsState={patientsState}
@@ -319,7 +315,7 @@ export default function App() {
           disabled={polling}
           states={seen}
         />
-        {run && (
+        {run && view === "patient" && (
           <div className="side-group">
             <h2 className="side-label">This reconciliation</h2>
             <SectionNav items={nav} current={shownSection} onSelect={choose} panelId={PANEL} />
@@ -335,6 +331,18 @@ export default function App() {
           </div>
         )}
         <main className="wrap">
+          {view === "welcome" ? (
+            <Welcome
+              patients={patients}
+              onPick={selectPatient}
+              onStart={() => {
+                const q = document.getElementById("pt-q");
+                q?.scrollIntoView({ block: "nearest" });
+                q?.focus();
+              }}
+            />
+          ) : (
+            <>
           <Stepper current={step} busy={polling} />
           <PatientHead
             patient={patient}
@@ -350,6 +358,18 @@ export default function App() {
           {hasResult && <BpmhBanner banner={run!.banner} bpmhConfirmable={run!.bpmh_confirmable} />}
           {run?.status === "partial" && <div className="alert alert-medium">Partial result. Read every caveat before relying on it.</div>}
 
+          <Pipeline
+            run={run}
+            health={health}
+            live={polling || review}
+            filter={logFilter}
+            onFilter={(f) => {
+              const off = sameFilter(logFilter, f);
+              setLogFilter(off ? null : f);
+              if (!off && run) choose("log");
+            }}
+          />
+
           <section className="panel overview" aria-labelledby="overview-title">
             <h2 className="h2" id="overview-title">
               Overview
@@ -360,8 +380,6 @@ export default function App() {
               </p>
             )}
             <Silos run={run} searching={polling} />
-            <Pipeline run={run} health={health} />
-            {!run && !polling && <WhyItMatters />}
           </section>
           {hasResult && <LearningHero run={run!} updates={trustUpdates} />}
 
@@ -400,10 +418,19 @@ export default function App() {
                   <h2 className="h2">
                     Reconciling… <span className="spinner spinner-sm" aria-hidden />
                   </h2>
-                  <Timeline run={run} polling={polling} warning={pollWarning} compact />
+                  <Timeline run={run} polling={polling} warning={pollWarning} compact patientName={patient ? fullName(patient) : null} />
                 </div>
               )}
-              {shownSection === "log" && !polling && <Timeline run={run} polling={polling} warning={pollWarning} />}
+              {shownSection === "log" && !polling && (
+                <Timeline
+                  run={run}
+                  polling={polling}
+                  warning={pollWarning}
+                  patientName={patient ? fullName(patient) : null}
+                  filter={logFilter}
+                  onClearFilter={() => setLogFilter(null)}
+                />
+              )}
 
               {shownSection === "log" && !polling && run.status === "error" && (
                 <div className="panel-pad">
@@ -451,6 +478,8 @@ export default function App() {
               {hasResult && shownSection === "supply" && <Supply notices={shortages} />}
               {hasResult && shownSection === "trust" && <TrustPanel trust={run.trust} runId={run.run_id} updates={trustUpdates} acceptance={acceptance} />}
             </div>
+          )}
+            </>
           )}
           <Footer />
         </main>

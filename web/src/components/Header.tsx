@@ -17,10 +17,7 @@ export function Brand() {
           <path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" />
         </svg>
       </div>
-      <div>
-        <div className="brand-name">MedTrace</div>
-        <div className="brand-sub">Medication Reconciliation</div>
-      </div>
+      <div className="brand-name">MedTrace</div>
     </div>
   );
 }

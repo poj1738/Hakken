@@ -48,5 +48,6 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-26 | Anshu | Claude Code (cloud session) | Opus 5.5 | Demo rehearsal: `docs/DEMO_SCRIPT.md` and a Playwright click-path script against the SAMPLE_MODE API; small UI display fixes found while rehearsing |
 | 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | UI judges pass in `web/`: design B layout, four-silos and Powered-by strips, learning card, side-by-side compare, grouped fills, condensed log, accessibility checks with Playwright |
 | 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | Scan S39, S41 and S42 (UI halves) in `web/`: cell cards say what each source says and why, scope-note labels, Supply section; checked with Playwright |
+| 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | UI cleanup in `web/`: Welcome page, sticky searchable sidebar, live Powered-by pipeline, plain-English processing-log summaries; checked with Playwright |
 
 The README's **AI and model usage** section summarises this for judges.
