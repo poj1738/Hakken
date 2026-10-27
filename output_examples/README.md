@@ -18,11 +18,11 @@ detection is deterministic; the model plans and explains.
 
 | Mode | Example | Patient | Status | Findings | Models | Zetaris queries | Seconds |
 |---|---|---|---|---|---|---|---|
-| sample_mode | `example_1` | MRN0000015 | success | dose_unconfirmable insulin aspart; omission insulin aspart; dose_unconfirmable warfarin; omission empagliflozin; duplication aspirin/clopidogrel | offline-heuristic | 3 | 0.07 |
+| sample_mode | `example_1` | MRN0000015 | success | dose_unconfirmable insulin aspart; omission insulin aspart; dose_unconfirmable warfarin; omission empagliflozin; duplication aspirin/clopidogrel | offline-heuristic | 3 | 0.09 |
 | sample_mode | `example_2` | MRN0000089 | success | duplication oxycodone/naloxone; omission gliclazide; frequency oxycodone/naloxone; frequency esomeprazole; stale_listing dapagliflozin | offline-heuristic | 3 | 0.04 |
 | sample_mode | `example_3` | MRN0000013 | success | none | offline-heuristic | 2 | 0.02 |
 | sample_mode | `example_4_learning_teach` | MRN0000003 | success | omission amlodipine | offline-heuristic | 3 | 0.03 |
-| sample_mode | `example_5_learning_learn` | MRN0000007 | success | dose rosuvastatin | offline-heuristic | 3 | 0.02 |
+| sample_mode | `example_5_learning_learn` | MRN0000007 | success | dose rosuvastatin | offline-heuristic | 3 | 0.03 |
 | live | `example_1` | MRN0000015 | success | dose_unconfirmable insulin aspart; omission insulin aspart; dose_unconfirmable warfarin; omission empagliflozin; duplication aspirin/clopidogrel | nvidia/nemotron-3.5-lightning-30b-a3b | 4 | 304.77 |
 | live | `example_2` | MRN0000089 | partial | duplication oxycodone/naloxone; omission gliclazide; frequency oxycodone/naloxone; frequency esomeprazole; stale_listing dapagliflozin | nvidia/nemotron-3.5-lightning-30b-a3b | 4 | 526.58 |
 | live | `example_3` | MRN0000013 | success | none | nvidia/nemotron-3.5-lightning-30b-a3b | 2 | 32.49 |

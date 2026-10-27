@@ -215,7 +215,7 @@ def _notices(cov, fused, stmts, as_of, confirmable, banner) -> list[Notice]:
                                                           "verify the dose.", tasks=[f"Verify the {med.generic} dose"]))
     for source, c in cov.items():
         for note in c.scope_notes:
-            if "updated" in note.casefold() and "month" in note.casefold():
+            if note.startswith(cov_mod.SCOPE_STALE_DOCUMENT):  # the marker, not the wording (scan S41)
                 out.append(Notice(type=NoticeType.STALE_DOCUMENT, source=source, detail=note))
     out.extend(_unidentified(stmts))
     return out

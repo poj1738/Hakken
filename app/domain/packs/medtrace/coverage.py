@@ -33,6 +33,9 @@ STALE_DOCUMENT_DAYS = 365
 SCOPE_DISPENSING_INCOMPLETE = "dispensing incomplete:"
 SCOPE_STALE_DOCUMENT = "stale document:"
 SCOPE_SINGLE_PHARMACY = "single pharmacy:"
+#: Informational (no marker): shown while an identity near-miss waits for the pharmacist.
+_IDENTITY_PENDING_NOTE = ("A possible match for this patient is waiting for you to confirm. "
+                          "Nothing from it is used until you do.")
 
 _ID_FIELD = {"emr": "mrn", "gp": "gp_pid", "pharmacy": "cust_no", "patient": "intake_id"}
 
@@ -108,31 +111,28 @@ def coverage(links: list[IdentityLink], rows: list[SourceRow]) -> dict[str, Cove
             dates = [r.doc_date for r in source_rows if r.doc_date]
             doc_date = max(dates) if dates else None
 
+        # Read by a pharmacist (scan S41): plain words after the machine-readable prefix,
+        # which `evidence_state` and the UI's labels key on and which must not change.
         if source == "pharmacy" and source_rows:
             pharmacies = sorted({r.pharmacy_id for r in source_rows if r.pharmacy_id})
             if len(pharmacies) == 1:
-                notes.append(
-                    f"{SCOPE_SINGLE_PHARMACY} only {pharmacies[0]} is visible; "
-                    f"anything dispensed elsewhere is not in this record"
-                )
+                notes.append(f"{SCOPE_SINGLE_PHARMACY} Only one pharmacy's records found ({pharmacies[0]}). "
+                             "Anything filled at another pharmacy won't show here.")
             elif len(pharmacies) > 1:
-                notes.append(f"{SCOPE_SINGLE_PHARMACY} {len(pharmacies)} pharmacies visible "
-                             f"({', '.join(pharmacies)})")
+                notes.append(f"{SCOPE_SINGLE_PHARMACY} Records from {len(pharmacies)} pharmacies found "
+                             f"({', '.join(pharmacies)}).")
             if any(r.script_type and r.script_type.casefold() == "private" for r in source_rows):
-                notes.append(
-                    f"{SCOPE_DISPENSING_INCOMPLETE} private scripts carry no PBS code, so a "
-                    f"privately dispensed medicine may not be matchable by code"
-                )
+                notes.append(f"{SCOPE_DISPENSING_INCOMPLETE} Some scripts were private (not PBS). Those can be "
+                             "missed or matched less reliably.")
 
         if source == "gp" and doc_date is not None:
             age = (reference - doc_date).days
             if age > STALE_DOCUMENT_DAYS:
-                notes.append(f"{SCOPE_STALE_DOCUMENT} GP list last updated {doc_date.isoformat()}, "
-                             f"about {age // 30} months ago")
+                notes.append(f"{SCOPE_STALE_DOCUMENT} GP list last updated {doc_date.day} {doc_date:%b %Y}, "
+                             f"about {age // 30} months ago. It may be out of date.")
 
         if state == "near_miss_pending":
-            notes.append("a near-miss identity match is awaiting confirmation; "
-                         "nothing from this source counts against a medicine yet")
+            notes.append(_IDENTITY_PENDING_NOTE)
 
         out[source] = Coverage(
             source=source,  # type: ignore[arg-type]

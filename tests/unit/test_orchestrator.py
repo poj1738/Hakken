@@ -434,3 +434,25 @@ def test_a_documented_intentional_finding_carries_its_chart_note(orch) -> None:
     assert f.intent_status == "documented_intentional"
     assert f.intent_reason == "withheld: hypotension" == f.detail["chart_note"]
     assert all(x.intent_reason is None for x in r.findings if x.intent_status != "documented_intentional")
+
+
+def test_scope_notes_are_plain_words_after_a_stable_prefix(orch) -> None:
+    """Scan S41: a pharmacist reads these. The prefix stays (evidence_state and the UI key on it);
+    the words after it are plain, one note per item, never joined with semicolons."""
+    import re
+
+    from app.domain.packs.medtrace import coverage as cov
+
+    prefixes = (cov.SCOPE_SINGLE_PHARMACY, cov.SCOPE_DISPENSING_INCOMPLETE, cov.SCOPE_STALE_DOCUMENT)
+    seen: list[str] = []
+    for mrn in sorted(orch.zetaris.replayable()):
+        r = run(orch, mrn)
+        seen += [n for c in r.coverage.values() for n in c.scope_notes]
+    assert seen
+    for note in seen:
+        assert note == cov._IDENTITY_PENDING_NOTE or note.startswith(prefixes), note
+        assert ";" not in note and "visible" not in note and "PBS code" not in note, note
+        if note.startswith(cov.SCOPE_STALE_DOCUMENT):
+            assert re.search(r"last updated \d{1,2} [A-Z][a-z]{2} \d{4}, about \d+ months ago\. It may be out of "
+                             r"date\.$", note), note
+    assert any(n.startswith(cov.SCOPE_SINGLE_PHARMACY + " Only one pharmacy's records found (") for n in seen)
