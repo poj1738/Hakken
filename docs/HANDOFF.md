@@ -27,6 +27,39 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Arnav · arnav/batch-model-calls
+
+**Did:** Nightshift cuts any call at about 90 s. Even with its highest-quality features off,
+the 5-finding critique was cut at 92 s on every run. So the Writer and the critique are
+now batched:
+- **`MODEL_BATCH = 2`** findings per call (`app/orchestrator.py`).
+  - **Writer:** drafts explanations batch by batch (`with_summary=False`).
+  - **Summary:** its own short call, `writer.summarise`, which sees each finding's
+    headline and statement, not its rows. The S10 summary checks still apply.
+  - **Critique:** batch by batch.
+  - **Revise:** only the flagged findings, in batches.
+  - **Round 2 onwards:** only the revised explanations are re-checked, since the rest
+    already passed and haven't changed.
+- **Each batch is its own `_llm_step`,** so the time guard, failed-call recording (S9)
+  and fallback apply per batch. A failed batch loses only its own explanations, which
+  fall back to the template. The degraded caveat is said once per step name, however many
+  batches fail.
+- **Tests:** 2 in `tests/unit/test_batched_model_calls.py` (mock Nightshift). Example_2's
+  calls split 2/2/1 for drafting and for critique, with one summary call. A batch that
+  gets a 499 twice costs exactly its 2 explanations, the run is `partial`, and the
+  failed call is still listed. `test_summary_verify` now patches `writer.summarise`.
+  `output_examples/sample_mode/` regenerated.
+
+**Changed shared files:** none.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:** nothing. Live `output_examples/` re-record follows.
+
+**Next:** re-record `output_examples/live/` on this code.
+
+---
+
 ### 2026-10-27 · Arnav · arnav/s42
 
 **Did:** Scan **S42**, my half (Anshu's Supply section was already on main).

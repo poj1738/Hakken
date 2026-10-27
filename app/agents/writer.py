@@ -81,16 +81,46 @@ def _offline_summary(findings: list[Finding], anchor: SourceRow, banner: str | N
     return head + "." + (f" {banner}" if banner else "")
 
 
+class Summary(BaseModel):
+    summary: str = Field(min_length=1, max_length=1200)
+
+
+def summarise(ctx: AgentContext, findings: list[Finding], anchor: SourceRow, banner: str | None) -> str:
+    """The patient summary, in its own short call (27 Oct: Nightshift cuts any call at ~90 s, so
+    the explanations are drafted in small batches and the summary no longer rides on one).
+
+    It sees each finding's headline -- type, medicine, severity, whether a pharmacist must
+    review it, its one-line statement -- not the rows: a summary restates findings, it does
+    not re-derive them. The orchestrator then checks it like any other model text.
+    """
+    ctx.check_time()
+    if not findings:
+        return _offline_summary(findings, anchor, banner)
+    brief = [{"id": f.id, "type": f.type.value, "generic": f.generic, "severity": f.severity,
+              "needs_pharmacist": f.needs_pharmacist, "statement": f.detail.get("statement")} for f in findings]
+    messages = [{"role": "user", "content": (
+        "Write a 2-3 sentence summary a hospital pharmacist reads first, for the findings below. Synthetic "
+        "data; drafts a pharmacist must confirm. Lead with what needs a pharmacist first. Use only numbers in "
+        "the findings. Never instruct anyone to stop or start a medicine; say what to confirm."
+        + (f" Mention this coverage caveat: {banner}" if banner else "") + "\n" + json.dumps(brief, default=str))}]
+    result, calls = ctx.llm.chat_json("Writer", messages, Summary, max_tokens=4096,
+                                      offline=lambda: Summary(summary=_offline_summary(findings, anchor, banner)))
+    ctx.record("Writer", "summarise", "DRAFT", calls, f"Summarised {len(findings)} findings.")
+    return result.summary
+
+
 def draft(ctx: AgentContext, findings: list[Finding], anchor: SourceRow, banner: str | None, *,
-          problems: dict[str, list[str]] | None = None) -> tuple[dict[str, str], str | None]:
+          problems: dict[str, list[str]] | None = None, with_summary: bool = True) -> tuple[dict[str, str], str | None]:
     """Returns (id -> explanation, summary). On a revision round only the flagged ids are rewritten
-    and the summary is None (kept from the first round)."""
+    and the summary is None (kept from the first round). The orchestrator calls this one small
+    batch at a time with `with_summary=False`, and writes the summary with `summarise`."""
     ctx.check_time()
     targets = [f for f in findings if problems is None or f.id in problems]
     if not targets:
         # A zero-finding run still gets a headline (scan S12); a revision keeps the first one.
-        return {}, (None if problems is not None else _offline_summary(findings, anchor, banner))
+        return {}, (_offline_summary(findings, anchor, banner) if problems is None and with_summary else None)
     revising = problems is not None
+    with_summary = with_summary and not revising
     instructions = (
         "Write the explanation a hospital pharmacist sees for each finding below. Synthetic data; these are "
         "drafts a pharmacist must confirm.\nRules: 1-2 sentences each. Cite the supporting row ids in "
@@ -100,7 +130,7 @@ def draft(ctx: AgentContext, findings: list[Finding], anchor: SourceRow, banner:
     )
     if revising:
         instructions += "\nYour previous explanations had these problems; fix them:\n" + json.dumps(problems)
-    else:
+    elif with_summary:
         instructions += ("\nAlso write a 2-3 sentence summary for the whole patient, leading with what needs a "
                          "pharmacist first." + (f" Mention this coverage caveat: {banner}" if banner else ""))
     messages = [{"role": "user", "content": instructions + "\n" + json.dumps([_brief(f) for f in targets],
@@ -110,9 +140,9 @@ def draft(ctx: AgentContext, findings: list[Finding], anchor: SourceRow, banner:
         # exhausted 8k came back as `<model>_empty_response` (trace, 25 Oct).
         "Writer", messages, Draft, max_tokens=16384,
         offline=lambda: Draft(explanations=[Explanation(id=f.id, text=template(f)) for f in targets],
-                              summary="" if revising else _offline_summary(findings, anchor, banner)))
+                              summary=_offline_summary(findings, anchor, banner) if with_summary else ""))
     ids = {f.id for f in targets}
     texts = {e.id: e.text for e in result.explanations if e.id in ids}
     ctx.record("Writer", "revise" if revising else "draft", "DRAFT", calls,
                f"{'Revised' if revising else 'Drafted'} explanations for {len(texts)} of {len(targets)} findings.")
-    return texts, (None if revising else (result.summary or _offline_summary(findings, anchor, banner)))
+    return texts, ((result.summary or _offline_summary(findings, anchor, banner)) if with_summary else None)
