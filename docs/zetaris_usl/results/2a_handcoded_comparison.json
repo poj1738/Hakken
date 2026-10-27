@@ -1,0 +1,127 @@
+{
+  "id": "2a_handcoded_comparison",
+  "executed_at": "2026-10-27T07:55:43+00:00",
+  "question": "Lines and distinct patient IDs per APINCHS high-risk class and source",
+  "usl": {
+    "sql": "SELECT high_risk_class, source_system, COUNT(*) AS lines, COUNT(DISTINCT patient_id) AS patients FROM lightning.metastore.medtrace.medtrace_usl.medication_statement WHERE high_risk_class IS NOT NULL GROUP BY high_risk_class, source_system ORDER BY high_risk_class, source_system",
+    "query_lines": 1,
+    "runtime_s": 19.11,
+    "zetaris_ms": 19107,
+    "rows": 15,
+    "one_time_activation_sql_lines": 43
+  },
+  "hand_coded": {
+    "lines_of_code": 51,
+    "manual_mapping_steps": 11,
+    "runtime_s": 0.34,
+    "rows": 15,
+    "mapping_steps": [
+      "Know each silo's endpoint and envelope ({'records': [...]}) -- 6 sources",
+      "Map each silo's patient-ID field: emr.mrn, gp.gp_pid, pharmacy.cust_no, patient.intake_id",
+      "Map each silo's medicine-code field: emr.amt_mp_code, gp.amt_code, pharmacy.pbs_code",
+      "Know EMR codes are AMT medicinal products (lexicon.amt_mp)",
+      "Know GP codes are AMT medicinal product PACKS (lexicon.amt_mpp), not amt_mp",
+      "Know pharmacy codes are PBS item codes (lexicon.pbs_code), and that pbs_code is not unique",
+      "Know private scripts carry no PBS code and must resolve by brand, case-insensitively",
+      "Know patient interview lines carry no code and cannot be resolved by code",
+      "Build one lookup per coding system from the lexicon",
+      "Match ATC to APINCHS by the LONGEST matching prefix",
+      "Aggregate lines and distinct patient IDs per (class, source)"
+    ],
+    "implementation": "Python stdlib (no pandas)"
+  },
+  "results_match_exactly": true,
+  "differences": [],
+  "rows": [
+    {
+      "high_risk_class": "C",
+      "source": "emr",
+      "lines": 1,
+      "patients": 1
+    },
+    {
+      "high_risk_class": "C",
+      "source": "gp",
+      "lines": 1,
+      "patients": 1
+    },
+    {
+      "high_risk_class": "C",
+      "source": "pharmacy",
+      "lines": 20,
+      "patients": 2
+    },
+    {
+      "high_risk_class": "Ext",
+      "source": "emr",
+      "lines": 44,
+      "patients": 38
+    },
+    {
+      "high_risk_class": "Ext",
+      "source": "gp",
+      "lines": 40,
+      "patients": 39
+    },
+    {
+      "high_risk_class": "Ext",
+      "source": "pharmacy",
+      "lines": 129,
+      "patients": 41
+    },
+    {
+      "high_risk_class": "H",
+      "source": "emr",
+      "lines": 48,
+      "patients": 43
+    },
+    {
+      "high_risk_class": "H",
+      "source": "gp",
+      "lines": 46,
+      "patients": 46
+    },
+    {
+      "high_risk_class": "H",
+      "source": "pharmacy",
+      "lines": 247,
+      "patients": 49
+    },
+    {
+      "high_risk_class": "I",
+      "source": "emr",
+      "lines": 44,
+      "patients": 39
+    },
+    {
+      "high_risk_class": "I",
+      "source": "gp",
+      "lines": 47,
+      "patients": 41
+    },
+    {
+      "high_risk_class": "I",
+      "source": "pharmacy",
+      "lines": 440,
+      "patients": 43
+    },
+    {
+      "high_risk_class": "N",
+      "source": "emr",
+      "lines": 68,
+      "patients": 56
+    },
+    {
+      "high_risk_class": "N",
+      "source": "gp",
+      "lines": 73,
+      "patients": 64
+    },
+    {
+      "high_risk_class": "N",
+      "source": "pharmacy",
+      "lines": 603,
+      "patients": 53
+    }
+  ]
+}
