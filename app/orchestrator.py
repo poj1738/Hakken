@@ -53,7 +53,14 @@ from app.tracing import LOG_DIR, Tracer
 DISCLAIMER = "Synthetic data. Not medical advice. A pharmacist must confirm every item."
 #: model step action -> the state-machine step its trace events belong to
 _STEP_OF = {"plan": "PLAN", "resolve_free_text": "RESOLVE_FREE_TEXT", "draft": "DRAFT", "revise": "DRAFT",
-            "critique": "CRITIQUE"}
+            "summarise": "DRAFT", "critique": "CRITIQUE"}
+#: Findings per Writer or critique call. Nightshift cuts any call at ~90 s (live, 27 Oct: the
+#: critique of five findings was cut at 92 s every run), so each call carries one or two.
+MODEL_BATCH = 2
+
+
+def _batches(items: list, size: int = MODEL_BATCH) -> list[list]:
+    return [items[i:i + size] for i in range(0, len(items), size)]
 ROLES = {"Planner": "plan the investigation", "Executor": "fetch, link, normalise, resolve free text",
          "Evaluator": "fuse, detect, gate, verify, critique", "Writer": "explain and summarise"}
 
@@ -293,8 +300,10 @@ class Orchestrator:
             if self.settings.sample_mode:
                 raise
             state.degraded = True
-            state.caveats.append(f"Nightshift unavailable for {name} ({exc.kind}); that step used the grounded "
-                                 "template and is labelled offline-heuristic.")
+            caveat = (f"Nightshift unavailable for {name} ({exc.kind}); the affected items used the grounded "
+                      "template and are labelled offline-heuristic.")
+            if caveat not in state.caveats:  # batched steps can fail more than once
+                state.caveats.append(caveat)
             agent, action = name.split()
             # Every request the failure spent is a model call: in model_calls and the trace, with
             # the model that answered where there was one (scan S9, CLAUDE.md rule 3).
@@ -388,13 +397,19 @@ class Orchestrator:
                     for f in analysis.findings]
         state.analysis, state.findings = analysis, findings
 
-        def offline_draft():
-            return ({f.id: writer.template(f) for f in findings},
-                    writer._offline_summary(findings, state.anchor, analysis.banner))
-        texts, summary = self._llm_step(state, "writer draft",
-                                        lambda: writer.draft(ctx, findings, state.anchor, analysis.banner),
-                                        offline_draft)
+        # Small batches, each its own model call (27 Oct: Nightshift cuts any call at ~90 s). A
+        # batch that fails loses only its own explanations, which fall back to the template.
+        texts: dict[str, str] = {}
+        for batch in _batches(findings):
+            drafted, _ = self._llm_step(
+                state, "writer draft",
+                lambda b=batch: writer.draft(ctx, b, state.anchor, analysis.banner, with_summary=False),
+                lambda b=batch: ({f.id: writer.template(f) for f in b}, None))
+            texts.update(drafted)
         findings = [f.model_copy(update={"explanation": texts.get(f.id) or writer.template(f)}) for f in findings]
+        summary = self._llm_step(state, "writer summarise",
+                                 lambda: writer.summarise(ctx, findings, state.anchor, analysis.banner),
+                                 lambda: writer._offline_summary(findings, state.anchor, analysis.banner))
         summary = self._checked_summary(state, summary, findings, analysis.banner)
         state.findings, state.summary = findings, summary
 
@@ -405,9 +420,13 @@ class Orchestrator:
             summary = state.summary = self._checked_summary(state, summary, findings, analysis.banner)
 
         rounds = max(1, self.settings.max_agent_iterations)
+        to_check = findings  # round 1 reads every explanation; later rounds only the revised ones
         for round_no in range(1, rounds + 1):
-            problems = self._llm_step(state, "evaluator critique", lambda: evaluator.critique(ctx, findings),
-                                      lambda: {f.id: p for f in findings if (p := evaluator.claim_problems(f))})
+            problems: dict[str, list[str]] = {}
+            for batch in _batches(to_check):
+                problems.update(self._llm_step(
+                    state, "evaluator critique", lambda b=batch: evaluator.critique(ctx, b),
+                    lambda b=batch: {f.id: p for f in b if (p := evaluator.claim_problems(f))}))
             if not problems:
                 break
             if round_no == rounds:
@@ -424,12 +443,16 @@ class Orchestrator:
                 break
             ctx.tracer.emit("Evaluator", "critique", step="CRITIQUE",
                             message=f"Round {round_no}: sending {len(problems)} explanation(s) back to the Writer.")
-            revised, _ = self._llm_step(state, "writer revise",
-                                        lambda: writer.draft(ctx, findings, state.anchor, analysis.banner,
-                                                             problems=problems),
-                                        lambda: ({fid: writer.template(f) for f in findings
-                                                  if (fid := f.id) in problems}, None))
+            revised: dict[str, str] = {}
+            for batch in _batches([f for f in findings if f.id in problems]):
+                fixed, _ = self._llm_step(
+                    state, "writer revise",
+                    lambda b=batch: writer.draft(ctx, b, state.anchor, analysis.banner,
+                                                 problems={f.id: problems[f.id] for f in b}),
+                    lambda b=batch: ({f.id: writer.template(f) for f in b}, None))
+                revised.update(fixed)
             findings = [f.model_copy(update={"explanation": revised.get(f.id, f.explanation)}) for f in findings]
+            to_check = [f for f in findings if f.id in problems]
             state.findings = findings
 
         state.findings = findings

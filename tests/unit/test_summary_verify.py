@@ -79,13 +79,8 @@ def test_the_summary_checks(p0089) -> None:
 
 
 def test_a_bad_summary_is_replaced_and_traced(orch, monkeypatch) -> None:
-    real = writer.draft
-
-    def draft(ctx, findings, anchor, banner, *, problems=None):
-        texts, summary = real(ctx, findings, anchor, banner, problems=problems)
-        return texts, (None if problems else "Stop oxycodone/naloxone now (GP-999999); 987 mg.")
-
-    monkeypatch.setattr(writer, "draft", draft)
+    monkeypatch.setattr(writer, "summarise",
+                        lambda *_a, **_kw: "Stop oxycodone/naloxone now (GP-999999); 987 mg.")
     r = orch.start(RunRequest(patient_id="MRN0000089"))
     assert "Stop" not in r.output.summary and r.output.summary.startswith("5 finding(s)")
     blocked = [e for e in r.trace if e.status == "blocked" and "summary" in e.message]
