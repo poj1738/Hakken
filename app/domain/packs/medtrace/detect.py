@@ -93,6 +93,9 @@ TASKS: dict[DiscrepancyType, str] = {
     DiscrepancyType.DOSE_UNCONFIRMABLE: "Confirm the current {g} dose",
 }
 
+#: How firmly a line was tied to its medicine, weakest last (types.Resolution).
+_RESOLUTION_RANK = {"code": 0, "lexicon": 1, "fuzzy": 2, "llm": 3, "unmapped": 4}
+
 
 def detect_discrepancies(
     fused: list[FusedMed],
@@ -176,6 +179,7 @@ def detect_discrepancies(
                 if chart_date is None or s.doc_date == chart_date]
 
     found: list[DiscrepancyCandidate] = []
+    resolution_of = {s.row_id: s.resolution for s in stmts}
 
     def emit(kind: DiscrepancyType, med: FusedMed, sources: list[str], rows: list[str],
              detail: dict, intent: str = "likely_unintentional",
@@ -214,6 +218,13 @@ def detect_discrepancies(
             note = next((c.note_text for c in chart_rows(med.generic) if c.note_text), None)
             if note:
                 detail["chart_note"] = note
+        # The weakest way any cited line was tied to this medicine (scan S20). safety_gate reads
+        # it: a finding that rests on a model's pick from free text ("a little white one") or an
+        # unmapped line needs a pharmacist's tick. Before this the key was never set.
+        weakest = max((resolution_of[r] for r in rows if r in resolution_of),
+                      key=lambda res: _RESOLUTION_RANK.get(res, 0), default=None)
+        if weakest is not None:
+            detail["resolution"] = weakest
         found.append(DiscrepancyCandidate(
             id=f"{kind.value}:{med.generic}", type=kind, generic=med.generic,
             sources_involved=sorted(dict.fromkeys(sources)), row_ids=rows, detail=detail,
@@ -335,6 +346,12 @@ def detect_discrepancies(
                  {"last_dispensed": last.doc_date.isoformat() if last.doc_date else None})
 
     found.extend(_duplications(fused, by_source, chart_rows, as_of, lex, emit_into=[]))
+    for cand in found:  # duplications are built outside emit(): same weakest-resolution rule (S20)
+        if "resolution" not in cand.detail:
+            weakest = max((resolution_of[r] for r in cand.row_ids if r in resolution_of),
+                          key=lambda res: _RESOLUTION_RANK.get(res, 0), default=None)
+            if weakest is not None:
+                cand.detail["resolution"] = weakest
     return _dedupe(found)
 
 

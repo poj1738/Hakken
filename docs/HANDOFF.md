@@ -27,6 +27,40 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Arnav · arnav/s20-s32-s33
+
+**Did:** Arpon's last three scan items, in the domain pack (under TODO_ARNAV §5).
+- **S20: the safety gate's "resolved by llm/unmapped" rule now fires.** `detect` sets
+  `detail["resolution"]` to the weakest resolution among a finding's cited lines (code <
+  lexicon < fuzzy < llm < unmapped). That includes duplications, which are built outside
+  `emit()`. Before this nothing set the key, so a finding resting on a model's pick from
+  free text came out `allow` with no pharmacist tick. The scan's optional ranking discount
+  in `prioritise` is not done, because it would change the scored ranking.
+- **S32: zero-weight fusion abstains.** When every voter, or a sole voter, is at trust 0,
+  `_resolve` abstains (value None) instead of picking a winner by string order with
+  margin 1.0.
+- **S33: the anchor is always found.** In `_accepted`, the anchor's own record counts as
+  auto-merge whatever band the link to another record has. A review-band link no longer
+  makes the patient's own EMR `near_miss_pending`.
+- **Guardrail, `scripts/eval.py --split tune`:**
+  - before: `ALL 145 17 5 precision 0.90 recall 0.97 F1 0.93`
+  - after: `ALL 145 17 5 precision 0.90 recall 0.97 F1 0.93`
+  - High-risk 34/34, 0 false merges. Held-out not touched; no floor changed. New
+    helpers are private.
+- 7 tests in `tests/unit/test_scan_domain_fixes.py`. `output_examples/sample_mode/`
+  regenerated, because findings now carry `resolution`. `make validate`: 24 passed.
+
+**Changed shared files:** none on the list. `detect.py`, `fuse.py` and `coverage.py` are
+Arpon's pack, mine under §5.
+
+**Broken:** nothing. 866 unit tests pass.
+
+**Needs from teammates:** nothing.
+
+**Next:** every scan item assigned to Arnav or handed to him is now closed.
+
+---
+
 ### 2026-10-27 · Arnav · arnav/validate
 
 **Did:** **`make validate` works and passes**: 24 passed, 0 failed, 0 skipped.
