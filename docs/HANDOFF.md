@@ -27,6 +27,20 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Anshu · anshu/pipeline-hover
+
+**Did:** Powered-by pipeline nodes now light up on hover and keyboard focus, each in its
+own agent colour (solid border, tint, soft glow, 1 px lift). Before this, a hovered
+node showed only its tooltip. Nodes not used in this mode (Nightshift and Nemotron in
+SAMPLE_MODE) stay dimmed but still show their tooltip. With reduced motion there is no
+lift. Checked with Playwright: every used node glows on hover. `web/src/styles.css` only.
+**Changed shared files:** none.
+**Broken:** nothing.
+**Needs from teammates:** nothing.
+**Next:** demo recording.
+
+---
+
 ### 2026-10-27 · Anshu · anshu/ui-cleanup (round 2: app shell, balance, copy, sponsors)
 
 **Did:** second pass on the same branch, `web/` only, presentation only:
