@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { PatientSummary } from "../types";
 import { API_MODE, MOCK_RUN_PATIENTS } from "../api";
 import { fmtDate } from "../format";
@@ -31,8 +32,28 @@ export function PatientList({
   disabled: boolean;
   states: Record<string, string>;
 }) {
+  const [q, setQ] = useState("");
+  const [atEnd, setAtEnd] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+  // Filter by name or MRN as typed ("walker", "0000015", "MRN15" all work); case and spaces ignored.
+  const shown = useMemo(() => {
+    const t = q.trim().toLowerCase();
+    if (!t) return patients;
+    const digits = t.replace(/^mrn\s*/, "").replace(/\s+/g, "");
+    return patients.filter((p) => fullName(p).toLowerCase().includes(t) || p.patient_id.toLowerCase().includes(t) || (/^\d+$/.test(digits) && p.patient_id.includes(digits)));
+  }, [patients, q]);
+  const list = useRef<HTMLUListElement>(null);
+  // The bottom fade shows only while there is more list below; recheck when the filter changes.
+  useEffect(() => {
+    const el = list.current;
+    if (el) setAtEnd(el.scrollTop + el.clientHeight >= el.scrollHeight - 4);
+  }, [shown]);
+  const clear = () => {
+    setQ("");
+    input.current?.focus();
+  };
   return (
-    <div className="side-group">
+    <div className="side-group pt-group">
       <h2 className="side-label" id="patients-label">
         Admitted patients{patientsState.kind === "ready" && patients.length > 0 && <span className="side-label-n"> · {patients.length}</span>}
       </h2>
@@ -43,7 +64,7 @@ export function PatientList({
       )}
       {patientsState.kind === "error" && (
         <div className="friendly-err" role="alert">
-          <span>The patient list didn't load. Check that the MedTrace API is running.</span>
+          <span>Patients didn't load. Is the API running?</span>
           <button type="button" className="btn btn-line btn-sm" onClick={onRetry}>
             Try again
           </button>
@@ -51,30 +72,75 @@ export function PatientList({
         </div>
       )}
       {patientsState.kind === "ready" && !patients.length && <p className="side-note">No admitted patients.</p>}
-      <ul className="pt-list" aria-labelledby="patients-label">
-        {patients.map((p) => {
-          // Mock mode only has example runs for two patients; say so before Run, not after.
-          const state = states[p.patient_id] ?? (API_MODE === "mock" && MOCK_RUN_PATIENTS.includes(p.patient_id) ? "Example run" : "Not yet run");
-          return (
-            <li key={p.patient_id}>
-              <button
-                type="button"
-                className={`pt-item ${p.patient_id === selected ? "on" : ""}`}
-                data-patient={p.patient_id}
-                aria-current={p.patient_id === selected ? "true" : undefined}
-                disabled={disabled && p.patient_id !== selected}
-                onClick={() => onSelect(p.patient_id)}
-                title={p.patient_id}
-              >
-                <span className="pt-item-name">{fullName(p)}</span>
-                <span className="pt-item-sub">
-                  MRN {mrn(p.patient_id)} · {state}
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      {patients.length > 0 && (
+        <div className="pt-search">
+          <label htmlFor="pt-q" className="sr-only">
+            Search patients by name or MRN
+          </label>
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden className="pt-search-ico">
+            <circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" strokeWidth="1.6" />
+            <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+          <input
+            id="pt-q"
+            ref={input}
+            type="search"
+            placeholder="Search name or MRN"
+            autoComplete="off"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e) => e.key === "Escape" && q && (e.preventDefault(), clear())}
+            aria-controls="pt-list"
+          />
+          {q && (
+            <button type="button" className="pt-clear" onClick={clear} aria-label="Clear search">
+              ×
+            </button>
+          )}
+        </div>
+      )}
+      {q && (
+        <p className="sr-only" role="status">
+          {shown.length ? `${shown.length} ${shown.length === 1 ? "patient" : "patients"} match` : "No patients match"}
+        </p>
+      )}
+      {/* Its own scroll area, so a long list (200 patients live) never runs into the sections below. */}
+      <div className={`pt-scroll ${atEnd ? "at-end" : ""}`}>
+        <ul
+          id="pt-list"
+          className="pt-list"
+          aria-labelledby="patients-label"
+          onScroll={(e) => {
+            const el = e.currentTarget;
+            setAtEnd(el.scrollTop + el.clientHeight >= el.scrollHeight - 4);
+          }}
+          ref={list}
+        >
+          {shown.map((p) => {
+            // Mock mode only has example runs for two patients; say so before Run, not after.
+            const state = states[p.patient_id] ?? (API_MODE === "mock" && MOCK_RUN_PATIENTS.includes(p.patient_id) ? "Example run" : "Not yet run");
+            return (
+              <li key={p.patient_id}>
+                <button
+                  type="button"
+                  className={`pt-item ${p.patient_id === selected ? "on" : ""}`}
+                  data-patient={p.patient_id}
+                  aria-current={p.patient_id === selected ? "true" : undefined}
+                  disabled={disabled && p.patient_id !== selected}
+                  onClick={() => onSelect(p.patient_id)}
+                  title={p.patient_id}
+                >
+                  <span className="pt-item-name">{fullName(p)}</span>
+                  <span className="pt-item-sub">
+                    MRN {mrn(p.patient_id)} · {state}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+          {q && !shown.length && <li className="pt-none">No patients match</li>}
+        </ul>
+      </div>
     </div>
   );
 }
@@ -107,10 +173,24 @@ export function PatientHead({
           {status && <span className={`tag ${status.tone}`}>{status.label}</span>}
         </div>
         {patient && (
-          <div className="pt-facts" title={patient.patient_id}>
-            MRN {mrn(patient.patient_id)} · Born {fmtDate(patient.dob)} · {patient.sex ? SEX[patient.sex] ?? patient.sex : "Sex not recorded"} · Admitted{" "}
-            {fmtDate(patient.admission_date)}
-          </div>
+          <dl className="pt-facts">
+            <div>
+              <dt>MRN</dt>
+              <dd title={patient.patient_id}>{mrn(patient.patient_id)}</dd>
+            </div>
+            <div>
+              <dt>Date of birth</dt>
+              <dd>{fmtDate(patient.dob)}</dd>
+            </div>
+            <div>
+              <dt>Sex</dt>
+              <dd>{patient.sex ? SEX[patient.sex] ?? patient.sex : "Not recorded"}</dd>
+            </div>
+            <div>
+              <dt>Admitted</dt>
+              <dd>{fmtDate(patient.admission_date)}</dd>
+            </div>
+          </dl>
         )}
         {error && (
           <div className="friendly-err" role="alert">
@@ -128,9 +208,6 @@ export function PatientHead({
             Example data
           </span>
         )}
-        <span className="badge" title="A pharmacist must confirm every item.">
-          Synthetic data · Not for clinical use
-        </span>
         <button className="btn btn-primary run-btn" type="button" onClick={onRun} disabled={running || !canRun}>
           {running ? "Reconciling…" : "Run reconciliation"}
         </button>

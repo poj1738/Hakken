@@ -3,6 +3,7 @@ import type { RunResponse, TraceEvent } from "../types";
 import { OFFLINE_MODEL, cleanText, engineLabel, fmtTime, humanize, plural } from "../format";
 import { TechDetails } from "./TechDetails";
 import { AgentTag } from "./Agent";
+import { type LogFilter, matches, routedModel } from "../trace";
 
 // Step names from the orchestrator, as a reader would say them.
 const STEP_LABEL: Record<string, string> = {
@@ -36,13 +37,6 @@ function footModels(calls: RunResponse["model_calls"]): string {
 
 const stepLabel = (e: TraceEvent) => STEP_LABEL[e.step ?? ""] ?? humanize(e.step ?? e.action);
 
-// The model that answered: the Meterless receipt's routed_model when the event
-// carries one, else `model`, which the API fills with the model that answered.
-function routedModel(e: TraceEvent): string | null {
-  const m = e.meterless?.["routed_model"];
-  return typeof m === "string" ? m : e.model ?? null;
-}
-
 /** One step's tags: the Meterless engine it used, and the model that answered it, both from the trace. */
 function StepTags({ e }: { e: TraceEvent }) {
   const m = routedModel(e);
@@ -67,13 +61,56 @@ function StepTags({ e }: { e: TraceEvent }) {
   );
 }
 
-/** A one-line summary of a step's message: its first sentence, cut at a word to about 80 characters. */
-function short(raw: string): string {
-  const t = cleanText(raw);
-  const first = t.match(/^.+?[.!?](\s|$)/)?.[0].trim() ?? t;
-  if (first.length <= 80) return first;
-  const cut = first.slice(0, 80);
-  return `${cut.slice(0, cut.lastIndexOf(" ") > 50 ? cut.lastIndexOf(" ") : 80).replace(/[,;:]$/, "")}…`;
+/**
+ * Item 10: each step's one-line summary is a fixed plain-English label, plus a
+ * count only where the API gives it as a structured field (row_count, coverage).
+ * The free-text message is never parsed or cut; it stays under "Show details".
+ */
+const SUMMARY: Record<string, string> = {
+  FIND_IDENTITY: "Matched the patient across sources",
+  NEEDS_REVIEW: "Paused for an identity check",
+  FETCH_MEDS: "Gathered medicine records",
+  NORMALISE: "Standardised medicine names",
+  RESOLVE_FREE_TEXT: "Interpreted free-text entries",
+  FUSE: "Compared sources",
+  DETECT: "Checked for discrepancies",
+  PRIORITISE: "Ranked findings by risk",
+  CHECK_SHORTAGES: "Checked known shortages",
+  DRAFT: "Prepared the report",
+  VERIFY: "Verified findings against source records",
+  CRITIQUE: "Checked the wording against the evidence",
+  DONE: "Report ready",
+  PARTIAL: "Stopped early with a partial result",
+  ERROR: "Stopped with an error",
+};
+/** The executor's actions (TraceEvent.action), as the plan's step labels. */
+const ACTION_LABEL: [string, string][] = [
+  ["find_identities", "Find identities"],
+  ["fetch_meds", "Gather medicines"],
+  ["resolve_free_text", "Resolve free text"],
+  ["check_shortages", "Check shortages"],
+  ["verify", "Verify"],
+];
+
+export interface SummaryCtx {
+  trace: TraceEvent[];
+  patientName?: string | null;
+  sourcesFound?: number | null;
+}
+
+function summarize(g: TraceEvent[], ctx: SummaryCtx): string {
+  const step = g[g.length - 1].step ?? "";
+  if (step === "START") return ctx.patientName ? `Started reconciliation for ${ctx.patientName}` : "Started reconciliation";
+  if (step === "PLAN") {
+    const acts = new Set(ctx.trace.map((e) => e.action));
+    const labels = ACTION_LABEL.filter(([a]) => acts.has(a)).map(([, l]) => l);
+    return labels.length ? labels.join(" · ") : "Planned the reconciliation steps";
+  }
+  const base = SUMMARY[step] ?? humanize(step || g[0].action);
+  if (step === "FIND_IDENTITY" && ctx.sourcesFound) return `${base} · ${ctx.sourcesFound} sources found`;
+  const rows = g.filter((e) => e.row_count !== null && e.row_count !== undefined).reduce((n, e) => n + (e.row_count ?? 0), 0);
+  if (step === "FETCH_MEDS" && rows) return `${base} · ${rows} records`;
+  return base;
 }
 
 const raw = (e: TraceEvent) => e.message ?? e.output_summary ?? e.action;
@@ -89,12 +126,13 @@ function groupSteps(trace: TraceEvent[]): TraceEvent[][] {
   return out;
 }
 
-function StepLine({ g }: { g: TraceEvent[] }) {
+function StepLine({ g, ctx }: { g: TraceEvent[]; ctx: SummaryCtx }) {
   const [open, setOpen] = useState(false);
   const lastE = g[g.length - 1];
   const warn = g.some((e) => e.status === "blocked" || e.status === "error" || !!e.error);
-  const summary = short(raw(lastE));
-  const more = g.length > 1 || cleanText(raw(lastE)) !== summary;
+  const summary = summarize(g, ctx);
+  // "Show details" only when there is something more than the summary: a message.
+  const more = g.some((e) => !!(e.message ?? e.output_summary));
   const agents = [...new Set(g.map((e) => e.agent_name).filter(Boolean))];
   const tagged = g.filter((e) => e.engine || routedModel(e));
   // One tag per distinct engine/model in the group.
@@ -116,9 +154,7 @@ function StepLine({ g }: { g: TraceEvent[] }) {
             {g.some((e) => e.status === "blocked") && <span className="log-flag"> · Withheld</span>}
             {g.some((e) => e.retry_count > 0) && <span className="log-flag"> · Retried</span>}
           </span>
-          <span className="log-sum" title={cleanText(raw(lastE))}>
-            {summary}
-          </span>
+          <span className="log-sum">{summary}</span>
           <span className="log-tags">
             {agents.map((a) => (
               <AgentTag key={a} name={a} small />
@@ -154,14 +190,41 @@ function StepLine({ g }: { g: TraceEvent[] }) {
   );
 }
 
+const ENGINE_NAME: Record<string, string> = { hmem: "H-MEM", world_model: "World Model" };
+const filterLabel = (f: LogFilter) =>
+  f.kind === "agent" ? `${f.agent} steps` : f.kind === "zetaris" ? "Zetaris queries" : f.kind === "engine" ? `${ENGINE_NAME[f.engine] ?? f.engine} steps` : "model calls";
+
 /**
  * The processing log, condensed: one line per step (repeats collapsed), a short
  * summary, and small agent / engine / model tags; each step's full messages sit
  * behind "Show details". `compact` is the live view while a run is in progress.
  */
-export function Timeline({ run, polling, warning, compact = false }: { run: RunResponse | null; polling: boolean; warning: string | null; compact?: boolean }) {
+export function Timeline({
+  run,
+  polling,
+  warning,
+  compact = false,
+  patientName,
+  filter = null,
+  onClearFilter,
+}: {
+  run: RunResponse | null;
+  polling: boolean;
+  warning: string | null;
+  compact?: boolean;
+  patientName?: string | null;
+  /** Set by clicking a node in the Powered-by pipeline. */
+  filter?: LogFilter | null;
+  onClearFilter?: () => void;
+}) {
   const end = useRef<HTMLDivElement>(null);
   const n = run?.trace.length ?? 0;
+  const shown = run ? (filter ? run.trace.filter((e) => matches(e, filter)) : run.trace) : [];
+  const ctx: SummaryCtx = {
+    trace: run?.trace ?? [],
+    patientName,
+    sourcesFound: run && Object.keys(run.coverage).length ? Object.values(run.coverage).filter((c) => c?.state === "found").length : null,
+  };
   useEffect(() => {
     if (polling) end.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [n, polling]);
@@ -174,12 +237,21 @@ export function Timeline({ run, polling, warning, compact = false }: { run: RunR
           {polling ? <span className="spinner" aria-label="running" /> : run && <span className="sec-meta">{run.execution_time_seconds < 0.05 ? "< 0.1" : run.execution_time_seconds.toFixed(1)} s</span>}
         </div>
       )}
-      {!run && !polling && <p className="sec-empty">Each step is logged here as it happens.</p>}
+      {!run && !polling && <p className="sec-empty">No steps yet</p>}
       {run && (
         <div className={`log ${compact ? "log-compact" : ""}`}>
-          {groupSteps(run.trace).map((g, i) => (
-            <StepLine key={`${g[0].timestamp}-${i}`} g={g} />
+          {filter && (
+            <div className="log-filter" role="status">
+              Showing {filterLabel(filter)} · {plural(shown.length, "step")}
+              <button type="button" className="lnk" onClick={onClearFilter}>
+                Show all
+              </button>
+            </div>
+          )}
+          {groupSteps(shown).map((g, i) => (
+            <StepLine key={`${g[0].timestamp}-${i}`} g={g} ctx={ctx} />
           ))}
+          {filter && !shown.length && <p className="sec-empty">No steps in this run.</p>}
         </div>
       )}
       {polling && (

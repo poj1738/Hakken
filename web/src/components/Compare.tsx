@@ -61,7 +61,7 @@ export function Compare({
       <div className="cmp-head">
         <span className="eyebrow">Side by side</span>
         {anyFlag && <span className="cmp-key">Highlighted: sources disagree</span>}
-        <InfoTip text="Each source's newest record, as written. The small value under it is what MedTrace read from that record. Highlights come from the reconciliation: where a source disagrees or the value is unresolved." />
+        <InfoTip text="Newest record per source, as written. Small text: the value MedTrace read. Highlight: disagreement or unresolved." />
       </div>
       <div className="cmp-scroll">
         <table className="cmp-table">
@@ -77,7 +77,7 @@ export function Compare({
           </thead>
           <tbody>
             <tr>
-              <th scope="row">Says</th>
+              <th scope="row">Read as</th>
               {cols.map((s) => {
                 const st = med?.per_source[s];
                 const missing = !bySource(s).length && coverage[s] && NOT_REACHED[coverage[s]!.state];

@@ -5,6 +5,7 @@ import { REASON_LABEL, ROW_TEXT_FIELDS, attributeLabel, cleanText, firstSentence
 import { InfoTip } from "./InfoTip";
 import { Compare, SourceRecords } from "./Compare";
 import { TechDetails } from "./TechDetails";
+import { ICON } from "./Silos";
 
 export interface FeedbackState {
   busy?: boolean;
@@ -71,7 +72,7 @@ function FeedbackControls({ f, state, onFeedback }: { f: Finding; state?: Feedba
     return (
       <div className="fb-done">
         <span className={`pill ${r.verdict === "confirm" ? "sev-low" : "sev-high"}`}>
-          {r.verdict === "confirm" ? "Confirmed" : `Rejected — ${REASON_LABEL[r.reason ?? "other"]}`}
+          {r.verdict === "confirm" ? "Confirmed" : `Rejected: ${REASON_LABEL[r.reason ?? "other"]}`}
         </span>
         {r.trust_updates.map((u) => (
           <span key={u.hmem_record_id} className="fb-trust">
@@ -178,10 +179,15 @@ function BySource({ by }: { by: Record<string, unknown> }) {
     <dl className="by-source" aria-label="What each source says">
       {rows.map((s) => (
         <div key={s}>
-          <dt>{s === "emr" ? "Chart" : sourceLabel(s)}</dt>
-          <dd>
-            <mark>{String(by[s])}</mark>
-          </dd>
+          <dt>
+            {s in ICON && (
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                {ICON[s as Source]}
+              </svg>
+            )}
+            {s === "emr" ? "Hospital chart" : sourceLabel(s)}
+          </dt>
+          <dd>{String(by[s])}</dd>
         </div>
       ))}
     </dl>
@@ -263,7 +269,7 @@ function FindingRow({ f, state, onFeedback, med, coverage, unit }: { f: Finding;
           )}
           {!by && str("statement") && <p className="finding-note">{cleanText(str("statement"))}</p>}
           {str("bpmh_single_source") && (
-            <p className="finding-note warn-text" title="The medication history is not verified from one source.">
+            <p className="finding-note warn-text">
               Single source: {sourceLabel(str("bpmh_single_source"))} only.
             </p>
           )}
@@ -336,10 +342,10 @@ export function Flags({ findings, grid, coverage, doseUnits, feedback, onFeedbac
           {reviewed} of {findings.length} reviewed
         </span>
       </div>
-      {!findings.length && <p className="sec-empty">✓ No discrepancies found across the sources located.</p>}
+      {!findings.length && <p className="sec-empty">No discrepancies found</p>}
       <Group
         title="Pharmacist review"
-        tip="Ranked by clinical risk. High-alert (APINCHS) medicines first."
+        tip="High-alert (APINCHS) first, then by risk"
         items={[...must.filter((f) => f.high_risk_class), ...must.filter((f) => !f.high_risk_class)]}
         feedback={feedback}
         onFeedback={onFeedback}

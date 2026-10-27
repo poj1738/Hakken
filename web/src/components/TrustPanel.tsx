@@ -78,12 +78,12 @@ export function TrustPanel({ trust, runId, updates, acceptance }: Props) {
     <div>
       <div className="sec-head">
         <h2 className="sec-title">Source confidence</h2>
-        <InfoTip text="How far each record source is relied upon for each kind of information, learned from pharmacist feedback (H-MEM). The shaded band shows the uncertainty." />
+        <InfoTip text="Trust per source and field, learned from feedback (H-MEM). Band: uncertainty." />
       </div>
       <div className="sec-pad">
       {updates.length > 0 && (
         <div className="change-box" role="status">
-          <div className="change-title">Change from pharmacist feedback</div>
+          <div className="change-title">Changed by feedback</div>
           {updates.map((u, i) => (
             <div key={i} className="change-line">
               {sourceLabel(u.source)} · {attributeLabel(u.attribute)}:{" "}
@@ -93,7 +93,7 @@ export function TrustPanel({ trust, runId, updates, acceptance }: Props) {
               <span className={u.delta < 0 ? "down" : "up"}>({signed(u.delta)})</span>
               <span className="change-why">
                 {" "}
-                — <span title={u.targetId}>{u.targetName ?? targetLabel(u.targetId)}</span>
+                · <span title={u.targetId}>{u.targetName ?? targetLabel(u.targetId)}</span>
                 {u.reason ? ` rejected as ${REASON_LABEL[u.reason].toLowerCase()}` : ""}
                 {u.runId !== runId ? " (earlier reconciliation)" : ""}
               </span>
@@ -101,7 +101,7 @@ export function TrustPanel({ trust, runId, updates, acceptance }: Props) {
           ))}
         </div>
       )}
-      {!all.length && <p className="sec-empty">No source confidence values were returned for this reconciliation.</p>}
+      {!all.length && <p className="sec-empty">No confidence values returned</p>}
       <div className="trust-grid">
         {sources.map((s) => (
           <div key={s}>

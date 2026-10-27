@@ -75,16 +75,16 @@ export type Says = { label: string; tone: "current" | "stopped" | "none" | "unre
 /**
  * The cell card's state: the API's existence value for this source when it has one,
  * else its evidence state:
- * present → "Says current"; absent with a row that mentions it → "Says stopped";
+ * present → "Current"; absent with a row that mentions it → "Not current";
  * absent with no row → "Not in this source"; unknown → "Not reached".
  */
 export function says(state: string | undefined, rowCount: number, existence?: unknown): Says {
   // What the API read this source as saying about whether the patient is on it wins over
   // per_source, which is "present" whenever the source has a row (S39's "Listed" vs "absent").
-  if (existence === "present") return { label: "Says current", tone: "current" };
-  if (existence === "absent") return { label: "Says stopped", tone: "stopped" };
-  if (state === "present") return { label: "Says current", tone: "current" };
-  if (state === "absent_in_scope") return rowCount ? { label: "Says stopped", tone: "stopped" } : { label: "Not in this source", tone: "none" };
+  if (existence === "present") return { label: "Current", tone: "current" };
+  if (existence === "absent") return { label: "Not current", tone: "stopped" };
+  if (state === "present") return { label: "Current", tone: "current" };
+  if (state === "absent_in_scope") return rowCount ? { label: "Not current", tone: "stopped" } : { label: "Not in this source", tone: "none" };
   return { label: "Not reached", tone: "unreached" };
 }
 
@@ -113,8 +113,8 @@ export function reason(source: string, rows: Evidence[], admission: string | nul
     const adm = parseDate(admission);
     const gap = adm ? monthsBetween(out, adm) : 0;
     const lead = `Last dispensed ${rowDate(f.doc_date)} (${n} days)${fills}`;
-    if (adm && out < adm && gap >= 1) return `${lead} — ran out about ${fmtDate(iso(out))}; no fills for ${gap} ${gap === 1 ? "month" : "months"}.`;
-    return `${lead} — supply runs to about ${fmtDate(iso(out))}.`;
+    if (adm && out < adm && gap >= 1) return `${lead}: ran out about ${fmtDate(iso(out))}, no fills for ${gap} ${gap === 1 ? "month" : "months"}.`;
+    return `${lead}: supply runs to about ${fmtDate(iso(out))}.`;
   }
   if (source === "gp") {
     const status = f.status_text && f.status_text !== "active" ? ` (marked ${q(f.status_text)})` : "";
@@ -122,7 +122,7 @@ export function reason(source: string, rows: Evidence[], admission: string | nul
   }
   if (source === "patient") {
     const words = [f.med_text, f.dose_text, f.freq_text].filter(Boolean).join(", ");
-    return `Patient: ${q(words)}${f.status_text ? ` — still taking? ${f.status_text}.` : "."}`;
+    return `Patient: ${q(words)}${f.status_text ? `. Still taking? ${f.status_text}.` : "."}`;
   }
   if (source === "emr") {
     const words = [f.med_text, f.dose_text, f.freq_text, f.route_text].filter(Boolean).join(" ");

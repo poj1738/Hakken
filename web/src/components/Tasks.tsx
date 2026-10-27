@@ -25,12 +25,12 @@ export function Tasks({ tasks, findings, notices, done, onToggle }: Props) {
     <>
       <div className="sec-head">
         <h2 className="sec-title">Actions</h2>
-        <InfoTip text="Checklist for this session only. Ticks are not saved or sent anywhere." />
+        <InfoTip text="Ticks stay on this screen only" />
         <span className="sec-meta">
           {tasks.filter((_, i) => done[i]).length} of {tasks.length} done
         </span>
       </div>
-      {!tasks.length && <p className="sec-empty">✓ No actions are required.</p>}
+      {!tasks.length && <p className="sec-empty">No actions</p>}
       {tasks.map((t, i) => {
         const origins = originsOf(t, findings, notices);
         return (

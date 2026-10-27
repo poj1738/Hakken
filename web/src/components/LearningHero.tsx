@@ -44,6 +44,7 @@ export function LearningHero({ run, updates }: { run: RunResponse; updates: Appl
             const now = here ? u.after : run.trust.find((t) => t.source === u.source && t.attribute === u.attribute)?.value ?? u.after;
             return (
               <div key={`${u.source}/${u.attribute}`} className="learn-move">
+                <div className="learn-info">
                 <div className="learn-line">
                   <strong>
                     {sourceLabel(u.source)} {attributeLabel(u.attribute).toLowerCase()}
@@ -52,6 +53,24 @@ export function LearningHero({ run, updates }: { run: RunResponse; updates: Appl
                     {u.before.toFixed(2)} → {now.toFixed(2)}
                   </span>
                   {!here && <span className="learn-tag">Applied to this run</span>}
+                </div>
+                {!here && (
+                  <div className="learn-used">
+                    Used here:{" "}
+                    {used.map((x, i) => (
+                      <span key={x.generic}>
+                        {i > 0 && "; "}
+                        <strong>{medName(x.generic)}</strong> {attributeLabel(u.attribute).toLowerCase()}, {sourceLabel(u.source)} {x.said}{" "}
+                        {x.resolved ? "outweighed" : "still disagrees"}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="learn-why" title={u.targetId}>
+                  {here ? "From" : "Learned from"} {u.targetName ?? targetLabel(u.targetId)}
+                  {u.reason ? ` · ${REASON_LABEL[u.reason].toLowerCase()}` : ""}
+                  {here ? "" : " · earlier patient"}
+                </div>
                 </div>
                 <div className="learn-bars" role="img" aria-label={`Confidence before ${u.before.toFixed(2)}, now ${now.toFixed(2)}`}>
                   <div className="learn-bar">
@@ -67,23 +86,6 @@ export function LearningHero({ run, updates }: { run: RunResponse; updates: Appl
                     </span>
                   </div>
                 </div>
-                <div className="learn-why" title={u.targetId}>
-                  {here ? "From" : "Learned from"} {u.targetName ?? targetLabel(u.targetId)}
-                  {u.reason ? ` · ${REASON_LABEL[u.reason].toLowerCase()}` : ""}
-                  {here ? "" : " · earlier patient"}
-                </div>
-                {!here && (
-                  <div className="learn-used">
-                    Used here:{" "}
-                    {used.map((x, i) => (
-                      <span key={x.generic}>
-                        {i > 0 && "; "}
-                        <strong>{medName(x.generic)}</strong> {attributeLabel(u.attribute).toLowerCase()}, {sourceLabel(u.source)} {x.said}{" "}
-                        {x.resolved ? "outweighed" : "still disagrees"}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
             );
           })}

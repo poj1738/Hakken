@@ -158,7 +158,7 @@ function CellFeedback({ med, source, unit, feedback, onRejectCell }: { med: Fuse
               <button
                 type="button"
                 className="btn btn-line btn-sm"
-                title="Tells MedTrace this source is outdated for this kind of information; its confidence drops"
+                title="Lowers this source's trust for this field"
                 disabled={st?.busy}
                 onClick={() => onRejectCell(med.generic, v.attribute as TrustAttribute, source as Source)}
               >
@@ -204,7 +204,7 @@ function Inspector({ cell, idx, coverage, unit, statement, admissionDate, pinned
       {why && <p className="insp-why">{why}</p>}
       {!why && state === "unknown" && (
         <p className="insp-why" title="This source cannot be seen for this medicine.">
-          {cov?.state === "not_found" ? `No ${sourceLabel(source)} record found` : "This source doesn't cover it"} — not the same as "not taking".
+          {cov?.state === "not_found" ? `No ${sourceLabel(source)} record found` : "This source doesn't cover it"}; not the same as "not taking".
         </p>
       )}
       {!why && state === "absent_in_scope" && <p className="insp-why">The {sourceLabel(source)} record doesn't mention it.</p>}
@@ -252,7 +252,7 @@ function Reconciled({ med, unit }: { med: FusedMed; unit?: string }) {
       .flatMap((v) => Object.entries(v.dissenting).map(([s, val]) => `${sourceLabel(s)} ${val}`));
     return (
       <div className="recon">
-        <div className="recon-main warn-text" title="Sources disagree and no value won: verify with the patient.">
+        <div className="recon-main warn-text" title="Sources disagree; verify with the patient">
           Unresolved
         </div>
         <div className="recon-basis">
@@ -305,7 +305,7 @@ export function Grid({ grid, evidenceIndex, coverage, doseUnits, findings, admis
     <>
       <div className="sec-head">
         <h2 className="sec-title">Medication history</h2>
-        <InfoTip text="Each medicine across the four sources. Select a cell to see its source record, original text and the SQL template that retrieved it." />
+        <InfoTip text="Select a cell for its source record and SQL template" />
       </div>
       <div className="legend">
         <span className="cell c-listed">

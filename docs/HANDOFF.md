@@ -27,6 +27,112 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Anshu · anshu/ui-cleanup (round 2: app shell, balance, copy, sponsors)
+
+**Did:** second pass on the same branch, `web/` only, presentation only:
+- **App shell:** the page itself never scrolls.
+  - The sidebar is full height: logo and search at the top, the patient list scrolling
+    in the middle with a fade, "This reconciliation" and status pinned at the bottom.
+  - Only the right-hand column scrolls.
+  - At phone width (≤940 px) the sidebar stacks on top and the page scrolls normally.
+  - `html.shot-full` lets the page flow for full-page screenshots;
+    `web/scripts/rehearse-demo.cjs` uses it.
+- **Balance:**
+  - Welcome hero has two columns: text and "The problem" on the left; the four sources
+    flowing into MedTrace plus "Start with a patient" on the right.
+  - Then three equal cards, four sponsor cards and three demo-patient cards.
+  - The Powered-by pipeline wraps in two deliberate rows.
+  - The learning card has two columns.
+- **Copy audit:** every screen shortened. No restated headings, no "This section shows",
+  no marketing words, no exclamation marks. Footer disclaimer and Limitations text
+  unchanged. `docs/DEMO_SCRIPT.md` quotes updated to match ("Why held back", the change line).
+- **Powered-by sponsor cards on Welcome:**
+  - Zetaris (Data), Meterless Nightshift (AI runtime), Meterless engines H-MEM · World
+    Model (Engines), NVIDIA Nemotron (Models).
+  - Each has a generic line icon in a soft-teal tile, with a teal glow and 2 px lift on
+    hover and focus (reduced motion: glow only).
+  - No logos are drawn. Official SVGs dropped into `web/public/sponsors/{zetaris,meterless,nvidia}.svg`
+    are picked up at build time.
+- **Review fixes:**
+  - The cell-card and compare wording is now "Current" / "Not current" under a "Read as"
+    row (was "Says current" / "Says stopped").
+  - Silo status sits left under the icon and name.
+  - The MedTrace hub shows "No run yet", "Reconciling…" or "Waiting for identity review"
+    instead of empty space.
+  - Finding evidence rows are a bordered list with source icons.
+  - Welcome caption: "No record in a source means unknown, not stopped".
+- **Checks:**
+  - 37 Playwright screenshots against SAMPLE_MODE: no page errors, no phone horizontal
+    overflow, and the sidebar unchanged at the bottom of a long scroll.
+  - Rehearsal clean on a fresh server.
+  - `npm run build`, `make test` (835 passed) and the secret scan are clean.
+
+**Changed shared files:** none.
+**Broken:** nothing. One test, `test_datasvc.py::test_each_reference_table_serves_a_records_array`,
+still skips locally after `make lexicon`: it needs a reference file that `make lexicon`
+does not build. That predates this branch.
+**Needs from teammates:** official sponsor SVGs, if we want logos in the cards (drop
+them in `web/public/sponsors/`).
+**Next:** Anshu's review of the screenshots; then the demo recording.
+
+---
+
+### 2026-10-27 · Anshu · anshu/ui-cleanup
+
+**Did:** UI cleanup from my review of the live UI (`web/` only, presentation only):
+- **Sidebar:**
+  - Stays in view while the page scrolls (sticky, full height, scrolls inside).
+  - The patient list has its own scroll area with a bottom fade, so the last name is
+    no longer cut off or run into the sections below.
+  - A search box filters by name or MRN, with a × button and Escape to clear, and
+    "No patients match" when nothing does.
+- **Overview tiles:** a fixed-height title row, so every tile's status line sits at the
+  same height.
+- **Header and footer:**
+  - "MedTrace" alone in the brand and the hub tile; no "Synthetic data" badge up top.
+  - The footer is one line: "Synthetic data. Not medical advice. A pharmacist must
+    confirm every item."
+  - The patient header is larger, with MRN, date of birth, sex and admission date as
+    label/value pairs.
+- **Welcome page:** the default view and the first sidebar item.
+  - Contents: the one-line brief, "The problem" (claim 1, cited), how it works with a
+    "Start with a patient" button, the four sources, what it checks, it learns,
+    Powered by, clickable demo patients and the PLAN §8 Limitations card.
+  - Wording only from README, metadata.json and PITCH_CLAIMS. "Why it matters" moved
+    here from the patient view.
+- **Processing log summaries:** fixed plain-English labels per step, plus counts only
+  from structured fields: the planned actions from `TraceEvent.action`, "N sources
+  found" from coverage, "N records" from `row_count`. The full message stays under
+  "Show details".
+- **Live Powered-by pipeline:**
+  - Zetaris → Planner · Executor · Evaluator · Writer → H-MEM, World Model →
+    Nightshift → Nemotron.
+  - Each node is dimmed until used, filled with a count once used, and pulses on the
+    current step.
+  - Connectors flow while data passes, and the query counter flashes on each new
+    query.
+  - In SAMPLE_MODE, Nightshift and Nemotron stay dimmed ("not used · sample mode").
+  - Click a node to filter the log; click again to clear. Respects reduced motion.
+- **Demo script and rehearsal:** updated for the Welcome landing and the pipeline.
+
+**Changed shared files:** none.
+
+**Broken:** nothing.
+- Build passes; `make test` 835 passed / 2 skipped; secret scan clean; rehearsal clean.
+- Contrast, labels, focus and phone width pass (my Playwright audit). The audit now
+  waits for colour transitions before measuring: mid-fade, the browser reports the
+  raw `color-mix()` and gave false failures.
+
+**Needs from teammates:**
+- **Arnav:** still open from my last two entries:
+  - the per-agent `meterless-app` header;
+  - S41 wording and S42 `relevance`. The Supply section groups by `relevance` as soon
+    as it arrives.
+
+**Next:** demo recording.
+
+---
+
 ### 2026-10-27 · Anshu · anshu/final-day
 
 **Did:** My last open scan items (all `web/`, presentation only):

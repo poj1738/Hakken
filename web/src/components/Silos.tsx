@@ -11,7 +11,7 @@ import { TechDetails } from "./TechDetails";
  * record source with the state the API's `coverage` reports for it; the hub
  * counts what the API returned. Nothing here is decided by the screen.
  */
-const ICON: Record<string, ReactNode> = {
+export const ICON: Record<string, ReactNode> = {
   // Hospital: a building with a cross.
   emr: <path d="M4 21V8l8-4 8 4v13M9 21v-4h6v4M12 8v5M9.5 10.5h5" />,
   // GP: a stethoscope.
@@ -49,30 +49,28 @@ export function Silos({ run, searching }: { run: RunResponse | null; searching: 
           const unreached = c?.state === "not_found";
           return (
             <li key={s} className={`silo ${st.cls}`}>
-              <svg className="silo-ico" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                {ICON[s]}
-              </svg>
-              <div className="silo-body">
-                <div className="silo-name">
+              <div className="silo-name">
+                <svg className="silo-ico" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  {ICON[s]}
+                </svg>
                   {s === "emr" ? "Hospital chart" : sourceLabel(s)}
-                  {(notes.length > 0 || unreached) && (
-                    <InfoTip
-                      label={`${sourceLabel(s)} limitations`}
-                      text={
-                        <>
-                          <ScopeNotes notes={notes} className="scope-notes scope-tip" />
-                          {unreached && <span>No record available — not the same as “not taking”.</span>}
-                        </>
-                      }
-                    />
-                  )}
-                </div>
-                <div className="silo-state">
-                  <span className="silo-dot" aria-hidden />
-                  {st.label}
-                </div>
-                {c?.doc_date && <div className="silo-date">{fmtDate(c.doc_date)}</div>}
+                {(notes.length > 0 || unreached) && (
+                  <InfoTip
+                    label={`${sourceLabel(s)} limitations`}
+                    text={
+                      <>
+                        <ScopeNotes notes={notes} className="scope-notes scope-tip" />
+                        {unreached && <span>No record available; not the same as “not taking”.</span>}
+                      </>
+                    }
+                  />
+                )}
               </div>
+              <div className="silo-state">
+                <span className="silo-dot" aria-hidden />
+                {st.label}
+              </div>
+              {c?.doc_date && <div className="silo-date">{fmtDate(c.doc_date)}</div>}
             </li>
           );
         })}
@@ -89,9 +87,10 @@ export function Silos({ run, searching }: { run: RunResponse | null; searching: 
               <path d="M3 12h4l3-7 4 14 3-7h4" />
             </svg>
           </span>
-          MedTrace · one view
+          MedTrace
         </div>
-        {result ? (
+        {!result && <div className="hub-idle">{!run ? (searching ? "Reconciling…" : "No run yet") : run.status === "needs_review" ? "Waiting for identity review" : run.status === "running" ? "Reconciling…" : "No result"}</div>}
+        {result && (
           <>
             <div className="hub-stats">
               <span>
@@ -111,8 +110,6 @@ export function Silos({ run, searching }: { run: RunResponse | null; searching: 
               <InfoTip label="About confirmability" text={CLAIM_3} />
             </div>
           </>
-        ) : (
-          <div className="hub-idle">A pre-populated medication history for clinician verification</div>
         )}
       </div>
       {hasCov && (

@@ -17,10 +17,7 @@ export function Brand() {
           <path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" />
         </svg>
       </div>
-      <div>
-        <div className="brand-name">MedTrace</div>
-        <div className="brand-sub">Medication Reconciliation</div>
-      </div>
+      <div className="brand-name">MedTrace</div>
     </div>
   );
 }
@@ -53,7 +50,7 @@ export function SideStatus({ health, error }: { health: HealthResponse | null; e
     <div className="side-status">
       <Row name="Data source" value={said(z)} dot={DOT[z] ?? "bad"} title={`Zetaris data layer: ${z}`} />
       <Row name="AI runtime" value={said(m)} dot={DOT[m] ?? "bad"} title={`Meterless Nightshift (GET /v1/models): ${m}`} />
-      <Row name="Model" value={model ?? "Not yet called"} title="The model that actually answered most recently (meterless.routed_model)" cls="st-model" />
+      <Row name="Model" value={model ?? "Not yet called"} title="Model that last answered (meterless.routed_model)" cls="st-model" />
     </div>
   );
 }
