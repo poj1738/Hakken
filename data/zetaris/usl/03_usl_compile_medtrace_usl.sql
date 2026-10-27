@@ -7,6 +7,8 @@
 -- its own line (Zetaris command reference 13.1). The semicolons below separate tables;
 -- there is none at the end. Columns are scalar (ARRAY/MAP/STRUCT are not supported).
 -- The PRIMARY KEYs and the FOREIGN KEY generate Zetaris data-quality rules of their own.
+-- The silo column is `source_system`: a column named `source` is rejected as invalid DDL
+-- (found live, 27 Oct, with COMPILE USL without DEPLOY).
 COMPILE USL medtrace_usl DEPLOY NAMESPACE lightning.metastore.medtrace DDL
 CREATE TABLE high_risk_class (
   atc_prefix varchar(16) NOT NULL PRIMARY KEY,
@@ -21,7 +23,7 @@ CREATE TABLE medicine (
 );
 CREATE TABLE medication_statement (
   row_id varchar(32) NOT NULL PRIMARY KEY,
-  source varchar(16),
+  source_system varchar(16),
   patient_id varchar(32),
   record_kind varchar(32),
   doc_date varchar(32),

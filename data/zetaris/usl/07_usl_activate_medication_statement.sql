@@ -44,7 +44,7 @@ ranked AS (
          ROW_NUMBER() OVER (PARTITION BY r.row_id ORDER BY length(h.atc_prefix) DESC) AS rn
   FROM resolved r LEFT JOIN medtrace.APINCHS h ON r.atc LIKE concat(h.atc_prefix, '%')
 )
-SELECT COALESCE(row_id, '') AS row_id, source, source_patient_id AS patient_id, record_kind, doc_date,
+SELECT COALESCE(row_id, '') AS row_id, source AS source_system, source_patient_id AS patient_id, record_kind, doc_date,
        med_text, code_system, med_code, generic, atc, apinchs_class AS high_risk_class, resolved_by,
        strength_text, dose_text, freq_text, status_text, qty, days_supply, pharmacy_id, script_type,
        CASE WHEN generic IS NULL OR strength_text IS NULL OR trim(strength_text) = '' THEN NULL
