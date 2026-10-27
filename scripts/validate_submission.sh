@@ -75,7 +75,9 @@ else
   fail "secret scan" "$(echo "$out" | tail -3)"
 fi
 # The NVIDIA key lives only in Nightshift (rule 3). Report file names, never the match.
-hits="$(git grep -l -I -E 'nvapi-[A-Za-z0-9_-]{20,}' -- . ':!scripts/validate_submission.sh' 2>/dev/null || true)"
+# Excluded: the secret scanner's own tests, which carry deliberately fake keys to prove the
+# scanner catches them (and the scan above already passed over them).
+hits="$(git grep -l -I -E 'nvapi-[A-Za-z0-9_-]{20,}' -- . ':!scripts/validate_submission.sh'   ':!tests/unit/test_secret_scan.py' 2>/dev/null || true)"
 [ -z "$hits" ] && pass "no NVIDIA API key in any tracked file" || fail "NVIDIA API key pattern found" "$hits"
 
 section "Rule 4 -- AI coding tools declared, one rules file"
@@ -84,7 +86,7 @@ if [ -e .cursorrules ] || [ -e .cursor/rules ]; then fail "a mirrored rules file
 [ -s docs/AI_TOOLS_USAGE.md ] && pass "docs/AI_TOOLS_USAGE.md present" || fail "docs/AI_TOOLS_USAGE.md missing"
 
 section "Rule 2 -- Meterless engines: conformance"
-if out="$(offline_env "$PY" -m pytest -q tests/engines 2>&1)"; then
+if out="$(offline_env "$PY" -m pytest tests/engines 2>&1)"; then
   pass "World Model + H-MEM conformance ($(echo "$out" | grep -E -o '[0-9]+ passed' | tail -1))"
 else
   fail "engine conformance" "$(echo "$out" | tail -5)"
@@ -180,14 +182,14 @@ kill "$SERVER_PID" 2>/dev/null; wait "$SERVER_PID" 2>/dev/null; SERVER_PID=""
 [[ "$api" == ok* ]] && pass "POST /run?wait=true: ${api#ok }" || fail "POST /run" "${api} $(tail -3 "${WORK}/serve.log")"
 
 section "Rule 6 -- output_examples from real runs"
-if out="$(offline_env "$PY" -m pytest -q tests/unit/test_output_examples.py 2>&1)"; then
+if out="$(offline_env "$PY" -m pytest tests/unit/test_output_examples.py 2>&1)"; then
   pass "output_examples: real, differ by input, match the code ($(echo "$out" | grep -E -o '[0-9]+ passed' | tail -1))"
 else
   fail "output_examples" "$(echo "$out" | tail -5)"
 fi
 
 section "Full test suite (offline)"
-if out="$(offline_env "$PY" -m pytest -q 2>&1)"; then
+if out="$(offline_env "$PY" -m pytest 2>&1)"; then
   pass "pytest ($(echo "$out" | grep -E -o '[0-9]+ passed.*' | tail -1))"
 else
   fail "pytest" "$(echo "$out" | grep -E '^(FAILED|ERROR)' | head -5)"
