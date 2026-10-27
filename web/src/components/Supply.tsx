@@ -13,6 +13,9 @@ import { InfoTip } from "./InfoTip";
  */
 export const DISCLAIMER = "The TGA shortage database is incomplete: a listed shortage is not a statement that a medicine is unavailable.";
 
+/** The API states the TGA disclaimer once, as a run caveat; Supply shows it (and the caveat banner does not). */
+export const isShortageCaveat = (c: string) => /^The TGA shortage database is incomplete/i.test(c.trim());
+
 type Rel = "affects" | "other" | "drop" | "unranked";
 interface Short {
   n: Notice;
@@ -77,7 +80,7 @@ function Line({ s }: { s: Short }) {
   );
 }
 
-export function Supply({ notices }: { notices: Notice[] }) {
+export function Supply({ notices, caveats = [] }: { notices: Notice[]; caveats?: string[] }) {
   const all = notices.filter((n) => n.type === "known_shortage").map(parse);
   const affects = all.filter((s) => s.rel === "affects");
   const other = all.filter((s) => s.rel === "other");
@@ -89,7 +92,7 @@ export function Supply({ notices }: { notices: Notice[] }) {
         <h2 className="sec-title">Supply</h2>
         <span className="sec-meta">Known shortages (TGA)</span>
       </div>
-      <p className="supply-caveat">{DISCLAIMER}</p>
+      <p className="supply-caveat">{caveats.find(isShortageCaveat) ?? DISCLAIMER}</p>
       {!all.length && <p className="sec-empty">No known shortages</p>}
 
       {affects.length > 0 && (

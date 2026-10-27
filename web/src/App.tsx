@@ -15,7 +15,7 @@ import { Stepper } from "./components/Stepper";
 import { Timeline } from "./components/Timeline";
 import { IdentityReview } from "./components/IdentityReview";
 import { BpmhBanner, Notices } from "./components/Coverage";
-import { Supply } from "./components/Supply";
+import { Supply, isShortageCaveat } from "./components/Supply";
 import { Grid, gridFeedbackKey } from "./components/Grid";
 import { Flags, type FeedbackChoice, type FeedbackState } from "./components/Flags";
 import { Tasks } from "./components/Tasks";
@@ -33,9 +33,9 @@ import { cleanText, medName, targetLabel, typeLabel } from "./format";
 type Section = "identity" | "findings" | "meds" | "actions" | "notices" | "supply" | "trust" | "log";
 const PANEL = "section-panel";
 
-/** The API's caveats about this result, minus the fixed disclaimer shown in the header and footer. */
-function Caveats({ caveats }: { caveats: string[] }) {
-  const shown = caveats.filter((c) => c !== DISCLAIMER);
+/** The API's caveats about this result, minus the fixed disclaimer shown in the header and footer, and minus the TGA one when the Supply section says it. */
+function Caveats({ caveats, supply }: { caveats: string[]; supply: boolean }) {
+  const shown = caveats.filter((c) => c !== DISCLAIMER && !(supply && isShortageCaveat(c)));
   if (!shown.length) return null;
   return (
     <div className="alert alert-note caveats" role="note">
@@ -354,7 +354,7 @@ export default function App() {
             error={runError}
             mock={API_MODE === "mock"}
           />
-          {run && (finished || review) && <Caveats caveats={run.output.caveats} />}
+          {run && (finished || review) && <Caveats caveats={run.output.caveats} supply={shortages.length > 0} />}
           {hasResult && <BpmhBanner banner={run!.banner} bpmhConfirmable={run!.bpmh_confirmable} />}
           {run?.status === "partial" && <div className="alert alert-medium">Partial result: read the caveats</div>}
 
@@ -475,7 +475,7 @@ export default function App() {
                 />
               )}
               {hasResult && shownSection === "notices" && <Notices notices={otherNotices} />}
-              {hasResult && shownSection === "supply" && <Supply notices={shortages} />}
+              {hasResult && shownSection === "supply" && <Supply notices={shortages} caveats={run!.output.caveats} />}
               {hasResult && shownSection === "trust" && <TrustPanel trust={run.trust} runId={run.run_id} updates={trustUpdates} acceptance={acceptance} />}
             </div>
           )}
