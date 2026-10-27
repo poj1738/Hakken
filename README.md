@@ -1,11 +1,10 @@
 # MedTrace — Hakken Agent
 
-> **Work in progress: Open Agent Hackathon 2026, team Hakken. Track 1.**
+> **Open Agent Hackathon 2026, team Hakken. Track 1.**
 >
-> **The data pipeline, the clinical logic, the agent loop, both Meterless engines and
-> the API are built and run end to end, live and in `SAMPLE_MODE`, on the host and in
-> Docker. The UI's screens have so far been reviewed only against example responses.**
-> Everything below says which is which.
+> **The data pipeline, the clinical logic, the agent loop, both Meterless engines, the
+> API and the web UI are built and run end to end, live and in `SAMPLE_MODE`, on the
+> host and in Docker.** The known limits are stated below.
 
 Team Hakken (Anshuman, Arpon, Arnav).
 
@@ -35,19 +34,22 @@ source to trust.
 | **`SAMPLE_MODE`** | **works.** Recorded Zetaris results, with every model step done by a deterministic offline function labelled `offline-heuristic`. No Zetaris, no Nightshift, no network. All five `input_examples/` produce the outcomes written in `input_examples/README.md`, pinned end to end by `tests/unit/test_orchestrator.py`. |
 | **Clinical domain pack** (`app/domain/packs/medtrace/`) | **works.** Identity linkage, normalisation, coverage, trust-weighted fusion, discrepancy detection, the safety gate and triage. Real code, no model calls. |
 | **Detector scorecard** (`scripts/eval.py`) | **works.** Scores the real chain against the answer key. Held-out, with simulated pharmacist review: **precision 0.95, recall 0.95, F1 0.95** (today's code prints recall 0.97 / F1 0.96, which includes one fix found while studying held-out misses; 0.95 is the clean figure, `docs/DECISIONS.md`); core APINCHS high-risk recall **30/32** (95% CI 0.80–0.98); **0 false merges** across 200 patients. Pinned by tests. |
+| **Web UI** (`web/`) | **works, live.** Served by the API at `http://localhost:8000` (Docker), on the same origin. Clicked through in a real browser against live Zetaris and Nightshift on 27 Oct: the identity review (P0015), discrepancies and side-by-side sources (P0089), and the learning demo (P0003 → P0007). No page, console or HTTP errors, and the pipeline showed Nightshift and Nemotron answering every run. |
 | **Sample inputs** (`input_examples/`) | **five**, each with replay fixtures and a written expected outcome, including a staged learning-demo pair (see `docs/DECISIONS.md`). |
 | `scripts/preflight.py`, `app/config.py`, `scripts/secret_scan.py` | **work.** Preflight, validated settings with secrets as `SecretStr`, and a pre-commit secret scan. |
 
-### Not finished
+### Known limits
 
-- **The web UI against the live API.** The Docker image now serves the UI built in live
-  mode, on the same origin as the API. Its screens have so far been reviewed only in
-  mock mode, against the hand-written examples in `tests/fixtures/api/`.
-- **Speed.** A live run takes 30 s to 9 min (`output_examples/live/`), almost all of it
-  Nemotron's hidden reasoning. That's inside the 10-minute limit. When time runs short, a
-  model step is skipped and the run returns `partial` with what it has already verified.
+- **Run time.** A live run takes 30 s to about 9 minutes (`output_examples/live/`), almost
+  all of it Nemotron's hidden reasoning. Every model request, retries included, is bounded
+  by the run's 10-minute deadline. When time runs short, a step falls back to its grounded
+  template and the run returns `partial` with what it has already verified.
+- **Medicine-shortage overlay (TGA).** Optional. It runs only where the TGA shortage table
+  is registered in Zetaris, which needs a manual TGA download (`docs/DATA_LICENCES.md` §4).
+  Elsewhere the step is skipped, says so in the trace, and the run continues.
 
-Nothing here fakes a result: unbuilt pieces raise `NotImplementedError` or exit non-zero.
+Nothing here fakes a result. A step that cannot run says so in the trace and falls back to
+a labelled, grounded output; nothing is invented to fill the gap.
 
 ## Quickstart
 
@@ -264,9 +266,8 @@ disclaimer on every screen.
 
 ## Limitations
 
-- **The product is not finished.** The data layer, clinical logic, agent loop, engines
-  and API work, on the host and in Docker. The UI has been reviewed only against example
-  responses.
+- **Built for a hackathon, not yet for a ward.** Everything above works end to end, but the
+  UI has not been tested with pharmacists, and nothing has run against real records.
 - Scores come from synthetic patients and a simulated pharmacist review. They show the
   logic does what it was designed to do, not how it performs on real records. 32 core
   high-risk cases cannot support a "100% recall" claim, and we don't make one.
