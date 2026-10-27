@@ -537,7 +537,7 @@ pre.code { margin: 8px 0 0; padding: 8px 10px; white-space: pre-wrap; font-size:
 .pg-label { width: 100%; font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 0 4px; }
 .pg-engines { flex-direction: row; }
 .pn { position: relative; --c: var(--accent); }
-.pn-btn { appearance: none; font: inherit; text-align: left; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 12px 6px 10px; border-radius: 10px; cursor: pointer; background: #fff; color: var(--ink); border: 1.5px dashed #b9c4c0; transition: background 0.3s, border-color 0.3s, box-shadow 0.3s; }
+.pn-btn { appearance: none; font: inherit; text-align: left; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 12px 6px 10px; border-radius: 10px; cursor: pointer; background: #fff; color: var(--ink); border: 1.5px dashed #b9c4c0; transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease; }
 .pn-btn[aria-disabled="true"] { cursor: default; }
 .pn-small .pn-btn { min-height: 38px; padding: 4px 10px 4px 8px; }
 .pn-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; border: 2px solid #b9c4c0; background: #fff; }
@@ -557,7 +557,11 @@ pre.code { margin: 8px 0 0; padding: 8px 10px; white-space: pre-wrap; font-size:
 /* not used in this mode (sample): dimmed, with its reason in words */
 .pn-off .pn-btn { opacity: 0.6; background: #f6f7f6; }
 .pn-active .pn-btn { outline: 3px solid var(--accent); outline-offset: 2px; }
-.pn-btn:hover:not([aria-disabled="true"]) { border-color: var(--c); }
+/* hover/focus: lights up in its own colour (clickable nodes only) */
+.pn-btn:not([aria-disabled="true"]):is(:hover, :focus-visible) { border-style: solid; border-color: var(--c); background: color-mix(in srgb, var(--c) 14%, #fff); box-shadow: 0 0 0 1px var(--c), 0 0 16px color-mix(in srgb, var(--c) 35%, transparent); transform: translateY(-1px); }
+.pn-btn:not([aria-disabled="true"]):is(:hover, :focus-visible) .pn-dot { background: var(--c); border-color: var(--c); }
+.pn-btn:not([aria-disabled="true"]):is(:hover, :focus-visible) .pn-label { color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .pn-btn { transition: none; } .pn-btn:is(:hover, :focus-visible) { transform: none !important; } }
 /* a short flash on each new query */
 .pn-flash { animation: pn-flash 0.9s ease-out; }
 @keyframes pn-flash { from { background: color-mix(in srgb, var(--c) 30%, transparent); } to { background: transparent; } }
