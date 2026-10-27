@@ -192,33 +192,36 @@ export function Pipeline({
           })}
         </div>
         <Link flowing={live && nowAt === "model"} />
-        <Node
-          label="Meterless Nightshift"
-          sub={mState === "off" ? "not used · sample mode" : calls.length ? plural(calls.length, "model call") : health?.meterless === "online" ? "online" : "no calls yet"}
-          state={mState}
-          role={ROLE.Nightshift}
-          filter={calls.length ? { kind: "model" } : undefined}
-          active={sameFilter(filter, { kind: "model" })}
-          onFilter={onFilter}
-        />
-        <Link flowing={live && nowAt === "model"} />
-        <Node
-          label="NVIDIA Nemotron"
-          sub={
-            mState === "off"
-              ? "not used · sample mode"
-              : modelNow && last
-                ? (routedModel(last) ?? "").replace(/^nvidia\//, "")
-                : models.length
-                  ? models.map((m) => m.replace(/^nvidia\//, "")).join(", ")
-                  : "not called yet"
-          }
-          state={mState}
-          role={ROLE.Nemotron}
-          filter={calls.length ? { kind: "model" } : undefined}
-          active={sameFilter(filter, { kind: "model" })}
-          onFilter={onFilter}
-        />
+        {/* Nightshift → Nemotron stay on one line together whenever they fit. */}
+        <span className="pseg">
+          <Node
+            label="Meterless Nightshift"
+            sub={mState === "off" ? "not used · sample mode" : calls.length ? plural(calls.length, "model call") : health?.meterless === "online" ? "online" : "no calls yet"}
+            state={mState}
+            role={ROLE.Nightshift}
+            filter={calls.length ? { kind: "model" } : undefined}
+            active={sameFilter(filter, { kind: "model" })}
+            onFilter={onFilter}
+          />
+          <Link flowing={live && nowAt === "model"} />
+          <Node
+            label="NVIDIA Nemotron"
+            sub={
+              mState === "off"
+                ? "not used · sample mode"
+                : modelNow && last
+                  ? (routedModel(last) ?? "").replace(/^nvidia\//, "")
+                  : models.length
+                    ? models.map((m) => m.replace(/^nvidia\//, "")).join(", ")
+                    : "not called yet"
+            }
+            state={mState}
+            role={ROLE.Nemotron}
+            filter={calls.length ? { kind: "model" } : undefined}
+            active={sameFilter(filter, { kind: "model" })}
+            onFilter={onFilter}
+          />
+        </span>
       </div>
     </section>
   );
