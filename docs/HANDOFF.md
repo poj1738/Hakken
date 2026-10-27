@@ -76,6 +76,52 @@ Supply on real rows.
 
 ---
 
+### 2026-10-27 · Arnav · arnav/s27
+
+**Did:** Scan **S27**. `run.py --confirm` (or `--reject`) with a candidate the run isn't
+asking about used to end in a `ValueError` traceback with no JSON. It now prints the
+reason and the candidates awaiting review to stderr, and exits **2** (bad usage, as the
+docstring promises). For example: "patient:WRONG is not awaiting review in run-…. Awaiting
+review: patient:INT00015". 1 test in `tests/unit/test_api.py`.
+
+**Changed shared files:** none.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:** nothing.
+
+**Next:** S26, S28, S29.
+
+---
+
+### 2026-10-27 · Arnav · arnav/s31
+
+**Did:** Scan **S31**. `POST /feedback` is idempotent.
+- **The same verdict counts once.** "Same" means run, target, verdict, reason, source and
+  attribute all match. A repeat (a double-click, a UI retry) returns the first response
+  and moves nothing. Before, four posts of the learning demo's reject took GP daily-dose
+  trust from 0.70 to 0.0.
+- **A lock** around the check and apply, because FastAPI runs sync endpoints on a
+  thread pool, so two clicks can arrive at the same time.
+- **A different verdict or reason** on the same target is a new decision and still
+  applies (reject, then confirm, moves trust back up).
+- **Not done:** the scan's optional trust floor above 0. H-MEM's clamp to [0, 1] is the
+  spec's (conformance-tested), and with repeats gone, a source reaches 0 only through
+  five separate verdicts.
+- 2 tests in `tests/unit/test_api.py`.
+
+**Changed shared files:** none.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:** nothing. The UI needs no change; a repeat simply gets the same
+response.
+
+**Next:** S27 (`run.py --confirm` with an unknown candidate crashes with a traceback),
+then S26, S28, S29.
+
+---
+
 ### 2026-10-27 · Arnav · arnav/live-examples
 
 **Did:** Re-recorded **`output_examples/live/`** on the batched model calls (#68), with

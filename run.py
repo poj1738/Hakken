@@ -64,7 +64,13 @@ def main(argv: list[str] | None = None) -> int:
     for candidate, same in decisions:
         if response.status != "needs_review":
             break
-        response = orch.resume(response.run_id, IdentityDecisionRequest(candidate_id=candidate, same_person=same))
+        try:
+            response = orch.resume(response.run_id, IdentityDecisionRequest(candidate_id=candidate, same_person=same))
+        except ValueError as exc:  # a candidate this run is not asking about: bad usage, not a crash (scan S27)
+            waiting = [c.candidate_id for c in (response.identity_review.candidates if response.identity_review else [])
+                       if c.band == "review"]
+            print(f"{exc}. Awaiting review: {', '.join(waiting) or 'nothing'}", file=sys.stderr)
+            return 2
     print(json.dumps(response.model_dump(mode="json"), indent=2))
     return 1 if response.status == "error" else 0
 

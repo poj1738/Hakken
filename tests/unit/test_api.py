@@ -178,3 +178,41 @@ def test_a_background_run_that_throws_is_reported_not_left_running(make_settings
                 break
             time.sleep(0.05)
         assert body["status"] == "error" and body["error"]["type"] == "TypeError"
+
+
+def test_a_repeated_verdict_moves_trust_once(api) -> None:
+    """Scan S31: a double-click on the learning demo's reject used to apply -0.20 each time."""
+    teach = api.post("/run?wait=true", json={"patient_id": "MRN0000003"}).json()
+    body = {"run_id": teach["run_id"], "target_id": "grid:candesartan:daily_dose", "verdict": "reject",
+            "reason": "source_outdated", "source": "gp", "attribute": "daily_dose"}
+    first = api.post("/feedback", json=body).json()
+    for _ in range(3):
+        assert api.post("/feedback", json=body).json() == first
+    # The live value (a finished run's response keeps the trust it ran with).
+    assert api.app.state.orchestrator.trust[("gp", "daily_dose")] == 0.5  # 0.70 -> 0.50 once, not 0.0
+
+
+def test_a_different_verdict_on_the_same_target_still_applies(api) -> None:
+    teach = api.post("/run?wait=true", json={"patient_id": "MRN0000003"}).json()
+    base = {"run_id": teach["run_id"], "target_id": "grid:candesartan:daily_dose", "source": "gp",
+            "attribute": "daily_dose"}
+    reject = api.post("/feedback", json=base | {"verdict": "reject", "reason": "source_outdated"}).json()
+    confirm = api.post("/feedback", json=base | {"verdict": "confirm"}).json()
+    assert reject["trust_updates"][0]["after"] == 0.5
+    assert confirm["trust_updates"][0]["before"] == 0.5 and confirm["trust_updates"][0]["after"] > 0.5
+
+
+def test_run_py_confirm_with_an_unknown_candidate_is_bad_usage(monkeypatch, capsys) -> None:
+    """Scan S27: a wrong --confirm used to end in a ValueError traceback with no JSON."""
+    import run
+    from app.config import get_settings
+
+    monkeypatch.setenv("SAMPLE_MODE", "true")
+    get_settings.cache_clear()
+    try:
+        code = run.main(["--input", "input_examples/example_1.json", "--confirm", "patient:WRONG"])
+    finally:
+        get_settings.cache_clear()
+    err = capsys.readouterr().err
+    assert code == 2
+    assert "patient:WRONG is not awaiting review" in err and "Awaiting review: patient:INT00015" in err

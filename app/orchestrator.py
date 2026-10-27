@@ -13,6 +13,7 @@ marks the run `partial` -- it never invents text and never hides the degradation
 
 from __future__ import annotations
 
+import threading
 import time
 import traceback
 import uuid
@@ -114,6 +115,9 @@ class Orchestrator:
         self._anchors: dict[str, SourceRow] | None = None
         self.runs: dict[str, RunState] = {}
         self.acceptance: dict[tuple[str, str], float] = {}
+        #: Verdicts already applied, so a double-click or a retry cannot move trust twice (scan S31).
+        self.feedback_applied: dict[tuple, Any] = {}
+        self.feedback_lock = threading.Lock()
         self.last_routed_model: str | None = None
 
     @property
