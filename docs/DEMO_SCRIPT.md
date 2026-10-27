@@ -87,7 +87,7 @@ demo patients, and Limitations.
 3. Point at "Is this the same patient?": the interview record "Nicholas Walker",
    **84% match**. Given name is a partial match (amber), family name and date of birth
    agree (green); the (i) beside each value gives the matcher's reason.
-4. Point at **Withheld from automatic linkage**: "This record carries no IHI, and it
+4. Point at **Why held back**: "This record carries no IHI, and it
    falls in a group of matching records that includes Malcolm Walker (DOB 1965-06-10,
    admission chart MRN0000159), who carries a different IHI — confirm it is this
    patient."
@@ -165,7 +165,7 @@ record ID and SQL template; the 8 actions.
    0.50", and the **System learned** card appears above the workspace: "GP daily dose
    0.70 → 0.50" with a before/after bar.
 4. **Source confidence**: the box at the top reads "GP · Daily dose: 0.70 → 0.50
-   (−0.20) — Candesartan daily dose rejected as source outdated".
+   (−0.20) · Candesartan daily dose rejected as source outdated".
 5. Click **Benjamin O'Brien · MRN 0000007** → **Run reconciliation**. The **System
    learned** card is back, tagged **Applied to this run**, with "Used here: Rosuvastatin
    daily dose, GP 20.0 outweighed" and the memory **H-MEM** recalled for this run. (On a

@@ -73,7 +73,7 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
       <div className="id-head">
         <h2>
           Is this the same patient?
-          <InfoTip text="These records may belong to this patient, but the match is not certain enough to link automatically. An incorrect link would combine two people's medicines." />
+          <InfoTip text="Not certain enough to link automatically. A wrong link would mix two people's medicines." />
         </h2>
         {banner && <p className="id-lead">{cleanText(banner)}</p>}
       </div>
@@ -118,7 +118,7 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
             ))}
             {otherKeys.length > 0 && (
               <tr>
-                <th scope="row">Other matching evidence</th>
+                <th scope="row">Other evidence</th>
                 <td className="anchor-col" />
                 {candidates.map((c) => (
                   <td key={c.candidate_id} className="small">
@@ -134,7 +134,7 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
               </tr>
             )}
             <tr>
-              <th scope="row">Withheld from automatic linkage</th>
+              <th scope="row">Why held back</th>
               <td className="anchor-col" />
               {candidates.map((c) => (
                 <td key={c.candidate_id} className="guard">
@@ -143,7 +143,7 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
               ))}
             </tr>
             <tr>
-              <th scope="row">Pharmacist decision</th>
+              <th scope="row">Decision</th>
               <td className="anchor-col" />
               {candidates.map((c) => {
                 const d = decided[c.candidate_id];
@@ -173,7 +173,7 @@ export function IdentityReview({ review, banner, decided, busy, error, onDecide 
       <p className="id-legend">
         <span className="swatch agree-agree" /> Agrees <span className="swatch agree-partial" /> Partial{" "}
         <span className="swatch agree-differ" /> Differs <span className="swatch agree-missing" /> Not compared
-        <InfoTip text="Colours show the matching engine's own verdict. The (i) beside each value gives its reason." />
+        <InfoTip text="Colour: the matcher's verdict. (i): its reason." />
       </p>
       <TechDetails
         items={[

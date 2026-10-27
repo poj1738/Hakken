@@ -61,7 +61,7 @@ export function Silos({ run, searching }: { run: RunResponse | null; searching: 
                       text={
                         <>
                           <ScopeNotes notes={notes} className="scope-notes scope-tip" />
-                          {unreached && <span>No record available — not the same as “not taking”.</span>}
+                          {unreached && <span>No record available; not the same as “not taking”.</span>}
                         </>
                       }
                     />

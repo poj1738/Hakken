@@ -15,15 +15,15 @@ import { AGENT_COLOR } from "./Agent";
  */
 const AGENTS = ["Planner", "Executor", "Evaluator", "Writer"];
 const ROLE: Record<string, string> = {
-  Zetaris: "Data layer: every fact comes from SQL sent to Zetaris.",
-  Planner: "Chooses the steps for this patient.",
-  Executor: "Runs the queries and links the patient's records across sources.",
-  Evaluator: "Compares the sources, finds discrepancies and checks them.",
-  Writer: "Writes the explanations and the summary.",
-  hmem: "Meterless H-MEM: remembers pharmacist feedback and how far each source is trusted.",
-  world_model: "Meterless World Model: remembers which records belong to the same patient.",
-  Nightshift: "Meterless Nightshift: every model call goes through it.",
-  Nemotron: "NVIDIA Nemotron: the model that answers the agents' calls, through Nightshift.",
+  Zetaris: "Data layer: every fact comes by SQL.",
+  Planner: "Chooses the steps.",
+  Executor: "Runs queries, links records.",
+  Evaluator: "Compares sources, checks findings.",
+  Writer: "Writes explanations and the summary.",
+  hmem: "Meterless H-MEM: pharmacist-taught trust.",
+  world_model: "Meterless World Model: identity memory.",
+  Nightshift: "Meterless Nightshift: routes every model call.",
+  Nemotron: "NVIDIA Nemotron: answers the agents' model calls.",
 };
 const ENGINES: [string, string][] = [
   ["hmem", "H-MEM"],
@@ -167,7 +167,10 @@ export function Pipeline({
             );
           })}
         </div>
-        <Link flowing={live && nowAt === "engine"} />
+      </div>
+      {/* Second row: engines and models, so the pipeline wraps at a meaningful point. */}
+      <div className="pipe2-row pipe2-row2">
+        <span className="pl-turn" aria-hidden />
         <div className="pg pg-engines" role="group" aria-label="Meterless engines">
           <span className="pg-label">Meterless engines</span>
           {ENGINES.map(([k, name]) => {

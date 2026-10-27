@@ -26,7 +26,12 @@ const note = (scene, s) => notes.push(`[${scene}] ${s}`);
   const errs = [];
   p.on('pageerror', (e) => errs.push(e.message));
   p.on('response', (r) => r.status() >= 400 && errs.push(`${r.status()} ${r.request().method()} ${r.url()}`));
-  const shot = (n) => p.screenshot({ path: `${OUT}/${n}.png`, fullPage: true });
+  // The app shell scrolls only the main column; shot-full lets the page flow so fullPage captures everything.
+  const shot = async (n) => {
+    await p.evaluate(() => document.documentElement.classList.add("shot-full"));
+    await p.screenshot({ path: `${OUT}/${n}.png`, fullPage: true });
+    await p.evaluate(() => document.documentElement.classList.remove("shot-full"));
+  };
   // Patients are picked from the sidebar list (button per patient, data-patient=MRN).
   const run = async (mrn) => { await p.click(`[data-patient="${mrn}"]`); const t = Date.now(); await p.click('.run-btn'); await settle(p); return ((Date.now() - t) / 1000).toFixed(1); };
   // Sections are the left rail's links (role="tab"; the name includes its count).

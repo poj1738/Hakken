@@ -327,7 +327,7 @@ export default function App() {
       <div className="main-col">
         {API_MODE === "mock" && (
           <div className="mock-note" title="VITE_API_MODE=mock: replaying tests/fixtures/api/*.json">
-            Example data: these screens replay hand-written examples, not the results of a real reconciliation.
+            Example data: hand-written, not a real run
           </div>
         )}
         <main className="wrap">
@@ -356,7 +356,7 @@ export default function App() {
           />
           {run && (finished || review) && <Caveats caveats={run.output.caveats} />}
           {hasResult && <BpmhBanner banner={run!.banner} bpmhConfirmable={run!.bpmh_confirmable} />}
-          {run?.status === "partial" && <div className="alert alert-medium">Partial result. Read every caveat before relying on it.</div>}
+          {run?.status === "partial" && <div className="alert alert-medium">Partial result: read the caveats</div>}
 
           <Pipeline
             run={run}
@@ -435,7 +435,7 @@ export default function App() {
               {shownSection === "log" && !polling && run.status === "error" && (
                 <div className="panel-pad">
                   <div className="friendly-err" role="alert">
-                    <span>The reconciliation stopped with an error. Nothing below is a result.</span>
+                    <span>Stopped with an error. No result.</span>
                     <button type="button" className="btn btn-line btn-sm" onClick={startRun}>
                       Run again
                     </button>

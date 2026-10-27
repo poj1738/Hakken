@@ -27,6 +27,48 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Anshu · anshu/ui-cleanup (round 2: app shell, balance, copy, sponsors)
+
+**Did:** second pass on the same branch, `web/` only, presentation only:
+- **App shell:** the page itself never scrolls.
+  - The sidebar is full height: logo and search at the top, the patient list scrolling
+    in the middle with a fade, "This reconciliation" and status pinned at the bottom.
+  - Only the right-hand column scrolls.
+  - At phone width (≤940 px) the sidebar stacks on top and the page scrolls normally.
+  - `html.shot-full` lets the page flow for full-page screenshots;
+    `web/scripts/rehearse-demo.cjs` uses it.
+- **Balance:**
+  - Welcome hero has two columns: text and "The problem" on the left; the four sources
+    flowing into MedTrace plus "Start with a patient" on the right.
+  - Then three equal cards, four sponsor cards and three demo-patient cards.
+  - The Powered-by pipeline wraps in two deliberate rows.
+  - The learning card has two columns.
+- **Copy audit:** every screen shortened. No restated headings, no "This section shows",
+  no marketing words, no exclamation marks. Footer disclaimer and Limitations text
+  unchanged. `docs/DEMO_SCRIPT.md` quotes updated to match ("Why held back", the change line).
+- **Powered-by sponsor cards on Welcome:**
+  - Zetaris (Data), Meterless Nightshift (AI runtime), Meterless engines H-MEM · World
+    Model (Engines), NVIDIA Nemotron (Models).
+  - Each has a generic line icon in a soft-teal tile, with a teal glow and 2 px lift on
+    hover and focus (reduced motion: glow only).
+  - No logos are drawn. Official SVGs dropped into `web/public/sponsors/{zetaris,meterless,nvidia}.svg`
+    are picked up at build time.
+- **Checks:**
+  - 37 Playwright screenshots against SAMPLE_MODE: no page errors, no phone horizontal
+    overflow, and the sidebar unchanged at the bottom of a long scroll.
+  - Rehearsal clean on a fresh server.
+  - `npm run build`, `make test` (835 passed) and the secret scan are clean.
+
+**Changed shared files:** none.
+**Broken:** nothing. One test, `test_datasvc.py::test_each_reference_table_serves_a_records_array`,
+still skips locally after `make lexicon`: it needs a reference file that `make lexicon`
+does not build. That predates this branch.
+**Needs from teammates:** official sponsor SVGs, if we want logos in the cards (drop
+them in `web/public/sponsors/`).
+**Next:** Anshu's review of the screenshots; then the demo recording.
+
+---
+
 ### 2026-10-27 · Anshu · anshu/ui-cleanup
 
 **Did:** UI cleanup from my review of the live UI (`web/` only, presentation only):

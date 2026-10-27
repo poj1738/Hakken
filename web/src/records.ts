@@ -113,8 +113,8 @@ export function reason(source: string, rows: Evidence[], admission: string | nul
     const adm = parseDate(admission);
     const gap = adm ? monthsBetween(out, adm) : 0;
     const lead = `Last dispensed ${rowDate(f.doc_date)} (${n} days)${fills}`;
-    if (adm && out < adm && gap >= 1) return `${lead} — ran out about ${fmtDate(iso(out))}; no fills for ${gap} ${gap === 1 ? "month" : "months"}.`;
-    return `${lead} — supply runs to about ${fmtDate(iso(out))}.`;
+    if (adm && out < adm && gap >= 1) return `${lead}: ran out about ${fmtDate(iso(out))}, no fills for ${gap} ${gap === 1 ? "month" : "months"}.`;
+    return `${lead}: supply runs to about ${fmtDate(iso(out))}.`;
   }
   if (source === "gp") {
     const status = f.status_text && f.status_text !== "active" ? ` (marked ${q(f.status_text)})` : "";
@@ -122,7 +122,7 @@ export function reason(source: string, rows: Evidence[], admission: string | nul
   }
   if (source === "patient") {
     const words = [f.med_text, f.dose_text, f.freq_text].filter(Boolean).join(", ");
-    return `Patient: ${q(words)}${f.status_text ? ` — still taking? ${f.status_text}.` : "."}`;
+    return `Patient: ${q(words)}${f.status_text ? `. Still taking? ${f.status_text}.` : "."}`;
   }
   if (source === "emr") {
     const words = [f.med_text, f.dose_text, f.freq_text, f.route_text].filter(Boolean).join(" ");

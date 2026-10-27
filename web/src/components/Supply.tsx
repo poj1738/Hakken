@@ -90,7 +90,7 @@ export function Supply({ notices }: { notices: Notice[] }) {
         <span className="sec-meta">Known shortages (TGA)</span>
       </div>
       <p className="supply-caveat">{DISCLAIMER}</p>
-      {!all.length && <p className="sec-empty">✓ No known shortages listed for this patient's medicines.</p>}
+      {!all.length && <p className="sec-empty">No known shortages</p>}
 
       {affects.length > 0 && (
         <div className="supply-group">
@@ -110,7 +110,7 @@ export function Supply({ notices }: { notices: Notice[] }) {
         <div className="supply-group">
           <h3 className="fgroup-title">
             Other products short <span className="count">{other.length}</span>
-            <InfoTip text="A different strength, brand or form of the same medicine; the patient's own product isn't listed." />
+            <InfoTip text="Other strength, brand or form; the patient's product isn't listed" />
           </h3>
           {byMedicine(other).map(([med, items]) => (
             <details key={med} className="supply-fold">
@@ -129,7 +129,7 @@ export function Supply({ notices }: { notices: Notice[] }) {
         <div className="supply-group">
           <h3 className="fgroup-title">
             Listed for these medicines <span className="count">{unranked.length}</span>
-            <InfoTip text="Not yet matched to the patient's own product (brand, strength, form), so some may be other products of the same medicine." />
+            <InfoTip text="Not yet matched to the patient's product" />
           </h3>
           {byMedicine(unranked).map(([med, items]) => (
             <details key={med} className="supply-fold" open={items.length === 1}>

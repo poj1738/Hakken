@@ -237,7 +237,7 @@ export function Timeline({
           {polling ? <span className="spinner" aria-label="running" /> : run && <span className="sec-meta">{run.execution_time_seconds < 0.05 ? "< 0.1" : run.execution_time_seconds.toFixed(1)} s</span>}
         </div>
       )}
-      {!run && !polling && <p className="sec-empty">Each step is logged here as it happens.</p>}
+      {!run && !polling && <p className="sec-empty">No steps yet</p>}
       {run && (
         <div className={`log ${compact ? "log-compact" : ""}`}>
           {filter && (

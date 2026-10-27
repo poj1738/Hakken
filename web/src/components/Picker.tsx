@@ -64,7 +64,7 @@ export function PatientList({
       )}
       {patientsState.kind === "error" && (
         <div className="friendly-err" role="alert">
-          <span>The patient list didn't load. Check that the MedTrace API is running.</span>
+          <span>Patients didn't load. Is the API running?</span>
           <button type="button" className="btn btn-line btn-sm" onClick={onRetry}>
             Try again
           </button>
