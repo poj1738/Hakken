@@ -60,8 +60,11 @@ def test_live_examples_name_the_nemotron_that_answered() -> None:
     for name in NAMES:
         r = _load("live", name)
         assert not r.sample_mode
-        models = {c.routed_model for c in r.model_calls}
-        assert models and all(m and m.startswith("nvidia/") for m in models), models
+        answered = {c.routed_model for c in r.model_calls if c.routed_model}
+        assert answered and all(m.startswith("nvidia/") for m in answered), answered
+        # A request no model answered is listed with no model (scan S9) -- only in a run that says so.
+        if any(c.routed_model is None for c in r.model_calls):
+            assert r.status == "partial", name
 
 
 def test_committed_sample_examples_match_a_fresh_regeneration(tmp_path, make_settings) -> None:

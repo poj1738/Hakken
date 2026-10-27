@@ -103,7 +103,9 @@ def summarise(ctx: AgentContext, findings: list[Finding], anchor: SourceRow, ban
         "data; drafts a pharmacist must confirm. Lead with what needs a pharmacist first. Use only numbers in "
         "the findings. Never instruct anyone to stop or start a medicine; say what to confirm."
         + (f" Mention this coverage caveat: {banner}" if banner else "") + "\n" + json.dumps(brief, default=str))}]
-    result, calls = ctx.llm.chat_json("Writer", messages, Summary, max_tokens=4096,
+    # 8k, not 4k: live 27 Oct, a 1-finding summary came back `<model>_empty_response` at 4096 (the
+    # hidden reasoning used it all), and another used 3,370 of 4,096.
+    result, calls = ctx.llm.chat_json("Writer", messages, Summary, max_tokens=8192,
                                       offline=lambda: Summary(summary=_offline_summary(findings, anchor, banner)))
     ctx.record("Writer", "summarise", "DRAFT", calls, f"Summarised {len(findings)} findings.")
     return result.summary
