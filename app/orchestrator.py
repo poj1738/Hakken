@@ -496,7 +496,7 @@ class Orchestrator:
                 out[source] = Coverage(source=source, state="found", record_key=merged.candidate_id)
             elif any(l.band == "review" for l in mine):
                 out[source] = Coverage(source=source, state="near_miss_pending",
-                                       scope_notes=["waiting for identity review"])
+                                       scope_notes=[cov_mod._IDENTITY_PENDING_NOTE])
             else:
                 out[source] = Coverage(source=source, state="not_found")
         return out

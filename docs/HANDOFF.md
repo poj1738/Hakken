@@ -27,6 +27,44 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Arnav · arnav/s41
+
+**Did:** Scan **S41**, my half (Anshu had already done the display half and ticked it).
+- **Plain wording after unchanged prefixes** in `coverage.py`:
+  - "single pharmacy: Only one pharmacy's records found (PHX03). Anything filled at
+    another pharmacy won't show here."
+  - "single pharmacy: Records from 2 pharmacies found (PHX03, PHX07)."
+  - "dispensing incomplete: Some scripts were private (not PBS). Those can be missed or
+    matched less reliably."
+  - "stale document: GP list last updated 30 Apr 2025, about 18 months ago. It may be out
+    of date."
+  - **Identity** (no prefix): "A possible match for this patient is waiting for you to
+    confirm. Nothing from it is used until you do." It's also used for the paused run's
+    coverage; that note used to read "waiting for identity review".
+- **Robustness:** the evaluator found stale-GP notes by matching the words "updated" and
+  "month". It now uses the `SCOPE_STALE_DOCUMENT` prefix, so wording can change freely.
+- **Private scripts, per medicine:** coverage is per source, so the note stays at the
+  source level. Whether a medicine had a private script is in its own pharmacy rows
+  (`script_type: "private"` in `evidence_index`, since #47).
+- **Guardrail:** `scripts/eval.py --split tune` before and after: `ALL 145 17 5 precision
+  0.90 recall 0.97 F1 0.93`, high-risk 34/34, 0 false merges.
+- 1 test covering every scope note across all 13 recorded patients.
+  `output_examples/sample_mode/` regenerated.
+
+**Changed shared files:** none on the list. `app/domain/packs/medtrace/coverage.py` (the
+pack, mine under §5): wording only, plus one private constant.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Anshu:** to show the private-script note only on medicines that had one, show it in
+  a pharmacy cell only when that cell's cited rows include
+  `evidence_index[row].fields.script_type == "private"`.
+
+**Next:** S42 (rank each shortage against the patient's own product, with `relevance`).
+
+---
+
 ### 2026-10-27 · Anshu · anshu/pipeline-hover
 
 **Did:** Powered-by pipeline nodes now light up on hover and keyboard focus, each in its
