@@ -47,6 +47,20 @@ def _attribute_for(f: Finding) -> str:
 
 
 def apply_feedback(orch: Orchestrator, req: FeedbackRequest) -> FeedbackResponse:
+    """Apply a verdict once. The same verdict again -- a double-click, a UI retry -- returns the
+    first response and moves nothing (scan S31: four repeats used to take GP daily-dose trust
+    from 0.70 to 0.0, and the learning demo's documented 0.70 -> 0.50 step was gone). A
+    different verdict or reason on the same target is a new decision and does apply."""
+    key = (req.run_id, req.target_id, req.verdict, req.reason, req.source, req.attribute)
+    with orch.feedback_lock:
+        if key in orch.feedback_applied:
+            return orch.feedback_applied[key]
+        result = _apply(orch, req)
+        orch.feedback_applied[key] = result
+        return result
+
+
+def _apply(orch: Orchestrator, req: FeedbackRequest) -> FeedbackResponse:
     response = orch.get(req.run_id)
     if response is None:
         raise FeedbackError(f"unknown run {req.run_id}")
