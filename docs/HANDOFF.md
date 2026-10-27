@@ -27,6 +27,57 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Arnav · arnav/s42
+
+**Did:** Scan **S42**, my half (Anshu's Supply section was already on main).
+- **Ranking.** `executor.check_shortages` ranks each TGA row against the patient's own
+  product. `_patient_products` reads that from the patient's rows for the medicine:
+  - lexicon brands named in their `med_text`;
+  - strengths, via `parse_strength_mg`;
+  - route families, from the statement route and the pharmacy dosage form.
+
+  `_relevance` then decides:
+  - **different route or form** (an injection ampoule for a patient on tablets):
+    dropped;
+  - **same brand**, or the **same strength** when no brand is recorded:
+    `relevance: "affects_this_patient"`, with "Check supply of … before discharge";
+  - **anything else:** `"other_product"`, one notice each (the UI collapses per
+    medicine), and no task.
+
+  `salt_quantity` is never read.
+- **Wording.** The detail keeps the sentence the UI parses ("Known shortage listed for X
+  (Current, expected to resolve …).") and adds "It matches the patient's product (Endone
+  5 mg)." or "The patient's product (…) is a different one."
+- **Disclaimer.** It's now said once, as a run caveat (`executor.SHORTAGE_DISCLAIMER`),
+  not on every notice.
+- **Trace.** It counts what matched, what was another product, and what was dropped.
+- **Contract:** **`Notice.relevance: str | None = None`** is a new optional field in
+  `app/domain/packs/medtrace/types.py`. The frozen-surface test still passes.
+- **Not verified live:** the TGA view isn't registered on my Zetaris, and registering it
+  would create objects. The 9 tests in `tests/unit/test_shortage_relevance.py` use rows in
+  the export's shape, taken from the scan's examples (ENDONE tablets, an oxycodone
+  ampoule, NOXICID, digoxin in micrograms).
+- **Guardrail:** `scripts/eval.py --split tune` unchanged: `ALL 145 17 5 precision 0.90
+  recall 0.97 F1 0.93`, high-risk 34/34, 0 false merges.
+
+**Changed shared files:** **`app/domain/packs/medtrace/types.py`**, the frozen
+MedTrace contract. One additive optional field on `Notice`. Arpon, this is your S42 ask;
+shout if you'd rather it lived elsewhere.
+
+**Broken:** nothing. Unit tests pass.
+
+**Needs from teammates:**
+- **Arpon (TGA registered on your machine):** please run P0089 live once and check the
+  ranking on real rows. If brand detection misses, the cause is the case of the first
+  word in `medicine_name`: a brand is only taken from an all-caps first word.
+- **Anshu:** `relevance` arrives top level, as `affects_this_patient` or `other_product`.
+  Your `relevanceOf` regexes already map both.
+
+**Next:** my low-priority items (S26–S29, S31). S31 first: repeating the same feedback can
+drive trust to 0.
+
+---
+
 ### 2026-10-27 · Arnav · arnav/s41
 
 **Did:** Scan **S41**, my half (Anshu had already done the display half and ticked it).

@@ -378,7 +378,10 @@ class Orchestrator:
         if self._planned(state, "check_shortages"):
             self._route(state, "check_shortages")
             shortages = executor.check_shortages(ctx, state.anchor,
-                                                 sorted({m.generic for m in analysis.fused if evaluator.is_current(m)}))
+                                                 sorted({m.generic for m in analysis.fused if evaluator.is_current(m)}),
+                                                 stmts, raw)
+            if shortages:  # said once for the run, not on every notice (scan S42)
+                state.caveats.append(executor.SHORTAGE_DISCLAIMER)
             analysis.notices = [*analysis.notices, *shortages]
             analysis.tasks = list(dict.fromkeys([*analysis.tasks, *(t for n in shortages for t in n.tasks)]))
         findings = [f.model_copy(update={"hmem_record_ids": self._hmem_ids(f), "explanation": writer.template(f)})
