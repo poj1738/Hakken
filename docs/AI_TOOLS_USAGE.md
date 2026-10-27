@@ -50,5 +50,6 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | Scan S39, S41 and S42 (UI halves) in `web/`: cell cards say what each source says and why, scope-note labels, Supply section; checked with Playwright |
 | 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | UI cleanup in `web/`: Welcome page, sticky searchable sidebar, live Powered-by pipeline, plain-English processing-log summaries; checked with Playwright |
 | 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | UI cleanup round 2 in `web/`: app-shell layout, Welcome balance and sponsor cards, copy audit of every screen; 37 Playwright screenshots against SAMPLE_MODE |
+| 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | Feature-freeze check in `web/`: verified S41/S42 display, fixed the duplicated TGA disclaimer and the pipeline layout at three widths; click path re-run with Playwright |
 
 The README's **AI and model usage** section summarises this for judges.

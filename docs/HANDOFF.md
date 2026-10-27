@@ -27,6 +27,55 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Anshu · anshu/final-check
+
+**Did:** feature-freeze check of the UI on main. Bug fixes only, all in `web/`.
+- **S41 scope notes (Arnav's wording):** checked on every SAMPLE_MODE patient.
+  - Notes show one per line, with no leftover prefixes: "One pharmacy only", "Private
+    scripts" and "Old GP list" labels, and the identity note on its own.
+  - They render correctly in the silo tooltip, the cell card and Notices.
+  - Nothing to fix.
+- **S42 Supply (Arnav's ranking):** no recorded run, sample or live, has a TGA row, so I
+  rendered notices from `executor.check_shortages` on Arnav's test-shaped rows, spliced
+  into the real P0089 run.
+  - "Affects this patient" comes first, other products collapse per medicine, and the
+    injection is dropped.
+  - **Bug fixed:** the API states the TGA disclaimer once, as a run caveat. The UI showed
+    it twice, once in the caveat banner and once in its own shorter copy in the Supply
+    header, and that copy dropped "a medicine not listed may still be short".
+  - Supply now shows the API's caveat text, and the banner leaves it out when Supply is
+    shown. Screenshots: [banner](handoff/final-check/tga-disclaimer-twice-banner.png),
+    [supply](handoff/final-check/tga-disclaimer-twice-supply.png).
+- **Pipeline layout bugs fixed** (before/after in `docs/handoff/final-check/pipeline-*.png`):
+  - The "Meterless engines" box was 137 px wider than its chips. The label sized the box
+    as if it sat on the same line as the chips. The label now sits on the box's top
+    border, and the two chips share the width equally (116/116 px; they were 85/116).
+  - Row 2 was misaligned: the engines box was 75 px tall against the agents box's 58 px,
+    so its chips sat 11 px off the connector line. The turn arrow from row 1 also ended
+    34 px above the chips. Everything in row 2 now sits on one centre line, and the turn
+    ends on it.
+  - At 1024 and 390 px, nodes wrapped and arrows dangled at line ends. When the panel is
+    under 720 px wide (container query), the pipeline is now one vertical flow with down
+    arrows. Nightshift → Nemotron stay side by side where they fit; agent and engine
+    chips form a 2×2 grid at phone width.
+  - Checked at 1440, 1024 and 390 px, before and after a run: zero dead space, no
+    horizontal overflow.
+- **Phone:** finding evidence rows use a narrower label column, so the values wrap less.
+- **Click path:**
+  - Rehearsal clean: P0089, P0015 identity review and confirm, P0003 mark GP candesartan
+    dose outdated → P0007 learning card.
+  - The 37-shot pass is also clean: Welcome, phone, states, hover. No page errors.
+- `make test` 847 passed, secret scan clean, `npm run build` ok.
+
+**Changed shared files:** none.
+**Broken:** nothing known. S42 is still not verified on a real TGA row; that needs
+Arpon's machine (see Arnav's s42 entry).
+**Needs from teammates:** Arpon, one live P0089 run with TGA registered, to confirm
+Supply on real rows.
+**Next:** demo recording.
+
+---
+
 ### 2026-10-27 · Arnav · arnav/live-examples
 
 **Did:** Re-recorded **`output_examples/live/`** on the batched model calls (#68), with
