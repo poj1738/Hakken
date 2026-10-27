@@ -1,40 +1,9 @@
 {
-  "run_id": "run-a6e19f2fee2f",
+  "run_id": "run-773ec5746c5e",
   "status": "success",
   "output": {
-    "summary": "",
-    "recommendations": [
-      {
-        "text": "Call GP practice",
-        "rationale": null,
-        "confidence": 0.5,
-        "requires_human_review": true
-      },
-      {
-        "text": "Ask the patient which pharmacy they use",
-        "rationale": null,
-        "confidence": 0.5,
-        "requires_human_review": true
-      },
-      {
-        "text": "Verify the glucosamine dose",
-        "rationale": null,
-        "confidence": 0.5,
-        "requires_human_review": true
-      },
-      {
-        "text": "Identify \"a little white one\" (patient, PAT-000115) with the patient",
-        "rationale": null,
-        "confidence": 0.5,
-        "requires_human_review": true
-      },
-      {
-        "text": "Identify \"cholesterol tablet\" (patient, PAT-000116) with the patient",
-        "rationale": null,
-        "confidence": 0.5,
-        "requires_human_review": true
-      }
-    ],
+    "summary": "No discrepancies found for Jennifer Young (MRN0000013) among the sources found; see the notices and tasks. Only 1 of 3 pre-admission sources found (patient). ACSQHC Standard 4 expects at least two independent sources besides the admission chart, so this is a draft medication history and is not confirmable. No record found in: gp, pharmacy.",
+    "recommendations": [],
     "evidence": [],
     "caveats": [
       "Synthetic data. Not medical advice. A pharmacist must confirm every item."
@@ -79,9 +48,9 @@
       "status": "ok"
     }
   ],
-  "trace_id": "run-a6e19f2fee2f",
-  "log_file": "/tmp/hakken-traces-6m1ic0ea/trace-run-a6e19f2fee2f.jsonl",
-  "execution_time_seconds": 32.49,
+  "trace_id": "run-773ec5746c5e",
+  "log_file": "/tmp/hakken-traces-igcxre8r/trace-run-773ec5746c5e.jsonl",
+  "execution_time_seconds": 26.38,
   "error": null,
   "memory_used": [],
   "sample_mode": false,
@@ -688,6 +657,11 @@
       ]
     }
   ],
+  "dose_units": {
+    "amlodipine": "mg",
+    "atorvastatin": "mg",
+    "gliclazide": "mg"
+  },
   "findings": [],
   "notices": [
     {
@@ -698,7 +672,8 @@
       "row_ids": [],
       "tasks": [
         "Call GP practice"
-      ]
+      ],
+      "relevance": null
     },
     {
       "type": "coverage_gap",
@@ -708,7 +683,8 @@
       "row_ids": [],
       "tasks": [
         "Ask the patient which pharmacy they use"
-      ]
+      ],
+      "relevance": null
     },
     {
       "type": "bpmh_not_confirmable",
@@ -716,7 +692,8 @@
       "source": null,
       "generic": null,
       "row_ids": [],
-      "tasks": []
+      "tasks": [],
+      "relevance": null
     },
     {
       "type": "patient_only_item",
@@ -728,7 +705,8 @@
       ],
       "tasks": [
         "Verify the glucosamine dose"
-      ]
+      ],
+      "relevance": null
     },
     {
       "type": "patient_only_item",
@@ -740,7 +718,8 @@
       ],
       "tasks": [
         "Identify \"a little white one\" (patient, PAT-000115) with the patient"
-      ]
+      ],
+      "relevance": null
     },
     {
       "type": "patient_only_item",
@@ -752,7 +731,8 @@
       ],
       "tasks": [
         "Identify \"cholesterol tablet\" (patient, PAT-000116) with the patient"
-      ]
+      ],
+      "relevance": null
     }
   ],
   "tasks": [
@@ -764,11 +744,473 @@
   ],
   "identity_review": null,
   "evidence_index": {
+    "EMR-000108": {
+      "source": "emr",
+      "row_id": "EMR-000108",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000108",
+        "source_patient_id": "MRN0000013",
+        "ihi_syn": "SYN-306753773813",
+        "name_given": "Jennifer",
+        "name_family": "Young",
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": "F",
+        "postcode": "2716",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": "amlodipine",
+        "med_code": "SYN-AMT-MP-0004",
+        "code_system": "amt",
+        "strength_text": "5 mg",
+        "dose_text": "5.0",
+        "route_text": "PO",
+        "freq_text": "1 daily",
+        "status_text": "",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "EMR-000109": {
+      "source": "emr",
+      "row_id": "EMR-000109",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000109",
+        "source_patient_id": "MRN0000013",
+        "ihi_syn": "SYN-306753773813",
+        "name_given": "Jennifer",
+        "name_family": "Young",
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": "F",
+        "postcode": "2716",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": "atorvastatin",
+        "med_code": "SYN-AMT-MP-0009",
+        "code_system": "amt",
+        "strength_text": "40 mg",
+        "dose_text": "40.0",
+        "route_text": "PO",
+        "freq_text": "1 daily",
+        "status_text": "",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "EMR-000110": {
+      "source": "emr",
+      "row_id": "EMR-000110",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000110",
+        "source_patient_id": "MRN0000013",
+        "ihi_syn": "SYN-306753773813",
+        "name_given": "Jennifer",
+        "name_family": "Young",
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": "F",
+        "postcode": "2716",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": "esomeprazole",
+        "med_code": "SYN-AMT-MP-0033",
+        "code_system": "amt",
+        "strength_text": "40 mg",
+        "dose_text": "40.0",
+        "route_text": "PO",
+        "freq_text": "1 daily",
+        "status_text": "",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "EMR-000111": {
+      "source": "emr",
+      "row_id": "EMR-000111",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000111",
+        "source_patient_id": "MRN0000013",
+        "ihi_syn": "SYN-306753773813",
+        "name_given": "Jennifer",
+        "name_family": "Young",
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": "F",
+        "postcode": "2716",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": "oxycodone",
+        "med_code": "SYN-AMT-MP-0063",
+        "code_system": "amt",
+        "strength_text": "20 mg",
+        "dose_text": "20.0",
+        "route_text": "PO",
+        "freq_text": "1 bd",
+        "status_text": "",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "EMR-000112": {
+      "source": "emr",
+      "row_id": "EMR-000112",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000112",
+        "source_patient_id": "MRN0000013",
+        "ihi_syn": "SYN-306753773813",
+        "name_given": "Jennifer",
+        "name_family": "Young",
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": "F",
+        "postcode": "2716",
+        "record_kind": "admission_chart",
+        "doc_date": "2026-10-24",
+        "med_text": "gliclazide",
+        "med_code": "SYN-AMT-MP-0044",
+        "code_system": "amt",
+        "strength_text": "30 mg",
+        "dose_text": "30.0",
+        "route_text": "PO",
+        "freq_text": "1 to 2 mane",
+        "status_text": "",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "EMR-000113": {
+      "source": "emr",
+      "row_id": "EMR-000113",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000113",
+        "source_patient_id": "MRN0000013",
+        "ihi_syn": "SYN-306753773813",
+        "name_given": "Jennifer",
+        "name_family": "Young",
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": "F",
+        "postcode": "2716",
+        "record_kind": "prior_discharge",
+        "doc_date": "2026-08-16",
+        "med_text": "atorvastatin",
+        "med_code": "SYN-AMT-MP-0009",
+        "code_system": "amt",
+        "strength_text": "40 mg",
+        "dose_text": "40.0",
+        "route_text": "PO",
+        "freq_text": "1 daily",
+        "status_text": "start",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "EMR-000114": {
+      "source": "emr",
+      "row_id": "EMR-000114",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000114",
+        "source_patient_id": "MRN0000013",
+        "ihi_syn": "SYN-306753773813",
+        "name_given": "Jennifer",
+        "name_family": "Young",
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": "F",
+        "postcode": "2716",
+        "record_kind": "prior_discharge",
+        "doc_date": "2026-08-16",
+        "med_text": "gliclazide",
+        "med_code": "SYN-AMT-MP-0044",
+        "code_system": "amt",
+        "strength_text": "30 mg",
+        "dose_text": "30.0",
+        "route_text": "PO",
+        "freq_text": "1 to 2 mane",
+        "status_text": "start",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "EMR-000115": {
+      "source": "emr",
+      "row_id": "EMR-000115",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000115",
+        "source_patient_id": "MRN0000013",
+        "ihi_syn": "SYN-306753773813",
+        "name_given": "Jennifer",
+        "name_family": "Young",
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": "F",
+        "postcode": "2716",
+        "record_kind": "prior_discharge",
+        "doc_date": "2026-08-16",
+        "med_text": "sertraline",
+        "med_code": "SYN-AMT-MP-0081",
+        "code_system": "amt",
+        "strength_text": "200 mg",
+        "dose_text": "200.0",
+        "route_text": "PO",
+        "freq_text": "1 daily",
+        "status_text": "cease",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "EMR-000116": {
+      "source": "emr",
+      "row_id": "EMR-000116",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "emr",
+        "row_id": "EMR-000116",
+        "source_patient_id": "MRN0000013",
+        "ihi_syn": "SYN-306753773813",
+        "name_given": "Jennifer",
+        "name_family": "Young",
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": "F",
+        "postcode": "2716",
+        "record_kind": "prior_discharge",
+        "doc_date": "2026-08-16",
+        "med_text": "amlodipine",
+        "med_code": "SYN-AMT-MP-0004",
+        "code_system": "amt",
+        "strength_text": "5 mg",
+        "dose_text": "5.0",
+        "route_text": "PO",
+        "freq_text": "1 daily",
+        "status_text": "start",
+        "note_text": "",
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000114": {
+      "source": "patient",
+      "row_id": "PAT-000114",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000114",
+        "source_patient_id": "INT00013",
+        "ihi_syn": "",
+        "name_given": "Jennifer Young",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "candesartan",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "no",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000117": {
+      "source": "patient",
+      "row_id": "PAT-000117",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000117",
+        "source_patient_id": "INT00013",
+        "ihi_syn": "",
+        "name_given": "Jennifer Young",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "Nexium",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000118": {
+      "source": "patient",
+      "row_id": "PAT-000118",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000118",
+        "source_patient_id": "INT00013",
+        "ihi_syn": "",
+        "name_given": "Jennifer Young",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "OxyContin",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "morning and night",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000119": {
+      "source": "patient",
+      "row_id": "PAT-000119",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000119",
+        "source_patient_id": "INT00013",
+        "ihi_syn": "",
+        "name_given": "Jennifer Young",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "Diamicron MR",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "1 to 2 mane",
+        "status_text": "yes",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
+    "PAT-000120": {
+      "source": "patient",
+      "row_id": "PAT-000120",
+      "sql_template_id": "Q2",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "fields": {
+        "source": "patient",
+        "row_id": "PAT-000120",
+        "source_patient_id": "INT00013",
+        "ihi_syn": "",
+        "name_given": "Jennifer Young",
+        "name_family": null,
+        "name_previous": null,
+        "dob_text": "1956-02-13",
+        "sex": null,
+        "postcode": null,
+        "record_kind": "interview",
+        "doc_date": null,
+        "med_text": "sertraline",
+        "med_code": null,
+        "code_system": null,
+        "strength_text": null,
+        "dose_text": null,
+        "route_text": null,
+        "freq_text": "one a day",
+        "status_text": "no",
+        "note_text": null,
+        "qty": null,
+        "days_supply": null,
+        "pharmacy_id": null,
+        "script_type": null
+      }
+    },
     "PAT-000121": {
       "source": "patient",
       "row_id": "PAT-000121",
       "sql_template_id": "Q2",
-      "query_id": "fb79b79e-2124-4bdb-bb3c-ceee30b2ef6a",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000121",
@@ -801,7 +1243,7 @@
       "source": "patient",
       "row_id": "PAT-000115",
       "sql_template_id": "Q2",
-      "query_id": "fb79b79e-2124-4bdb-bb3c-ceee30b2ef6a",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000115",
@@ -834,7 +1276,7 @@
       "source": "patient",
       "row_id": "PAT-000116",
       "sql_template_id": "Q2",
-      "query_id": "fb79b79e-2124-4bdb-bb3c-ceee30b2ef6a",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
       "fields": {
         "source": "patient",
         "row_id": "PAT-000116",
@@ -1127,8 +1569,8 @@
   ],
   "trace": [
     {
-      "timestamp": "2026-10-26T03:50:22.296160+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:28.853391+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Planner",
       "action": "start",
       "input_summary": null,
@@ -1152,8 +1594,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:22.297907+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:28.855189+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Planner",
       "action": "recall",
       "input_summary": null,
@@ -1177,8 +1619,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:41.534378+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:38.126865+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Planner",
       "action": "plan",
       "input_summary": null,
@@ -1189,13 +1631,13 @@
       "retry_count": 0,
       "status": "ok",
       "step": "PLAN",
-      "message": "Plan: find_identities (\"Confirm patient identity across all data sources using MRN0000013\"); fetch_meds (\"Retrieve current medication list from general practice (medtrace.gp)\"); verify (\"Re‑read cited rows to confirm reconciliation accuracy\"). The plan systematically identifies the patient, gathers medication data from key sources (EMR, pharmacy, GP), and verifies the reconciled list to ensure accuracy and safety, staying within the query budget of 8.",
+      "message": "Plan: find_identities (\"Locate patient record across all data sources to ensure we have the correct identity mapping.\"); fetch_meds (\"Retrieve current medication list from EMR, pharmacy, GP, and other sources.\"); check_shortages (\"Identify any known supply shortages that may affect current prescriptions.\"); verify (\"Re‑check cited rows to confirm accuracy before finalizing reconciliation.\"). The plan first resolves the patient's identity across all Medtrace sources to avoid mismatches, then pulls the most up‑to‑date medication records from each relevant system, checks for any documented shortages that could impact therapy, and finally verifies the cited data to ensure accuracy before delivering the reconciled list.",
       "route": "meterless/fast",
-      "latency_ms": 18132,
+      "latency_ms": 9268,
       "tokens": {
         "prompt_tokens": 475,
-        "completion_tokens": 1200,
-        "total_tokens": 1675
+        "completion_tokens": 749,
+        "total_tokens": 1224
       },
       "sql": null,
       "row_count": null,
@@ -1204,8 +1646,8 @@
       "memory_ids": [],
       "error": null,
       "meterless": {
-        "receipt_id": "rcpt_req_7xsklyd8",
-        "decision_id": "req_7xsklyd8",
+        "receipt_id": "rcpt_req_cg2jmv26",
+        "decision_id": "req_cg2jmv26",
         "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
         "provider_model": "meterless/auto",
         "requested_model": "meterless/fast",
@@ -1231,16 +1673,16 @@
           {
             "phase": "planning",
             "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
-            "ms": 18351,
+            "ms": 9426,
             "tokensIn": 475,
-            "tokensOut": 1200
+            "tokensOut": 749
           }
         ]
       }
     },
     {
-      "timestamp": "2026-10-26T03:50:41.535106+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:38.128014+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1251,7 +1693,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "Planner need \"Confirm patient identity across all data sources using MRN0000013\" -> the Executor fills template Q1 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "message": "Planner need \"Locate patient record across all data sources to ensure we have the correct identity mapping.\" -> the Executor runs verified query Q1 on Zetaris, read-only.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -1264,8 +1706,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:49.073617+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:48.552925+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Executor",
       "action": "find_identities",
       "input_summary": null,
@@ -1278,7 +1720,7 @@
       "step": "FIND_IDENTITY",
       "message": "Found Jennifer Young in 0 other record(s): none. 1 near-miss(es) need your confirmation: patient:INT00013 0.84 (held: this record carries no IHI, and it falls in a group of matching records that includes Joseph Young (DOB 1956-12-13, emr:MRN0000009), who carries a different IHI — confirm it is this patient).",
       "route": null,
-      "latency_ms": 7531,
+      "latency_ms": 9601,
       "tokens": null,
       "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date FROM medtrace.all_sources WHERE ihi_syn = 'SYN-306753773813' OR dob_text IN ('13/02/1956', '1956-02-13') OR (dob_text LIKE '%1956%' AND (UPPER(name_family) LIKE 'YOUN%' OR UPPER(name_previous) LIKE 'YOUN%' OR UPPER(name_given) LIKE 'YOUN%')) OR (source = 'emr' AND source_patient_id = 'MRN0000013')",
       "row_count": 57,
@@ -1288,13 +1730,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q1",
-      "query_id": "febf0b88-ea0f-4ac7-af5a-6d4262ea5138",
-      "request_id": "73e8f6dc-0abc-46e3-835d-468924fba95e",
+      "query_id": "a1543403-e0d1-46b4-862e-88ab6ae850e5",
+      "request_id": "811fc1e1-fde5-453c-bc4c-c0c2197fa644",
       "replayed": false
     },
     {
-      "timestamp": "2026-10-26T03:50:49.074812+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:48.555567+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1305,7 +1747,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FIND_IDENTITY",
-      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query febf0b88-ea0f-4ac7-af5a-6d4262ea5138); audit seq 21-25.",
+      "message": "World Model: recorded 5 patient records and 0 same-person link(s), each with provenance (Zetaris query a1543403-e0d1-46b4-862e-88ab6ae850e5); audit seq 21-25.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -1318,8 +1760,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:49.075372+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:48.555962+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Executor",
       "action": "needs_review",
       "input_summary": null,
@@ -1343,8 +1785,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:49.080904+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:48.563158+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Executor",
       "action": "identity_decision",
       "input_summary": null,
@@ -1368,8 +1810,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:49.081792+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:48.564124+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1393,8 +1835,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:49.082080+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:48.564593+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Executor",
       "action": "world_model",
       "input_summary": null,
@@ -1418,8 +1860,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:49.082222+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:48.564788+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1430,7 +1872,7 @@
       "retry_count": 0,
       "status": "ok",
       "step": "FETCH_MEDS",
-      "message": "Planner need \"Retrieve current medication list from general practice (medtrace.gp)\" -> the Executor fills template Q2 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "message": "Planner need \"Retrieve current medication list from EMR, pharmacy, GP, and other sources.\" -> the Executor runs verified query Q2 on Zetaris, read-only.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -1443,8 +1885,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:55.873432+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:55.765420+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Executor",
       "action": "fetch_meds",
       "input_summary": null,
@@ -1457,7 +1899,7 @@
       "step": "FETCH_MEDS",
       "message": "Fetched 17 medicine rows in one query: emr 9, patient 8.",
       "route": null,
-      "latency_ms": 6785,
+      "latency_ms": 7198,
       "tokens": null,
       "sql": "SELECT source, row_id, source_patient_id, ihi_syn, name_given, name_family, name_previous, dob_text, sex, postcode, record_kind, doc_date, med_text, med_code, code_system, strength_text, dose_text, route_text, freq_text, status_text, note_text, qty, days_supply, pharmacy_id, script_type FROM medtrace.all_sources WHERE (source = 'emr' AND source_patient_id = 'MRN0000013') OR (source = 'patient' AND source_patient_id = 'INT00013')",
       "row_count": 17,
@@ -1467,13 +1909,13 @@
       "error": null,
       "meterless": null,
       "sql_template_id": "Q2",
-      "query_id": "fb79b79e-2124-4bdb-bb3c-ceee30b2ef6a",
-      "request_id": "d590e5fd-eb99-402d-8438-157078fdfaad",
+      "query_id": "9301b5f9-47ea-401d-b8fe-57b8e16f2ba0",
+      "request_id": "f47039c5-a020-4a02-abae-50b1e0c50569",
       "replayed": false
     },
     {
-      "timestamp": "2026-10-26T03:50:55.877701+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:55.772236+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Executor",
       "action": "normalise",
       "input_summary": null,
@@ -1497,8 +1939,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:55.880704+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:55.775780+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Evaluator",
       "action": "fuse",
       "input_summary": null,
@@ -1522,8 +1964,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:55.881739+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:55.777121+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Evaluator",
       "action": "detect",
       "input_summary": null,
@@ -1547,8 +1989,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:55.881939+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:55.777386+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Evaluator",
       "action": "prioritise",
       "input_summary": null,
@@ -1572,8 +2014,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:55.882629+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:55.778377+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Executor",
       "action": "route",
       "input_summary": null,
@@ -1583,8 +2025,8 @@
       "confidence": null,
       "retry_count": 0,
       "status": "ok",
-      "step": "VERIFY",
-      "message": "Planner need \"Re‑read cited rows to confirm reconciliation accuracy\" -> the Executor fills template Q3 and the Zetaris adapter sends it (read-only check, Bearer key, X-Org-ID, fresh X-Request-ID).",
+      "step": "CHECK_SHORTAGES",
+      "message": "Planner need \"Identify any known supply shortages that may affect current prescriptions.\" -> the Executor runs verified query Q4 on Zetaris, read-only.",
       "route": null,
       "latency_ms": null,
       "tokens": null,
@@ -1597,8 +2039,58 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:55.882822+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:56.046765+00:00",
+      "run_id": "run-773ec5746c5e",
+      "agent_name": "Executor",
+      "action": "check_shortages",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "skipped",
+      "step": "CHECK_SHORTAGES",
+      "message": "Shortage overlay unavailable on this Zetaris (the TGA view may not be registered); continuing without it.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": "HTTP 400: {'msg': \"[TABLE_OR_VIEW_NOT_FOUND] The table or view `medtrace`.`tga_shortages` cannot be found. Verify the spelling and correctness of the schema and catalog.\\nIf you did not qualify the name with a ",
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-27T02:28:56.047378+00:00",
+      "run_id": "run-773ec5746c5e",
+      "agent_name": "Executor",
+      "action": "route",
+      "input_summary": null,
+      "output_summary": null,
+      "target_agent": null,
+      "model": null,
+      "confidence": null,
+      "retry_count": 0,
+      "status": "ok",
+      "step": "VERIFY",
+      "message": "Planner need \"Re‑check cited rows to confirm accuracy before finalizing reconciliation.\" -> the Executor runs verified query Q3 on Zetaris, read-only.",
+      "route": null,
+      "latency_ms": null,
+      "tokens": null,
+      "sql": null,
+      "row_count": null,
+      "engine": null,
+      "engine_op": null,
+      "memory_ids": [],
+      "error": null,
+      "meterless": null
+    },
+    {
+      "timestamp": "2026-10-27T02:28:56.047598+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Evaluator",
       "action": "verify",
       "input_summary": null,
@@ -1622,8 +2114,8 @@
       "meterless": null
     },
     {
-      "timestamp": "2026-10-26T03:50:55.882990+00:00",
-      "run_id": "run-a6e19f2fee2f",
+      "timestamp": "2026-10-27T02:28:56.047824+00:00",
+      "run_id": "run-773ec5746c5e",
       "agent_name": "Writer",
       "action": "done",
       "input_summary": null,
@@ -1647,18 +2139,18 @@
       "meterless": null
     }
   ],
-  "query_count": 2,
-  "zetaris_ms": 14316,
+  "query_count": 3,
+  "zetaris_ms": 16799,
   "model_calls": [
     {
       "role": "Planner",
       "requested_route": "meterless/fast",
       "routed_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
-      "request_id": "chatcmpl-75bd66c9-ff4e-4adc-b589-ab7067fb9893",
+      "request_id": "chatcmpl-13ff882a-c2a1-4f8c-98a2-04e50923aef0",
       "tokens": {
         "prompt_tokens": 475,
-        "completion_tokens": 1200,
-        "total_tokens": 1675
+        "completion_tokens": 749,
+        "total_tokens": 1224
       },
       "truncated": false
     }

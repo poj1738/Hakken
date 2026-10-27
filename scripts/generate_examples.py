@@ -53,14 +53,14 @@ def _write(path: Path, model) -> None:
     path.write_text(json.dumps(model.model_dump(mode="json"), indent=2, ensure_ascii=False) + "\n")
 
 
-def run_mode(mode: str, out_root: Path = OUT, settings=None) -> list[dict]:
+def run_mode(mode: str, out_root: Path = OUT, settings=None, only: list[str] | None = None) -> list[dict]:
     settings = (settings or get_settings()).model_copy(update={"sample_mode": mode == "sample_mode"})
     out = out_root / mode
     out.mkdir(parents=True, exist_ok=True)
     traces = Path(tempfile.mkdtemp(prefix="hakken-traces-"))
     orch = Orchestrator(settings, log_dir=traces, world=WorldModel(namespace="examples"), hmem=HMEM())
     summary = []
-    for name in ORDER:
+    for name in (n for n in ORDER if not only or n in only):
         req = RunRequest.model_validate_json((INPUTS / f"{name}.json").read_text())
         t0 = time.monotonic()
         print(f"[{mode}] {name} ({req.patient_id}) ...", flush=True)
@@ -124,10 +124,15 @@ def write_readme() -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--mode", choices=["sample", "live", "both"], default="sample")
+    # Re-record some examples only (a live run takes minutes each). example_5 learns from the
+    # verdict applied after example_4, so the generator refuses to run 5 without 4.
+    ap.add_argument("--only", nargs="+", choices=ORDER, metavar="EXAMPLE")
     args = ap.parse_args()
+    if args.only and "example_5_learning_learn" in args.only and "example_4_learning_teach" not in args.only:
+        ap.error("example_5_learning_learn needs example_4_learning_teach in the same run")
     modes = {"sample": ["sample_mode"], "live": ["live"], "both": ["sample_mode", "live"]}[args.mode]
     for mode in modes:
-        run_mode(mode)
+        run_mode(mode, only=args.only)
     write_readme()
     print(f"wrote {OUT.relative_to(ROOT)}/")
     return 0

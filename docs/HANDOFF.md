@@ -27,6 +27,48 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Arnav · arnav/live-examples
+
+**Did:** Re-recorded **`output_examples/live/`** on the batched model calls (#68), with
+Nightshift's highest-quality features off. **All five are now `success`.** Every model call
+was answered by `nvidia/nemotron-3.5-lightning-30b-a3b`. There are no unanswered calls and
+no degradation caveats, and the live findings are identical to sample mode.
+
+| Example | Findings | Seconds |
+|---|---|---|
+| example_1 | 5 | 453 |
+| example_2 | 5 (was `partial`) | 463 |
+| example_3 | 0 | 26 |
+| example_4 | 1 | 496 |
+| example_5 | 1 | 154 |
+
+- **First pass:** example_4 ended `partial`. Its summary call (4096 tokens) came back
+  `nemotron…_empty_response` after 142 s, because the hidden reasoning used the whole
+  budget. `writer.summarise` now has 8192, and examples 4 and 5 were re-run together, both
+  `success`.
+- **`scripts/generate_examples.py --only <example …>`** re-records named examples only.
+  It refuses example_5 without example_4, because example_5 learns from the verdict
+  applied after example_4.
+- **`test_live_examples_name_the_nemotron_that_answered`** predated S9. It now requires
+  every *answered* call to be `nvidia/*`, and allows a call with no model only in a run
+  marked `partial`.
+
+**Changed shared files:** none.
+
+**Broken:** nothing. Unit tests pass.
+
+**Watch:**
+- **example_4 took 496 s** of the 600 s budget. If Nightshift slows, the S5 time guard
+  skips late model steps and the run says `partial`.
+- **Example_5's free-text resolution used 7,995 of 8,192 tokens.** It didn't truncate,
+  but it was close.
+
+**Needs from teammates:** nothing.
+
+**Next:** S31, S27, then S26, S28, S29.
+
+---
+
 ### 2026-10-27 · Arnav · arnav/batch-model-calls
 
 **Did:** Nightshift cuts any call at about 90 s. Even with its highest-quality features off,
