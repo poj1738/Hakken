@@ -85,9 +85,10 @@ submission. **Hard deadline 2026-10-27 23:45 UTC** (Wed 28 Oct 10:45 AEDT).
 
 - [x] ≥3 genuinely different `input_examples/`; `scripts/generate_examples.py` writing
       `output_examples/` from real runs; a test asserting the outputs differ.
-- [ ] `scripts/validate_submission.sh` — the full disqualification checklist, including
+- [x] `scripts/validate_submission.sh` — the full disqualification checklist, including
       the step people skip: fresh clone, no `.env`, both services unreachable,
       `SAMPLE_MODE=true`, and a run must still succeed with real logic.
+      *(27 Oct: `make validate` → 24 passed, 0 failed.)*
 - [ ] Finish `README.md`, `docs/SPONSOR_TECH.md`, `metadata.json`,
       `docs/DATA_SOURCES.md`, `docs/ARCHITECTURE.md` (mermaid from real code).
       README architecture + agents, `docs/ARCHITECTURE.md` and `docs/SPONSOR_TECH.md`
