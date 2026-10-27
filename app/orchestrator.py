@@ -22,7 +22,7 @@ from typing import Any
 from datetime import date
 from pathlib import Path
 
-from app.adapters.meterless import MeterlessClient, MeterlessError
+from app.adapters.meterless import MeterlessClient, MeterlessError, run_deadline
 from app.adapters.zetaris import QueryBudgetExceeded, RunQueries, ZetarisClient, ZetarisError, load_lexicon
 from app.agents import evaluator, executor, identity_memory, planner, writer
 from app.agents.base import AgentContext, RunTimeout
@@ -317,7 +317,10 @@ class Orchestrator:
         if not self._time_for_a_model_call(state, name):
             return fallback()
         try:
-            return call()
+            # Every request this step makes -- retries and the JSON repair included -- ends by
+            # the run's deadline (live, 27 Oct: one step's retries ran 20 minutes past it).
+            with run_deadline(state.ctx.deadline):
+                return call()
         except MeterlessError as exc:
             if self.settings.sample_mode:
                 raise

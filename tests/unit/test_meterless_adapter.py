@@ -374,3 +374,57 @@ def test_a_second_499_is_a_recorded_failure_not_a_loop(make_settings) -> None:
         client(make_settings, rec, max_retries=2).chat("Writer", MSG)
     assert exc.value.status == 499 and len(rec.requests) == 2
     assert exc.value.calls and exc.value.calls[0].routed_model is None  # S9: still in model_calls
+
+
+# -- the run deadline bounds every attempt (live, 27 Oct: a summary step ran 20 min) ------------
+
+
+def test_no_attempt_starts_once_the_run_deadline_has_passed(make_settings) -> None:
+    import time as _time
+
+    from app.adapters.meterless import run_deadline
+
+    rec = Recorder(httpx.Response(200, json=chat_body("ok")))
+    with run_deadline(_time.monotonic() + 1.0), pytest.raises(MeterlessError) as exc:
+        client(make_settings, rec).chat("Writer", MSG)
+    assert "run deadline reached" in str(exc.value) and rec.requests == []
+
+
+def test_retries_stop_at_the_run_deadline(make_settings, monkeypatch) -> None:
+    """Upstream 502 every time, plenty of retries configured: the deadline, not MAX_RETRIES, ends it."""
+    import time as _time
+
+    from app.adapters.meterless import MIN_ATTEMPT_S, run_deadline
+
+    base, clock = _time.monotonic(), {"t": 0.0}
+    rec = Recorder(httpx.Response(502, json={"error": "x"}))
+    c = client(make_settings, rec, max_retries=50)
+    c._sleep = lambda _s: clock.__setitem__("t", clock["t"] + 100.0)  # each retry wait spends 100 s
+    monkeypatch.setattr(_time, "monotonic", lambda: base + clock["t"])
+    with run_deadline(base + 3 * 100.0 + MIN_ATTEMPT_S - 1), pytest.raises(MeterlessError) as exc:
+        c.chat("Writer", MSG)
+    assert exc.value.kind == "upstream" and len(rec.requests) == 3  # not 51
+
+
+def test_an_attempt_is_capped_by_the_time_left(make_settings) -> None:
+    """A peer that never answers is abandoned at the run deadline, not at the per-call timeout."""
+    import threading
+    import time as _time
+
+    from app.adapters.meterless import run_deadline
+
+    release = threading.Event()
+
+    def hang(_request: httpx.Request) -> httpx.Response:
+        release.wait(30)
+        return httpx.Response(200, json=chat_body("late"))
+
+    c = MeterlessClient(make_settings(meterless_runtime_token=TOKEN, meterless_timeout_s=180.0),
+                        transport=httpx.MockTransport(hang), sleep=lambda _s: None)
+    start = _time.monotonic()
+    try:
+        with run_deadline(start + 12.0), pytest.raises(MeterlessError) as exc:
+            c.chat("Writer", MSG)
+    finally:
+        release.set()
+    assert exc.value.kind == "offline" and _time.monotonic() - start < 20

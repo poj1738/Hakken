@@ -29,7 +29,11 @@ from __future__ import annotations
 import json
 import re
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FutureTimeout
+from contextlib import contextmanager
+from contextvars import ContextVar, copy_context
 from dataclasses import dataclass, field
 from typing import Any, Literal, TypeVar
 
@@ -69,6 +73,24 @@ _RETRYABLE_STATUS = {502, 503, 504}
 #: 26 Oct on three long calls (Writer draft, Writer revise, a critique) in one example_2 run.
 #: Retried exactly once, whatever MAX_RETRIES says -- each attempt was already a long wait.
 _ABORTED_STATUS = 499
+
+#: The run's deadline (time.monotonic()), set by the orchestrator around each model step. No
+#: request attempt -- first try, retry or JSON repair -- may outlast it. Live, 27 Oct: one
+#: summary step failed upstream again and again and took 20 minutes of a 10-minute run,
+#: because the deadline was only checked between steps.
+_DEADLINE: ContextVar[float | None] = ContextVar("meterless_run_deadline", default=None)
+#: Less run time than this left: do not start another attempt.
+MIN_ATTEMPT_S = 10.0
+
+
+@contextmanager
+def run_deadline(deadline: float | None) -> Iterator[None]:
+    """Bound every Nightshift request made inside this block by `deadline` (monotonic seconds)."""
+    token = _DEADLINE.set(deadline)
+    try:
+        yield
+    finally:
+        _DEADLINE.reset(token)
 _ROLES = ("Planner", "Executor", "Evaluator", "Writer")
 
 ProviderState = Literal["online", "unauthorized", "offline"]
@@ -329,6 +351,22 @@ class MeterlessClient:
         result.attempts = attempts
         return result
 
+    def _post_within(self, payload: dict[str, Any], timeout: float) -> httpx.Response:
+        """One POST that returns within `timeout` seconds of wall clock, whatever the server does.
+
+        httpx's timeout bounds each wait for bytes, not the whole request, so a peer that keeps
+        the connection busy can hold a call far longer. The request runs on a worker thread and
+        is abandoned at the deadline; that thread finishes on its own, bounded by httpx.
+        """
+        def post() -> httpx.Response:
+            with self._client(timeout) as client:
+                return client.post("/chat/completions", json=payload, headers=self._headers(chat=True))
+        pool = ThreadPoolExecutor(max_workers=1)
+        try:
+            return pool.submit(copy_context().run, post).result(timeout=timeout + 1.0)
+        finally:
+            pool.shutdown(wait=False)
+
     def _post_with_retry(self, payload: dict[str, Any]) -> tuple[httpx.Response, int, int]:
         """Bounded retries on connection failures and 502/503/504, plus one retry on a 499. A
         read timeout is not retried: three 180 s waits would spend the whole run budget."""
@@ -340,12 +378,20 @@ class MeterlessClient:
             attempt += 1
             if attempt:
                 self._sleep(min(2.0 * attempt, 5.0))
+            timeout = self.settings.meterless_timeout_s
+            deadline = _DEADLINE.get()
+            if deadline is not None:
+                left = deadline - time.monotonic()
+                if left < MIN_ATTEMPT_S:
+                    # Out of run time: no new attempt. Report the last failure if there was one.
+                    raise last or MeterlessError("offline", f"run deadline reached ({left:.0f}s left); "
+                                                            "no request sent")
+                timeout = min(timeout, left)
             start = time.monotonic()
             try:
-                with self._client(self.settings.meterless_timeout_s) as client:
-                    response = client.post("/chat/completions", json=payload, headers=self._headers(chat=True))
-            except httpx.TimeoutException as exc:
-                raise MeterlessError("offline", f"no answer within {self.settings.meterless_timeout_s:.0f}s "
+                response = self._post_within(payload, timeout)
+            except (httpx.TimeoutException, FutureTimeout) as exc:
+                raise MeterlessError("offline", f"no answer within {timeout:.0f}s "
                                      f"({type(exc).__name__})") from exc
             except httpx.TransportError as exc:
                 last = MeterlessError("offline", f"cannot reach Nightshift at {self.base_url} "
