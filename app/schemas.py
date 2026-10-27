@@ -12,7 +12,7 @@ has a default, so a run that never reached a stage still validates.
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
-from typing import Any, Literal
+from typing import Any, Literal, get_args
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -61,14 +61,19 @@ class RunRequest(BaseModel):
 
     # The EMR `source_patient_id` of the admitted patient, e.g. "MRN0000001" --
     # never a ground-truth key like "P0001", which exists only for evaluation.
-    patient_id: str | None = Field(default=None, min_length=1, max_length=64)
+    # Required (scan S26): a missing patient is a 422 from validation, not a 404 later.
+    patient_id: str = Field(min_length=1, max_length=64)
     question: str = Field(
         default="Reconcile this patient's pre-admission medicines.",
         min_length=3,
         max_length=2000,
     )
-    domain_pack: str | None = None
+    # Only the pack that exists; anything else is a 422, never silently ignored.
+    domain_pack: Literal["medtrace"] | None = None
+    # Critique rounds for this run, capped by the server's MAX_AGENT_ITERATIONS.
     max_iterations: int | None = Field(default=None, ge=1, le=10)
+    # Must match the server's mode if given: a request cannot switch a live server offline
+    # (the orchestrator refuses a mismatch with 422 rather than ignore it).
     sample_mode: bool | None = None
     context: dict[str, Any] = Field(default_factory=dict)
 
@@ -375,6 +380,12 @@ class FeedbackRequest(BaseModel):
             raise ValueError("a confirm carries no reason")
         if self.reason == "source_outdated" and (self.source is None or self.attribute is None):
             raise ValueError("source_outdated needs the outdated source and attribute")
+        if self.target_id.startswith("grid:"):
+            # A format error is the caller's (422), not "not found" (404) -- scan S29.
+            parts = self.target_id.split(":")
+            if len(parts) != 3 or not parts[1] or parts[2] not in get_args(TrustAttribute):
+                raise ValueError("a grid target is grid:<generic>:<attribute>, with attribute one of "
+                                 + ", ".join(get_args(TrustAttribute)))
         return self
 
 

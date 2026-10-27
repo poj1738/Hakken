@@ -70,6 +70,11 @@ class UnknownPatient(ValueError):
     pass
 
 
+class InvalidRequest(ValueError):
+    """A well-formed request the server cannot honour (scan S26), e.g. `sample_mode` that differs
+    from the server's mode. The API answers 422; it is never silently ignored."""
+
+
 @dataclass
 class RunState:
     run_id: str
@@ -91,6 +96,10 @@ class RunState:
     verified: bool = False
     q3_sql: str = ""
     response: RunResponse | None = None
+    # Time spent waiting for the pharmacist is not run time (scan S28): the identity pause
+    # starts at `paused_at` and its length is added to `paused_s` when the decision arrives.
+    paused_at: float | None = None
+    paused_s: float = 0.0
 
 
 class Orchestrator:
@@ -163,6 +172,11 @@ class Orchestrator:
         """Validate the patient and open the run. Returns its id; nothing is queried yet."""
         if not request.patient_id:
             raise UnknownPatient("patient_id is required")
+        if request.sample_mode is not None and request.sample_mode != self.settings.sample_mode:
+            mode = "SAMPLE_MODE" if self.settings.sample_mode else "live"
+            raise InvalidRequest(f"this server runs in {mode} mode; a request cannot switch it "
+                                 f"(sample_mode={str(request.sample_mode).lower()}). Restart it with "
+                                 f"SAMPLE_MODE={'false' if self.settings.sample_mode else 'true'} instead.")
         anchor = self._load_anchors().get(request.patient_id)
         if anchor is None:
             raise UnknownPatient(f"{request.patient_id} is not an admitted patient")
@@ -212,7 +226,11 @@ class Orchestrator:
                               engine_op="relate",
                               message=f"World Model: decision recorded with provenance (audit seq {seq}); future "
                                       "runs for this patient reuse it.")
-        # The deadline restarts: time spent waiting for a human is not run time.
+        # The deadline restarts: time spent waiting for a human is not run time -- and neither
+        # is it counted in `execution_time_seconds` (scan S28).
+        if state.paused_at is not None:
+            state.paused_s += time.monotonic() - state.paused_at
+            state.paused_at = None
         state.ctx.deadline = time.monotonic() + self.settings.run_timeout_s
         state.running = True
 
@@ -423,7 +441,9 @@ class Orchestrator:
         if blocked:  # the summary may describe a finding that verification just removed
             summary = state.summary = self._checked_summary(state, summary, findings, analysis.banner)
 
-        rounds = max(1, self.settings.max_agent_iterations)
+        # A request may ask for fewer critique rounds than the server allows, never more (scan S26).
+        rounds = max(1, min(self.settings.max_agent_iterations,
+                            state.request.max_iterations or self.settings.max_agent_iterations))
         to_check = findings  # round 1 reads every explanation; later rounds only the revised ones
         for round_no in range(1, rounds + 1):
             problems: dict[str, list[str]] = {}
@@ -540,6 +560,7 @@ class Orchestrator:
                              summary=f"Waiting for identity review: {len(pending)} near-miss record(s).",
                              coverage=cov, banner=banner or None, confirmable=confirmable)
         resp.identity_review = IdentityReview(anchor=state.anchor, candidates=pending, records=rows)
+        state.paused_at = time.monotonic()
         return resp
 
     def _respond(self, state: RunState, status: str, *, summary: str | None = None, analysis=None,
@@ -576,7 +597,8 @@ class Orchestrator:
                                        row_count=len(f.evidence), verified=True) for f in findings if q3_sql],
                 caveats=caveats),
             agents=agents, trace_id=state.run_id, log_file=ctx.tracer.log_file,
-            execution_time_seconds=round(time.monotonic() - state.started, 2), error=error,
+            execution_time_seconds=round((state.paused_at or time.monotonic()) - state.started - state.paused_s, 2),
+            error=error,
             sample_mode=self.settings.sample_mode,
             provider_state="sample_mode" if self.settings.sample_mode else ("online" if live else None),
             patient_id=state.anchor.source_patient_id, coverage=coverage or {}, bpmh_confirmable=confirmable,

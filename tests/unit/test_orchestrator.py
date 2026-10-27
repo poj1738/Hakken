@@ -456,3 +456,21 @@ def test_scope_notes_are_plain_words_after_a_stable_prefix(orch) -> None:
             assert re.search(r"last updated \d{1,2} [A-Z][a-z]{2} \d{4}, about \d+ months ago\. It may be out of "
                              r"date\.$", note), note
     assert any(n.startswith(cov.SCOPE_SINGLE_PHARMACY + " Only one pharmacy's records found (") for n in seen)
+
+
+def test_waiting_for_the_pharmacist_is_not_run_time(orch) -> None:
+    """Scan S28: a run paused 10 minutes for an identity decision used to report ~620 s."""
+    first = run(orch, "MRN0000015")
+    assert first.status == "needs_review"
+    orch.runs[first.run_id].paused_at -= 600  # as if the pharmacist answered ten minutes later
+    r = orch.resume(first.run_id, IdentityDecisionRequest(candidate_id="patient:INT00015", same_person=True))
+    assert r.status == "success" and r.execution_time_seconds < 60
+    assert orch.runs[first.run_id].paused_s >= 600
+
+
+def test_a_request_cannot_switch_the_server_mode(orch) -> None:
+    from app.orchestrator import InvalidRequest
+
+    with pytest.raises(InvalidRequest, match="SAMPLE_MODE"):
+        orch.create(RunRequest(patient_id="MRN0000089", sample_mode=False))
+    assert orch.create(RunRequest(patient_id="MRN0000089", sample_mode=True))  # matching is fine
