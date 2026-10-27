@@ -27,6 +27,48 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-10-27 · Arnav · arnav/call-deadline
+
+**Did:** a live click-through of the final UI (#72) at :8000, then a fix for what it found.
+- **Click-through.** A Playwright browser in the official image, on our compose network.
+  The order was P0089, then P0015 (confirm identity), then P0003, marking the GP dose out of
+  date, then P0007.
+  - **Every screen worked.** There were no page, console or HTTP errors.
+  - **The pipeline lit every node on every patient,** including **Meterless Nightshift**
+    (4–8 model calls) and **NVIDIA Nemotron** (`nemotron-3.5-lightning-30b-a3b`).
+  - **The learning demo worked live.** Marking the GP dose moved trust 0.70 → 0.50, and
+    P0007 then showed the rosuvastatin finding, "Applied to this run", and the recalled
+    H-MEM memory.
+- **Found: P0003 took 1,372 s.** Its summary step failed upstream (502 `nvidia_404: Function
+  … Not Found`) on every attempt and took 20 minutes. The run deadline was only checked
+  between steps, so nothing bounded a step's retries.
+- **Fixed** (`app/adapters/meterless.py`): `run_deadline()` sets the run's deadline around
+  every model step (`_llm_step`).
+  - Each request attempt is capped at the smaller of `METERLESS_TIMEOUT_S` and the time
+    left in the run, as a hard wall-clock cap. The POST runs on a worker thread and is
+    abandoned at the cap, because httpx's timeout bounds waits between bytes, not the
+    whole request.
+  - No attempt (retry or JSON repair) starts with less than 10 s left.
+- **Tests:** 3 new adapter tests: no attempt after the deadline; retries stop at the
+  deadline, not at `MAX_RETRIES`; a peer that never answers is abandoned at the deadline.
+  869 unit tests pass, a live example_3 smoke test succeeds in 46 s, and `make validate` is
+  24/24.
+
+**Changed shared files:** none.
+
+**Broken:** nothing.
+
+**Needs from teammates:**
+- **Anshu:** the candesartan cell reads "GP 16.0 vs Pharmacy 8.0". There's no unit (from
+  `dose_units`) and there's a stray ".0".
+- **Whoever records the demo:** the live server now remembers this session. P0015 is
+  confirmed and GP daily-dose trust is 0.50, so reset `STATE_DIR` (or the `hakken-state`
+  Docker volume) before recording.
+
+**Next:** nothing of mine open.
+
+---
+
 ### 2026-10-27 · Arnav · arnav/s20-s32-s33
 
 **Did:** Arpon's last three scan items, in the domain pack (under TODO_ARNAV §5).
