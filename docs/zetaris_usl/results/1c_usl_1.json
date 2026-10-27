@@ -5,8 +5,8 @@
   "question": "Is the USL active? Every line from four silos, resolved to a medicine, in one table.",
   "sql": "SELECT source_system, resolved_by, COUNT(*) AS lines, COUNT(generic) AS resolved, COUNT(high_risk_class) AS high_risk_lines FROM lightning.metastore.medtrace.medtrace_usl.medication_statement GROUP BY source_system, resolved_by ORDER BY source_system",
   "client": "app/adapters/zetaris.py (read-only)",
-  "executed_at": "2026-10-27T07:36:39+00:00",
-  "latency_ms": 18680,
+  "executed_at": "2026-10-27T08:03:39+00:00",
+  "latency_ms": 19454,
   "row_count": 5,
   "headers": [
     "source_system",
@@ -52,5 +52,42 @@
       "64"
     ]
   ],
-  "error": null
+  "error": null,
+  "all_rows": [
+    [
+      "emr",
+      "amt_mp",
+      "1561",
+      "1561",
+      "205"
+    ],
+    [
+      "gp",
+      "amt_mpp",
+      "1527",
+      "1527",
+      "207"
+    ],
+    [
+      "patient",
+      "none",
+      "1552",
+      "0",
+      "0"
+    ],
+    [
+      "pharmacy",
+      "pbs_code",
+      "8895",
+      "8895",
+      "1375"
+    ],
+    [
+      "pharmacy",
+      "brand",
+      "321",
+      "321",
+      "64"
+    ]
+  ]
 }

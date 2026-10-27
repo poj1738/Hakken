@@ -5,8 +5,8 @@
   "question": "Run the custom rule: is every charted strength a real product?",
   "sql": "RUN DQ strength_is_a_real_product TABLE lightning.metastore.medtrace.medtrace_usl.medication_statement",
   "client": "scripts/register_sources.py (build-time)",
-  "executed_at": "2026-10-27T07:37:54+00:00",
-  "latency_ms": 35903,
+  "executed_at": "2026-10-27T08:04:59+00:00",
+  "latency_ms": 38536,
   "row_count": 1,
   "headers": [
     "name",
@@ -26,5 +26,15 @@
       "14"
     ]
   ],
-  "error": null
+  "error": null,
+  "all_rows": [
+    [
+      "strength_is_a_real_product",
+      "medication_statement",
+      "Custom Data Quality",
+      "13856",
+      "13842",
+      "14"
+    ]
+  ]
 }

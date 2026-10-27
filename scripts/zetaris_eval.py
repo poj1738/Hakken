@@ -131,7 +131,9 @@ def _entry(qid: str, part: str, source: str, question: str, sql: str, client: st
     return {"id": qid, "part": part, "source": source, "question": question, "sql": sql, "client": client,
             "executed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "latency_ms": ms, "row_count": None if error else len(rows), "headers": headers,
-            "first_rows": rows[:10], "error": error}
+            "first_rows": rows[:10], "error": error,
+            # Small results are kept whole, so the docs can check every row (e.g. each DQ violation).
+            **({"all_rows": rows} if not error and len(rows) <= 100 else {})}
 
 
 def run(only: str | None = None) -> int:
