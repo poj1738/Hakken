@@ -471,6 +471,9 @@ class Notice(BaseModel):
     generic: str | None = None
     row_ids: list[str] = Field(default_factory=list)
     tasks: list[str] = Field(default_factory=list)
+    # Additive (26 Oct, scan S42): for `known_shortage` only, how the TGA row compares with
+    # the patient's own product -- "affects_this_patient" or "other_product". None elsewhere.
+    relevance: str | None = None
 
 
 class GateResult(BaseModel):

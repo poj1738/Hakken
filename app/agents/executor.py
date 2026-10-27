@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import re
+from dataclasses import dataclass, field
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -23,7 +25,7 @@ from pydantic import BaseModel, Field
 from app.adapters.zetaris import QueryBudgetExceeded, ReplayMiss, ZetarisError
 from app.agents.base import AgentContext
 from app.domain.packs.medtrace import identity, queries
-from app.domain.packs.medtrace.normalise import llm_candidates, normalise_med
+from app.domain.packs.medtrace.normalise import llm_candidates, normalise_med, parse_strength_mg
 from app.domain.packs.medtrace.parse import dicts_from_sql, rows_from_sql
 from app.domain.packs.medtrace.types import IdentityLink, MedStatement, Notice, NoticeType, SourceRow, SqlResult
 
@@ -187,13 +189,98 @@ def resolve_free_text(ctx: AgentContext, stmts: list[MedStatement]) -> tuple[lis
     return out, tasks
 
 
-def check_shortages(ctx: AgentContext, anchor: SourceRow, current_generics: list[str]) -> list[Notice]:
+#: The TGA disclaimer, said ONCE per run (a run caveat), not on every notice (scan S42).
+SHORTAGE_DISCLAIMER = ("The TGA shortage database is incomplete: a listed shortage is not a statement that a "
+                       "medicine is unavailable, and a medicine not listed may still be short.")
+AFFECTS = "affects_this_patient"
+OTHER_PRODUCT = "other_product"
+
+_TGA_STRENGTH = re.compile(r"(\d+(?:\.\d+)?)\s*(mg|microgram|mcg|g|units?)\b", re.IGNORECASE)
+#: Dose form -> route family, first match wins (injection before "solution", which is ambiguous).
+_FORM_FAMILY = (("inject", "parenteral"), ("infusion", "parenteral"), ("ampoule", "parenteral"),
+                ("vial", "parenteral"), ("inhal", "inhaled"), ("aerosol", "inhaled"), ("nebul", "inhaled"),
+                ("patch", "transdermal"), ("transdermal", "transdermal"), ("suppositor", "rectal"),
+                ("cream", "topical"), ("ointment", "topical"), ("gel", "topical"), ("eye", "eye"),
+                ("tablet", "oral"), ("capsule", "oral"), ("oral", "oral"), ("granule", "oral"),
+                ("lozenge", "oral"))
+_ROUTE_FAMILY = {"PO": "oral", "SL": "oral", "IV": "parenteral", "SC": "parenteral", "IM": "parenteral",
+                 "INH": "inhaled", "TD": "transdermal", "TOP": "topical", "PR": "rectal"}
+
+
+@dataclass
+class _Product:
+    """What the patient's own records say they take: brands, strengths (mg), route families."""
+
+    brands: set[str] = field(default_factory=set)
+    strengths: set[float] = field(default_factory=set)
+    families: set[str] = field(default_factory=set)
+    label: str = ""
+
+
+def _form_family(text: str | None) -> str | None:
+    low = (text or "").casefold()
+    return next((fam for word, fam in _FORM_FAMILY if word in low), None)
+
+
+def _patient_products(generics: list[str], stmts: list[MedStatement], raw: dict[str, dict[str, str | None]],
+                      lex) -> dict[str, _Product]:
+    out: dict[str, _Product] = {}
+    for g in generics:
+        mine = [s for s in stmts if s.generic == g]
+        rows = [raw[s.row_id] for s in mine if s.row_id in raw]
+        text = " ".join((r.get("med_text") or "") for r in rows).casefold()
+        brands = {b for b, e in lex.by_brand.items() if (e.generic or "").casefold() == g.casefold()
+                  and re.search(rf"\b{re.escape(b.casefold())}\b", text)}
+        strengths = {v for r in rows if (v := parse_strength_mg(r.get("strength_text"))) is not None}
+        families = {f for s in mine if (f := _ROUTE_FAMILY.get(s.route or ""))}
+        families |= {f for r in rows if (f := _form_family(r.get("route_text")))}
+        # The label is the pharmacy's wording where there is one (it names the product dispensed).
+        named = next((r for r in rows if r.get("source") == "pharmacy"), None) or (rows[0] if rows else {})
+        label, strength = named.get("med_text") or g, named.get("strength_text") or ""
+        if strength and strength.casefold() not in label.casefold():
+            label = f"{label} {strength}"
+        out[g] = _Product(brands, strengths, families, label)
+    return out
+
+
+def _relevance(rec: dict[str, str | None], product: _Product) -> str | None:
+    """Rank one TGA row against the patient's own product (scan S42). None means drop it.
+
+    Different route (an injection ampoule for a patient on tablets): dropped. Same brand --
+    or, when the records name no brand, the same strength -- affects this patient. Anything
+    else is another product of the same medicine. `salt_quantity` is never used: it is salt
+    mass, not strength.
+    """
+    name = rec.get("medicine_name") or ""
+    family = _form_family(f"{rec.get('dosage_form') or ''} {name}")
+    if family and product.families and family not in product.families:
+        return None
+    first = name.split()[0] if name.split() else ""
+    brand = first.casefold() if first.isupper() and len(first) >= 3 else None
+    if product.brands:
+        return AFFECTS if brand in product.brands else OTHER_PRODUCT
+    m = _TGA_STRENGTH.search(name)
+    if m:
+        value, unit = float(m.group(1)), m.group(2).casefold()
+        mg = value / 1000 if unit in ("microgram", "mcg") else value * 1000 if unit == "g" else value
+        if any(abs(mg - s) < 1e-6 for s in product.strengths):
+            return AFFECTS
+    return OTHER_PRODUCT
+
+
+def check_shortages(ctx: AgentContext, anchor: SourceRow, current_generics: list[str],
+                    stmts: list[MedStatement] | None = None,
+                    raw: dict[str, dict[str, str | None]] | None = None) -> list[Notice]:
     """Q4: known TGA shortages for the medicines the patient is on. Optional (the Planner's call).
 
     A row is a `known_shortage` notice -- never "unavailable": the TGA database is
     incomplete, and a medicine absent from it says nothing. If the data is not there
     (SAMPLE_MODE has no recording; the view may not be registered), the run says so
     and continues.
+
+    Each row is ranked against the patient's own product (`_relevance`, scan S42): a
+    different route is dropped, and every notice carries its `relevance`. The disclaimer
+    is the caller's to state once (`SHORTAGE_DISCLAIMER`), not repeated on each notice.
     """
     ctx.check_time()
     if not current_generics:
@@ -213,17 +300,28 @@ def check_shortages(ctx: AgentContext, anchor: SourceRow, current_generics: list
                         message="Shortage overlay unavailable on this Zetaris (the TGA view may not be "
                                 "registered); continuing without it.")
         return []
+    products = _patient_products(current_generics, stmts or [], raw or {}, ctx.lex)
     notices: list[Notice] = []
+    dropped = 0
     for rec in dicts_from_sql(result):
+        g = rec.get("generic") or ""
+        product = products.get(g, _Product(label=g))
+        relevance = _relevance(rec, product)
+        if relevance is None:
+            dropped += 1
+            continue
         when = f", expected to resolve {rec['expected_resolution']}" if rec.get("expected_resolution") else ""
+        whose = (f"It matches the patient's product ({product.label})." if relevance == AFFECTS else
+                 f"The patient's product ({product.label}) is a different one.")
         notices.append(Notice(
-            type=NoticeType.KNOWN_SHORTAGE, generic=rec.get("generic") or None,
-            detail=f"Known shortage listed for {rec.get('medicine_name') or rec.get('generic')} "
-                   f"({rec.get('status')}{when}). The TGA shortage database is incomplete: this is not a "
-                   "statement that it is unavailable.",
-            tasks=[f"Check supply of {rec.get('generic')} before discharge"] if rec.get("generic") else []))
+            type=NoticeType.KNOWN_SHORTAGE, generic=g or None, relevance=relevance,
+            detail=f"Known shortage listed for {rec.get('medicine_name') or g} ({rec.get('status')}{when}). {whose}",
+            tasks=[f"Check supply of {g} before discharge"] if g and relevance == AFFECTS else []))
+    affects = sum(n.relevance == AFFECTS for n in notices)
     ctx.tracer.emit("Executor", "check_shortages", step="CHECK_SHORTAGES",
-                    message=f"Checked {len(current_generics)} medicines for known shortages: {len(notices)} listed.",
+                    message=f"Checked {len(current_generics)} medicines for known shortages: {affects} match the "
+                            f"patient's product, {len(notices) - affects} other product(s) of the same medicine, "
+                            f"{dropped} dropped (different route or form).",
                     **record.trace_fields())
     return notices
 
