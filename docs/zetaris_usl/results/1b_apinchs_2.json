@@ -1,0 +1,64 @@
+{
+  "id": "1b_apinchs_2",
+  "part": "1b",
+  "source": "ACSQHC APINCHS",
+  "question": "Which ATC prefixes put a medicine in APINCHS class I (insulins) or H (heparin and anticoagulants)?",
+  "sql": "SELECT apinchs_class, atc_prefix, label FROM medtrace.APINCHS WHERE apinchs_class IN ('I', 'H') ORDER BY apinchs_class, atc_prefix",
+  "client": "app/adapters/zetaris.py (read-only)",
+  "executed_at": "2026-10-27T07:39:39+00:00",
+  "latency_ms": 723,
+  "row_count": 9,
+  "headers": [
+    "apinchs_class",
+    "atc_prefix",
+    "label"
+  ],
+  "first_rows": [
+    [
+      "H",
+      "B01AA",
+      "vitamin K antagonists"
+    ],
+    [
+      "H",
+      "B01AB",
+      "heparins"
+    ],
+    [
+      "H",
+      "B01AD",
+      "thrombolytics"
+    ],
+    [
+      "H",
+      "B01AE",
+      "direct thrombin inhibitors"
+    ],
+    [
+      "H",
+      "B01AF",
+      "factor Xa inhibitors"
+    ],
+    [
+      "I",
+      "A10AB",
+      "fast-acting"
+    ],
+    [
+      "I",
+      "A10AC",
+      "intermediate"
+    ],
+    [
+      "I",
+      "A10AD",
+      "premixed"
+    ],
+    [
+      "I",
+      "A10AE",
+      "long-acting"
+    ]
+  ],
+  "error": null
+}

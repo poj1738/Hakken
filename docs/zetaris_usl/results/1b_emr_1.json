@@ -1,0 +1,29 @@
+{
+  "id": "1b_emr_1",
+  "part": "1b",
+  "source": "Hospital EMR",
+  "question": "How many patients and medicine lines does the EMR hold, by record kind?",
+  "sql": "SELECT record_kind, COUNT(DISTINCT source_patient_id) AS patients, COUNT(*) AS lines FROM medtrace.EMR GROUP BY record_kind ORDER BY lines DESC",
+  "client": "app/adapters/zetaris.py (read-only)",
+  "executed_at": "2026-10-27T07:39:23+00:00",
+  "latency_ms": 1240,
+  "row_count": 2,
+  "headers": [
+    "record_kind",
+    "patients",
+    "lines"
+  ],
+  "first_rows": [
+    [
+      "admission_chart",
+      "200",
+      "1326"
+    ],
+    [
+      "prior_discharge",
+      "74",
+      "235"
+    ]
+  ],
+  "error": null
+}

@@ -1,0 +1,82 @@
+{
+  "id": "1c_dq_list",
+  "part": "1c",
+  "source": "USL data quality",
+  "question": "Which data-quality rules does the USL carry?",
+  "sql": "LIST DQ USL lightning.metastore.medtrace.medtrace_usl",
+  "client": "scripts/register_sources.py (build-time)",
+  "executed_at": "2026-10-27T08:04:20+00:00",
+  "latency_ms": 165,
+  "row_count": 5,
+  "headers": [
+    "name",
+    "table",
+    "type",
+    "expression"
+  ],
+  "first_rows": [
+    [
+      "atc_prefix",
+      "high_risk_class",
+      "Primary key constraints",
+      ""
+    ],
+    [
+      "generic",
+      "medicine",
+      "Primary key constraints",
+      ""
+    ],
+    [
+      "row_id",
+      "medication_statement",
+      "Primary key constraints",
+      ""
+    ],
+    [
+      "generic",
+      "medication_statement",
+      "Foreign key constraints",
+      ""
+    ],
+    [
+      "strength_is_a_real_product",
+      "medication_statement",
+      "Custom Data Quality",
+      "COALESCE(strength_listed, true)"
+    ]
+  ],
+  "error": null,
+  "all_rows": [
+    [
+      "atc_prefix",
+      "high_risk_class",
+      "Primary key constraints",
+      ""
+    ],
+    [
+      "generic",
+      "medicine",
+      "Primary key constraints",
+      ""
+    ],
+    [
+      "row_id",
+      "medication_statement",
+      "Primary key constraints",
+      ""
+    ],
+    [
+      "generic",
+      "medication_statement",
+      "Foreign key constraints",
+      ""
+    ],
+    [
+      "strength_is_a_real_product",
+      "medication_statement",
+      "Custom Data Quality",
+      "COALESCE(strength_listed, true)"
+    ]
+  ]
+}

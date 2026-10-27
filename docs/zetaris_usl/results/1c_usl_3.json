@@ -1,0 +1,191 @@
+{
+  "id": "1c_usl_3",
+  "part": "1c",
+  "source": "USL",
+  "question": "For each strength that is not a real product, what strengths does the medicine come in?",
+  "sql": "SELECT s.row_id, s.patient_id, s.generic, s.strength_text AS charted, m.strengths AS made_in FROM lightning.metastore.medtrace.medtrace_usl.medication_statement s JOIN lightning.metastore.medtrace.medtrace_usl.medicine m ON s.generic = m.generic WHERE s.strength_listed = false ORDER BY s.row_id",
+  "client": "app/adapters/zetaris.py (read-only)",
+  "executed_at": "2026-10-27T08:04:20+00:00",
+  "latency_ms": 18742,
+  "row_count": 14,
+  "headers": [
+    "row_id",
+    "patient_id",
+    "generic",
+    "charted",
+    "made_in"
+  ],
+  "first_rows": [
+    [
+      "EMR-000015",
+      "MRN0000002",
+      "aspirin",
+      "50 mg",
+      "100 mg"
+    ],
+    [
+      "EMR-000320",
+      "MRN0000038",
+      "telmisartan",
+      "20 mg",
+      "40 mg, 80 mg"
+    ],
+    [
+      "EMR-000361",
+      "MRN0000043",
+      "rosuvastatin",
+      "2.5 mg",
+      "10 mg, 20 mg, 40 mg, 5 mg"
+    ],
+    [
+      "EMR-000459",
+      "MRN0000057",
+      "amlodipine",
+      "2.5 mg",
+      "10 mg, 5 mg"
+    ],
+    [
+      "EMR-000697",
+      "MRN0000085",
+      "amlodipine",
+      "2.5 mg",
+      "10 mg, 5 mg"
+    ],
+    [
+      "EMR-000710",
+      "MRN0000086",
+      "ezetimibe",
+      "5 mg",
+      "10 mg"
+    ],
+    [
+      "EMR-000743",
+      "MRN0000091",
+      "glyceryl trinitrate",
+      "0.2 mg",
+      "400 microgram/dose"
+    ],
+    [
+      "EMR-000752",
+      "MRN0000092",
+      "mirabegron",
+      "12.5 mg",
+      "25 mg, 50 mg"
+    ],
+    [
+      "EMR-000765",
+      "MRN0000095",
+      "irbesartan/hydrochlorothiazide",
+      "150 mg",
+      "150/12.5 mg, 300/12.5 mg"
+    ],
+    [
+      "EMR-000855",
+      "MRN0000108",
+      "paracetamol",
+      "332.5 mg",
+      "500 mg, 665 mg"
+    ]
+  ],
+  "error": null,
+  "all_rows": [
+    [
+      "EMR-000015",
+      "MRN0000002",
+      "aspirin",
+      "50 mg",
+      "100 mg"
+    ],
+    [
+      "EMR-000320",
+      "MRN0000038",
+      "telmisartan",
+      "20 mg",
+      "40 mg, 80 mg"
+    ],
+    [
+      "EMR-000361",
+      "MRN0000043",
+      "rosuvastatin",
+      "2.5 mg",
+      "10 mg, 20 mg, 40 mg, 5 mg"
+    ],
+    [
+      "EMR-000459",
+      "MRN0000057",
+      "amlodipine",
+      "2.5 mg",
+      "10 mg, 5 mg"
+    ],
+    [
+      "EMR-000697",
+      "MRN0000085",
+      "amlodipine",
+      "2.5 mg",
+      "10 mg, 5 mg"
+    ],
+    [
+      "EMR-000710",
+      "MRN0000086",
+      "ezetimibe",
+      "5 mg",
+      "10 mg"
+    ],
+    [
+      "EMR-000743",
+      "MRN0000091",
+      "glyceryl trinitrate",
+      "0.2 mg",
+      "400 microgram/dose"
+    ],
+    [
+      "EMR-000752",
+      "MRN0000092",
+      "mirabegron",
+      "12.5 mg",
+      "25 mg, 50 mg"
+    ],
+    [
+      "EMR-000765",
+      "MRN0000095",
+      "irbesartan/hydrochlorothiazide",
+      "150 mg",
+      "150/12.5 mg, 300/12.5 mg"
+    ],
+    [
+      "EMR-000855",
+      "MRN0000108",
+      "paracetamol",
+      "332.5 mg",
+      "500 mg, 665 mg"
+    ],
+    [
+      "EMR-000902",
+      "MRN0000114",
+      "oxycodone/naloxone",
+      "5 mg",
+      "10/5 mg, 20/10 mg"
+    ],
+    [
+      "EMR-001207",
+      "MRN0000153",
+      "empagliflozin/metformin",
+      "6.25 mg",
+      "12.5/1000 mg"
+    ],
+    [
+      "EMR-001370",
+      "MRN0000174",
+      "alendronate",
+      "35 mg",
+      "70 mg"
+    ],
+    [
+      "EMR-001394",
+      "MRN0000176",
+      "paracetamol",
+      "332.5 mg",
+      "500 mg, 665 mg"
+    ]
+  ]
+}

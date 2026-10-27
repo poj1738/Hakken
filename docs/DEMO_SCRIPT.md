@@ -200,6 +200,9 @@ merges across 286 auto-merged records, core APINCHS 30/32, extended 5/5. Quote
 **core** APINCHS recall, not the pooled 35/37, anywhere it reads as ACSQHC
 compliance (Arpon, HANDOFF 25 Oct).
 
+Slide/video note (Arnav, 27 Oct): **"Zetaris USL: 6 sources → 1 view, DQ rule caught 14
+violations."** The evidence is in `docs/zetaris_usl/README.md`.
+
 ---
 
 ## What doesn't work or looks wrong (rehearsal, 26 Oct)
