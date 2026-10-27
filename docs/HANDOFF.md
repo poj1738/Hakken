@@ -62,6 +62,62 @@ It reuses this checkout's `.venv`; building a fresh one would need the network.
 
 ---
 
+### 2026-10-27 · Arnav · feat/zetaris-usl
+
+**Did:** the **Zetaris Scoring Methodology** evidence (posted 27 Oct), indexed in
+**`docs/zetaris_usl/README.md`**, which maps each item 1a–2c to a file and live evidence.
+- **USL created live** (with Arnav's go-ahead after a dry run):
+  `lightning.metastore.medtrace.medtrace_usl`, three tables over six sources:
+  - `high_risk_class` (APINCHS, 42 rows);
+  - `medicine` (PBS lexicon by generic, 98 rows);
+  - `medication_statement` (all four silos, 13,856 rows, every coded line resolved:
+    EMR by `amt_mp`, GP by `amt_mpp`, pharmacy by `pbs_code` or brand for private scripts).
+
+  The DDL is in `data/zetaris/usl/` (one statement per file).
+  `register_sources.py --usl` is a dry run; add `--apply` to execute. Its client now
+  allows `;` only inside `COMPILE USL`.
+- **Native DQ:** `REGISTER DQ strength_is_a_real_product`. `RUN DQ` reports **14 invalid
+  of 13,856**, all of them planted chart-dose errors: 14 of the 28 planted. The other 14
+  chart a strength that exists. The generated foreign-key rule flags the 1,552 patient
+  free-text lines, because Zetaris counts a null FK as invalid.
+- **Evidence scripts:**
+  - `scripts/zetaris_eval.py`: 15 exploratory queries plus 8 USL and DQ results, saved
+    live with timestamps to `docs/zetaris_usl/results/`.
+  - `scripts/handcoded_comparison.py`: the same question hand-coded in stdlib Python.
+    Identical 15 rows; 51 lines and 11 mapping steps by hand; 0.34 s by hand against
+    19.1 s for the USL, reported as is.
+  - `scripts/zetaris_docs.py`: renders 02, 03 and the 04 table from the results, so
+    nothing is typed by hand.
+- **Found live:** a USL column named `source` is rejected as "Invalid DDL", so ours is
+  `source_system`. Referencing an exploded view twice fails (`MISSING_ATTRIBUTES`), so the
+  lexicon becomes one key map. `IN (subquery)` on these views fails the same way.
+- **Links:** `docs/zetaris_usl/` is linked from the README (what-works table) and from
+  SPONSOR_TECH's Zetaris section. I added one line to `docs/DEMO_SCRIPT.md` (Anshu's): "Zetaris
+  USL: 6 sources → 1 view, DQ rule caught 14 violations."
+
+**Changed shared files:** `scripts/register_sources.py` (`--usl`, `--dry-run`, the COMPILE
+exception), `README.md`, `docs/SPONSOR_TECH.md`, and `docs/DEMO_SCRIPT.md` (one line).
+
+**Broken:** nothing. Unit tests pass, SAMPLE_MODE works, and the secret scan is clean.
+`make validate` still exits "not implemented yet": `scripts/validate_submission.sh` has
+never existed.
+
+**Skipped:**
+- **Pointing an agent query at the USL.** Only my Zetaris has the USL, and the safe
+  candidate (the APINCHS lookup at startup) would stop the live app from starting on any
+  machine without it.
+- **TGA as a source.** It isn't registered on my instance, so APINCHS is the sixth source.
+
+**Needs from teammates:**
+- **Everyone:** `docs/zetaris_usl/05_would_it_help.md` has a `<!-- TEAM: rewrite in our own
+  words -->` paragraph that only we can write, and 04 has one optional `TEAM` note.
+- **Anyone recreating the USL on another machine:** register the sources first, then run
+  `python3 scripts/register_sources.py --usl --apply`.
+
+**Next:** S20, S32, S33 if the team wants them; otherwise nothing of mine is open.
+
+---
+
 ### 2026-10-27 · Arnav · arnav/s26-s28-s29
 
 **Did:** Scan **S26**, **S28** and **S29**. That closes every scan item assigned to me;

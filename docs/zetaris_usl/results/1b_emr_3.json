@@ -1,0 +1,38 @@
+{
+  "id": "1b_emr_3",
+  "part": "1b",
+  "source": "Hospital EMR",
+  "question": "Which chart notes document a medicine as withheld, and how often?",
+  "sql": "SELECT note_text, COUNT(*) AS lines FROM medtrace.EMR WHERE note_text IS NOT NULL AND note_text <> '' GROUP BY note_text ORDER BY lines DESC",
+  "client": "app/adapters/zetaris.py (read-only)",
+  "executed_at": "2026-10-27T07:39:25+00:00",
+  "latency_ms": 841,
+  "row_count": 5,
+  "headers": [
+    "note_text",
+    "lines"
+  ],
+  "first_rows": [
+    [
+      "withheld: hypotension",
+      "44"
+    ],
+    [
+      "withheld: nil by mouth",
+      "34"
+    ],
+    [
+      "withheld: AKI",
+      "10"
+    ],
+    [
+      "withheld: bradycardia",
+      "4"
+    ],
+    [
+      "withheld: contrast",
+      "1"
+    ]
+  ],
+  "error": null
+}

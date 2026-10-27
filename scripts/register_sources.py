@@ -127,7 +127,11 @@ class Zetaris:
             sys.exit("ZETARIS_API_KEY is not set in .env. Nothing was sent.")
 
     def run(self, sql: str, limit: int = 1000) -> tuple[dict | None, float, str | None]:
-        if ";" in sql:
+        # One statement per call. The one exception is a multi-table COMPILE USL, which
+        # Zetaris requires as ONE statement with `;` between its CREATE TABLEs (command
+        # reference 13.1); it still may not end with one.
+        compile_usl = sql.lstrip().upper().startswith("COMPILE USL") and not sql.rstrip().endswith(";")
+        if ";" in sql and not compile_usl:
             return None, 0.0, "refused locally: one statement per call, no semicolon"
         body = json.dumps({"queryId": str(uuid.uuid4()), "sql": sql,
                            "source": "SqlEditor", "limit": limit}).encode()
@@ -218,6 +222,26 @@ def create_all_sources() -> str:
         f"CREATE SCHEMASTORE VIEW {ALL_SOURCES_VIEW.split('.', 1)[1]} "
         f"WITH CONTAINER {CONTAINER} AS {union}"
     )
+
+
+USL_DIR = pathlib.Path(__file__).resolve().parent.parent / "data" / "zetaris" / "usl"
+
+
+def usl_statements() -> list[tuple[str, str]]:
+    """The Unified Semantic Layer, one statement per file in `data/zetaris/usl/`, in order.
+
+    Leading `--` comment lines are dropped; the rest is sent as written, newlines kept,
+    because a multi-table COMPILE needs each CREATE TABLE on its own line.
+    """
+    out: list[tuple[str, str]] = []
+    for path in sorted(USL_DIR.glob("[0-9][0-9]_usl_*.sql")):
+        body = "\n".join(line for line in path.read_text().splitlines()
+                         if not line.lstrip().startswith("--")).strip()
+        assert body and not body.endswith(";"), path.name
+        if not body.upper().startswith("COMPILE USL"):
+            assert ";" not in body, f"{path.name}: one statement per file"
+        out.append((path.stem, body))
+    return out
 
 
 def plan_statements(with_tga: bool = False) -> list[tuple[str, str]]:
@@ -547,7 +571,27 @@ def main() -> int:
     ap.add_argument("--with-tga", action="store_true",
                     help="also register Q4's TGA shortage table (needs the gitignored "
                          "data/reference/tga_shortages.json: scripts/load_tga_shortages.py)")
+    ap.add_argument("--usl", action="store_true",
+                    help="the Unified Semantic Layer in data/zetaris/usl/ (dry run unless --apply)")
+    ap.add_argument("--dry-run", action="store_true", help="print the statements, send nothing (the default)")
     args = ap.parse_args()
+
+    if args.usl:
+        statements = usl_statements()
+        if args.apply and not args.dry_run:
+            client, failures = Zetaris(), 0
+            for label, sql in statements:
+                _result, secs, error = client.run(sql)
+                ok = error is None or (args.skip_exists and already_exists(error))
+                log(f"  {'ok  ' if ok else 'FAIL'}  {label:45} {secs:6.2f}s  {'' if ok else error[:200]}")
+                if not ok:
+                    failures += 1
+                    break  # each step needs the one before it
+            return 1 if failures else 0
+        log(f"--- DRY RUN: {len(statements)} USL statements, nothing sent (--apply to execute) ---")
+        for label, sql in statements:
+            log(f"\n-- {label}\n{sql}")
+        return 0
 
     settings = get_settings()
     statements = plan_statements(with_tga=args.with_tga)

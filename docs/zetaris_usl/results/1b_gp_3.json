@@ -1,0 +1,26 @@
+{
+  "id": "1b_gp_3",
+  "part": "1b",
+  "source": "GP",
+  "question": "How old are the GP medication lists (year of last update)?",
+  "sql": "SELECT substring(doc_date, 7, 4) AS year_updated, COUNT(DISTINCT source_patient_id) AS patients FROM medtrace.GP GROUP BY substring(doc_date, 7, 4) ORDER BY year_updated",
+  "client": "app/adapters/zetaris.py (read-only)",
+  "executed_at": "2026-10-27T07:39:28+00:00",
+  "latency_ms": 1184,
+  "row_count": 2,
+  "headers": [
+    "year_updated",
+    "patients"
+  ],
+  "first_rows": [
+    [
+      "2025",
+      "27"
+    ],
+    [
+      "2026",
+      "156"
+    ]
+  ],
+  "error": null
+}

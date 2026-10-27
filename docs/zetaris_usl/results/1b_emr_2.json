@@ -1,0 +1,58 @@
+{
+  "id": "1b_emr_2",
+  "part": "1b",
+  "source": "Hospital EMR",
+  "question": "Which medicines are charted most often on admission?",
+  "sql": "SELECT med_text AS medicine, COUNT(*) AS charted FROM medtrace.EMR WHERE record_kind = 'admission_chart' GROUP BY med_text ORDER BY charted DESC LIMIT 10",
+  "client": "app/adapters/zetaris.py (read-only)",
+  "executed_at": "2026-10-27T07:39:24+00:00",
+  "latency_ms": 949,
+  "row_count": 10,
+  "headers": [
+    "medicine",
+    "charted"
+  ],
+  "first_rows": [
+    [
+      "rosuvastatin",
+      "77"
+    ],
+    [
+      "amlodipine",
+      "67"
+    ],
+    [
+      "esomeprazole",
+      "58"
+    ],
+    [
+      "pantoprazole",
+      "57"
+    ],
+    [
+      "paracetamol",
+      "56"
+    ],
+    [
+      "atorvastatin",
+      "53"
+    ],
+    [
+      "metformin",
+      "52"
+    ],
+    [
+      "aspirin",
+      "49"
+    ],
+    [
+      "metoprolol",
+      "42"
+    ],
+    [
+      "gliclazide",
+      "35"
+    ]
+  ],
+  "error": null
+}

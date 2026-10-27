@@ -5,6 +5,11 @@ and the traces.** Anything unproven is marked *pending*, not asserted.
 
 ## Zetaris — the data layer
 
+**Zetaris Scoring Methodology evidence: [`docs/zetaris_usl/README.md`](zetaris_usl/README.md).**
+It maps every item (1a–2c) to a file and live, timestamped results. Headline: the Unified
+Semantic Layer `medtrace_usl` turns 6 sources into 1 view, and its native DQ rule
+`strength_is_a_real_product` caught 14 violations in 13,856 records.
+
 **Verified live, 24–26 Oct, on two machines.** Agents get every fact by sending
 Lightning SQL to the Zetaris REST API (`POST /sql-editor/sqls/run`, Bearer key,
 `X-Org-ID`, a fresh `X-Request-ID` per call). They never read data files.
