@@ -49,30 +49,28 @@ export function Silos({ run, searching }: { run: RunResponse | null; searching: 
           const unreached = c?.state === "not_found";
           return (
             <li key={s} className={`silo ${st.cls}`}>
-              <svg className="silo-ico" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                {ICON[s]}
-              </svg>
-              <div className="silo-body">
-                <div className="silo-name">
+              <div className="silo-name">
+                <svg className="silo-ico" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  {ICON[s]}
+                </svg>
                   {s === "emr" ? "Hospital chart" : sourceLabel(s)}
-                  {(notes.length > 0 || unreached) && (
-                    <InfoTip
-                      label={`${sourceLabel(s)} limitations`}
-                      text={
-                        <>
-                          <ScopeNotes notes={notes} className="scope-notes scope-tip" />
-                          {unreached && <span>No record available; not the same as “not taking”.</span>}
-                        </>
-                      }
-                    />
-                  )}
-                </div>
-                <div className="silo-state">
-                  <span className="silo-dot" aria-hidden />
-                  {st.label}
-                </div>
-                {c?.doc_date && <div className="silo-date">{fmtDate(c.doc_date)}</div>}
+                {(notes.length > 0 || unreached) && (
+                  <InfoTip
+                    label={`${sourceLabel(s)} limitations`}
+                    text={
+                      <>
+                        <ScopeNotes notes={notes} className="scope-notes scope-tip" />
+                        {unreached && <span>No record available; not the same as “not taking”.</span>}
+                      </>
+                    }
+                  />
+                )}
               </div>
+              <div className="silo-state">
+                <span className="silo-dot" aria-hidden />
+                {st.label}
+              </div>
+              {c?.doc_date && <div className="silo-date">{fmtDate(c.doc_date)}</div>}
             </li>
           );
         })}
@@ -91,6 +89,7 @@ export function Silos({ run, searching }: { run: RunResponse | null; searching: 
           </span>
           MedTrace
         </div>
+        {!result && <div className="hub-idle">{!run ? (searching ? "Reconciling…" : "No run yet") : run.status === "needs_review" ? "Waiting for identity review" : run.status === "running" ? "Reconciling…" : "No result"}</div>}
         {result && (
           <>
             <div className="hub-stats">

@@ -195,14 +195,13 @@ select { font: inherit; font-size: 14px; min-height: 44px; padding: 0 12px; bord
 /* Four silos, one view */
 .silos { display: grid; grid-template-columns: 1fr 40px minmax(230px, 0.6fr); align-items: stretch; }
 .silo-row { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-.silo { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: #fff; min-width: 0; }
-.silo-ico { flex: none; color: var(--accent); margin-top: 1px; }
-.silo-body { min-width: 0; }
+.silo { display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: #fff; min-width: 0; }
+.silo-ico { flex: none; color: var(--accent); margin-top: -1px; }
 /* A fixed-height title row (room for two lines), so every tile's status line sits on the same line. */
-.silo-name { font-weight: 600; font-size: 14px; display: flex; align-items: flex-start; line-height: 1.35; min-height: calc(2 * 1.35em); }
-.silo-state { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; margin-top: 2px; }
+.silo-name { font-weight: 600; font-size: 14px; display: flex; align-items: flex-start; gap: 8px; line-height: 1.35; min-height: calc(2 * 1.35em); }
+.silo-state { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; white-space: nowrap; }
 .silo-dot { width: 8px; height: 8px; border-radius: 50%; background: #8a9692; flex: none; }
-.silo-date { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.silo-date { font-size: 13px; color: var(--muted); margin-top: -4px; }
 .s-found .silo-state { color: #0d5c3a; }
 .s-found .silo-dot { background: #16a34a; }
 .s-none { background: repeating-linear-gradient(135deg, #f7f3fd 0 6px, #efe8fa 6px 12px); border-color: #d6c8ef; }
@@ -462,11 +461,12 @@ pre.code { margin: 8px 0 0; padding: 8px 10px; white-space: pre-wrap; font-size:
 .cmp-read { display: block; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
 
 /* S37: what each source says */
-.by-source { margin: -2px 0 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
-.by-source > div { display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 10px; font-size: 13.5px; }
-.by-source dt { color: var(--muted); font-weight: 600; font-size: 12.5px; }
-.by-source dd { margin: 0; }
-.by-source mark { background: #fff1c2; color: var(--ink); border-radius: 4px; padding: 0 4px; }
+.by-source { margin: 0 0 12px; max-width: 680px; border: 1px solid var(--line); border-radius: 10px; background: #fbfcfb; overflow: hidden; }
+.by-source > div { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; align-items: center; padding: 7px 12px; font-size: 13.5px; line-height: 1.4; }
+.by-source > div + div { border-top: 1px solid var(--line); }
+.by-source dt { display: flex; align-items: center; gap: 7px; color: var(--muted); font-weight: 600; font-size: 12.5px; }
+.by-source dt svg { color: var(--accent); flex: none; }
+.by-source dd { margin: 0; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 /* Source records, with repeated fills grouped (S38) */
 .src-records { margin: 4px 0 6px; }

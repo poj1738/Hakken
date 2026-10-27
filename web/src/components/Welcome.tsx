@@ -112,7 +112,7 @@ export function Welcome({ patients, onPick, onStart }: { patients: PatientSummar
             </span>
             <div className="wl-flow-hub">MedTrace</div>
           </div>
-          <p className="wl-caption">Missing source: unknown, never "not taking"</p>
+          <p className="wl-caption">No record in a source means unknown, not stopped</p>
           <button type="button" className="btn btn-primary" onClick={onStart}>
             Start with a patient
           </button>

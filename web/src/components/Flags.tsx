@@ -5,6 +5,7 @@ import { REASON_LABEL, ROW_TEXT_FIELDS, attributeLabel, cleanText, firstSentence
 import { InfoTip } from "./InfoTip";
 import { Compare, SourceRecords } from "./Compare";
 import { TechDetails } from "./TechDetails";
+import { ICON } from "./Silos";
 
 export interface FeedbackState {
   busy?: boolean;
@@ -178,10 +179,15 @@ function BySource({ by }: { by: Record<string, unknown> }) {
     <dl className="by-source" aria-label="What each source says">
       {rows.map((s) => (
         <div key={s}>
-          <dt>{s === "emr" ? "Chart" : sourceLabel(s)}</dt>
-          <dd>
-            <mark>{String(by[s])}</mark>
-          </dd>
+          <dt>
+            {s in ICON && (
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                {ICON[s as Source]}
+              </svg>
+            )}
+            {s === "emr" ? "Hospital chart" : sourceLabel(s)}
+          </dt>
+          <dd>{String(by[s])}</dd>
         </div>
       ))}
     </dl>

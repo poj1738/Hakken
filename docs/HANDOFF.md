@@ -53,6 +53,14 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
     hover and focus (reduced motion: glow only).
   - No logos are drawn. Official SVGs dropped into `web/public/sponsors/{zetaris,meterless,nvidia}.svg`
     are picked up at build time.
+- **Review fixes:**
+  - The cell-card and compare wording is now "Current" / "Not current" under a "Read as"
+    row (was "Says current" / "Says stopped").
+  - Silo status sits left under the icon and name.
+  - The MedTrace hub shows "No run yet", "Reconciling…" or "Waiting for identity review"
+    instead of empty space.
+  - Finding evidence rows are a bordered list with source icons.
+  - Welcome caption: "No record in a source means unknown, not stopped".
 - **Checks:**
   - 37 Playwright screenshots against SAMPLE_MODE: no page errors, no phone horizontal
     overflow, and the sidebar unchanged at the bottom of a long scroll.

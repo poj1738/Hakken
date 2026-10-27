@@ -77,7 +77,7 @@ export function Compare({
           </thead>
           <tbody>
             <tr>
-              <th scope="row">Says</th>
+              <th scope="row">Read as</th>
               {cols.map((s) => {
                 const st = med?.per_source[s];
                 const missing = !bySource(s).length && coverage[s] && NOT_REACHED[coverage[s]!.state];
