@@ -7,6 +7,7 @@ import type { DataMapQuerySpec } from "../types";
 import { DataMapDiagram, RunStatus, formatCount, formatSeconds, soleCell, useDataMapRun, type LogEntry } from "./DataMapDiagram";
 
 const SILOS = ["emr", "gp", "pharmacy", "patient"] as const;
+const KNOWN_QUERIES = new Set(["emr", "gp", "pharmacy", "patient", "lexicon", "apinchs", "tga", "all_sources", "rows", "high_risk", "dq"]);
 const PATIENT_NOTE = "Patients describe medicines in their own words, so no code or risk class is attached.";
 
 export function DataMap({ onPresent }: { onPresent: () => void }) {
@@ -37,6 +38,8 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
     const query = catalogue?.find((q) => q.node === node);
     return query ? byId[query.id] : undefined;
   };
+  const waysQuery = catalogue?.find((q) => !KNOWN_QUERIES.has(q.id) && q.id !== "dq_examples");
+  const examplesQuery = catalogue?.find((q) => q.id === "dq_examples");
 
   return (
     <div className="dm-page">
@@ -59,68 +62,76 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
         </div>
       )}
 
-      <section className="panel dm-hero" aria-labelledby="dm-diagram-title">
-        <h2 className="h2" id="dm-diagram-title">
-          Sources
-        </h2>
-        <div className="dm-diagram">
-          {catalogue ? (
-            <DataMapDiagram catalogue={catalogue} byId={byId} flow={clock.phase === "done" || clock.phase === "cached"} />
-          ) : (
-            <p className="dm-wait">querying Zetaris…</p>
-          )}
-        </div>
-      </section>
-
-      <div className="dm-split">
-        <section className="panel panel-pad" aria-labelledby="dm-risk-title">
-          <h2 className="h2" id="dm-risk-title">
-            High-risk medicine lines by source
+      <div className="dm-top">
+        <section className="panel dm-hero" aria-labelledby="dm-diagram-title">
+          <h2 className="h2" id="dm-diagram-title">
+            From six sources to one view
           </h2>
-          <RiskChart entry={find("high_risk")} catalogue={catalogue} byId={byId} />
+          <p className="dm-cap">Hover any box to see what it is and the query behind it.</p>
+          <div className="dm-diagram">
+            {catalogue ? (
+              <DataMapDiagram catalogue={catalogue} byId={byId} flow={clock.phase === "done" || clock.phase === "cached"} />
+            ) : (
+              <p className="dm-wait">querying Zetaris…</p>
+            )}
+          </div>
         </section>
-        <section className="panel panel-pad" aria-labelledby="dm-dq-title">
-          <h2 className="h2" id="dm-dq-title">
-            Data quality
+
+        <section className="panel panel-pad dm-log-card" aria-labelledby="dm-log-title">
+          <h2 className="h2" id="dm-log-title">
+            Live query log
           </h2>
-          <QualityCard dq={find("dq")} rows={find("usl")} sql={catalogue?.find((q) => q.node === "dq")?.sql} />
+          <p className="dm-cap">Every SQL statement sent to Zetaris, in order.</p>
+          <div className="dm-log-scroll" ref={logRef}>
+            <table className="dm-log">
+              <caption className="dm-live">Query log</caption>
+              <thead>
+                <tr>
+                  <th scope="col" className="dm-log-dot-col">
+                    <span className="dm-live">Status</span>
+                  </th>
+                  <th scope="col">Time</th>
+                  <th scope="col">Query</th>
+                  <th scope="col" className="dm-log-num">
+                    Result
+                  </th>
+                  <th scope="col" className="dm-log-num">
+                    Took
+                  </th>
+                  <th scope="col">
+                    <span className="dm-live">SQL</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {entries.map((entry) => (
+                  <LogRow key={entry.id} entry={entry} />
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       </div>
 
-      <section className="panel panel-pad" aria-labelledby="dm-log-title">
-        <h2 className="h2" id="dm-log-title">
-          Query log
-        </h2>
-        <div className="dm-log-scroll" ref={logRef}>
-          <table className="dm-log">
-            <caption className="dm-live">Query log</caption>
-            <thead>
-              <tr>
-                <th scope="col" className="dm-log-dot-col">
-                  <span className="dm-live">Status</span>
-                </th>
-                <th scope="col">Time</th>
-                <th scope="col">Query</th>
-                <th scope="col" className="dm-log-num">
-                  Result
-                </th>
-                <th scope="col" className="dm-log-num">
-                  Took
-                </th>
-                <th scope="col">
-                  <span className="dm-live">SQL</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((entry) => (
-                <LogRow key={entry.id} entry={entry} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
+      <div className={`dm-bottom${waysQuery ? " dm-bottom-3" : ""}`}>
+        <section className="panel panel-pad" aria-labelledby="dm-risk-title">
+          <h2 className="h2" id="dm-risk-title">
+            High-risk medicines by source
+          </h2>
+          <RiskChart entry={find("high_risk")} catalogue={catalogue} byId={byId} />
+        </section>
+        {waysQuery && (
+          <section className="panel panel-pad" aria-labelledby="dm-ways-title">
+            <h2 className="h2" id="dm-ways-title">
+              Same medicine, written many ways
+            </h2>
+            <WaysCard entry={byId[waysQuery.id]} />
+          </section>
+        )}
+        <section className="panel panel-pad" aria-labelledby="dm-dq-title">
+          <QualityCard dq={find("dq")} rows={find("usl")} sql={catalogue?.find((q) => q.node === "dq")?.sql} examples={examplesQuery ? byId[examplesQuery.id] : undefined} />
+        </section>
+      </div>
   );
 }
 
@@ -205,27 +216,59 @@ function riskRows(result: { data: (string | null)[][] }, labelOf: Map<string, st
   return rows;
 }
 
-function QualityCard({ dq, rows, sql }: { dq?: LogEntry; rows?: LogEntry; sql?: string }) {
+function WaysCard({ entry }: { entry?: LogEntry }) {
+  if (!entry) return <p className="dm-wait">Waiting for its query.</p>;
+  if (entry.phase === "running") return <p className="dm-wait">querying Zetaris…</p>;
+  if (entry.phase === "error") return <p className="dm-err">{entry.error}</p>;
+  const result = entry.result;
+  if (!result) return <p className="dm-wait">querying Zetaris…</p>;
+  return (
+    <div className="dm-log-scroll">
+      <table className="dm-log">
+        <thead>
+          <tr>
+            {result.headers.map((header) => (
+              <th key={header} scope="col">
+                {header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {result.data.map((row, i) => (
+            <tr key={i}>
+              {row.map((cell, j) => (
+                <td key={j}>{cell ?? ""}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function QualityCard({ dq, rows, sql }: { dq?: LogEntry; rows?: LogEntry; sql?: string; examples?: LogEntry }) {
   const violations = dq?.phase === "done" ? soleCell(dq.result) : null;
   const total = rows?.phase === "done" ? soleCell(rows.result) : null;
+  const counted = violations == null ? null : formatCount(violations);
+  const across = total == null ? null : formatCount(total);
   return (
     <div>
-      {dq?.phase === "error" ? (
-        <p className="dm-err">{dq.error}</p>
-      ) : violations != null ? (
-        <p className="dm-dq-num dm-num" aria-label={`${formatCount(violations)} medicine lines failed the strength check`}>
-          {formatCount(violations)}
-        </p>
-      ) : (
-        <p className="dm-wait">querying Zetaris…</p>
-      )}
-      {violations != null && (
-        <p className="dm-cap dm-dq-line">
-          {total != null
-            ? `of ${formatCount(total)} medicine lines have a strength that isn't a real product`
-            : "medicine lines have a strength that isn't a real product"}
-        </p>
-      )}
+      <h2 className="h2 dm-dq-title" id="dm-dq-title">
+        {dq?.phase === "error" ? (
+          "Strengths no product comes in"
+        ) : counted == null ? (
+          "querying Zetaris…"
+        ) : (
+          <>
+            <span className="dm-dq-num dm-num">{counted}</span>
+            {" medicine lines list a strength no product comes in"}
+            {across != null ? `, out of ${across} lines across all four records.` : "."}
+          </>
+        )}
+      </h2>
+      {dq?.phase === "error" && <p className="dm-err">{dq.error}</p>}
       <p className="dm-rule">strength_is_a_real_product</p>
       <p className="dm-cap">Native rule registered in Zetaris</p>
       {sql && <pre className="dm-code">{formatSql(sql)}</pre>}
@@ -262,7 +305,7 @@ function LogRow({ entry }: { entry: LogEntry }) {
       </td>
       <td className="dm-log-time">{time}</td>
       <td>
-        {entry.label}
+        {entry.id === "dq" ? "Strengths no product comes in" : entry.label}
         {result?.replayed ? <span className="badge">replayed</span> : null}
       </td>
       <td className="dm-log-num">{resultWords(entry)}</td>

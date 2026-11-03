@@ -744,8 +744,17 @@ html.shot-full .side { height: auto; }
 .dm-node-btn:focus-visible { box-shadow: inset 0 0 0 3px var(--accent); }
 .dm-svg { width: 100%; height: auto; display: block; min-width: 0; max-width: 100%; }
 .dm-svg foreignObject { overflow: hidden; }
-.dm-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; min-width: 0; align-items: stretch; }
-.dm-split > .panel { height: 100%; }
+.dm-top { display: grid; grid-template-columns: minmax(0, 13fr) minmax(0, 7fr); gap: 16px; align-items: stretch; min-width: 0; }
+.dm-top > * { min-width: 0; max-width: 100%; }
+.dm-log-card { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.dm-log-card .dm-log-scroll { flex: 1 1 auto; min-height: 0; max-height: none; }
+.dm-bottom { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: stretch; min-width: 0; }
+.dm-bottom-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.dm-bottom > * { min-width: 0; max-width: 100%; }
+@media (max-width: 1279px) {
+  .dm-top, .dm-bottom, .dm-bottom-3 { grid-template-columns: minmax(0, 1fr); }
+  .dm-log-card .dm-log-scroll { max-height: 420px; }
+}
 .dm-num { font-variant-numeric: tabular-nums; }
 .dm-node-body { box-sizing: border-box; height: 100%; padding: 8px 16px; display: flex; flex-direction: column; justify-content: center; gap: 0; font-family: var(--sans); color: var(--ink); overflow: hidden; }
 .dm-src { border: 1px solid var(--line); border-radius: 12px; }
@@ -830,9 +839,6 @@ html.shot-full .side { height: auto; }
 .dm-dq-hero { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
 .dm-dq-hero .dm-dq-num { margin: 0; }
 .dm-live { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-@media (max-width: 900px) {
-  .dm-split { grid-template-columns: 1fr; }
-}
 @media (prefers-reduced-motion: reduce) {
   .dm-edge-on:not(.dm-edge-opt) { transition: none; }
   .dm-g.pn-now .pn-dot, .pn-now .pn-dot, .dm-dot-status.run, .dm-log tbody tr { animation: none; }
