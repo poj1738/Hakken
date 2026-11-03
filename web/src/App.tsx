@@ -349,7 +349,7 @@ export default function App() {
             Example data: hand-written, not a real run
           </div>
         )}
-        <main className="wrap">
+        <main className={`wrap${view === "datamap" ? " dm-wide" : ""}`}>
           {view === "datamap" ? (
             <DataMap onPresent={() => setPresent(true)} />
           ) : view === "welcome" ? (

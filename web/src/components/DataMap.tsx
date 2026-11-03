@@ -65,7 +65,7 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
         </h2>
         <div className="dm-diagram">
           {catalogue ? (
-            <DataMapDiagram catalogue={catalogue} byId={byId} />
+            <DataMapDiagram catalogue={catalogue} byId={byId} flow={clock.phase === "done" || clock.phase === "cached"} />
           ) : (
             <p className="dm-wait">querying Zetaris…</p>
           )}
@@ -77,13 +77,13 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
           <h2 className="h2" id="dm-risk-title">
             High-risk medicine lines by source
           </h2>
-          <RiskChart entry={find("high_risk")} catalogue={catalogue} />
+          <RiskChart entry={find("high_risk")} catalogue={catalogue} byId={byId} />
         </section>
         <section className="panel panel-pad" aria-labelledby="dm-dq-title">
           <h2 className="h2" id="dm-dq-title">
             Data quality
           </h2>
-          <QualityCard dq={find("dq")} rows={find("usl")} />
+          <QualityCard dq={find("dq")} rows={find("usl")} sql={catalogue?.find((q) => q.node === "dq")?.sql} />
         </section>
       </div>
 
@@ -124,31 +124,59 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
   );
 }
 
-function RiskChart({ entry, catalogue }: { entry?: LogEntry; catalogue: DataMapQuerySpec[] | null }) {
+const AU_PERCENT = new Intl.NumberFormat("en-AU", { maximumFractionDigits: 1 });
+
+function RiskChart({
+  entry,
+  catalogue,
+  byId,
+}: {
+  entry?: LogEntry;
+  catalogue: DataMapQuerySpec[] | null;
+  byId: Record<string, LogEntry>;
+}) {
   if (!entry) return <p className="dm-wait">Waiting for its query.</p>;
   if (entry.phase === "running") return <p className="dm-wait">querying Zetaris…</p>;
   if (entry.phase === "error") return <p className="dm-err">{entry.error}</p>;
   const result = entry.result;
   if (!result) return <p className="dm-wait">querying Zetaris…</p>;
   const labelOf = new Map((catalogue ?? []).map((q) => [q.id, q.label]));
-  const rows = riskRows(result, labelOf);
+  const rows = riskRows(result, labelOf).map((row) => ({ ...row, source: sourceCount(byId[row.key]) }));
   const max = rows.reduce((m, row) => Math.max(m, row.n), 0);
   return (
     <div className="dm-bars" role="list">
-      {rows.map((row) => (
-        <div key={row.key} role="listitem" aria-label={`${row.label}: ${formatCount(row.text) ?? row.text} high-risk medicine lines`}>
-          <div className="dm-bar">
-            <span className="dm-bar-name">{row.label}</span>
-            <span className="dm-track">
-              <span className="dm-fill" style={{ width: max > 0 ? `${(row.n / max) * 100}%` : "0%" }} />
-            </span>
-            <span className="dm-bar-val dm-num">{formatCount(row.text) ?? row.text}</span>
+      {rows.map((row) => {
+        const value = riskValue(row.text, row.n, row.source);
+        return (
+          <div key={row.key} role="listitem" aria-label={`${row.label}: ${value}`}>
+            <div className="dm-bar">
+              <span className="dm-bar-name">{row.label}</span>
+              <span className="dm-track">
+                <span className="dm-fill" style={{ width: max > 0 ? `${(row.n / max) * 100}%` : "0%" }} />
+              </span>
+              <span className="dm-bar-val dm-num">{value}</span>
+            </div>
+            {row.note && <p className="dm-note">{PATIENT_NOTE}</p>}
           </div>
-          {row.note && <p className="dm-note">{PATIENT_NOTE}</p>}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
+}
+
+function sourceCount(entry: LogEntry | undefined): number | null {
+  if (!entry || entry.phase !== "done") return null;
+  const cell = soleCell(entry.result);
+  const n = cell == null ? Number.NaN : Number(cell);
+  return Number.isFinite(n) ? n : null;
+}
+
+function riskValue(text: string, highRisk: number, source: number | null): string {
+  const high = formatCount(text) ?? text;
+  if (source == null) return high;
+  const of = `${high} of ${formatCount(source)}`;
+  if (!(source > 0) || !Number.isFinite(highRisk)) return of;
+  return `${of} (${AU_PERCENT.format((highRisk / source) * 100)}%)`;
 }
 
 function riskRows(result: { data: (string | null)[][] }, labelOf: Map<string, string>) {
@@ -177,28 +205,36 @@ function riskRows(result: { data: (string | null)[][] }, labelOf: Map<string, st
   return rows;
 }
 
-function QualityCard({ dq, rows }: { dq?: LogEntry; rows?: LogEntry }) {
-  if (!dq) return <p className="dm-wait">Waiting for its query.</p>;
-  if (dq.phase === "running") return <p className="dm-wait">querying Zetaris…</p>;
-  if (dq.phase === "error") return <p className="dm-err">{dq.error}</p>;
-  const violations = soleCell(dq.result);
-  const total = soleCell(rows?.result);
-  if (violations == null) return <p className="dm-err">The data-quality query returned no count.</p>;
+function QualityCard({ dq, rows, sql }: { dq?: LogEntry; rows?: LogEntry; sql?: string }) {
+  const violations = dq?.phase === "done" ? soleCell(dq.result) : null;
+  const total = rows?.phase === "done" ? soleCell(rows.result) : null;
   return (
     <div>
-      <p className="dm-dq-num dm-num" aria-label={`${formatCount(violations)} medicine lines failed the strength check`}>
-        {formatCount(violations)}
-      </p>
-      <p className="dm-cap dm-dq-line">
-        {total != null
-          ? `of ${formatCount(total)} medicine lines have a strength that isn't a real product`
-          : "medicine lines have a strength that isn't a real product"}
-      </p>
+      {dq?.phase === "error" ? (
+        <p className="dm-err">{dq.error}</p>
+      ) : violations != null ? (
+        <p className="dm-dq-num dm-num" aria-label={`${formatCount(violations)} medicine lines failed the strength check`}>
+          {formatCount(violations)}
+        </p>
+      ) : (
+        <p className="dm-wait">querying Zetaris…</p>
+      )}
+      {violations != null && (
+        <p className="dm-cap dm-dq-line">
+          {total != null
+            ? `of ${formatCount(total)} medicine lines have a strength that isn't a real product`
+            : "medicine lines have a strength that isn't a real product"}
+        </p>
+      )}
       <p className="dm-rule">strength_is_a_real_product</p>
-      <p className="dm-cap">Same predicate as the Zetaris data-quality rule</p>
-      {dq.result?.sql && <pre className="dm-code">{dq.result.sql}</pre>}
+      <p className="dm-cap">Native rule registered in Zetaris</p>
+      {sql && <pre className="dm-code">{formatSql(sql)}</pre>}
     </div>
   );
+}
+
+function formatSql(sql: string): string {
+  return sql.replace(/\s+\b(FROM|WHERE)\b\s+/g, "\n$1 ");
 }
 
 function resultWords(entry: LogEntry): string {

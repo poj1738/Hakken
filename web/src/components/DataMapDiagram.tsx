@@ -298,16 +298,23 @@ function clockTime(iso: string): string {
   return date.toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
-const SRC_X = 12;
-const SRC_W = 210;
-const SRC_H = 72;
+const VB_W = 1440;
+const PAD = 16;
+const SRC_W = 420;
+const SRC_H = 64;
 const SRC_GAP = 8;
-const SRC_TOP = 8;
-const VB_W = 960;
-
-const USL = { x: 470, y: 168, w: 250, h: 156 };
-const TRACE = { x: 768, y: 196, w: 176, h: 104 };
-const BUS_X = SRC_X + SRC_W + 52;
+const LABEL_H = 16;
+const USL_W = 440;
+const USL_H = 248;
+const TRACE_W = 340;
+const TRACE_H = 200;
+const COL_GAP = (VB_W - PAD * 2 - SRC_W - USL_W - TRACE_W) / 2;
+const SRC_X = PAD;
+const USL_X = SRC_X + SRC_W + COL_GAP;
+const TRACE_X = USL_X + USL_W + COL_GAP;
+const BUS_X = SRC_X + SRC_W + COL_GAP / 2;
+const USL_TABLES = ["medicine", "high_risk_class", "medication_statement"] as const;
+const PIPE = ["Planner", "Executor", "Evaluator", "Writer"] as const;
 
 function curve(x1: number, y1: number, x2: number, y2: number) {
   const c = (x1 + x2) / 2;
@@ -331,26 +338,38 @@ interface Props {
   /** Presenter focus. Omit it on the data map so nothing is dimmed. */
   lit?: readonly string[];
   present?: boolean;
+  /** Slow dots along lit edges, only once every query has finished. */
+  flow?: boolean;
 }
 
 const SKIP = new Set(["merge", "usl", "high_risk", "dq"]);
 const XHTML = { xmlns: "http://www.w3.org/1999/xhtml" } as HTMLAttributes<HTMLDivElement>;
 
-export function DataMapDiagram({ catalogue, byId, lit, present = false }: Props) {
+export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = false }: Props) {
   const reduced = useReducedMotion();
   const sources = catalogue.filter((q) => !SKIP.has(q.node));
-  // Presenter type is larger, so the boxes grow with it. The data map keeps the compact size.
-  const srcH = present ? 128 : SRC_H;
-  const srcGap = present ? 6 : SRC_GAP;
-  const srcW = present ? 228 : SRC_W;
-  const yOf = (i: number) => SRC_TOP + i * (srcH + srcGap);
+  const srcH = SRC_H;
+  const srcW = SRC_W;
+  const siloIdxEarly = sources.findIndex((q) => q.node === "patient");
+  const lastSiloEarly = siloIdxEarly >= 0 ? siloIdxEarly : Math.min(3, sources.length - 1);
+  const tgaEarly = sources.findIndex((q) => q.node === "tga");
+  const yOf = (i: number) => {
+    let y = PAD + LABEL_H + i * (srcH + SRC_GAP);
+    if (i > lastSiloEarly) y += LABEL_H;
+    if (tgaEarly >= 0 && i >= tgaEarly) y += PAD;
+    return y;
+  };
   const cyOf = (i: number) => yOf(i) + srcH / 2;
-  const columnBottom = sources.length ? yOf(sources.length - 1) + srcH + 16 : 200;
-  const columnMid = sources.length ? (cyOf(0) + cyOf(sources.length - 1)) / 2 : USL.y + USL.h / 2;
-  const uslBox = present ? { x: 488, y: Math.max(12, columnMid - 96), w: 268, h: 192 } : USL;
-  const traceBox = present
-    ? { x: uslBox.x + uslBox.w + 24, y: uslBox.y + 44, w: 168, h: 104 }
-    : TRACE;
+  const columnTop = sources.length ? yOf(0) : PAD;
+  const columnBottom = sources.length ? yOf(sources.length - 1) + srcH : 200;
+  const columnMid = (columnTop + columnBottom) / 2;
+  const uslBox = { x: USL_X, y: Math.max(PAD, columnMid - USL_H / 2), w: USL_W, h: USL_H };
+  const traceBox = {
+    x: TRACE_X,
+    y: uslBox.y + (uslBox.h - TRACE_H) / 2,
+    w: TRACE_W,
+    h: TRACE_H,
+  };
   const spec = (node: string) => catalogue.find((q) => q.node === node);
   const entry = (node: string) => {
     const query = spec(node);
@@ -409,15 +428,17 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false }: Props)
           on={edgeOn(query.node)}
           faint={dimming && !isLit(query.node)}
           reduced={reduced}
+          flow={flow}
         />
       ))}
-      <Edge d={trunk} on={mergeOn} faint={dimming && !isLit("merge")} reduced={reduced} />
+      <Edge d={trunk} on={mergeOn} faint={dimming && !isLit("merge")} reduced={reduced} flow={flow} />
       {lexiconI >= 0 && (
         <Edge
           d={curve(SRC_X + srcW, cyOf(lexiconI), uslBox.x, lexiconEntryY)}
           on={edgeOn("lexicon")}
           faint={dimming && !isLit("lexicon")}
           reduced={reduced}
+          flow={flow}
         />
       )}
       {apinchsI >= 0 && (
@@ -426,12 +447,16 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false }: Props)
           on={edgeOn("apinchs")}
           faint={dimming && !isLit("apinchs")}
           reduced={reduced}
+          flow={flow}
         />
       )}
       {tgaPath && (
-        <Edge d={tgaPath} on={edgeOn("tga")} optional faint={dimming && !isLit("tga")} reduced={reduced} />
+        <Edge d={tgaPath} on={edgeOn("tga")} optional faint={dimming && !isLit("tga")} reduced={reduced} flow={flow} />
       )}
-      <Edge d={toTrace} on={traceOn} faint={dimming && !isLit("medtrace")} reduced={reduced} />
+      <Edge d={toTrace} on={traceOn} faint={dimming && !isLit("medtrace")} reduced={reduced} flow={flow} />
+
+      <GroupLabel x={SRC_X} y={yOf(0) - 20} w={srcW} text="Clinical records · synthetic" />
+      {lexiconI >= 0 && <GroupLabel x={SRC_X} y={yOf(lexiconI) - 20} w={srcW} text="Australian reference data · real" />}
 
       {sources.map((query, i) => (
         <NodeBox
@@ -457,6 +482,8 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false }: Props)
         h={uslBox.h}
         label={spec("usl")?.label ?? "Zetaris · semantic layer (medtrace_usl)"}
         usl
+        chips={USL_TABLES}
+        caption="medicine lines, every source in one shape"
         entry={entry("usl")}
         active={dimming && isLit("usl")}
         faint={dimming && !isLit("usl")}
@@ -467,7 +494,7 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false }: Props)
         w={traceBox.w}
         h={traceBox.h}
         label="MedTrace"
-        caption="Reads the semantic layer by SQL"
+        pipe
         entry={entry("usl")?.phase === "done" ? { id: "medtrace", label: "MedTrace", node: "medtrace", phase: "done" } : undefined}
         active={dimming && isLit("medtrace")}
         faint={dimming && !isLit("medtrace")}
@@ -483,23 +510,21 @@ function Edge({
   optional = false,
   faint,
   reduced,
+  flow,
 }: {
   d: string;
   on: boolean;
   optional?: boolean;
   faint: boolean;
   reduced: boolean;
+  flow: boolean;
 }) {
-  const end = /([\d.]+)\s+([\d.]+)\s*$/.exec(d);
-  const x2 = end ? Number(end[1]) : 0;
-  const y2 = end ? Number(end[2]) : 0;
   return (
     <g className={faint ? "dm-faint" : undefined} aria-hidden>
       <path d={d} className={`dm-edge${on ? " dm-edge-on" : ""}${optional ? " dm-edge-opt" : ""}`} pathLength={optional ? undefined : 1} />
-      {on && reduced && <circle cx={x2} cy={y2} r="4" className="dm-dot" />}
-      {on && !reduced && (
-        <circle r="4" className="dm-dot">
-          <animateMotion dur="0.6s" fill="freeze" path={d} />
+      {on && flow && !reduced && (
+        <circle r="3.5" className="dm-dot">
+          <animateMotion dur="4s" repeatCount="indefinite" path={d} />
         </circle>
       )}
     </g>
@@ -516,6 +541,8 @@ function NodeBox({
   optional = false,
   usl = false,
   caption,
+  chips,
+  pipe = false,
   active,
   faint,
   noCount = false,
@@ -529,6 +556,8 @@ function NodeBox({
   optional?: boolean;
   usl?: boolean;
   caption?: string;
+  chips?: readonly string[];
+  pipe?: boolean;
   active: boolean;
   faint: boolean;
   noCount?: boolean;
@@ -557,33 +586,65 @@ function NodeBox({
 
   return (
     <g className={cls} tabIndex={0} role="img" aria-label={aria}>
-      <rect x={x} y={y} width={w} height={h} rx={12} className={`dm-box${optional ? " dm-box-opt" : ""}${usl ? " dm-box-usl" : ""}`} />
+      <rect x={x} y={y} width={w} height={h} rx={usl ? 24 : 12} className={`dm-box${optional ? " dm-box-opt" : ""}${usl ? " dm-box-usl" : " dm-box-ghost"}`} />
       <foreignObject x={x} y={y} width={w} height={h} aria-hidden="true">
-        <div {...XHTML} className={`dm-node-body ${state}${usl ? " dm-usl-body" : ""}`}>
-          <div className="dm-name">
-            {phase === "running" && <span className="pn-dot" />}
-            {label}
+        <div {...XHTML} className={`dm-node-body ${state}${usl ? " dm-usl-body" : " panel dm-src"}${optional ? " dm-opt" : ""}${phase === "done" && !usl && !pipe ? " dm-arrived" : ""}`}>
+          <div className={usl || pipe ? undefined : "dm-src-line"}>
+            <div className="dm-name">
+              {phase === "running" && <span className="pn-dot" />}
+              {label}
+            </div>
+            {!usl && !pipe && shown && <div className="dm-count dm-num">{formatCount(shown)}</div>}
           </div>
-          {optional && <div className="dm-cap">optional overlay</div>}
-          {waiting && <div className="dm-wait">{waiting}</div>}
+          {!usl && !pipe && waiting && <div className="dm-wait">{waiting}</div>}
+          {(usl || pipe) && waiting && <div className="dm-wait">{waiting}</div>}
           {detail && (
             <div className="dm-err" title={detail}>
               {detail}
             </div>
           )}
-          {shown && <div className="dm-count dm-num">{formatCount(shown)}</div>}
+          {(usl || pipe) && shown && <div className="dm-count dm-num">{formatCount(shown)}</div>}
           {shown && <div className="dm-cap">{caption ?? "rows in Zetaris"}</div>}
-          {noCount && caption && <div className="dm-cap">{caption}</div>}
+          {shown && optional && <div className="dm-cap">optional overlay</div>}
+          {shown && chips && (
+            <div className="dm-chips">
+              {chips.map((name) => (
+                <span key={name} className="dm-chip">
+                  {name}
+                </span>
+              ))}
+            </div>
+          )}
+          {pipe && (
+            <ol className="dm-pipe">
+              {PIPE.map((name) => (
+                <li key={name} className="pn pn-used dm-pipe-step">
+                  <span className="pn-dot" aria-hidden />
+                  <span className="pn-label">{name}</span>
+                </li>
+              ))}
+            </ol>
+          )}
         </div>
       </foreignObject>
     </g>
   );
 }
 
+function GroupLabel({ x, y, w, text }: { x: number; y: number; w: number; text: string }) {
+  return (
+    <foreignObject x={x} y={y} width={w} height={20} aria-hidden="true">
+      <div {...XHTML} className="dm-group">
+        {text}
+      </div>
+    </foreignObject>
+  );
+}
+
 function MergeLabel({ x, y, entry, faint }: { x: number; y: number; entry?: LogEntry; faint: boolean }) {
   const count = entry?.phase === "done" ? soleCell(entry.result) : null;
   const text =
-    entry?.phase === "running" ? "querying Zetaris…" : count ? `4 systems combined: ${formatCount(count)} rows` : "";
+    entry?.phase === "running" ? "querying Zetaris…" : count ? `4 systems → ${formatCount(count)} medicine lines` : "";
   if (!text) return null;
   return (
     <foreignObject x={x} y={y} width={168} height={52} className={faint ? "dm-faint" : undefined}>
