@@ -713,3 +713,75 @@ pre.code { margin: 8px 0 0; padding: 8px 10px; white-space: pre-wrap; font-size:
 html.shot-full, html.shot-full body, html.shot-full #root { height: auto; overflow: visible; }
 html.shot-full .app, html.shot-full .main-col { height: auto; overflow: visible; }
 html.shot-full .side { height: auto; }
+
+/* Data map — same cards and type as the rest of the app. Counts use tabular figures. */
+.dm-page { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.dm-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.dm-title { font-family: var(--sans); font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin: 0; color: var(--ink); }
+.dm-sub { font-family: var(--sans); color: var(--muted); margin: 6px 0 0; font-size: 15px; line-height: 1.45; max-width: 68ch; }
+.dm-actions { display: flex; gap: 8px; flex: none; }
+.dm-hero { padding: 18px 18px 8px; min-width: 0; }
+.dm-diagram { width: 100%; min-width: 0; overflow: hidden; }
+.dm-svg { width: 100%; height: auto; display: block; }
+.dm-svg foreignObject { overflow: hidden; }
+.dm-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; min-width: 0; }
+.dm-num { font-variant-numeric: tabular-nums; }
+.dm-log .dm-num { font-family: var(--mono); }
+.dm-node-body { box-sizing: border-box; height: 100%; padding: 7px 10px; display: flex; flex-direction: column; justify-content: center; gap: 1px; font-family: var(--sans); color: var(--ink); overflow: hidden; }
+.dm-name { font-weight: 700; font-size: 13px; line-height: 1.2; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+.dm-count { font-weight: 800; font-size: 22px; line-height: 1.05; color: var(--ink); }
+.dm-cap, .dm-wait { color: var(--muted); font-size: 11.5px; line-height: 1.25; font-family: var(--sans); }
+.dm-err { color: var(--alert); font-size: 12px; line-height: 1.35; margin: 4px 0 0; }
+.dm-box { fill: var(--page); stroke: var(--line-strong); stroke-width: 1.5; }
+.dm-box-opt { stroke-dasharray: 5 4; }
+.dm-box-usl { fill: var(--accent); stroke: var(--accent); }
+.dm-usl-body, .dm-usl-body .dm-name, .dm-usl-body .dm-count, .dm-usl-body .dm-cap, .dm-usl-body .dm-wait { color: #fff; }
+.dm-g.pn-used .dm-box, .dm-g.pn-now .dm-box { stroke: var(--accent); }
+.dm-g.dm-bad .dm-box { stroke: var(--alert); }
+.dm-edge { fill: none; stroke: var(--line-strong); stroke-width: 2; }
+.dm-edge:not(.dm-edge-opt) { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.dm-edge-on:not(.dm-edge-opt) { stroke: var(--accent); stroke-dashoffset: 0; transition: stroke-dashoffset 600ms ease, stroke 600ms ease; }
+.dm-edge-opt { stroke-dasharray: 6 4; }
+.dm-edge-opt.dm-edge-on { stroke: var(--accent); }
+.dm-dot { fill: var(--accent); }
+.dm-faint { opacity: 0.35; }
+.dm-merge { background: var(--page); color: var(--muted); font-family: var(--sans); font-size: 12px; line-height: 1.3; padding: 2px 4px; }
+.dm-g:focus { outline: none; }
+.dm-g:focus-visible .dm-box { stroke: var(--accent); stroke-width: 3; }
+.dm-bars { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
+.dm-bar { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.dm-bar-name { font-size: 14px; color: var(--ink); }
+.dm-track { display: block; height: 10px; background: var(--line-soft); border-radius: 999px; overflow: hidden; }
+.dm-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.dm-bar-val { font-weight: 700; color: var(--ink); }
+.dm-note { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
+.dm-dq-num { color: var(--high); background: var(--high-bg); font-size: 40px; font-weight: 800; line-height: 1; display: inline-block; padding: 6px 12px; border-radius: 10px; margin: 10px 0 6px; }
+.dm-dq-line { margin: 0 0 8px; font-size: 14px; }
+.dm-rule { font-family: var(--mono); color: var(--ink); margin: 0 0 4px; font-size: 13px; }
+.dm-code { font-family: var(--mono); font-size: 12px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--line-soft); color: var(--ink); border-radius: 10px; padding: 10px 12px; margin: 8px 0 0; }
+.dm-log { list-style: none; margin: 8px 0 0; padding: 0; max-height: 420px; overflow-y: auto; overflow-x: hidden; }
+.dm-log-item { border-bottom: 1px solid var(--line-soft); padding-bottom: 6px; }
+.dm-log-row { display: grid; grid-template-columns: 11ch minmax(0, 1fr) minmax(8ch, auto) 8ch auto; gap: 12px; align-items: baseline; padding: 8px 0; font-size: 14px; }
+.dm-log-head { color: var(--muted); font-size: 12px; font-weight: 600; border-bottom: 0; }
+.dm-fold { margin: 0 0 8px; }
+.dm-fold > summary { cursor: pointer; color: var(--accent); font-size: 13px; font-weight: 600; }
+.dm-present { position: relative; height: 100vh; max-width: 100vw; overflow: hidden; display: flex; flex-direction: column; gap: 8px; padding: 18px 28px 14px; background: var(--page); color: var(--ink); font-family: var(--sans); box-sizing: border-box; }
+.dm-kicker { color: var(--muted); font-size: 14px; margin: 0 0 4px; font-variant-numeric: tabular-nums; }
+.dm-diagram-present { flex: 1 1 auto; min-height: 0; min-width: 0; overflow-x: hidden; overflow-y: auto; }
+.dm-diagram-present .dm-svg { height: auto; }
+.dm-present .dm-title { font-size: 32px; }
+.dm-svg.present .dm-name { font-size: 22px; line-height: 1.15; }
+.dm-svg.present .dm-count { font-size: 32px; }
+.dm-svg.present .dm-cap, .dm-svg.present .dm-wait { font-size: 14px; }
+.dm-present-foot { flex: none; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dm-disclaimer { margin: 0 0 0 auto; max-width: 42ch; }
+.dm-dq-hero { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
+.dm-dq-hero .dm-dq-num { margin: 0; }
+.dm-live { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (max-width: 900px) {
+  .dm-split { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dm-edge-on:not(.dm-edge-opt) { transition: none; }
+  .dm-g.pn-now .pn-dot, .pn-now .pn-dot { animation: none; }
+}

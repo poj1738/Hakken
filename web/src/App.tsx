@@ -26,6 +26,8 @@ import { Pipeline } from "./components/Pipeline";
 import { LearningHero } from "./components/LearningHero";
 import { SectionNav, type NavItem } from "./components/SectionNav";
 import { Welcome } from "./components/Welcome";
+import { DataMap } from "./components/DataMap";
+import { DataMapPresenter } from "./components/DataMapPresenter";
 import type { LogFilter } from "./trace";
 import { sameFilter } from "./trace";
 import { cleanText, medName, targetLabel, typeLabel } from "./format";
@@ -75,7 +77,10 @@ export default function App() {
   const [feedback, setFeedback] = useState<Record<string, FeedbackState>>({});
   const [section, setSection] = useState<Section>("findings");
   // Item 9: the Welcome page is the default view until a patient is chosen, and always one click away.
-  const [view, setView] = useState<"welcome" | "patient">("welcome");
+  // Data map is a third screen. ?present=1 opens the presenter once, with no router.
+  const openedInPresenter = new URLSearchParams(window.location.search).get("present") === "1";
+  const [view, setView] = useState<"welcome" | "patient" | "datamap">(openedInPresenter ? "datamap" : "welcome");
+  const [present, setPresent] = useState(openedInPresenter);
   // Item 11: a click on a Powered-by node filters the processing log.
   const [logFilter, setLogFilter] = useState<LogFilter | null>(null);
   // Checklist ticks for this screen only; the summary card counts them live.
@@ -296,6 +301,17 @@ export default function App() {
   // Never show a section the rail has disabled (e.g. right after a new run starts).
   const shownSection: Section = nav.find((i) => i.id === section && !i.disabled) ? section : review ? "identity" : hasResult ? "findings" : "log";
 
+  if (present) {
+    return (
+      <DataMapPresenter
+        onExit={() => {
+          setView("datamap");
+          setPresent(false);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="app">
       <a className="skip" href={`#${PANEL}`}>
@@ -305,6 +321,9 @@ export default function App() {
         <Brand />
         <button type="button" className={`snav-item side-welcome ${view === "welcome" ? "on" : ""}`} aria-current={view === "welcome" ? "page" : undefined} onClick={() => setView("welcome")}>
           <span>Welcome</span>
+        </button>
+        <button type="button" className={`snav-item side-welcome ${view === "datamap" ? "on" : ""}`} aria-current={view === "datamap" ? "page" : undefined} onClick={() => setView("datamap")}>
+          <span>Data map</span>
         </button>
         <PatientList
           patients={patients}
@@ -331,7 +350,9 @@ export default function App() {
           </div>
         )}
         <main className="wrap">
-          {view === "welcome" ? (
+          {view === "datamap" ? (
+            <DataMap onPresent={() => setPresent(true)} />
+          ) : view === "welcome" ? (
             <Welcome
               patients={patients}
               onPick={selectPatient}
