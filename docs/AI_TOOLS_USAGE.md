@@ -6,7 +6,9 @@ there is no second rules file to keep in sync.
 ## On Cursor
 
 The event's resources are inconsistent: the event page's rules read as "must use
-Cursor", while other official resources call it optional. We are not using it. The repo
+Cursor", while other official resources call it optional. We used it for one feature:
+the Data map screen and presenter view, built by Grok in Cursor on 2026-11-03 (see the
+log). Everything else was built with Claude Code. The repo
 previously carried a `.cursor/rules/project.mdc` mirroring `CLAUDE.md`; it has been
 removed, because a duplicated rules file drifts from the original and then quietly
 misleads whoever reads the stale copy.
@@ -52,5 +54,6 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | UI cleanup round 2 in `web/`: app-shell layout, Welcome balance and sponsor cards, copy audit of every screen; 37 Playwright screenshots against SAMPLE_MODE |
 | 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | Feature-freeze check in `web/`: verified S41/S42 display, fixed the duplicated TGA disclaimer and the pipeline layout at three widths; click path re-run with Playwright |
 | 2026-11-03 | Arpon | Grok (xAI) in Cursor | Grok 4.7 | Data map screen and presenter view: read-only Zetaris catalogue, live envelopes for SAMPLE_MODE, diagram, high-risk chart, data-quality card, query log |
+| 2026-11-04 | Arpon | Claude Code | Opus 5.5 | Data map presenter after Grok's build: final step shows all three findings as stat cards, centred column and spacing; checked with Playwright against live Zetaris |
 
 The README's **AI and model usage** section summarises this for judges.
