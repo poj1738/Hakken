@@ -307,15 +307,27 @@ const SRC_GAP = 8;
 const LABEL_H = 16;
 const USL_W = 440;
 const USL_H = 248;
-const TRACE_W = 340;
-const TRACE_H = 200;
+const AGENT_W = 236;
+const AGENT_H = 80;
+const AGENT_GAP = 12;
+const GROUP_PAD = 12;
+const RETRY_GUTTER = 36;
+const GROUP_W = GROUP_PAD + AGENT_W + RETRY_GUTTER + GROUP_PAD;
+const GROUP_H = GROUP_PAD + 4 * AGENT_H + 3 * AGENT_GAP + GROUP_PAD;
+const TRACE_HEAD = 40;
+const TRACE_W = GROUP_W;
 const COL_GAP = (VB_W - PAD * 2 - SRC_W - USL_W - TRACE_W) / 2;
 const SRC_X = PAD;
 const USL_X = SRC_X + SRC_W + COL_GAP;
 const TRACE_X = USL_X + USL_W + COL_GAP;
 const BUS_X = SRC_X + SRC_W + COL_GAP / 2;
 const USL_TABLES = ["medicine", "high_risk_class", "medication_statement"] as const;
-const PIPE = ["Planner", "Executor", "Evaluator", "Writer"] as const;
+const AGENTS = [
+  { id: "planner", name: "Planner", job: "Splits the job into steps" },
+  { id: "executor", name: "Executor", job: "Runs the SQL in Zetaris" },
+  { id: "evaluator", name: "Evaluator", job: "Re-checks every cited row in Zetaris" },
+  { id: "writer", name: "Writer", job: "Explains each finding for a pharmacist" },
+] as const;
 
 function curve(x1: number, y1: number, x2: number, y2: number) {
   const c = (x1 + x2) / 2;
@@ -369,16 +381,16 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
   const [suppressed, setSuppressed] = useState(false);
   const [pos, setPos] = useState<{ left: number; top: number; width: number; maxH: number } | null>(null);
   const openId = present ? forcedNode ?? null : suppressed ? null : focusId ?? pinned ?? hover;
-  const sources = catalogue.filter((q) => !SKIP.has(q.node));
+  const detailNode = openId && AGENTS.some((agent) => agent.id === openId) ? "medtrace" : openId;
+  const sources = catalogue.filter((q) => !SKIP.has(q.node) && q.node !== "tga");
+  const tgaQuery = catalogue.find((q) => q.node === "tga");
   const srcH = SRC_H;
   const srcW = SRC_W;
   const siloIdxEarly = sources.findIndex((q) => q.node === "patient");
   const lastSiloEarly = siloIdxEarly >= 0 ? siloIdxEarly : Math.min(3, sources.length - 1);
-  const tgaEarly = sources.findIndex((q) => q.node === "tga");
   const yOf = (i: number) => {
     let y = PAD + LABEL_H + i * (srcH + SRC_GAP);
     if (i > lastSiloEarly) y += LABEL_H;
-    if (tgaEarly >= 0 && i >= tgaEarly) y += PAD;
     return y;
   };
   const cyOf = (i: number) => yOf(i) + srcH / 2;
@@ -386,12 +398,6 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
   const columnBottom = sources.length ? yOf(sources.length - 1) + srcH : 200;
   const columnMid = (columnTop + columnBottom) / 2;
   const uslBox = { x: USL_X, y: Math.max(PAD, columnMid - USL_H / 2), w: USL_W, h: USL_H };
-  const traceBox = {
-    x: TRACE_X,
-    y: uslBox.y + (uslBox.h - TRACE_H) / 2,
-    w: TRACE_W,
-    h: TRACE_H,
-  };
   const spec = (node: string) => catalogue.find((q) => q.node === node);
   const entry = (node: string) => {
     const query = spec(node);
@@ -412,7 +418,6 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
   const uslCy = uslBox.y + uslBox.h / 2;
   const lexiconI = sources.findIndex((q) => q.node === "lexicon");
   const apinchsI = sources.findIndex((q) => q.node === "apinchs");
-  const tgaI = sources.findIndex((q) => q.node === "tga");
   // Top to bottom on the semantic layer's left edge, matching source order, so the lines do not cross.
   const entryPad = 28;
   const entryY = (i: number) => uslBox.y + entryPad + ((uslBox.h - entryPad * 2) * i) / 2;
@@ -422,18 +427,35 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
   const mergeEntry = entry("merge");
   const mergeOn = mergeEntry?.phase === "error" ? false : dimming ? isLit("merge") : mergeEntry?.phase === "done";
   const trunk = curve(BUS_X, mergeY, uslBox.x, mergeEntryY);
-  const toTrace = curve(uslBox.x + uslBox.w, uslCy, traceBox.x, traceBox.y + traceBox.h / 2);
-  const traceOn = entry("usl")?.phase === "done" && (!dimming || isLit("medtrace"));
-  const yUnder = Math.max(
-    tgaI >= 0 ? cyOf(tgaI) + 36 : 0,
-    uslBox.y + uslBox.h + 28,
-    traceBox.y + traceBox.h + 24,
-  );
-  const tgaPath =
-    tgaI >= 0
-      ? `M ${SRC_X + srcW} ${cyOf(tgaI)} C ${SRC_X + srcW + 56} ${yUnder}, ${traceBox.x + traceBox.w / 2} ${yUnder}, ${traceBox.x + traceBox.w / 2} ${traceBox.y + traceBox.h}`
+  // Sit the four agents so the Executor and Evaluator lines stay horizontal and inside the semantic layer's right edge.
+  const execOffset = GROUP_PAD + (AGENT_H + AGENT_GAP) + AGENT_H / 2;
+  const evalOffset = GROUP_PAD + 2 * (AGENT_H + AGENT_GAP) + AGENT_H / 2;
+  let groupTop = uslCy - (execOffset + evalOffset) / 2;
+  let headTop = groupTop - 8 - TRACE_HEAD;
+  if (headTop < 8) {
+    groupTop += 8 - headTop;
+    headTop = 8;
+  }
+  const groupX = TRACE_X;
+  const agentX = groupX + GROUP_PAD;
+  const agentRight = agentX + AGENT_W;
+  const boxY = (i: number) => groupTop + GROUP_PAD + i * (AGENT_H + AGENT_GAP);
+  const execCy = boxY(1) + AGENT_H / 2;
+  const evalCy = boxY(2) + AGENT_H / 2;
+  const tgaY = groupTop + GROUP_H + 28;
+  const tgaH = SRC_H;
+  const tgaCy = tgaY + tgaH / 2;
+  const uslRight = uslBox.x + uslBox.w;
+  const sqlLine = `M ${uslRight} ${execCy} L ${agentX} ${execCy}`;
+  const recheckLine = `M ${agentX} ${evalCy} L ${uslRight} ${evalCy}`;
+  const linkOn = entry("usl")?.phase === "done" && (!dimming || isLit("usl") || isLit("medtrace"));
+  const xOut = Math.min(VB_W - 6, groupX + GROUP_W + 8);
+  const shortage =
+    tgaQuery != null
+      ? `M ${agentRight} ${boxY(1) + 16} L ${xOut} ${boxY(1) + 16} L ${xOut} ${tgaCy} L ${agentRight} ${tgaCy}`
       : "";
-  const vbH = Math.max(columnBottom, uslBox.y + uslBox.h + 24, traceBox.y + traceBox.h + 24, yUnder + 12);
+  const retry = `M ${agentRight} ${evalCy} C ${agentRight + 22} ${evalCy}, ${agentRight + 22} ${execCy}, ${agentRight} ${execCy}`;
+  const vbH = Math.max(columnBottom, uslBox.y + uslBox.h + 24, tgaY + tgaH + 16);
 
   useEffect(() => {
     if (present) return;
@@ -537,7 +559,7 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
       style={present ? undefined : { left: pos?.left ?? 8, top: pos?.top ?? 8, width: pos?.width ?? 360, maxHeight: pos?.maxH, visibility: pos ? "visible" : "hidden" }}
       onMouseEnter={() => openId && ui.enter(openId)}
     >
-      <NodeDetail nodeId={openId} entry={entry(openId)} showQuality={showQuality} quality={showQuality ? byId.dq : undefined} present={present} />
+      <NodeDetail nodeId={detailNode ?? openId} entry={entry(detailNode ?? openId)} showQuality={showQuality} quality={showQuality ? byId.dq : undefined} present={present} />
     </div>
   ) : null;
 
@@ -551,6 +573,11 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
       role="img"
       aria-label="Sources flowing through the Zetaris semantic layer into MedTrace"
     >
+      <defs>
+        <marker id="dm-arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0 0 L8 4 L0 8 Z" className="dm-arr" />
+        </marker>
+      </defs>
       {sources.slice(0, lastSilo + 1).map((query, i) => (
         <Edge
           key={query.id}
@@ -580,10 +607,12 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
           flow={flow}
         />
       )}
-      {tgaPath && (
-        <Edge d={tgaPath} on={edgeOn("tga")} optional faint={dimming && !isLit("tga")} reduced={reduced} flow={flow} />
+      <rect x={groupX} y={groupTop} width={GROUP_W} height={GROUP_H} rx={14} className="dm-trace-frame" />
+      <Edge d={sqlLine} on={linkOn} faint={dimming && !isLit("usl") && !isLit("medtrace")} reduced={reduced} flow={flow} />
+      <Edge d={recheckLine} on={linkOn} faint={dimming && !isLit("usl") && !isLit("medtrace")} reduced={reduced} flow={flow} />
+      {shortage && (
+        <Edge d={shortage} on={edgeOn("tga")} optional faint={dimming && !isLit("tga")} reduced={reduced} flow={flow} />
       )}
-      <Edge d={toTrace} on={traceOn} faint={dimming && !isLit("medtrace")} reduced={reduced} flow={flow} />
 
       <GroupLabel x={SRC_X} y={yOf(0) - 20} w={srcW} text="Clinical records · synthetic" />
       {lexiconI >= 0 && <GroupLabel x={SRC_X} y={yOf(lexiconI) - 20} w={srcW} text="Australian reference data · real" />}
@@ -620,19 +649,63 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
         faint={dimming && !isLit("usl")}
         nodeId="usl"
       />
-      <NodeBox
-        x={traceBox.x}
-        y={traceBox.y}
-        w={traceBox.w}
-        h={traceBox.h}
-        label="MedTrace"
-        pipe
-        entry={entry("usl")?.phase === "done" ? { id: "medtrace", label: "MedTrace", node: "medtrace", phase: "done" } : undefined}
-        active={dimming && isLit("medtrace")}
-        faint={dimming && !isLit("medtrace")}
-        noCount
-        nodeId="medtrace"
-      />
+      <foreignObject x={groupX} y={headTop} width={GROUP_W} height={TRACE_HEAD} aria-hidden="true">
+        <div {...XHTML} className="dm-trace-head">
+          <div className="dm-trace-kicker">MedTrace</div>
+          <div className="dm-trace-sub">Asks Zetaris in SQL</div>
+        </div>
+      </foreignObject>
+      {AGENTS.slice(0, -1).map((agent, i) => (
+        <line
+          key={agent.id}
+          x1={agentX + AGENT_W / 2}
+          y1={boxY(i) + AGENT_H}
+          x2={agentX + AGENT_W / 2}
+          y2={boxY(i + 1)}
+          className="dm-join"
+          markerEnd="url(#dm-arr)"
+        />
+      ))}
+      <path d={retry} className="dm-join" markerEnd="url(#dm-arr)" />
+      <text className="dm-mini" x={(uslRight + agentX) / 2} y={execCy - 8} textAnchor="middle">
+        SQL
+      </text>
+      <text className="dm-mini" x={(uslRight + agentX) / 2} y={evalCy - 8} textAnchor="middle">
+        re-check
+      </text>
+      <text className="dm-mini" x={agentRight + 22} y={(execCy + evalCy) / 2 + 4} textAnchor="middle">
+        retry
+      </text>
+      <text className="dm-mini" x={agentX + AGENT_W / 2} y={tgaY - 10} textAnchor="middle">
+        shortage lookup
+      </text>
+      {AGENTS.map((agent, i) => (
+        <AgentBox
+          key={agent.id}
+          x={agentX}
+          y={boxY(i)}
+          w={AGENT_W}
+          h={AGENT_H}
+          id={agent.id}
+          name={agent.name}
+          job={agent.job}
+          faint={dimming && !isLit("medtrace")}
+        />
+      ))}
+      {tgaQuery && (
+        <NodeBox
+          x={agentX}
+          y={tgaY}
+          w={AGENT_W}
+          h={tgaH}
+          label={tgaQuery.label}
+          optional
+          entry={byId[tgaQuery.id]}
+          active={dimming && isLit("tga")}
+          faint={dimming && !isLit("tga")}
+          nodeId="tga"
+        />
+      )}
     </svg>
     {detail}
     </div>
@@ -678,7 +751,6 @@ function NodeBox({
   usl = false,
   caption,
   chips,
-  pipe = false,
   active,
   faint,
   noCount = false,
@@ -694,7 +766,6 @@ function NodeBox({
   usl?: boolean;
   caption?: string;
   chips?: readonly string[];
-  pipe?: boolean;
   active: boolean;
   faint: boolean;
   noCount?: boolean;
@@ -730,7 +801,7 @@ function NodeBox({
         <button
           {...XHTML_BTN}
           type="button"
-          className={`dm-node-btn dm-node-body ${state}${usl ? " dm-usl-body" : " panel dm-src"}${optional ? " dm-opt" : ""}${phase === "done" && !usl && !pipe ? " dm-arrived" : ""}`}
+          className={`dm-node-btn dm-node-body ${state}${usl ? " dm-usl-body" : " panel dm-src"}${optional ? " dm-opt" : ""}${phase === "done" && !usl ? " dm-arrived" : ""}`}
           aria-label={aria}
           aria-expanded={ui?.openId === nodeId}
           aria-controls={ui?.openId === nodeId ? `dm-detail-${nodeId}` : undefined}
@@ -740,21 +811,21 @@ function NodeBox({
           onBlur={() => ui?.blur()}
           onClick={() => ui?.toggle(nodeId)}
         >
-          <div className={usl || pipe ? undefined : "dm-src-line"}>
+          <div className={usl ? undefined : "dm-src-line"}>
             <div className="dm-name">
               {phase === "running" && <span className="pn-dot" />}
               {label}
             </div>
-            {!usl && !pipe && shown && <div className="dm-count dm-num">{formatCount(shown)}</div>}
+            {!usl && shown && <div className="dm-count dm-num">{formatCount(shown)}</div>}
           </div>
-          {!usl && !pipe && waiting && <div className="dm-wait">{waiting}</div>}
-          {(usl || pipe) && waiting && <div className="dm-wait">{waiting}</div>}
+          {!usl && waiting && <div className="dm-wait">{waiting}</div>}
+          {usl && waiting && <div className="dm-wait">{waiting}</div>}
           {detail && (
             <div className="dm-err" title={detail}>
               {detail}
             </div>
           )}
-          {(usl || pipe) && shown && <div className="dm-count dm-num">{formatCount(shown)}</div>}
+          {usl && shown && <div className="dm-count dm-num">{formatCount(shown)}</div>}
           {shown && <div className="dm-cap">{caption ?? "rows in Zetaris"}</div>}
           {shown && optional && <div className="dm-cap">optional overlay</div>}
           {shown && chips && (
@@ -766,16 +837,53 @@ function NodeBox({
               ))}
             </div>
           )}
-          {pipe && (
-            <ol className="dm-pipe">
-              {PIPE.map((name) => (
-                <li key={name} className="pn pn-used dm-pipe-step">
-                  <span className="pn-dot" aria-hidden />
-                  <span className="pn-label">{name}</span>
-                </li>
-              ))}
-            </ol>
-          )}
+        </button>
+      </foreignObject>
+    </g>
+  );
+}
+
+function AgentBox({
+  x,
+  y,
+  w,
+  h,
+  id,
+  name,
+  job,
+  faint,
+}: {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  id: string;
+  name: string;
+  job: string;
+  faint: boolean;
+}) {
+  const ui = useContext(OpenCtx);
+  const open = ui?.openId === id;
+  return (
+    <g className={faint ? "dm-faint" : undefined} data-node={id}>
+      <rect x={x} y={y} width={w} height={h} rx={12} className="dm-box dm-box-ghost" />
+      <foreignObject x={x} y={y} width={w} height={h}>
+        <button
+          {...XHTML_BTN}
+          type="button"
+          className="dm-node-btn dm-node-body panel dm-src dm-agent"
+          data-node={id}
+          aria-label={`${name}. ${job}`}
+          aria-expanded={open}
+          aria-controls={open ? "dm-detail-medtrace" : undefined}
+          onMouseEnter={() => ui?.enter(id)}
+          onMouseLeave={ui?.leave}
+          onFocus={() => ui?.focus(id)}
+          onBlur={() => ui?.blur()}
+          onClick={() => ui?.toggle(id)}
+        >
+          <div className="dm-agent-name">{name}</div>
+          <div className="dm-agent-job">{job}</div>
         </button>
       </foreignObject>
     </g>

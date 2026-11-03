@@ -775,10 +775,18 @@ html.shot-full .side { height: auto; }
 .dm-group { color: var(--muted); font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; font-variant: small-caps; line-height: 16px; }
 .dm-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
 .dm-chip { border: 1px solid currentColor; border-radius: 999px; padding: 1px 6px; font-size: 10px; line-height: 1.3; font-family: var(--mono); }
-.dm-pipe { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-.dm-pipe-step { display: flex; align-items: center; gap: 6px; min-height: 0; }
-.dm-pipe-step .pn-dot { width: 8px; height: 8px; }
-.dm-pipe-step .pn-label { font-size: 12px; white-space: nowrap; }
+.dm-trace-head { display: flex; flex-direction: column; gap: 2px; font-family: var(--sans); }
+.dm-trace-kicker { font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); line-height: 1.2; }
+.dm-trace-sub { font-size: 13px; color: var(--muted); line-height: 1.25; }
+.dm-trace-frame { fill: var(--page); stroke: var(--line-soft); stroke-width: 1; }
+.dm-agent { padding: 8px 10px; gap: 2px; justify-content: center; }
+.dm-agent-name { font-size: 15px; font-weight: 600; line-height: 1.2; color: var(--ink); }
+.dm-agent-job { font-size: 12px; line-height: 1.25; color: var(--muted); }
+.dm-svg.present .dm-agent-name { font-size: 18px; }
+.dm-svg.present .dm-agent-job { font-size: 15px; }
+.dm-join { fill: none; stroke: var(--line-strong); stroke-width: 2; }
+.dm-arr { fill: var(--line-strong); }
+.dm-mini { font-family: var(--sans); font-size: 11px; fill: var(--muted); }
 .dm-g:focus { outline: none; }
 .dm-g:focus-visible .dm-box { stroke: var(--accent); stroke-width: 3; }
 .dm-bars { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
