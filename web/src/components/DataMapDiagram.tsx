@@ -366,7 +366,7 @@ const BLURB: Record<string, string> = {
   patient: "What the patient says they take, in their own words.",
   lexicon: "Australia's list of subsidised medicines.",
   apinchs: "Medicines a pharmacist must review first.",
-  tga: "Medicine shortages reported to the TGA.",
+  tga: "Supply check: MedTrace looks up each patient's medicines here for shortage notices. Not part of the semantic layer.",
 };
 
 export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = false }: Props) {
@@ -427,18 +427,14 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
   const boxY = (i: number) => groupTop + GROUP_PAD + i * (AGENT_H + AGENT_GAP);
   const execCy = boxY(1) + AGENT_H / 2;
   const evalCy = boxY(2) + AGENT_H / 2;
-  const tgaY = groupTop + GROUP_H + 16;
-  const tgaH = 72;
-  const tgaCy = tgaY + tgaH / 2;
+  const tgaY = groupTop + GROUP_H + 28;
+  const tgaH = 108;
   const uslRight = uslBox.x + uslBox.w;
   const sqlLine = `M ${uslRight} ${execCy} L ${agentX} ${execCy}`;
   const recheckLine = `M ${agentX} ${evalCy} L ${uslRight} ${evalCy}`;
   const linkOn = entry("usl")?.phase === "done" && (!dimming || isLit("usl") || isLit("medtrace"));
-  const xOut = Math.min(VB_W - 6, groupX + GROUP_W + 8);
-  const shortage =
-    tgaQuery != null
-      ? `M ${agentRight} ${boxY(1) + 16} L ${xOut} ${boxY(1) + 16} L ${xOut} ${tgaCy} L ${agentRight} ${tgaCy}`
-      : "";
+  const dropX = Math.min(agentRight + 16, groupX + GROUP_W - 12);
+  const shortage = tgaQuery != null ? `M ${dropX} ${execCy} L ${dropX} ${tgaY - 14}` : "";
   const retry = `M ${agentRight} ${evalCy} C ${agentRight + 22} ${evalCy}, ${agentRight + 22} ${execCy}, ${agentRight} ${execCy}`;
   const vbH = Math.max(columnBottom, uslBox.y + uslBox.h + 24, tgaY + tgaH + 16);
 
@@ -554,7 +550,7 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
       <text className="dm-mini" x={agentRight + 22} y={(execCy + evalCy) / 2 + 4} textAnchor="middle">
         retry
       </text>
-      <text className="dm-mini" x={agentX + AGENT_W / 2} y={tgaY - 10} textAnchor="middle">
+      <text className="dm-mini" x={groupX + GROUP_W / 2} y={tgaY - 4} textAnchor="middle">
         shortage lookup
       </text>
       {AGENTS.map((agent, i) => (
@@ -572,9 +568,9 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
       ))}
       {tgaQuery && (
         <NodeBox
-          x={agentX}
+          x={groupX}
           y={tgaY}
-          w={AGENT_W}
+          w={GROUP_W}
           h={tgaH}
           label={tgaQuery.label}
           optional

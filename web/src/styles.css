@@ -758,7 +758,7 @@ html.shot-full .side { height: auto; }
 .dm-num { font-variant-numeric: tabular-nums; }
 .dm-node-body { box-sizing: border-box; height: 100%; padding: 8px 16px; display: flex; flex-direction: column; justify-content: center; gap: 0; font-family: var(--sans); color: var(--ink); overflow: hidden; }
 .dm-src { border: 1px solid var(--line); border-radius: 12px; }
-.dm-src.dm-opt { border-style: dashed; }
+.dm-src.dm-opt { border-style: solid; }
 .dm-src.dm-arrived { background: var(--accent-soft); border-left: 3px solid var(--accent); }
 .dm-src-line { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-width: 0; }
 .dm-name { font-weight: 600; font-size: 15px; line-height: 1.2; color: var(--ink); display: flex; align-items: center; gap: 8px; min-width: 0; }
