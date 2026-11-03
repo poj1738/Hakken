@@ -51,5 +51,6 @@ tool was never used, leave it out rather than listing it to look compliant.
 | 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | UI cleanup in `web/`: Welcome page, sticky searchable sidebar, live Powered-by pipeline, plain-English processing-log summaries; checked with Playwright |
 | 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | UI cleanup round 2 in `web/`: app-shell layout, Welcome balance and sponsor cards, copy audit of every screen; 37 Playwright screenshots against SAMPLE_MODE |
 | 2026-10-27 | Anshu | Claude Code (cloud session) | Opus 5.5 | Feature-freeze check in `web/`: verified S41/S42 display, fixed the duplicated TGA disclaimer and the pipeline layout at three widths; click path re-run with Playwright |
+| 2026-11-03 | Arpon | Grok (xAI) in Cursor | Grok 4.7 | Data map screen and presenter view: read-only Zetaris catalogue, live envelopes for SAMPLE_MODE, diagram, high-risk chart, data-quality card, query log |
 
 The README's **AI and model usage** section summarises this for judges.
