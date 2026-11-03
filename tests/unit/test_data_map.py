@@ -85,7 +85,11 @@ def test_examples_are_read_after_the_quality_count() -> None:
     assert query.label == "Data-quality examples"
     assert query.sql.startswith("SELECT med_text, strength_text, source_system ")
     assert "LIMIT 3" in query.sql
-    assert ids.index("dq") < ids.index("dq_examples")
+    assert ids.index("dq") < ids.index("spellings") < ids.index("dq_examples")
+    spellings = next(query for query in CATALOGUE if query.id == "spellings")
+    assert spellings.label == "Same medicine, many ways"
+    assert "COUNT(DISTINCT med_text)" in spellings.sql
+    assert "GROUP BY generic" in spellings.sql
 
 
 def test_unknown_query_is_404(dm_api: TestClient) -> None:

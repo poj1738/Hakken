@@ -7,7 +7,6 @@ import type { DataMapQuerySpec } from "../types";
 import { DataMapDiagram, RunStatus, formatCount, formatSeconds, soleCell, useDataMapRun, type LogEntry } from "./DataMapDiagram";
 
 const SILOS = ["emr", "gp", "pharmacy", "patient"] as const;
-const KNOWN_QUERIES = new Set(["emr", "gp", "pharmacy", "patient", "lexicon", "apinchs", "tga", "all_sources", "rows", "high_risk", "dq", "dq_examples"]);
 const PATIENT_NOTE = "Patients describe medicines in their own words, so no code or risk class is attached.";
 
 export function DataMap({ onPresent }: { onPresent: () => void }) {
@@ -33,7 +32,10 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
     const query = catalogue?.find((q) => q.node === node);
     return query ? byId[query.id] : undefined;
   };
-  const waysQuery = catalogue?.find((q) => !KNOWN_QUERIES.has(q.id) && q.id !== "dq_examples");
+  const spellings = catalogue?.find((q) => q.id === "spellings");
+  const spellingsEntry = spellings ? byId[spellings.id] : undefined;
+  const spellingsFailed = spellingsEntry?.phase === "error";
+  const showSpellings = Boolean(spellings) && !spellingsFailed;
   const examplesQuery = catalogue?.find((q) => q.id === "dq_examples");
 
   return (
@@ -74,7 +76,8 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
         <QueryLog entries={entries} catalogue={catalogue} clock={clock} />
       </div>
 
-      <div className={`dm-bottom${waysQuery ? " dm-bottom-3" : ""}`}>
+      {spellingsFailed && <p className="dm-err">{spellingsEntry?.error}</p>}
+      <div className={`dm-bottom${showSpellings ? " dm-bottom-3" : ""}`}>
         <section className="panel panel-pad" aria-labelledby="dm-risk-title">
           <h2 className="h2" id="dm-risk-title">
             High-risk medicines by source
@@ -82,12 +85,13 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
           <p className="dm-desc">Medicine lines with an ACSQHC high-risk class</p>
           <RiskChart entry={find("high_risk")} catalogue={catalogue} byId={byId} />
         </section>
-        {waysQuery && (
+        {showSpellings && (
           <section className="panel panel-pad" aria-labelledby="dm-ways-title">
             <h2 className="h2" id="dm-ways-title">
               Same medicine, written many ways
             </h2>
-            <WaysCard entry={byId[waysQuery.id]} />
+            <p className="dm-desc">How many different ways each medicine is written across the four records</p>
+            <WaysCard entry={spellingsEntry} />
           </section>
         )}
         <section className="panel panel-pad" aria-labelledby="dm-dq-title">
@@ -122,6 +126,7 @@ function RiskChart({
   });
   const maxPct = rows.reduce((m, row) => Math.max(m, row.pct), 0);
   return (
+    <>
     <div className="dm-bars" role="list">
       {rows.map((row) => {
         const high = formatCount(row.text) ?? row.text;
@@ -144,6 +149,7 @@ function RiskChart({
       })}
     </div>
     <p className="dm-note">{PATIENT_NOTE}</p>
+    </>
   );
 }
 
@@ -187,27 +193,19 @@ function WaysCard({ entry }: { entry?: LogEntry }) {
   const result = entry.result;
   if (!result) return <p className="dm-wait">querying Zetaris…</p>;
   return (
-    <div className="dm-log-scroll">
-      <table className="dm-log">
-        <thead>
-          <tr>
-            {result.headers.map((header) => (
-              <th key={header} scope="col">
-                {header}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {result.data.map((row, i) => (
-            <tr key={i}>
-              {row.map((cell, j) => (
-                <td key={j}>{cell ?? ""}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div>
+      <ul className="dm-ways">
+        {result.data.map((row, i) => (
+          <li key={`${row[0] ?? ""}-${i}`}>
+            <span>{row[0] ?? ""}</span>
+            <span className="dm-ways-meta">
+              <span className="dm-num">{formatCount(row[1]) ?? row[1]} ways</span>
+              <span> · in {formatCount(row[2]) ?? row[2]} systems</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="dm-note">The semantic layer matches every version to one medicine.</p>
     </div>
   );
 }

@@ -847,6 +847,11 @@ html.shot-full .side { height: auto; }
 .dm-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
 .dm-bar-val { font-weight: 400; font-size: 14px; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .dm-note { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
+.dm-ways { list-style: none; margin: 8px 0 0; padding: 0; }
+.dm-ways li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; min-width: 0; padding: 8px 0; border-top: 1px solid var(--line-soft); font-size: 15px; color: var(--ink); }
+.dm-ways li > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dm-ways-meta { white-space: nowrap; font-size: 14px; color: var(--muted); }
+.dm-ways-meta .dm-num { font-weight: 600; color: var(--ink); }
 
 .dm-dq-lead { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .dm-dq-say { margin: 0; font-size: 15px; font-weight: 400; line-height: 1.35; color: var(--ink); }

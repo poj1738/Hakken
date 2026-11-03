@@ -138,6 +138,19 @@ CATALOGUE: tuple[MapQuery, ...] = (
         node="dq",
     ),
     MapQuery(
+        id="spellings",
+        template_id="MAP_USL",
+        replay_key="spellings",
+        sql=(
+            "SELECT generic, COUNT(DISTINCT med_text), COUNT(DISTINCT source_system) FROM "
+            "lightning.metastore.medtrace.medtrace_usl.medication_statement "
+            "WHERE generic IS NOT NULL GROUP BY generic "
+            "ORDER BY COUNT(DISTINCT med_text) DESC LIMIT 6"
+        ),
+        label="Same medicine, many ways",
+        node="spellings",
+    ),
+    MapQuery(
         id="dq_examples",
         template_id="MAP_USL",
         replay_key="dq_examples",
