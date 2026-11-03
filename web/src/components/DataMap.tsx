@@ -4,7 +4,7 @@
 import { useEffect, useRef } from "react";
 import { API_MODE } from "../api";
 import type { DataMapQueryResult, DataMapQuerySpec } from "../types";
-import { DataMapDiagram, rowsShown, soleCell, useDataMapRun, type LogEntry } from "./DataMapDiagram";
+import { DataMapDiagram, formatCount, formatSeconds, soleCell, useDataMapRun, type LogEntry } from "./DataMapDiagram";
 
 const SILOS = ["emr", "gp", "pharmacy", "patient"] as const;
 const PATIENT_NOTE = "Patients describe medicines in their own words, so no code or risk class is attached.";
@@ -27,7 +27,7 @@ export function DataMap({ onPresent }: { onPresent: () => void }) {
 
 function DataMapLive({ onPresent }: { onPresent: () => void }) {
   const { catalogue, byId, entries, fatal, rerun } = useDataMapRun(true);
-  const logRef = useRef<HTMLOListElement>(null);
+  const logRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = logRef.current;
     if (el) el.scrollTop = el.scrollHeight;
@@ -90,18 +90,34 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
         <h2 className="h2" id="dm-log-title">
           Query log
         </h2>
-        <ol className="dm-log" ref={logRef} aria-live="polite">
-          <li className="dm-log-row dm-log-head" aria-hidden>
-            <span>Time</span>
-            <span>Query</span>
-            <span>Rows</span>
-            <span>ms</span>
-            <span />
-          </li>
-          {entries.map((entry) => (
-            <LogRow key={entry.id} entry={entry} />
-          ))}
-        </ol>
+        <div className="dm-log-scroll" ref={logRef}>
+          <table className="dm-log">
+            <caption className="dm-live">Query log</caption>
+            <thead>
+              <tr>
+                <th scope="col" className="dm-log-dot-col">
+                  <span className="dm-live">Status</span>
+                </th>
+                <th scope="col">Time</th>
+                <th scope="col">Query</th>
+                <th scope="col" className="dm-log-num">
+                  Result
+                </th>
+                <th scope="col" className="dm-log-num">
+                  Took
+                </th>
+                <th scope="col">
+                  <span className="dm-live">SQL</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {entries.map((entry) => (
+                <LogRow key={entry.id} entry={entry} />
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   );
@@ -119,13 +135,13 @@ function RiskChart({ entry, catalogue }: { entry?: LogEntry; catalogue: DataMapQ
   return (
     <div className="dm-bars" role="list">
       {rows.map((row) => (
-        <div key={row.key} role="listitem" aria-label={`${row.label}: ${row.text} high-risk medicine lines`}>
+        <div key={row.key} role="listitem" aria-label={`${row.label}: ${formatCount(row.text) ?? row.text} high-risk medicine lines`}>
           <div className="dm-bar">
             <span className="dm-bar-name">{row.label}</span>
             <span className="dm-track">
               <span className="dm-fill" style={{ width: max > 0 ? `${(row.n / max) * 100}%` : "0%" }} />
             </span>
-            <span className="dm-bar-val dm-num">{row.text}</span>
+            <span className="dm-bar-val dm-num">{formatCount(row.text) ?? row.text}</span>
           </div>
           {row.note && <p className="dm-note">{PATIENT_NOTE}</p>}
         </div>
@@ -169,12 +185,12 @@ function QualityCard({ dq, rows }: { dq?: LogEntry; rows?: LogEntry }) {
   if (violations == null) return <p className="dm-err">The data-quality query returned no count.</p>;
   return (
     <div>
-      <p className="dm-dq-num dm-num" aria-label={`${violations} medicine lines failed the strength check`}>
-        {violations}
+      <p className="dm-dq-num dm-num" aria-label={`${formatCount(violations)} medicine lines failed the strength check`}>
+        {formatCount(violations)}
       </p>
       <p className="dm-cap dm-dq-line">
         {total != null
-          ? `of ${total} medicine lines have a strength that isn't a real product`
+          ? `of ${formatCount(total)} medicine lines have a strength that isn't a real product`
           : "medicine lines have a strength that isn't a real product"}
       </p>
       <p className="dm-rule">strength_is_a_real_product</p>
@@ -184,28 +200,45 @@ function QualityCard({ dq, rows }: { dq?: LogEntry; rows?: LogEntry }) {
   );
 }
 
+function resultWords(entry: LogEntry): string {
+  if (entry.phase === "running") return "querying Zetaris…";
+  if (entry.phase === "error") return entry.error ?? "The query failed";
+  const result = entry.result;
+  if (!result) return "";
+  if (result.data.length === 1 && result.headers.length === 1) {
+    const count = formatCount(soleCell(result));
+    return count ? `${count} rows counted` : "";
+  }
+  const sources = formatCount(result.row_count);
+  return sources ? `${sources} sources` : "";
+}
+
 function LogRow({ entry }: { entry: LogEntry }) {
   const result = entry.result;
-  const time = result ? clock(result.executed_at) : "";
-  const rows = result ? rowsShown(result) : "";
-  const ms = result ? String(result.latency_ms) : "";
+  const time = result && entry.phase !== "running" ? clock(result.executed_at) : "";
+  const took = result && entry.phase === "done" ? formatSeconds(result.latency_ms) : "";
+  const dot = entry.phase === "error" ? "bad" : entry.phase === "running" ? "run" : entry.phase === "done" ? "done" : "";
   return (
-    <li className="dm-log-item">
-      <div className="dm-log-row">
-        <span className="dm-num">{time}</span>
-        <span>{entry.label}</span>
-        <span className="dm-num">{entry.phase === "running" ? "querying Zetaris…" : rows}</span>
-        <span className="dm-num">{ms}</span>
-        <span>{result?.replayed ? <span className="badge">replayed</span> : null}</span>
-      </div>
-      {entry.phase === "error" && <p className="dm-err">{entry.error}</p>}
-      {result?.sql && (
-        <details className="dm-fold">
-          <summary>SQL</summary>
-          <pre className="dm-code">{result.sql}</pre>
-        </details>
-      )}
-    </li>
+    <tr>
+      <td>
+        <span className={`dm-dot-status ${dot}`} aria-hidden />
+      </td>
+      <td className="dm-log-time">{time}</td>
+      <td>
+        {entry.label}
+        {result?.replayed ? <span className="badge">replayed</span> : null}
+      </td>
+      <td className="dm-log-num">{resultWords(entry)}</td>
+      <td className="dm-log-num">{took}</td>
+      <td>
+        {result?.sql ? (
+          <details className="dm-fold">
+            <summary>SQL</summary>
+            <pre className="dm-code">{result.sql}</pre>
+          </details>
+        ) : null}
+      </td>
+    </tr>
   );
 }
 

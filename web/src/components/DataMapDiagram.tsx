@@ -15,10 +15,26 @@ export interface LogEntry {
   error?: string;
 }
 
+const AU_COUNT = new Intl.NumberFormat("en-AU");
+const AU_SECONDS = new Intl.NumberFormat("en-AU", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
 export function soleCell(result: DataMapQueryResult | undefined): string | null {
   const value = result?.data[0]?.[0];
   if (value == null || value === "") return null;
   return String(value);
+}
+
+/** Australian grouping for a count that came back from Zetaris. A non-number stays as returned. */
+export function formatCount(raw: string | number | null | undefined): string | null {
+  if (raw == null || raw === "") return null;
+  const n = typeof raw === "number" ? raw : Number(raw);
+  if (!Number.isFinite(n)) return String(raw);
+  return AU_COUNT.format(n);
+}
+
+/** Latency as seconds with one decimal, from the adapter's latency_ms. */
+export function formatSeconds(ms: number): string {
+  return `${AU_SECONDS.format(ms / 1000)} s`;
 }
 
 /** Rows column: a single count's cell, otherwise how many rows came back. */
@@ -139,7 +155,6 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false }: Props)
   const traceBox = present
     ? { x: uslBox.x + uslBox.w + 24, y: uslBox.y + 44, w: 168, h: 104 }
     : TRACE;
-  const vbH = Math.max(columnBottom, uslBox.y + uslBox.h + 24, traceBox.y + traceBox.h + 24);
   const spec = (node: string) => catalogue.find((q) => q.node === node);
   const entry = (node: string) => {
     const query = spec(node);
@@ -158,11 +173,30 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false }: Props)
   const lastSilo = siloIdx >= 0 ? siloIdx : Math.min(3, sources.length - 1);
   const mergeY = sources.length ? (cyOf(0) + cyOf(Math.max(lastSilo, 0))) / 2 : uslBox.y + uslBox.h / 2;
   const uslCy = uslBox.y + uslBox.h / 2;
+  const lexiconI = sources.findIndex((q) => q.node === "lexicon");
+  const apinchsI = sources.findIndex((q) => q.node === "apinchs");
+  const tgaI = sources.findIndex((q) => q.node === "tga");
+  // Top to bottom on the semantic layer's left edge, matching source order, so the lines do not cross.
+  const entryPad = 28;
+  const entryY = (i: number) => uslBox.y + entryPad + ((uslBox.h - entryPad * 2) * i) / 2;
+  const mergeEntryY = entryY(0);
+  const lexiconEntryY = entryY(1);
+  const apinchsEntryY = entryY(2);
   const mergeEntry = entry("merge");
   const mergeOn = mergeEntry?.phase === "error" ? false : dimming ? isLit("merge") : mergeEntry?.phase === "done";
-  const trunk = curve(BUS_X, mergeY, uslBox.x, uslCy);
+  const trunk = curve(BUS_X, mergeY, uslBox.x, mergeEntryY);
   const toTrace = curve(uslBox.x + uslBox.w, uslCy, traceBox.x, traceBox.y + traceBox.h / 2);
   const traceOn = entry("usl")?.phase === "done" && (!dimming || isLit("medtrace"));
+  const yUnder = Math.max(
+    tgaI >= 0 ? cyOf(tgaI) + 36 : 0,
+    uslBox.y + uslBox.h + 28,
+    traceBox.y + traceBox.h + 24,
+  );
+  const tgaPath =
+    tgaI >= 0
+      ? `M ${SRC_X + srcW} ${cyOf(tgaI)} C ${SRC_X + srcW + 56} ${yUnder}, ${traceBox.x + traceBox.w / 2} ${yUnder}, ${traceBox.x + traceBox.w / 2} ${traceBox.y + traceBox.h}`
+      : "";
+  const vbH = Math.max(columnBottom, uslBox.y + uslBox.h + 24, traceBox.y + traceBox.h + 24, yUnder + 12);
 
   return (
     <svg
@@ -182,21 +216,25 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false }: Props)
         />
       ))}
       <Edge d={trunk} on={mergeOn} faint={dimming && !isLit("merge")} reduced={reduced} />
-      {sources.slice(lastSilo + 1).map((query) => {
-        const i = sources.indexOf(query);
-        const slot = i - lastSilo;
-        const y2 = uslBox.y + uslBox.h - 36 - slot * 22;
-        return (
-          <Edge
-            key={query.id}
-            d={curve(SRC_X + srcW, cyOf(i), uslBox.x, Math.min(uslBox.y + uslBox.h - 18, Math.max(uslBox.y + 18, y2)))}
-            on={edgeOn(query.node)}
-            optional={query.node === "tga"}
-            faint={dimming && !isLit(query.node)}
-            reduced={reduced}
-          />
-        );
-      })}
+      {lexiconI >= 0 && (
+        <Edge
+          d={curve(SRC_X + srcW, cyOf(lexiconI), uslBox.x, lexiconEntryY)}
+          on={edgeOn("lexicon")}
+          faint={dimming && !isLit("lexicon")}
+          reduced={reduced}
+        />
+      )}
+      {apinchsI >= 0 && (
+        <Edge
+          d={curve(SRC_X + srcW, cyOf(apinchsI), uslBox.x, apinchsEntryY)}
+          on={edgeOn("apinchs")}
+          faint={dimming && !isLit("apinchs")}
+          reduced={reduced}
+        />
+      )}
+      {tgaPath && (
+        <Edge d={tgaPath} on={edgeOn("tga")} optional faint={dimming && !isLit("tga")} reduced={reduced} />
+      )}
       <Edge d={toTrace} on={traceOn} faint={dimming && !isLit("medtrace")} reduced={reduced} />
 
       {sources.map((query, i) => (
@@ -310,7 +348,7 @@ function NodeBox({
     : [
         label,
         optional ? "optional overlay" : "",
-        shown ? `${shown} rows in Zetaris` : "",
+        shown ? `${formatCount(shown) ?? shown} rows in Zetaris` : "",
         waiting ?? "",
         detail ?? "",
         !shown && !waiting && !detail ? "waiting for its query" : "",
@@ -337,7 +375,7 @@ function NodeBox({
               {detail}
             </div>
           )}
-          {shown && <div className="dm-count dm-num">{shown}</div>}
+          {shown && <div className="dm-count dm-num">{formatCount(shown)}</div>}
           {shown && <div className="dm-cap">{caption ?? "rows in Zetaris"}</div>}
           {noCount && caption && <div className="dm-cap">{caption}</div>}
         </div>
@@ -349,7 +387,7 @@ function NodeBox({
 function MergeLabel({ x, y, entry, faint }: { x: number; y: number; entry?: LogEntry; faint: boolean }) {
   const count = entry?.phase === "done" ? soleCell(entry.result) : null;
   const text =
-    entry?.phase === "running" ? "querying Zetaris…" : count ? `4 systems combined: ${count} rows` : "";
+    entry?.phase === "running" ? "querying Zetaris…" : count ? `4 systems combined: ${formatCount(count)} rows` : "";
   if (!text) return null;
   return (
     <foreignObject x={x} y={y} width={168} height={52} className={faint ? "dm-faint" : undefined}>

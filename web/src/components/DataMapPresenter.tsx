@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { API_MODE } from "../api";
 import { DISCLAIMER } from "./Footer";
-import { DataMapDiagram, soleCell, useDataMapRun, type LogEntry } from "./DataMapDiagram";
+import { DataMapDiagram, formatCount, soleCell, useDataMapRun, type LogEntry } from "./DataMapDiagram";
 
 const STEPS: { queryId: string; title: string; line: string; lit: readonly string[] }[] = [
   { queryId: "emr", title: "Hospital EMR", line: "What was charted in hospital. Synthetic.", lit: ["emr"] },
@@ -128,7 +128,7 @@ function speak(entry: LogEntry | undefined, tga: boolean): string {
   if (!entry) return "";
   if (entry.phase === "running") return "Querying Zetaris.";
   if (entry.phase === "error") return tga ? "Not registered." : "The query failed.";
-  const count = soleCell(entry.result);
+  const count = formatCount(soleCell(entry.result));
   return count ? `${count} rows.` : "";
 }
 
@@ -140,7 +140,7 @@ function DqHero({ entry }: { entry?: LogEntry }) {
   if (count == null) return null;
   return (
     <p className="dm-dq-hero">
-      <span className="dm-dq-num dm-num">{count}</span>
+      <span className="dm-dq-num dm-num">{formatCount(count)}</span>
       <span className="dm-rule">strength_is_a_real_product</span>
     </p>
   );
