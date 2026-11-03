@@ -360,7 +360,7 @@ interface Props {
   flow?: boolean;
 }
 
-const SKIP = new Set(["merge", "usl", "high_risk", "dq"]);
+const SKIP = new Set(["merge", "usl", "high_risk", "dq", "dq_examples"]);
 const XHTML = { xmlns: "http://www.w3.org/1999/xhtml" } as HTMLAttributes<HTMLDivElement>;
 
 /** The short line from each source's description, shown on the card itself. */

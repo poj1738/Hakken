@@ -78,6 +78,16 @@ def test_each_query_returns_the_recorded_envelope(dm_api: TestClient) -> None:
         assert isinstance(body["executed_at"], str) and body["executed_at"]
 
 
+def test_examples_are_read_after_the_quality_count() -> None:
+    ids = [query.id for query in CATALOGUE]
+    assert ids[-1] == "dq_examples"
+    query = CATALOGUE[-1]
+    assert query.label == "Data-quality examples"
+    assert query.sql.startswith("SELECT med_text, strength_text, source_system ")
+    assert "LIMIT 3" in query.sql
+    assert ids.index("dq") < ids.index("dq_examples")
+
+
 def test_unknown_query_is_404(dm_api: TestClient) -> None:
     response = dm_api.get("/data-map/query/not-a-query")
     assert response.status_code == 404

@@ -7,7 +7,7 @@ import type { DataMapQuerySpec } from "../types";
 import { DataMapDiagram, RunStatus, formatCount, formatSeconds, soleCell, useDataMapRun, type LogEntry } from "./DataMapDiagram";
 
 const SILOS = ["emr", "gp", "pharmacy", "patient"] as const;
-const KNOWN_QUERIES = new Set(["emr", "gp", "pharmacy", "patient", "lexicon", "apinchs", "tga", "all_sources", "rows", "high_risk", "dq"]);
+const KNOWN_QUERIES = new Set(["emr", "gp", "pharmacy", "patient", "lexicon", "apinchs", "tga", "all_sources", "rows", "high_risk", "dq", "dq_examples"]);
 const PATIENT_NOTE = "Patients describe medicines in their own words, so no code or risk class is attached.";
 
 export function DataMap({ onPresent }: { onPresent: () => void }) {
@@ -237,12 +237,13 @@ function QualityCard({ dq, rows, sql, examples }: { dq?: LogEntry; rows?: LogEnt
           </div>
         </div>
       )}
+      {examples?.phase === "error" && <p className="dm-err">{examples.error}</p>}
       {exampleRows.length > 0 && (
         <>
           <p className="dm-cap">For example:</p>
           <ul className="dm-examples">
             {exampleRows.map((row, i) => (
-              <li key={i}>{row.filter((cell) => cell != null && cell !== "").join(" ")}</li>
+              <li key={i}>{exampleLine(examples?.result?.headers ?? [], row)}</li>
             ))}
           </ul>
         </>
@@ -261,6 +262,18 @@ function QualityCard({ dq, rows, sql, examples }: { dq?: LogEntry; rows?: LogEnt
       )}
     </div>
   );
+}
+
+function exampleLine(headers: string[], row: (string | null)[]): string {
+  const cell = (name: string) => {
+    const index = headers.findIndex((header) => header.toLowerCase() === name);
+    if (index < 0 || row[index] == null) return "";
+    return String(row[index]);
+  };
+  const med = cell("med_text");
+  const strength = cell("strength_text");
+  if (med || strength) return `${med} ${strength}`.trim();
+  return row.filter((value) => value != null && value !== "").join(" ");
 }
 
 function formatSql(sql: string): string {

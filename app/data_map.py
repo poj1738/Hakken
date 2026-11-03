@@ -137,6 +137,18 @@ CATALOGUE: tuple[MapQuery, ...] = (
         label="Data quality",
         node="dq",
     ),
+    MapQuery(
+        id="dq_examples",
+        template_id="MAP_USL",
+        replay_key="dq_examples",
+        sql=(
+            "SELECT med_text, strength_text, source_system FROM "
+            "lightning.metastore.medtrace.medtrace_usl.medication_statement "
+            "WHERE NOT COALESCE(strength_listed, true) LIMIT 3"
+        ),
+        label="Data-quality examples",
+        node="dq_examples",
+    ),
 )
 
 _BY_ID = {query.id: query for query in CATALOGUE}
