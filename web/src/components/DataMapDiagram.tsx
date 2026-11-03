@@ -246,7 +246,7 @@ export function useDataMapRun(enabled: boolean) {
   return { catalogue, byId, entries, fatal, rerun, clock };
 }
 
-export function RunStatus({ clock, onRerun }: { clock: RunClock; onRerun: () => void }) {
+export function RunStatus({ clock }: { clock: RunClock; onRerun: () => void }) {
   const ticking = clock.phase === "running" || clock.phase === "cached";
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -264,13 +264,10 @@ export function RunStatus({ clock, onRerun }: { clock: RunClock; onRerun: () => 
   if (clock.phase === "cached") {
     const started = Date.parse(clock.startedAt);
     const mins = Number.isFinite(started) ? Math.max(0, Math.floor((now - started) / 60000)) : 0;
-    const origin = clock.replayed ? "Replayed" : "live Zetaris";
+    const origin = clock.replayed ? "replayed" : "live Zetaris";
     return (
       <p className="dm-status">
-        Results from the {origin} run at {clockTime(clock.startedAt)} ({formatCount(mins)} min ago) ·{" "}
-        <button type="button" className="lnk" onClick={onRerun}>
-          Run live again
-        </button>
+        Showing the {origin} run from {clockTime(clock.startedAt)} ({formatCount(mins)} min ago)
       </p>
     );
   }
