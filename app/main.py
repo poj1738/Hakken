@@ -25,6 +25,8 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.adapters.zetaris import ReplayMiss, ZetarisError
+from app.data_map import DataMapCatalogueResponse, DataMapQueryResult, catalogue_response, execute_query
 from app.feedback import FeedbackError, apply_feedback
 from app.orchestrator import InvalidRequest, Orchestrator, UnknownPatient
 from app.schemas import (
@@ -146,6 +148,23 @@ def create_app(orchestrator: Orchestrator | None = None, *, background: bool = T
             return apply_feedback(orch, req)
         except FeedbackError as exc:
             raise HTTPException(404, str(exc)) from exc
+
+    @app.get("/data-map/queries", response_model=DataMapCatalogueResponse)
+    def data_map_queries() -> DataMapCatalogueResponse:
+        """The ordered catalogue. Runs no SQL."""
+        return catalogue_response()
+
+    @app.get("/data-map/query/{query_id}", response_model=DataMapQueryResult)
+    def data_map_query(query_id: str) -> DataMapQueryResult:
+        """One catalogue query, through the process Zetaris client. No stand-in number."""
+        try:
+            return execute_query(orch.zetaris, query_id)
+        except KeyError as exc:
+            raise HTTPException(404, f"unknown data-map query {query_id}") from exc
+        except ReplayMiss as exc:
+            raise HTTPException(503, f"{exc.name}.json") from exc
+        except ZetarisError as exc:
+            raise HTTPException(502, str(exc)) from exc
 
     if (WEB_DIST / "index.html").is_file():
         # Same origin as the API (scan S18). Mounted last, so every API route above wins.
