@@ -765,7 +765,7 @@ html.shot-full .side { height: auto; }
 .dm-log-head { color: var(--muted); font-size: 12px; font-weight: 600; border-bottom: 0; }
 .dm-fold { margin: 0 0 8px; }
 .dm-fold > summary { cursor: pointer; color: var(--accent); font-size: 13px; font-weight: 600; }
-.dm-present { position: relative; height: 100vh; max-width: 100vw; overflow: hidden; display: flex; flex-direction: column; gap: 8px; padding: 18px 28px 14px; background: var(--page); color: var(--ink); font-family: var(--sans); box-sizing: border-box; }
+.dm-present { position: relative; height: 100vh; max-width: 100vw; overflow: hidden; display: flex; flex-direction: column; gap: 6px; padding: 10px 28px 8px; background: var(--page); color: var(--ink); font-family: var(--sans); box-sizing: border-box; }
 .dm-kicker { color: var(--muted); font-size: 14px; margin: 0 0 4px; font-variant-numeric: tabular-nums; }
 .dm-diagram-present { flex: 1 1 auto; min-height: 0; min-width: 0; overflow-x: hidden; overflow-y: auto; }
 .dm-diagram-present .dm-svg { height: auto; }
