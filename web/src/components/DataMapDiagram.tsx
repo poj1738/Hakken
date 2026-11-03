@@ -2,7 +2,8 @@
 // The data map and the presenter view both render this. Positions are layout,
 // not counts: a number appears only after that node's query has answered.
 
-import { useCallback, useEffect, useRef, useState, type HTMLAttributes } from "react";
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type HTMLAttributes, type MouseEvent as ReactMouseEvent } from "react";
+import { NodeDetail } from "./DataMapDetail";
 import { api } from "../api";
 import type { DataMapQueryResult, DataMapQuerySpec } from "../types";
 
@@ -340,13 +341,34 @@ interface Props {
   present?: boolean;
   /** Slow dots along lit edges, only once every query has finished. */
   flow?: boolean;
+  /** Presenter: this node's card stays open beside the diagram. */
+  forcedNode?: string;
+  showQuality?: boolean;
 }
 
 const SKIP = new Set(["merge", "usl", "high_risk", "dq"]);
 const XHTML = { xmlns: "http://www.w3.org/1999/xhtml" } as HTMLAttributes<HTMLDivElement>;
+const XHTML_BTN = { xmlns: "http://www.w3.org/1999/xhtml" } as ButtonHTMLAttributes<HTMLButtonElement>;
 
-export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = false }: Props) {
+const OpenCtx = createContext<{
+  openId: string | null;
+  enter: (id: string) => void;
+  leave: (event: ReactMouseEvent) => void;
+  focus: (id: string) => void;
+  blur: () => void;
+  toggle: (id: string) => void;
+} | null>(null);
+
+export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = false, forcedNode, showQuality = false }: Props) {
   const reduced = useReducedMotion();
+  const stageRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [pinned, setPinned] = useState<string | null>(null);
+  const [hover, setHover] = useState<string | null>(null);
+  const [focusId, setFocusId] = useState<string | null>(null);
+  const [suppressed, setSuppressed] = useState(false);
+  const [pos, setPos] = useState<{ left: number; top: number; width: number; maxH: number } | null>(null);
+  const openId = present ? forcedNode ?? null : suppressed ? null : focusId ?? pinned ?? hover;
   const sources = catalogue.filter((q) => !SKIP.has(q.node));
   const srcH = SRC_H;
   const srcW = SRC_W;
@@ -413,7 +435,115 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
       : "";
   const vbH = Math.max(columnBottom, uslBox.y + uslBox.h + 24, traceBox.y + traceBox.h + 24, yUnder + 12);
 
+  useEffect(() => {
+    if (present) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setPinned(null);
+      setSuppressed(true);
+    };
+    const onDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest(".dm-node-btn") || target.closest(".dm-detail")) return;
+      setPinned(null);
+      setSuppressed(true);
+    };
+    const onFocusIn = (event: FocusEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const btn = target.closest(".dm-node-btn");
+      if (!btn || !stageRef.current?.contains(btn)) return;
+      const id = btn.closest("[data-node]")?.getAttribute("data-node");
+      if (!id) return;
+      setSuppressed(false);
+      setFocusId(id);
+    };
+    const onFocusOut = (event: FocusEvent) => {
+      const next = event.relatedTarget;
+      if (next instanceof Element && next.closest(".dm-node-btn")) return;
+      setFocusId(null);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("focusin", onFocusIn, true);
+    document.addEventListener("focusout", onFocusOut, true);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("focusin", onFocusIn, true);
+      document.removeEventListener("focusout", onFocusOut, true);
+    };
+  }, [present]);
+
+  useLayoutEffect(() => {
+    if (present || !openId || !stageRef.current || !cardRef.current) {
+      setPos(null);
+      return;
+    }
+    const node = stageRef.current.querySelector(`[data-node="${openId}"]`);
+    if (!node) return;
+    const box = stageRef.current.getBoundingClientRect();
+    const nr = node.getBoundingClientRect();
+    const gap = 8;
+    const roomRight = box.width - (nr.right - box.left) - gap * 2;
+    const roomLeft = nr.left - box.left - gap * 2;
+    const right = roomRight >= roomLeft;
+    const width = Math.max(160, Math.min(360, right ? roomRight : roomLeft));
+    let left = right ? nr.right - box.left + gap : nr.left - box.left - width - gap;
+    left = Math.max(gap, Math.min(left, box.width - width - gap));
+    const cr = cardRef.current.getBoundingClientRect();
+    let top = nr.top - box.top;
+    if (top + cr.height > box.height - gap) top = box.height - cr.height - gap;
+    top = Math.max(gap, top);
+    const maxH = Math.max(120, Math.round(box.height - gap * 2));
+    const next = { left: Math.round(left), top: Math.round(top), width: Math.round(width), maxH };
+    setPos((prev) =>
+      prev && prev.left === next.left && prev.top === next.top && prev.width === next.width && prev.maxH === next.maxH ? prev : next,
+    );
+  }, [present, openId, byId, pos?.width, pos?.maxH]);
+
+  const ui = {
+    openId,
+    enter: (id: string) => {
+      if (present) return;
+      setSuppressed(false);
+      setHover(id);
+    },
+    leave: (event: ReactMouseEvent) => {
+      const next = event.relatedTarget;
+      if (next instanceof Element && (next.closest(".dm-detail") || next.closest(".dm-node-btn"))) return;
+      setHover(null);
+      setSuppressed(false);
+    },
+    focus: (id: string) => {
+      if (present) return;
+      setSuppressed(false);
+      setFocusId(id);
+    },
+    blur: () => setFocusId(null),
+    toggle: (id: string) => {
+      if (present) return;
+      const closing = pinned === id;
+      setSuppressed(closing);
+      setPinned(closing ? null : id);
+    },
+  };
+
+  const detail = openId ? (
+    <div
+      ref={cardRef}
+      className={present ? "dm-detail-present-wrap" : "dm-detail-slot"}
+      style={present ? undefined : { left: pos?.left ?? 8, top: pos?.top ?? 8, width: pos?.width ?? 360, maxHeight: pos?.maxH, visibility: pos ? "visible" : "hidden" }}
+      onMouseEnter={() => openId && ui.enter(openId)}
+    >
+      <NodeDetail nodeId={openId} entry={entry(openId)} showQuality={showQuality} quality={showQuality ? byId.dq : undefined} present={present} />
+    </div>
+  ) : null;
+
   return (
+    <OpenCtx.Provider value={ui}>
+    <div ref={stageRef} className={present ? "dm-stage dm-stage-present" : "dm-stage"} onMouseLeave={ui.leave}>
     <svg
       className={`dm-svg${present ? " present" : ""}`}
       viewBox={`0 0 ${VB_W} ${vbH}`}
@@ -470,6 +600,7 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
           entry={byId[query.id]}
           active={dimming && isLit(query.node)}
           faint={dimming && !isLit(query.node)}
+          nodeId={query.node}
         />
       ))}
 
@@ -487,6 +618,7 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
         entry={entry("usl")}
         active={dimming && isLit("usl")}
         faint={dimming && !isLit("usl")}
+        nodeId="usl"
       />
       <NodeBox
         x={traceBox.x}
@@ -499,8 +631,12 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
         active={dimming && isLit("medtrace")}
         faint={dimming && !isLit("medtrace")}
         noCount
+        nodeId="medtrace"
       />
     </svg>
+    {detail}
+    </div>
+    </OpenCtx.Provider>
   );
 }
 
@@ -546,6 +682,7 @@ function NodeBox({
   active,
   faint,
   noCount = false,
+  nodeId,
 }: {
   x: number;
   y: number;
@@ -561,7 +698,9 @@ function NodeBox({
   active: boolean;
   faint: boolean;
   noCount?: boolean;
+  nodeId: string;
 }) {
+  const ui = useContext(OpenCtx);
   const phase = entry?.phase;
   const count = phase === "done" ? soleCell(entry?.result) : null;
   const tgaMiss = optional && phase === "error";
@@ -585,10 +724,22 @@ function NodeBox({
   const cls = ["dm-g", faint ? "dm-faint" : "", state, usl ? "dm-usl" : ""].filter(Boolean).join(" ");
 
   return (
-    <g className={cls} tabIndex={0} role="img" aria-label={aria}>
+    <g className={cls} data-node={nodeId}>
       <rect x={x} y={y} width={w} height={h} rx={usl ? 24 : 12} className={`dm-box${optional ? " dm-box-opt" : ""}${usl ? " dm-box-usl" : " dm-box-ghost"}`} />
-      <foreignObject x={x} y={y} width={w} height={h} aria-hidden="true">
-        <div {...XHTML} className={`dm-node-body ${state}${usl ? " dm-usl-body" : " panel dm-src"}${optional ? " dm-opt" : ""}${phase === "done" && !usl && !pipe ? " dm-arrived" : ""}`}>
+      <foreignObject x={x} y={y} width={w} height={h}>
+        <button
+          {...XHTML_BTN}
+          type="button"
+          className={`dm-node-btn dm-node-body ${state}${usl ? " dm-usl-body" : " panel dm-src"}${optional ? " dm-opt" : ""}${phase === "done" && !usl && !pipe ? " dm-arrived" : ""}`}
+          aria-label={aria}
+          aria-expanded={ui?.openId === nodeId}
+          aria-controls={ui?.openId === nodeId ? `dm-detail-${nodeId}` : undefined}
+          onMouseEnter={() => ui?.enter(nodeId)}
+          onMouseLeave={ui?.leave}
+          onFocus={() => ui?.focus(nodeId)}
+          onBlur={() => ui?.blur()}
+          onClick={() => ui?.toggle(nodeId)}
+        >
           <div className={usl || pipe ? undefined : "dm-src-line"}>
             <div className="dm-name">
               {phase === "running" && <span className="pn-dot" />}
@@ -625,7 +776,7 @@ function NodeBox({
               ))}
             </ol>
           )}
-        </div>
+        </button>
       </foreignObject>
     </g>
   );

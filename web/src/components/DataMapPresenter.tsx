@@ -104,7 +104,15 @@ function PresenterLive({ onExit }: { onExit: () => void }) {
       </header>
       <div className="dm-diagram dm-diagram-present">
         {catalogue ? (
-          <DataMapDiagram catalogue={catalogue} byId={byId} lit={current.lit} present flow={clock.phase === "done" || clock.phase === "cached"} />
+          <DataMapDiagram
+            catalogue={catalogue}
+            byId={byId}
+            lit={current.lit}
+            present
+            flow={clock.phase === "done" || clock.phase === "cached"}
+            forcedNode={current.queryId === "rows" || current.queryId === "dq" ? "usl" : current.queryId}
+            showQuality={current.queryId === "dq"}
+          />
         ) : (
           <p className="dm-wait">querying Zetaris…</p>
         )}
