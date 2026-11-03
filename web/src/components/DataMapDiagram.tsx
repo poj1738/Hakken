@@ -435,7 +435,8 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
   const linkOn = entry("usl")?.phase === "done" && (!dimming || isLit("usl") || isLit("medtrace"));
   const dropX = Math.min(agentRight + 16, groupX + GROUP_W - 12);
   const shortage = tgaQuery != null ? `M ${dropX} ${execCy} L ${dropX} ${tgaY - 14}` : "";
-  const retry = `M ${agentRight} ${evalCy} C ${agentRight + 22} ${evalCy}, ${agentRight + 22} ${execCy}, ${agentRight} ${execCy}`;
+  const retryBulge = Math.min(18, RETRY_GUTTER + GROUP_PAD - 20);
+  const retry = `M ${agentRight} ${evalCy} C ${agentRight + retryBulge} ${evalCy}, ${agentRight + retryBulge} ${execCy}, ${agentRight} ${execCy}`;
   const vbH = Math.max(columnBottom, uslBox.y + uslBox.h + 24, tgaY + tgaH + 16);
 
   return (
@@ -448,8 +449,8 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
       aria-label="Sources flowing through the Zetaris semantic layer into MedTrace"
     >
       <defs>
-        <marker id="dm-arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
-          <path d="M0 0 L8 4 L0 8 Z" className="dm-arr" />
+        <marker id="dm-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0 0 L10 5 L0 10 Z" className="dm-arr" />
         </marker>
       </defs>
       {clinical.map((query, i) => (
@@ -547,7 +548,7 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
       <text className="dm-mini" x={(uslRight + agentX) / 2} y={evalCy - 8} textAnchor="middle">
         re-check
       </text>
-      <text className="dm-mini" x={agentRight + 22} y={(execCy + evalCy) / 2 + 4} textAnchor="middle">
+      <text className="dm-mini" x={agentRight + retryBulge} y={(execCy + evalCy) / 2 + 4} textAnchor="middle">
         retry
       </text>
       <text className="dm-mini" x={groupX + GROUP_W / 2} y={tgaY - 4} textAnchor="middle">
