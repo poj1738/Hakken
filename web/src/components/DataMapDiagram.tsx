@@ -18,6 +18,8 @@ export interface LogEntry {
   phase: "running" | "done" | "error";
   result?: StoredResult;
   error?: string;
+  /** When this request was sent. Set on the running entry; a finished row uses executed_at. */
+  startedAt?: string;
 }
 
 const AU_COUNT = new Intl.NumberFormat("en-AU");
@@ -200,7 +202,13 @@ export function useDataMapRun(enabled: boolean) {
       try {
         for (const query of queries) {
           if (!alive()) return;
-          const runningEntry: LogEntry = { id: query.id, label: query.label, node: query.node, phase: "running" };
+          const runningEntry: LogEntry = {
+            id: query.id,
+            label: query.label,
+            node: query.node,
+            phase: "running",
+            startedAt: new Date().toISOString(),
+          };
           setById((m) => ({ ...m, [query.id]: runningEntry }));
           setEntries((es) => [...es.filter((e) => e.id !== query.id), runningEntry]);
           try {

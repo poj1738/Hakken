@@ -28,11 +28,6 @@ export function DataMap({ onPresent }: { onPresent: () => void }) {
 
 function DataMapLive({ onPresent }: { onPresent: () => void }) {
   const { catalogue, byId, entries, fatal, rerun, clock } = useDataMapRun(true);
-  const logRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = logRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [entries]);
 
   const find = (node: string) => {
     const query = catalogue?.find((q) => q.node === node);
@@ -76,40 +71,7 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
           </div>
         </section>
 
-        <section className="panel panel-pad dm-log-card" aria-labelledby="dm-log-title">
-          <h2 className="h2" id="dm-log-title">
-            Live query log
-          </h2>
-          <p className="dm-cap">Every SQL statement sent to Zetaris, in order.</p>
-          <div className="dm-log-scroll" ref={logRef}>
-            <table className="dm-log">
-              <caption className="dm-live">Query log</caption>
-              <thead>
-                <tr>
-                  <th scope="col" className="dm-log-dot-col">
-                    <span className="dm-live">Status</span>
-                  </th>
-                  <th scope="col">Time</th>
-                  <th scope="col">Query</th>
-                  <th scope="col" className="dm-log-num">
-                    Result
-                  </th>
-                  <th scope="col" className="dm-log-num">
-                    Took
-                  </th>
-                  <th scope="col">
-                    <span className="dm-live">SQL</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {entries.map((entry) => (
-                  <LogRow key={entry.id} entry={entry} />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <QueryLog entries={entries} catalogue={catalogue} clock={clock} />
       </div>
 
       <div className={`dm-bottom${waysQuery ? " dm-bottom-3" : ""}`}>
@@ -305,53 +267,144 @@ function QualityCard({ dq, rows, sql, examples }: { dq?: LogEntry; rows?: LogEnt
 }
 
 function formatSql(sql: string): string {
-  return sql.replace(/\s+\b(FROM|WHERE)\b\s+/g, "\n$1 ");
-}
-
-function resultWords(entry: LogEntry): string {
-  if (entry.phase === "running") return "querying Zetaris…";
-  if (entry.phase === "error") return entry.error ?? "The query failed";
-  const result = entry.result;
-  if (!result) return "";
-  if (result.data.length === 1 && result.headers.length === 1) {
-    const count = formatCount(soleCell(result));
-    return count ? `${count} rows counted` : "";
-  }
-  const sources = formatCount(result.row_count ?? undefined);
-  return sources ? `${sources} sources` : "";
-}
-
-function LogRow({ entry }: { entry: LogEntry }) {
-  const result = entry.result;
-  const time = result && entry.phase !== "running" ? clock(result.executed_at) : "";
-  const took = result && entry.phase === "done" && result.latency_ms != null ? formatSeconds(result.latency_ms) : "";
-  const dot = entry.phase === "error" ? "bad" : entry.phase === "running" ? "run" : entry.phase === "done" ? "done" : "";
-  return (
-    <tr>
-      <td>
-        <span className={`dm-dot-status ${dot}`} aria-hidden />
-      </td>
-      <td className="dm-log-time">{time}</td>
-      <td>
-        {entry.id === "dq" ? "Strengths no product comes in" : entry.label}
-        {result?.replayed ? <span className="badge">replayed</span> : null}
-      </td>
-      <td className="dm-log-num">{resultWords(entry)}</td>
-      <td className="dm-log-num">{took}</td>
-      <td>
-        {result?.sql ? (
-          <details className="dm-fold">
-            <summary>SQL</summary>
-            <pre className="dm-code">{result.sql}</pre>
-          </details>
-        ) : null}
-      </td>
-    </tr>
+  return sql.replace(/\s+\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|LIMIT)\b/gi, (_match, keyword: string, offset: number) =>
+    offset === 0 ? keyword : `\n${keyword}`,
   );
 }
 
-function clock(iso: string) {
+function QueryLog({
+  entries,
+  catalogue,
+  clock,
+}: {
+  entries: LogEntry[];
+  catalogue: DataMapQuerySpec[] | null;
+  clock: { phase: string; startedAt: string | null; durationMs: number | null; replayed: boolean };
+}) {
+  const latest = entries.length ? entries[entries.length - 1] : undefined;
+  const earlier = entries.slice(0, -1).slice().reverse();
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [demoted, setDemoted] = useState<string | null>(null);
+  const prevLatest = useRef<string | null>(null);
+  useEffect(() => {
+    const id = latest?.id ?? null;
+    if (prevLatest.current && id && prevLatest.current !== id) setDemoted(prevLatest.current);
+    prevLatest.current = id;
+  }, [latest?.id]);
+  const sqlOf = (entry: LogEntry) => entry.result?.sql ?? catalogue?.find((q) => q.id === entry.id)?.sql ?? "";
+  const finished = clock.phase === "done" && clock.durationMs != null;
+  const cached = clock.phase === "cached";
+  return (
+    <section className="panel panel-pad dm-log-card" aria-labelledby="dm-log-title">
+      <h2 className="h2" id="dm-log-title">
+        Live query log
+      </h2>
+      <p className="dm-desc">Every SQL statement sent to Zetaris, newest first.</p>
+      {finished && <p className="dm-cap">All {formatCount(entries.length)} queries done · {formatSeconds(clock.durationMs ?? 0)}</p>}
+      {cached && clock.startedAt && (
+        <p className="dm-cap">From the {clock.replayed ? "replayed" : "live"} run at {sentAt(clock.startedAt)}</p>
+      )}
+      {latest ? (
+        <LatestBlock entry={latest} sql={sqlOf(latest)} />
+      ) : (
+        <p className="dm-wait">querying Zetaris…</p>
+      )}
+      {earlier.length > 0 && (
+        <>
+          <h3 className="dm-earlier-h">Earlier queries ({formatCount(earlier.length)})</h3>
+          <div className="dm-log-scroll">
+            {earlier.map((entry) => (
+              <EarlierRow
+                key={entry.id}
+                entry={entry}
+                sql={sqlOf(entry)}
+                open={openId === entry.id}
+                fresh={demoted === entry.id}
+                onToggle={() => setOpenId((current) => (current === entry.id ? null : entry.id))}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+function LatestBlock({ entry, sql }: { entry: LogEntry; sql: string }) {
+  const result = entry.phase === "error" ? entry.error ?? "The query failed" : entry.phase === "running" ? "querying Zetaris…" : doneLine(entry);
+  const spoken = `${entry.label}: ${result}`;
+  return (
+    <div className="dm-latest" aria-live="polite" aria-atomic="true">
+      <div className="dm-latest-top">
+        <span className={`dm-dot-status${dotClass(entry)}`} aria-hidden />
+        <span className="dm-latest-name">{entry.label}</span>
+        <span className={entry.phase === "error" ? "dm-latest-result dm-err" : "dm-latest-result dm-num"}>{result}</span>
+      </div>
+      <p className="dm-sent">Sent {sentAt(entry.result?.executed_at || entry.startedAt)}</p>
+      <span className="dm-live">{spoken}</span>
+      {entry.phase !== "error" && sql && <pre className="dm-sql">{formatSql(sql)}</pre>}
+    </div>
+  );
+}
+
+function EarlierRow({
+  entry,
+  sql,
+  open,
+  fresh,
+  onToggle,
+}: {
+  entry: LogEntry;
+  sql: string;
+  open: boolean;
+  fresh: boolean;
+  onToggle: () => void;
+}) {
+  const failed = entry.phase === "error";
+  return (
+    <div className={fresh ? "dm-earlier-wrap is-new" : "dm-earlier-wrap"}>
+      <button type="button" className="dm-earlier" aria-expanded={open} onClick={onToggle}>
+        <span className={`dm-dot-status${dotClass(entry)}`} aria-hidden />
+        <span className="dm-earlier-time">{sentAt(entry.result?.executed_at || entry.startedAt)}</span>
+        <span className="dm-earlier-name">{entry.label}</span>
+        <span className={failed ? "dm-earlier-result dm-err" : "dm-earlier-result"}>{failed ? entry.error ?? "The query failed" : shortResult(entry)}</span>
+        <span className="dm-earlier-took">{entry.result?.latency_ms != null ? formatSeconds(entry.result.latency_ms) : ""}</span>
+      </button>
+      {open && sql && <pre className="dm-sql">{formatSql(sql)}</pre>}
+    </div>
+  );
+}
+
+function dotClass(entry: LogEntry): string {
+  if (entry.phase === "error") return " bad";
+  if (entry.phase === "running") return " run";
+  if (entry.phase === "done") return " done";
+  return "";
+}
+
+function shortResult(entry: LogEntry): string {
+  const result = entry.result;
+  if (!result || entry.phase !== "done") return "";
+  if (result.data.length === 1 && result.headers.length === 1) {
+    const count = formatCount(soleCell(result));
+    if (!count) return "";
+    return entry.node === "dq" ? `${count} lines` : `${count} rows`;
+  }
+  const count = formatCount(result.data.length);
+  if (!count) return "";
+  return entry.node === "high_risk" ? `${count} sources` : `${count} rows`;
+}
+
+function doneLine(entry: LogEntry): string {
+  const summary = shortResult(entry);
+  const took = entry.result?.latency_ms != null ? formatSeconds(entry.result.latency_ms) : "";
+  if (summary && took) return `${summary} · ${took}`;
+  return summary || took;
+}
+
+function sentAt(iso: string | undefined): string {
+  if (!iso) return "…";
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return date.toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
