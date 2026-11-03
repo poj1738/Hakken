@@ -816,6 +816,12 @@ html.shot-full .side { height: auto; }
 .dm-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
 .dm-bar-val { font-weight: 600; font-size: 16px; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
 .dm-note { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
+
+.dm-dq-lead { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.dm-dq-say { margin: 0; font-size: 15px; font-weight: 400; line-height: 1.35; color: var(--ink); }
+.dm-dq-lead .dm-cap { margin: 2px 0 0; }
+.dm-mono { font-family: var(--mono); }
+.dm-examples { margin: 4px 0 8px; padding-left: 18px; font-size: 13px; color: var(--muted); }
 .dm-dq-num { color: var(--high); background: var(--high-bg); font-size: 44px; font-weight: 600; line-height: 1; display: inline-block; padding: 8px 16px; border-radius: 10px; margin: 0 8px 0 0; vertical-align: -6px; font-variant-numeric: tabular-nums; }
 .dm-dq-line { margin: 0 0 8px; font-size: 14px; }
 .dm-rule { font-family: var(--mono); color: var(--ink); margin: 0 0 4px; font-size: 13px; }

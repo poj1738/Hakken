@@ -1,7 +1,7 @@
 // The Data map. Every count is a cell from GET /data-map/query/{id}.
 // Mock mode does not invent a diagram.
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { API_MODE } from "../api";
 import type { DataMapQuerySpec } from "../types";
 import { DataMapDiagram, RunStatus, formatCount, formatSeconds, soleCell, useDataMapRun, type LogEntry } from "./DataMapDiagram";
@@ -254,30 +254,53 @@ function WaysCard({ entry }: { entry?: LogEntry }) {
   );
 }
 
-function QualityCard({ dq, rows, sql }: { dq?: LogEntry; rows?: LogEntry; sql?: string; examples?: LogEntry }) {
+function QualityCard({ dq, rows, sql, examples }: { dq?: LogEntry; rows?: LogEntry; sql?: string; examples?: LogEntry }) {
+  const [showSql, setShowSql] = useState(false);
   const violations = dq?.phase === "done" ? soleCell(dq.result) : null;
   const total = rows?.phase === "done" ? soleCell(rows.result) : null;
   const counted = violations == null ? null : formatCount(violations);
   const across = total == null ? null : formatCount(total);
+  const exampleRows = examples?.phase === "done" ? examples.result?.data.slice(0, 3) ?? [] : [];
   return (
     <div>
-      <h2 className="h2 dm-dq-title" id="dm-dq-title">
-        {dq?.phase === "error" ? (
-          "Strengths no product comes in"
-        ) : counted == null ? (
-          "querying Zetaris…"
-        ) : (
-          <>
-            <span className="dm-dq-num dm-num">{counted}</span>
-            {" medicine lines list a strength no product comes in"}
-            {across != null ? `, out of ${across} lines across all four records.` : "."}
-          </>
-        )}
+      <h2 className="h2" id="dm-dq-title">
+        Doses that don't exist
       </h2>
-      {dq?.phase === "error" && <p className="dm-err">{dq.error}</p>}
-      <p className="dm-rule">strength_is_a_real_product</p>
-      <p className="dm-cap">Native rule registered in Zetaris</p>
-      {sql && <pre className="dm-code">{formatSql(sql)}</pre>}
+      {dq?.phase === "error" ? (
+        <p className="dm-err">{dq.error}</p>
+      ) : counted == null ? (
+        <p className="dm-wait">querying Zetaris…</p>
+      ) : (
+        <div className="dm-dq-lead">
+          <span className="dm-dq-num dm-num">{counted}</span>
+          <div className="dm-list-copy">
+            <p className="dm-dq-say">medicine lines list a strength no product comes in</p>
+            {across != null && <p className="dm-cap">out of {across} lines across all four records</p>}
+          </div>
+        </div>
+      )}
+      {exampleRows.length > 0 && (
+        <>
+          <p className="dm-cap">For example:</p>
+          <ul className="dm-examples">
+            {exampleRows.map((row, i) => (
+              <li key={i}>{row.filter((cell) => cell != null && cell !== "").join(" ")}</li>
+            ))}
+          </ul>
+        </>
+      )}
+      <p className="dm-cap">
+        Zetaris checks every line automatically with a rule stored in Zetaris: <span className="dm-mono">strength_is_a_real_product</span>
+      </p>
+      <p className="dm-cap">These are dose errors we planted to test MedTrace.</p>
+      {sql && (
+        <div>
+          <button type="button" className="lnk" aria-expanded={showSql} onClick={() => setShowSql((open) => !open)}>
+            {showSql ? "Hide the SQL" : "Show the SQL"}
+          </button>
+          {showSql && <pre className="dm-code">{formatSql(sql)}</pre>}
+        </div>
+      )}
     </div>
   );
 }

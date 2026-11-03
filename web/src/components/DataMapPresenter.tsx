@@ -43,8 +43,8 @@ const STEPS: { queryId: string; title: string; line: string; lit: readonly strin
   },
   {
     queryId: "dq",
-    title: "Data quality",
-    line: "medicine lines have a strength that isn't a real product",
+    title: "Doses that don't exist",
+    line: "Medicine lines that list a strength no product comes in.",
     lit: [],
   },
 ];
@@ -94,12 +94,10 @@ function PresenterLive({ onExit }: { onExit: () => void }) {
           Step {step + 1} of {STEPS.length}
         </p>
         <h1 className="dm-title">{current.title}</h1>
-        <p className="dm-sub">{current.line}</p>
+        <p className="dm-sub">{dq ? <DqSentence entry={entry} total={byId.rows} /> : current.line}</p>
         <p className="dm-live" aria-live="polite">
-          {current.title}. {spoken || "Waiting for its query."} {current.line}
-          {dq && entry?.phase === "done" ? " Rule strength_is_a_real_product." : ""}
+          {current.title}. {spoken || "Waiting for its query."} {dq ? "" : current.line}
         </p>
-        {dq && <DqHero entry={entry} />}
         <RunStatus clock={clock} onRerun={rerun} />
       </header>
       <div className="dm-diagram dm-diagram-present">
@@ -110,8 +108,6 @@ function PresenterLive({ onExit }: { onExit: () => void }) {
             lit={current.lit}
             present
             flow={clock.phase === "done" || clock.phase === "cached"}
-            forcedNode={current.queryId === "rows" || current.queryId === "dq" ? "usl" : current.queryId}
-            showQuality={current.queryId === "dq"}
           />
         ) : (
           <p className="dm-wait">querying Zetaris…</p>
@@ -141,16 +137,20 @@ function speak(entry: LogEntry | undefined, tga: boolean): string {
   return count ? `${count} rows.` : "";
 }
 
-function DqHero({ entry }: { entry?: LogEntry }) {
-  if (!entry) return <p className="dm-wait">Waiting for its query.</p>;
-  if (entry.phase === "running") return <p className="dm-wait">querying Zetaris…</p>;
-  if (entry.phase === "error") return <p className="dm-err">{entry.error}</p>;
-  const count = soleCell(entry.result);
-  if (count == null) return null;
+function DqSentence({ entry, total }: { entry?: LogEntry; total?: LogEntry }) {
+  if (!entry) return <span className="dm-wait">Waiting for its query.</span>;
+  if (entry.phase === "running") return <span className="dm-wait">querying Zetaris…</span>;
+  if (entry.phase === "error") return <span className="dm-err">{entry.error}</span>;
+  const count = formatCount(soleCell(entry.result));
+  if (!count) return null;
+  const across = total?.phase === "done" ? formatCount(soleCell(total.result)) : null;
   return (
-    <p className="dm-dq-hero">
-      <span className="dm-dq-num dm-num">{formatCount(count)}</span>
-      <span className="dm-rule">strength_is_a_real_product</span>
-    </p>
+    <span className="dm-dq-lead">
+      <span className="dm-dq-num dm-num">{count}</span>
+      <span>
+        <span className="dm-dq-say">medicine lines list a strength no product comes in</span>
+        {across ? <span className="dm-cap"> out of {across} lines across all four records</span> : null}
+      </span>
+    </span>
   );
 }
