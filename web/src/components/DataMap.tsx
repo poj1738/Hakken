@@ -79,6 +79,7 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
           <h2 className="h2" id="dm-risk-title">
             High-risk medicines by source
           </h2>
+          <p className="dm-desc">Medicine lines with an ACSQHC high-risk class</p>
           <RiskChart entry={find("high_risk")} catalogue={catalogue} byId={byId} />
         </section>
         {waysQuery && (
@@ -123,22 +124,26 @@ function RiskChart({
   return (
     <div className="dm-bars" role="list">
       {rows.map((row) => {
-        const value = riskValue(row.text, row.n, row.source);
+        const high = formatCount(row.text) ?? row.text;
         const width = maxPct > 0 ? (row.pct / maxPct) * 100 : 0;
+        const share = row.source != null && row.source > 0 ? ` of ${formatCount(row.source)} · ${AU_PERCENT.format(row.pct)}%` : "";
         return (
-          <div key={row.key} role="listitem" aria-label={`${row.label}: ${value}`}>
+          <div key={row.key} role="listitem" aria-label={`${row.label}: ${high}${share}`}>
             <div className="dm-bar">
               <span className="dm-bar-name">{row.label}</span>
-              <span className="dm-bar-val dm-num">{value}</span>
+              <span className="dm-bar-val dm-num">
+                <span className="dm-bar-n">{high}</span>
+                {share && <span className="dm-bar-of">{share}</span>}
+              </span>
             </div>
             <span className="dm-track">
               <span className="dm-fill" style={{ width: `${width}%` }} />
             </span>
-            {row.note && <p className="dm-note">{PATIENT_NOTE}</p>}
           </div>
         );
       })}
     </div>
+    <p className="dm-note">{PATIENT_NOTE}</p>
   );
 }
 
@@ -147,14 +152,6 @@ function sourceCount(entry: LogEntry | undefined): number | null {
   const cell = soleCell(entry.result);
   const n = cell == null ? Number.NaN : Number(cell);
   return Number.isFinite(n) ? n : null;
-}
-
-function riskValue(text: string, highRisk: number, source: number | null): string {
-  const high = formatCount(text) ?? text;
-  if (source == null) return high;
-  const of = `${high} of ${formatCount(source)}`;
-  if (!(source > 0) || !Number.isFinite(highRisk)) return of;
-  return `${of} · ${AU_PERCENT.format((highRisk / source) * 100)}%`;
 }
 
 function riskRows(result: { data: (string | null)[][] }, labelOf: Map<string, string>) {
