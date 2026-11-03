@@ -718,7 +718,7 @@ html.shot-full .side { height: auto; }
 /* Data map — same cards and type as the rest of the app. Counts use tabular figures. */
 .dm-page { display: flex; flex-direction: column; gap: 24px; min-width: 0; max-width: 100%; }
 .dm-page > *, .dm-page .panel, .dm-hero, .dm-diagram, .dm-stage, .dm-svg { min-width: 0; max-width: 100%; }
-.dm-page .h2 { font-size: 18px; font-weight: 600; color: var(--ink); }
+.dm-page .h2 { font-size: 19px; font-weight: 600; color: var(--ink); }
 .dm-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; min-width: 0; max-width: 100%; }
 .dm-title { font-family: var(--sans); font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin: 0; color: var(--ink); min-width: 0; overflow-wrap: break-word; }
 .dm-sub { font-family: var(--sans); color: var(--muted); margin: 6px 0 0; font-size: 15px; line-height: 1.45; max-width: 68ch; }
@@ -761,10 +761,10 @@ html.shot-full .side { height: auto; }
 .dm-src.dm-opt { border-style: dashed; }
 .dm-src.dm-arrived { background: var(--accent-soft); border-left: 3px solid var(--accent); }
 .dm-src-line { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-width: 0; }
-.dm-name { font-weight: 600; font-size: 14px; line-height: 1.2; color: var(--ink); display: flex; align-items: center; gap: 8px; min-width: 0; }
-.dm-count { font-weight: 600; font-size: 20px; line-height: 1.05; color: var(--ink); }
+.dm-name { font-weight: 600; font-size: 15px; line-height: 1.2; color: var(--ink); display: flex; align-items: center; gap: 8px; min-width: 0; }
+.dm-count { font-weight: 600; font-size: 16px; line-height: 1.05; color: var(--ink); font-variant-numeric: tabular-nums; }
 .dm-usl-body { padding: 16px 24px; }
-.dm-usl-body .dm-count { font-size: 28px; }
+.dm-usl-body .dm-count { font-size: 36px; font-weight: 600; }
 .dm-cap, .dm-wait { color: var(--muted); font-size: 13px; line-height: 1.25; font-family: var(--sans); }
 .dm-err { color: var(--alert); font-size: 12px; line-height: 1.35; margin: 4px 0 0; }
 .dm-box { fill: var(--page); stroke: var(--line-strong); stroke-width: 1.5; }
@@ -782,7 +782,7 @@ html.shot-full .side { height: auto; }
 .dm-dot { fill: var(--accent); }
 .dm-faint { opacity: 0.35; }
 .dm-merge { background: transparent; color: var(--muted); font-family: var(--sans); font-size: 13px; line-height: 1.3; padding: 0; }
-.dm-group { color: var(--muted); font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; font-variant: small-caps; line-height: 16px; }
+.dm-group { color: var(--muted); font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; font-variant: normal; line-height: 16px; display: flex; justify-content: space-between; gap: 8px; }
 .dm-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
 .dm-chip { border: 1px solid currentColor; border-radius: 999px; padding: 1px 6px; font-size: 10px; line-height: 1.3; font-family: var(--mono); }
 .dm-trace-head { display: flex; flex-direction: column; gap: 2px; font-family: var(--sans); }
@@ -791,9 +791,10 @@ html.shot-full .side { height: auto; }
 .dm-trace-frame { fill: var(--page); stroke: var(--line-soft); stroke-width: 1; }
 .dm-agent { padding: 8px 10px; gap: 2px; justify-content: center; }
 .dm-agent-name { font-size: 15px; font-weight: 600; line-height: 1.2; color: var(--ink); }
-.dm-agent-job { font-size: 12px; line-height: 1.25; color: var(--muted); }
-.dm-svg.present .dm-agent-name { font-size: 18px; }
-.dm-svg.present .dm-agent-job { font-size: 15px; }
+.dm-agent-job { font-size: 13px; line-height: 1.25; color: var(--muted); }
+.dm-svg.present .dm-agent-name { font-size: 15px; }
+.dm-svg.present .dm-agent-job { font-size: 13px; }
+.dm-blurb { color: var(--muted); font-size: 13px; line-height: 1.25; font-family: var(--sans); }
 .dm-join { fill: none; stroke: var(--line-strong); stroke-width: 2; }
 .dm-arr { fill: var(--line-strong); }
 .dm-mini { font-family: var(--sans); font-size: 11px; fill: var(--muted); }
@@ -804,9 +805,9 @@ html.shot-full .side { height: auto; }
 .dm-bar-name { font-size: 14px; color: var(--ink); }
 .dm-track { display: block; height: 10px; background: var(--line-soft); border-radius: 999px; overflow: hidden; }
 .dm-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
-.dm-bar-val { font-weight: 400; color: var(--ink); text-align: right; }
+.dm-bar-val { font-weight: 600; font-size: 16px; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
 .dm-note { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; }
-.dm-dq-num { color: var(--high); background: var(--high-bg); font-size: 28px; font-weight: 600; line-height: 1; display: inline-block; padding: 8px 16px; border-radius: 10px; margin: 8px 0; }
+.dm-dq-num { color: var(--high); background: var(--high-bg); font-size: 44px; font-weight: 600; line-height: 1; display: inline-block; padding: 8px 16px; border-radius: 10px; margin: 0 8px 0 0; vertical-align: -6px; font-variant-numeric: tabular-nums; }
 .dm-dq-line { margin: 0 0 8px; font-size: 14px; }
 .dm-rule { font-family: var(--mono); color: var(--ink); margin: 0 0 4px; font-size: 13px; }
 .dm-code { font-family: var(--mono); font-size: 12px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; overflow-x: hidden; max-width: 100%; background: var(--line-soft); color: var(--ink); border-radius: 10px; padding: 10px 12px; margin: 8px 0 0; }
