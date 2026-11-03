@@ -810,9 +810,9 @@ html.shot-full .side { height: auto; }
 .dm-g:focus { outline: none; }
 .dm-g:focus-visible .dm-box { stroke: var(--accent); stroke-width: 3; }
 .dm-bars { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
-.dm-bar { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr) 26ch; gap: 8px; align-items: center; }
+.dm-bar { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; min-width: 0; }
 .dm-bar-name { font-size: 14px; color: var(--ink); }
-.dm-track { display: block; height: 10px; background: var(--line-soft); border-radius: 999px; overflow: hidden; }
+.dm-track { display: block; height: 10px; width: 100%; margin-top: 6px; background: var(--line-soft); border-radius: 999px; overflow: hidden; }
 .dm-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
 .dm-bar-val { font-weight: 600; font-size: 16px; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
 .dm-note { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; }

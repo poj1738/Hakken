@@ -136,7 +136,7 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
   );
 }
 
-const AU_PERCENT = new Intl.NumberFormat("en-AU", { maximumFractionDigits: 1 });
+const AU_PERCENT = new Intl.NumberFormat("en-AU", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 function RiskChart({
   entry,
@@ -153,21 +153,26 @@ function RiskChart({
   const result = entry.result;
   if (!result) return <p className="dm-wait">querying Zetaris…</p>;
   const labelOf = new Map((catalogue ?? []).map((q) => [q.id, q.label]));
-  const rows = riskRows(result, labelOf).map((row) => ({ ...row, source: sourceCount(byId[row.key]) }));
-  const max = rows.reduce((m, row) => Math.max(m, row.n), 0);
+  const rows = riskRows(result, labelOf).map((row) => {
+    const source = sourceCount(byId[row.key]);
+    const pct = source != null && source > 0 ? (row.n / source) * 100 : 0;
+    return { ...row, source, pct };
+  });
+  const maxPct = rows.reduce((m, row) => Math.max(m, row.pct), 0);
   return (
     <div className="dm-bars" role="list">
       {rows.map((row) => {
         const value = riskValue(row.text, row.n, row.source);
+        const width = maxPct > 0 ? (row.pct / maxPct) * 100 : 0;
         return (
           <div key={row.key} role="listitem" aria-label={`${row.label}: ${value}`}>
             <div className="dm-bar">
               <span className="dm-bar-name">{row.label}</span>
-              <span className="dm-track">
-                <span className="dm-fill" style={{ width: max > 0 ? `${(row.n / max) * 100}%` : "0%" }} />
-              </span>
               <span className="dm-bar-val dm-num">{value}</span>
             </div>
+            <span className="dm-track">
+              <span className="dm-fill" style={{ width: `${width}%` }} />
+            </span>
             {row.note && <p className="dm-note">{PATIENT_NOTE}</p>}
           </div>
         );
@@ -188,7 +193,7 @@ function riskValue(text: string, highRisk: number, source: number | null): strin
   if (source == null) return high;
   const of = `${high} of ${formatCount(source)}`;
   if (!(source > 0) || !Number.isFinite(highRisk)) return of;
-  return `${of} (${AU_PERCENT.format((highRisk / source) * 100)}%)`;
+  return `${of} · ${AU_PERCENT.format((highRisk / source) * 100)}%`;
 }
 
 function riskRows(result: { data: (string | null)[][] }, labelOf: Map<string, string>) {
