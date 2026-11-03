@@ -304,12 +304,12 @@ function clockTime(iso: string): string {
 }
 
 // Screen pixels. The viewBox matches the card, so one unit is one pixel.
-// Floors: names 13, descriptions 11, connector labels 10, counts 14,
-// semantic-layer count 30. These sit above those floors.
-const NAME_PX = 14;
-const DESC_PX = 12;
-const USL_COUNT_PX = 32;
-const LABEL_PX = 11;
+// These are the floors: names 13, descriptions 11, connector labels 10,
+// row counts 14, semantic-layer count 30.
+const NAME_PX = 13;
+const DESC_PX = 11;
+const USL_COUNT_PX = 30;
+const LABEL_PX = 10;
 const ROW_H = 56;
 const HEAD_H = 30;
 const LIST_GAP = 16;
@@ -317,6 +317,10 @@ const AGENT_H = 52;
 const AGENT_GAP = 12;
 const GROUP_PAD = 12;
 const TRACE_HEAD = 36;
+const RETRY_STEM = 22;
+const RETRY_LABEL_GAP = 8;
+const SHORTAGE_GAP = 10;
+const FRAME_PAD = 8;
 const USL_TABLES = ["medicine", "high_risk_class", "medication_statement"] as const;
 const AGENTS = [
   { id: "planner", name: "Planner", job: "Splits the job" },
@@ -418,6 +422,7 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
     return phase === "done";
   };
   const linkOn = entry("usl")?.phase === "done" && (!dimming || isLit("usl") || isLit("medtrace"));
+  const links = geom ? agentLinks(geom) : null;
 
   const ordered = [...clinical, ...reference];
 
@@ -474,16 +479,6 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
             reduced={reduced}
             flow={flow}
           />
-          {tgaQuery && (
-            <Edge
-              d={`M ${geom.group.x + geom.group.w / 2} ${geom.group.y + geom.group.h} L ${geom.group.x + geom.group.w / 2} ${geom.tgaY}`}
-              on={edgeOn("tga")}
-              optional
-              faint={dimming && !isLit("tga")}
-              reduced={reduced}
-              flow={flow}
-            />
-          )}
 
           <SourceList
             x={geom.src.x}
@@ -512,7 +507,7 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
             y={geom.usl.y}
             w={geom.usl.w}
             h={geom.usl.h}
-            label={spec("usl")?.label ?? "Zetaris · semantic layer (medtrace_usl)"}
+            label="Zetaris - Semantic layer (USL)"
             usl
             chips={USL_TABLES}
             caption="medicine lines · every source, one shape"
@@ -538,18 +533,8 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
               markerEnd="url(#dm-arr)"
             />
           ))}
-          <path
-            d={`M ${geom.agent.x + geom.agent.w} ${geom.evalCy} C ${geom.agent.x + geom.agent.w + 18} ${geom.evalCy}, ${geom.agent.x + geom.agent.w + 18} ${geom.execCy}, ${geom.agent.x + geom.agent.w} ${geom.execCy}`}
-            className="dm-join"
-            markerEnd="url(#dm-arr)"
-          />
           <LinkLabel x1={geom.usl.x + geom.usl.w} x2={geom.agent.x} y={geom.execCy} text="SQL" />
           <LinkLabel x1={geom.usl.x + geom.usl.w} x2={geom.agent.x} y={geom.evalCy} text="re-check" />
-          <RetryLabel
-            x={geom.agent.x + geom.agent.w + 24}
-            y={(geom.execCy + geom.evalCy) / 2}
-            maxX={geom.group.x + geom.group.w - 8}
-          />
           {AGENTS.map((agent, i) => (
             <AgentBox
               key={agent.id}
@@ -563,6 +548,12 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
               faint={dimming && !isLit("medtrace")}
             />
           ))}
+          {links && (
+            <path d={links.retry} className="dm-join" />
+          )}
+          {links && (
+            <RetryLabel x={links.labelX} y={links.labelY} maxX={links.labelMax} />
+          )}
           {tgaQuery && (
             <NodeBox
               x={geom.group.x}
@@ -578,6 +569,17 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
               nodeId="tga"
             />
           )}
+          {tgaQuery && links && (
+            <Edge
+              d={links.shortage}
+              on={edgeOn("tga")}
+              optional
+              arrow
+              faint={dimming && !isLit("tga")}
+              reduced={reduced}
+              flow={flow}
+            />
+          )}
         </svg>
       )}
     </div>
@@ -589,54 +591,44 @@ function layoutDiagram(width: number, clinicalCount: number, referenceCount: num
   const longestJob = AGENTS.map((agent) => agent.job).reduce((a, b) => (textWidth(b, DESC_PX, 400) > textWidth(a, DESC_PX, 400) ? b : a));
   const agentInner = Math.ceil(textWidth(longestJob, DESC_PX, 400)) + 28;
   const retryLabel = Math.ceil(textWidth("retry", LABEL_PX, 400));
-  const retryReserve = 18 + 6 + retryLabel + 10;
+  const retryReserve = retryReserveOf(retryLabel);
   const groupMin = GROUP_PAD + agentInner + retryReserve;
   const uslCaption = textWidth("medicine lines · every source, one shape", DESC_PX, 400);
-  const uslTitle = textWidth("Zetaris · semantic layer (medtrace_usl)", NAME_PX, 600);
+  const uslTitle = textWidth("Zetaris - Semantic layer (USL)", NAME_PX, 600);
   const tgaLine = textWidth(TGA_LINES[0], DESC_PX, 400);
   const sourceLine = Math.max(
     ...Object.values(BLURB).map((line) => textWidth(line, DESC_PX, 400)),
     textWidth("High-risk classes (ACSQHC)", NAME_PX, 600),
     textWidth("Patient interview", NAME_PX, 600),
   );
-  const countW = textWidth("00,000", 15, 600);
+  const countW = textWidth("00,000", 14, 600);
   const srcNeed = 32 + 14 + 8 + Math.ceil(sourceLine) + 8 + Math.ceil(countW);
   const grpNeed = Math.max(groupMin, Math.ceil(tgaLine) + 36);
-  const uslNeed = Math.ceil(Math.max(uslCaption, uslTitle)) + 68;
+  const uslNeed = Math.ceil(Math.max(uslCaption, uslTitle)) + 48;
   const gap2Floor = Math.max(56, Math.ceil(textWidth("re-check", LABEL_PX, 400)) + 16);
+  const rightPad = 16;
 
-  const col = {
-    src: Math.max(width * 0.32, srcNeed),
-    gap1: 48,
-    usl: Math.max(width * 0.26, uslNeed),
-    gap2: 72,
-    grp: Math.max(width * 0.26, grpNeed),
-  };
-  const textFloor = { src: srcNeed, gap1: 12, usl: uslNeed, gap2: gap2Floor, grp: grpNeed };
-  const share = { src: width * 0.32, usl: width * 0.26, grp: width * 0.26 };
-  const overflow = () => col.src + col.gap1 + col.usl + col.gap2 + col.grp + 32 - width;
-  // Columns may sit above their share so a line fits. Give that extra back
-  // before touching the 48px and 72px gaps.
-  for (const key of ["src", "grp", "usl"] as const) {
-    const over = overflow();
-    if (over <= 0) break;
-    const spare = col[key] - textFloor[key];
-    if (spare > 0) col[key] -= Math.min(spare, over);
-  }
+  const col = { src: srcNeed, gap1: 72, usl: uslNeed, gap2: 64, grp: grpNeed };
+  const floors = { src: srcNeed, gap1: 36, usl: uslNeed, gap2: gap2Floor, grp: grpNeed };
+  const overflow = () => col.src + col.gap1 + col.usl + col.gap2 + col.grp + rightPad - width;
   for (const key of ["gap1", "gap2"] as const) {
     const over = overflow();
     if (over <= 0) break;
-    const spare = col[key] - textFloor[key];
+    const spare = col[key] - floors[key];
     if (spare > 0) col[key] -= Math.min(spare, over);
   }
   let extra = -overflow();
   if (extra > 0) {
-    for (const key of ["src", "usl", "grp"] as const) {
-      const room = Math.max(0, share[key] - col[key]);
-      const add = Math.min(extra, room);
-      col[key] += add;
-      extra -= add;
-    }
+    col.gap1 += extra;
+  } else if (overflow() > 1) {
+    const sum = col.src + col.gap1 + col.usl + col.gap2 + col.grp;
+    const fit = Math.max(1, width - rightPad);
+    const scale = fit / sum;
+    col.src *= scale;
+    col.gap1 *= scale;
+    col.usl *= scale;
+    col.gap2 *= scale;
+    col.grp *= scale;
   }
 
   const srcX = 0;
@@ -693,7 +685,21 @@ function layoutDiagram(width: number, clinicalCount: number, referenceCount: num
 }
 
 function retryReserveOf(labelWidth: number): number {
-  return 18 + 6 + labelWidth + 10;
+  return RETRY_STEM + RETRY_LABEL_GAP + labelWidth + SHORTAGE_GAP + FRAME_PAD;
+}
+
+function agentLinks(geom: NonNullable<ReturnType<typeof layoutDiagram>>) {
+  const right = geom.agent.x + geom.agent.w;
+  const stemX = right + RETRY_STEM;
+  const labelW = Math.ceil(textWidth("retry", LABEL_PX, 400));
+  const shortageX = stemX + RETRY_LABEL_GAP + labelW + SHORTAGE_GAP;
+  const intoY = geom.boxY(1) + AGENT_H - 8;
+  const fromY = geom.evalCy;
+  const stubY = geom.boxY(1) + 16;
+  const bow = 10;
+  const retry = `M ${right} ${fromY} H ${stemX - bow} Q ${stemX} ${fromY} ${stemX} ${fromY - bow} V ${intoY + bow} Q ${stemX} ${intoY} ${stemX - bow} ${intoY} H ${right}`;
+  const shortage = `M ${right} ${stubY} H ${shortageX} V ${geom.tgaY}`;
+  return { retry, shortage, labelX: stemX + RETRY_LABEL_GAP, labelY: (fromY + intoY) / 2, labelMax: shortageX - 4 };
 }
 
 function LinkLabel({ x1, x2, y, text }: { x1: number; x2: number; y: number; text: string }) {
@@ -781,6 +787,7 @@ function Edge({
   on,
   optional = false,
   into = false,
+  arrow = false,
   faint,
   reduced,
   flow,
@@ -789,6 +796,7 @@ function Edge({
   on: boolean;
   optional?: boolean;
   into?: boolean;
+  arrow?: boolean;
   faint: boolean;
   reduced: boolean;
   flow: boolean;
@@ -798,7 +806,7 @@ function Edge({
       <path
         d={d}
         className={`dm-edge${into ? " dm-edge-into" : ""}${on ? " dm-edge-on" : ""}${optional ? " dm-edge-opt" : ""}`}
-        markerEnd={into ? "url(#dm-into)" : undefined}
+        markerEnd={into || arrow ? "url(#dm-into)" : undefined}
         pathLength={optional || into ? undefined : 1}
       />
       {on && flow && !reduced && !into && (
