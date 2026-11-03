@@ -27,6 +27,20 @@ depend on: `app/schemas.py`, `app/config.py`, `.env.example`, `CLAUDE.md`,
 
 ---
 
+### 2026-11-03 21:30 AEDT · Arpon · grok/data-map
+
+**Did:** a Data map screen and a presenter view of the same diagram. `GET /data-map/queries` lists the catalogue; `GET /data-map/query/{id}` runs that one read-only statement through `ZetarisClient.run`. `SAMPLE_MODE` replays envelopes recorded live by `scripts/record_data_map.py`. The UI is a third `view` in `App.tsx` (`?present=1` opens the presenter). No patient-run code, no existing endpoint, and no shared contract file was changed.
+
+**Changed shared files:** none. `CLAUDE.md` and the README AI-usage section still say the team builds with Claude Code and does not use Cursor. A human needs to add the Grok/Cursor declaration there. I did not edit `CLAUDE.md`. The session is logged in `docs/AI_TOOLS_USAGE.md`.
+
+**Broken:** nothing.
+
+**Needs from teammates:** the README and `CLAUDE.md` AI-usage wording, as above. Do not retype the data-map counts; re-record with `python3 scripts/record_data_map.py` if the views change.
+
+**Next:** review the PR. Do not merge from this branch.
+
+---
+
 ### 2026-10-27 · Arnav · arnav/call-deadline
 
 **Did:** a live click-through of the final UI (#72) at :8000, then a fix for what it found.

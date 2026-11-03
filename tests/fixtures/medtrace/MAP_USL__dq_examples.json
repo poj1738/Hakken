@@ -1,0 +1,25 @@
+{
+ "headers": [
+  "med_text",
+  "strength_text",
+  "source_system"
+ ],
+ "data": [
+  [
+   "aspirin",
+   "50 mg",
+   "emr"
+  ],
+  [
+   "telmisartan",
+   "20 mg",
+   "emr"
+  ],
+  [
+   "rosuvastatin",
+   "2.5 mg",
+   "emr"
+  ]
+ ],
+ "total": 3
+}

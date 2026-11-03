@@ -7,6 +7,8 @@
 // so instead of making something up.
 
 import type {
+  DataMapCatalogueResponse,
+  DataMapQueryResult,
   FeedbackRequest,
   FeedbackResponse,
   HealthResponse,
@@ -33,6 +35,9 @@ const API_URL = String(import.meta.env.VITE_API_URL ?? "http://localhost:8000").
 // Nightshift can take minutes on a cold model load, so a run is polled rather
 // than awaited; a single request still gets a bounded timeout.
 const REQUEST_TIMEOUT_MS = 30_000;
+// A semantic-layer scan is about 20 s, and a cold Zetaris call can sit longer.
+// Only the data-map requests use this; every other call keeps REQUEST_TIMEOUT_MS.
+const DATA_MAP_TIMEOUT_MS = 180_000;
 export const POLL_INTERVAL_MS = API_MODE === "mock" ? 600 : 1500;
 // 15 minutes of polling at most; a judge's run should finish in 5-10.
 export const MAX_POLL_FAILURES = 3;
@@ -45,9 +50,15 @@ export class ApiError extends Error {
   }
 }
 
-async function http<T>(path: string, init?: RequestInit): Promise<T> {
+async function http<T>(path: string, init?: RequestInit, timeoutMs = REQUEST_TIMEOUT_MS): Promise<T> {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  const parent = init?.signal;
+  const fromParent = () => ctrl.abort();
+  if (parent) {
+    if (parent.aborted) ctrl.abort();
+    else parent.addEventListener("abort", fromParent);
+  }
   try {
     const res = await fetch(`${API_URL}${path}`, {
       ...init,
@@ -66,13 +77,15 @@ async function http<T>(path: string, init?: RequestInit): Promise<T> {
     }
     return (await res.json()) as T;
   } catch (e) {
+    if (parent?.aborted) throw new DOMException("The request was cancelled.", "AbortError");
     if (e instanceof ApiError) throw e;
     if (e instanceof DOMException && e.name === "AbortError") {
-      throw new ApiError(`${init?.method ?? "GET"} ${path} timed out after ${REQUEST_TIMEOUT_MS / 1000}s`);
+      throw new ApiError(`${init?.method ?? "GET"} ${path} timed out after ${timeoutMs / 1000}s`);
     }
     throw new ApiError(`Cannot reach the API at ${API_URL} (${(e as Error).message})`);
   } finally {
     clearTimeout(timer);
+    parent?.removeEventListener("abort", fromParent);
   }
 }
 
@@ -166,6 +179,15 @@ const mock = {
     if (review.candidates.some((c) => !decided.has(c.candidate_id))) return clone(run.final);
     return clone(fx.resumedPlaceholder);
   },
+  async dataMapQueries(signal?: AbortSignal): Promise<DataMapCatalogueResponse> {
+    void signal;
+    throw new ApiError("The Data map needs the API (live or SAMPLE_MODE)");
+  },
+  async dataMapQuery(id?: string, signal?: AbortSignal): Promise<DataMapQueryResult> {
+    void id;
+    void signal;
+    throw new ApiError("The Data map needs the API (live or SAMPLE_MODE)");
+  },
   async feedback(req: FeedbackRequest): Promise<FeedbackResponse> {
     await sleep(400);
     const f = fx.feedback;
@@ -193,6 +215,14 @@ const live = {
     http<RunResponse>(`/run/${encodeURIComponent(runId)}/identity`, { method: "POST", body: JSON.stringify(req) }),
   feedback: (req: FeedbackRequest) =>
     http<FeedbackResponse>("/feedback", { method: "POST", body: JSON.stringify(req) }),
+  dataMapQueries: (signal?: AbortSignal) =>
+    http<DataMapCatalogueResponse>("/data-map/queries", signal ? { signal } : undefined, DATA_MAP_TIMEOUT_MS),
+  dataMapQuery: (id: string, signal?: AbortSignal) =>
+    http<DataMapQueryResult>(
+      `/data-map/query/${encodeURIComponent(id)}`,
+      signal ? { signal } : undefined,
+      DATA_MAP_TIMEOUT_MS,
+    ),
 };
 
 export const api = API_MODE === "live" ? live : mock;

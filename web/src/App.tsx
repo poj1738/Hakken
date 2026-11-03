@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { API_MODE, MAX_POLL_FAILURES, MAX_POLLS, POLL_INTERVAL_MS, STATUS_REFRESH_MS, api, isTerminal } from "./api";
 import type {
   AcceptanceUpdate,
@@ -9,7 +9,7 @@ import type {
   Source,
   TrustAttribute,
 } from "./types";
-import { Brand, SideStatus } from "./components/Header";
+import { Brand, SideStatus, StatusDots } from "./components/Header";
 import { PatientHead, PatientList, fullName, type PatientsState } from "./components/Picker";
 import { Stepper } from "./components/Stepper";
 import { Timeline } from "./components/Timeline";
@@ -26,6 +26,8 @@ import { Pipeline } from "./components/Pipeline";
 import { LearningHero } from "./components/LearningHero";
 import { SectionNav, type NavItem } from "./components/SectionNav";
 import { Welcome } from "./components/Welcome";
+import { DataMap } from "./components/DataMap";
+import { DataMapPresenter } from "./components/DataMapPresenter";
 import type { LogFilter } from "./trace";
 import { sameFilter } from "./trace";
 import { cleanText, medName, targetLabel, typeLabel } from "./format";
@@ -49,6 +51,24 @@ function Caveats({ caveats, supply }: { caveats: string[]; supply: boolean }) {
 }
 
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
+
+const SIDEBAR_KEY = "medtrace.sidebar.collapsed";
+
+function readCollapsed(): boolean {
+  try {
+    return localStorage.getItem(SIDEBAR_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function writeCollapsed(collapsed: boolean) {
+  try {
+    localStorage.setItem(SIDEBAR_KEY, collapsed ? "true" : "false");
+  } catch {
+    // Storage can be blocked. The choice still applies for this visit.
+  }
+}
 
 // The run's status (from the API) in words, for the patient header and the sidebar list.
 const STATUS_TAG: Record<string, { label: string; tone: string }> = {
@@ -75,7 +95,12 @@ export default function App() {
   const [feedback, setFeedback] = useState<Record<string, FeedbackState>>({});
   const [section, setSection] = useState<Section>("findings");
   // Item 9: the Welcome page is the default view until a patient is chosen, and always one click away.
-  const [view, setView] = useState<"welcome" | "patient">("welcome");
+  // Data map is a third screen. ?present=1 opens the presenter once, with no router.
+  const openedInPresenter = new URLSearchParams(window.location.search).get("present") === "1";
+  const [view, setView] = useState<"welcome" | "patient" | "datamap">(openedInPresenter ? "datamap" : "welcome");
+  const [present, setPresent] = useState(openedInPresenter);
+  const [collapsed, setCollapsed] = useState(readCollapsed);
+  const focusPatients = useRef(false);
   // Item 11: a click on a Powered-by node filters the processing log.
   const [logFilter, setLogFilter] = useState<LogFilter | null>(null);
   // Checklist ticks for this screen only; the summary card counts them live.
@@ -102,6 +127,33 @@ export default function App() {
     const t = setInterval(refreshStatus, STATUS_REFRESH_MS);
     return () => clearInterval(t);
   }, [refreshStatus]);
+
+  useEffect(() => {
+    writeCollapsed(collapsed);
+  }, [collapsed]);
+
+  useEffect(() => {
+    if (!collapsed && focusPatients.current) {
+      focusPatients.current = false;
+      document.getElementById("pt-q")?.focus();
+    }
+  }, [collapsed]);
+
+  useEffect(() => {
+    if (present) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "[") return;
+      const target = event.target;
+      if (target instanceof HTMLElement) {
+        const tag = target.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable) return;
+      }
+      event.preventDefault();
+      setCollapsed((c) => !c);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [present]);
 
   useEffect(() => {
     if (!polling) refreshStatus();
@@ -296,32 +348,83 @@ export default function App() {
   // Never show a section the rail has disabled (e.g. right after a new run starts).
   const shownSection: Section = nav.find((i) => i.id === section && !i.disabled) ? section : review ? "identity" : hasResult ? "findings" : "log";
 
+  if (present) {
+    return (
+      <DataMapPresenter
+        onExit={() => {
+          setView("datamap");
+          setPresent(false);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="app">
       <a className="skip" href={`#${PANEL}`}>
         Skip to results
       </a>
-      <aside className="side" aria-label="Workspace">
-        <Brand />
-        <button type="button" className={`snav-item side-welcome ${view === "welcome" ? "on" : ""}`} aria-current={view === "welcome" ? "page" : undefined} onClick={() => setView("welcome")}>
-          <span>Welcome</span>
-        </button>
-        <PatientList
-          patients={patients}
-          patientsState={patientsState}
-          onRetry={loadPatients}
-          selected={selected}
-          onSelect={selectPatient}
-          disabled={polling}
-          states={seen}
-        />
-        {run && view === "patient" && (
-          <div className="side-group">
-            <h2 className="side-label">This reconciliation</h2>
-            <SectionNav items={nav} current={shownSection} onSelect={choose} panelId={PANEL} />
-          </div>
+      <aside className={`side${collapsed ? " is-collapsed" : ""}`} aria-label="Workspace">
+        <div className="side-head">
+          <Brand />
+          <button
+            type="button"
+            className="side-toggle"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-expanded={!collapsed}
+            onClick={() => setCollapsed((c) => !c)}
+          >
+            <Chevron collapsed={collapsed} />
+          </button>
+        </div>
+        {collapsed ? (
+          <>
+            <nav className="rail-nav" aria-label="Sections">
+              <RailButton label="Welcome" on={view === "welcome"} onClick={() => setView("welcome")}>
+                <WelcomeIcon />
+              </RailButton>
+              <RailButton label="Data map" on={view === "datamap"} onClick={() => setView("datamap")}>
+                <MapIcon />
+              </RailButton>
+              <RailButton
+                label="Patients"
+                on={view === "patient"}
+                onClick={() => {
+                  focusPatients.current = true;
+                  setCollapsed(false);
+                }}
+              >
+                <PatientsIcon />
+              </RailButton>
+            </nav>
+            <StatusDots health={health} error={healthError} />
+          </>
+        ) : (
+          <>
+            <button type="button" className={`snav-item side-welcome ${view === "welcome" ? "on" : ""}`} aria-current={view === "welcome" ? "page" : undefined} onClick={() => setView("welcome")}>
+              <span>Welcome</span>
+            </button>
+            <button type="button" className={`snav-item side-welcome ${view === "datamap" ? "on" : ""}`} aria-current={view === "datamap" ? "page" : undefined} onClick={() => setView("datamap")}>
+              <span>Data map</span>
+            </button>
+            <PatientList
+              patients={patients}
+              patientsState={patientsState}
+              onRetry={loadPatients}
+              selected={selected}
+              onSelect={selectPatient}
+              disabled={polling}
+              states={seen}
+            />
+            {run && view === "patient" && (
+              <div className="side-group">
+                <h2 className="side-label">This reconciliation</h2>
+                <SectionNav items={nav} current={shownSection} onSelect={choose} panelId={PANEL} />
+              </div>
+            )}
+            <SideStatus health={health} error={healthError} />
+          </>
         )}
-        <SideStatus health={health} error={healthError} />
       </aside>
 
       <div className="main-col">
@@ -330,8 +433,10 @@ export default function App() {
             Example data: hand-written, not a real run
           </div>
         )}
-        <main className="wrap">
-          {view === "welcome" ? (
+        <main className={`wrap${view === "datamap" ? " dm-wide" : ""}`}>
+          {view === "datamap" ? (
+            <DataMap onPresent={() => setPresent(true)} />
+          ) : view === "welcome" ? (
             <Welcome
               patients={patients}
               onPick={selectPatient}
@@ -485,5 +590,58 @@ export default function App() {
         </main>
       </div>
     </div>
+  );
+}
+
+function RailButton({ label, on, onClick, children }: { label: string; on: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <button type="button" className={`rail-btn rail-tip${on ? " on" : ""}`} aria-label={label} aria-current={on ? "page" : undefined} data-tip={label} title={label} onClick={onClick}>
+      {children}
+    </button>
+  );
+}
+
+function Icon({ children }: { children: ReactNode }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      {children}
+    </svg>
+  );
+}
+
+function Chevron({ collapsed }: { collapsed: boolean }) {
+  return (
+    <Icon>
+      {collapsed ? <path d="M9 6l6 6-6 6" /> : <path d="M15 6l-6 6 6 6" />}
+    </Icon>
+  );
+}
+
+function WelcomeIcon() {
+  return (
+    <Icon>
+      <path d="M4 10.5 12 4l8 6.5" />
+      <path d="M6 10v10h12V10" />
+    </Icon>
+  );
+}
+
+function MapIcon() {
+  return (
+    <Icon>
+      <circle cx="6" cy="12" r="2.2" />
+      <circle cx="18" cy="7" r="2.2" />
+      <circle cx="18" cy="17" r="2.2" />
+      <path d="M8.2 11.2 15.8 8M8.2 12.8 15.8 16" />
+    </Icon>
+  );
+}
+
+function PatientsIcon() {
+  return (
+    <Icon>
+      <circle cx="12" cy="8" r="3" />
+      <path d="M5.5 19.5c1.2-3.2 3.5-4.8 6.5-4.8s5.3 1.6 6.5 4.8" />
+    </Icon>
   );
 }

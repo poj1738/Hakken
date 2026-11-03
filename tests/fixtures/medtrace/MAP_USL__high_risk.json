@@ -1,0 +1,21 @@
+{
+ "headers": [
+  "source_system",
+  "count(1)"
+ ],
+ "data": [
+  [
+   "pharmacy",
+   "1439"
+  ],
+  [
+   "emr",
+   "205"
+  ],
+  [
+   "gp",
+   "207"
+  ]
+ ],
+ "total": 3
+}

@@ -395,3 +395,31 @@ export interface FeedbackResponse {
   trust_updates: TrustUpdate[];
   acceptance_updates: AcceptanceUpdate[];
 }
+
+/** GET /data-map/queries — the catalogue only, no SQL has run. */
+export interface DataMapQuerySpec {
+  id: string;
+  template_id: string;
+  replay_key: string;
+  sql: string;
+  label: string;
+  node: string;
+}
+
+export interface DataMapCatalogueResponse {
+  queries: DataMapQuerySpec[];
+}
+
+/** GET /data-map/query/{id} — one envelope, values still strings. */
+export interface DataMapQueryResult {
+  id: string;
+  label: string;
+  sql: string;
+  headers: string[];
+  data: (string | null)[][];
+  row_count: number;
+  latency_ms: number;
+  executed_at: string;
+  replayed: boolean;
+  error: string | null;
+}
