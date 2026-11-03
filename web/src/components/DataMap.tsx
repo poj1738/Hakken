@@ -3,8 +3,8 @@
 
 import { useEffect, useRef } from "react";
 import { API_MODE } from "../api";
-import type { DataMapQueryResult, DataMapQuerySpec } from "../types";
-import { DataMapDiagram, formatCount, formatSeconds, soleCell, useDataMapRun, type LogEntry } from "./DataMapDiagram";
+import type { DataMapQuerySpec } from "../types";
+import { DataMapDiagram, RunStatus, formatCount, formatSeconds, soleCell, useDataMapRun, type LogEntry } from "./DataMapDiagram";
 
 const SILOS = ["emr", "gp", "pharmacy", "patient"] as const;
 const PATIENT_NOTE = "Patients describe medicines in their own words, so no code or risk class is attached.";
@@ -26,7 +26,7 @@ export function DataMap({ onPresent }: { onPresent: () => void }) {
 }
 
 function DataMapLive({ onPresent }: { onPresent: () => void }) {
-  const { catalogue, byId, entries, fatal, rerun } = useDataMapRun(true);
+  const { catalogue, byId, entries, fatal, rerun, clock } = useDataMapRun(true);
   const logRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = logRef.current;
@@ -44,13 +44,14 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
         <h1 className="dm-title">Data map</h1>
         <div className="dm-actions">
           <button type="button" className="btn btn-line" onClick={rerun}>
-            Run again
+            Run live again
           </button>
           <button type="button" className="btn btn-primary" onClick={onPresent}>
             Presenter view
           </button>
         </div>
       </header>
+      <RunStatus clock={clock} onRerun={rerun} />
 
       {fatal && (
         <div className="alert alert-note" role="alert">
@@ -150,7 +151,7 @@ function RiskChart({ entry, catalogue }: { entry?: LogEntry; catalogue: DataMapQ
   );
 }
 
-function riskRows(result: DataMapQueryResult, labelOf: Map<string, string>) {
+function riskRows(result: { data: (string | null)[][] }, labelOf: Map<string, string>) {
   const seen = new Set<string>();
   const rows: { key: string; label: string; text: string; n: number; note: boolean }[] = [];
   for (const id of SILOS) {
@@ -209,14 +210,14 @@ function resultWords(entry: LogEntry): string {
     const count = formatCount(soleCell(result));
     return count ? `${count} rows counted` : "";
   }
-  const sources = formatCount(result.row_count);
+  const sources = formatCount(result.row_count ?? undefined);
   return sources ? `${sources} sources` : "";
 }
 
 function LogRow({ entry }: { entry: LogEntry }) {
   const result = entry.result;
   const time = result && entry.phase !== "running" ? clock(result.executed_at) : "";
-  const took = result && entry.phase === "done" ? formatSeconds(result.latency_ms) : "";
+  const took = result && entry.phase === "done" && result.latency_ms != null ? formatSeconds(result.latency_ms) : "";
   const dot = entry.phase === "error" ? "bad" : entry.phase === "running" ? "run" : entry.phase === "done" ? "done" : "";
   return (
     <tr>

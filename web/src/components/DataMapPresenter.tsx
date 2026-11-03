@@ -5,7 +5,7 @@
 import { useEffect, useState } from "react";
 import { API_MODE } from "../api";
 import { DISCLAIMER } from "./Footer";
-import { DataMapDiagram, formatCount, soleCell, useDataMapRun, type LogEntry } from "./DataMapDiagram";
+import { DataMapDiagram, RunStatus, formatCount, soleCell, useDataMapRun, type LogEntry } from "./DataMapDiagram";
 
 const STEPS: { queryId: string; title: string; line: string; lit: readonly string[] }[] = [
   { queryId: "emr", title: "Hospital EMR", line: "What was charted in hospital. Synthetic.", lit: ["emr"] },
@@ -64,7 +64,7 @@ export function DataMapPresenter({ onExit }: { onExit: () => void }) {
 }
 
 function PresenterLive({ onExit }: { onExit: () => void }) {
-  const { catalogue, byId } = useDataMapRun(true);
+  const { catalogue, byId, rerun, clock } = useDataMapRun(true);
   const [step, setStep] = useState(0);
   const current = STEPS[step] ?? STEPS[0];
   const last = STEPS.length - 1;
@@ -100,6 +100,7 @@ function PresenterLive({ onExit }: { onExit: () => void }) {
           {dq && entry?.phase === "done" ? " Rule strength_is_a_real_product." : ""}
         </p>
         {dq && <DqHero entry={entry} />}
+        <RunStatus clock={clock} onRerun={rerun} />
       </header>
       <div className="dm-diagram dm-diagram-present">
         {catalogue ? (

@@ -6,19 +6,24 @@ import { useCallback, useEffect, useRef, useState, type HTMLAttributes } from "r
 import { api } from "../api";
 import type { DataMapQueryResult, DataMapQuerySpec } from "../types";
 
+export type StoredResult = Omit<DataMapQueryResult, "latency_ms" | "row_count"> & {
+  latency_ms: number | null;
+  row_count: number | null;
+};
+
 export interface LogEntry {
   id: string;
   label: string;
   node: string;
   phase: "running" | "done" | "error";
-  result?: DataMapQueryResult;
+  result?: StoredResult;
   error?: string;
 }
 
 const AU_COUNT = new Intl.NumberFormat("en-AU");
 const AU_SECONDS = new Intl.NumberFormat("en-AU", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
-export function soleCell(result: DataMapQueryResult | undefined): string | null {
+export function soleCell(result: { data: (string | null)[][] } | undefined): string | null {
   const value = result?.data[0]?.[0];
   if (value == null || value === "") return null;
   return String(value);
@@ -38,7 +43,7 @@ export function formatSeconds(ms: number): string {
 }
 
 /** Rows column: a single count's cell, otherwise how many rows came back. */
-export function rowsShown(result: DataMapQueryResult): string {
+export function rowsShown(result: StoredResult): string {
   if (result.data.length === 1 && result.headers.length === 1) {
     const cell = soleCell(result);
     if (cell != null) return cell;
@@ -46,60 +51,251 @@ export function rowsShown(result: DataMapQueryResult): string {
   return String(result.row_count);
 }
 
+const STORAGE_KEY = "medtrace.datamap.lastRun";
+
+export interface SavedRun {
+  startedAt: string;
+  durationMs: number;
+  results: StoredResult[];
+}
+
+export type RunPhase = "idle" | "cached" | "running" | "done";
+
+export interface RunClock {
+  phase: RunPhase;
+  startedAt: string | null;
+  durationMs: number | null;
+  replayed: boolean;
+}
+
+function readCache(): SavedRun | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as SavedRun;
+    if (!parsed || typeof parsed.startedAt !== "string" || !Array.isArray(parsed.results) || parsed.results.length === 0) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeCache(run: SavedRun) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(run));
+  } catch {
+    // Storage can be blocked. The run still shows; it just will not be there next time.
+  }
+}
+
+function entryFrom(result: StoredResult, node: string): LogEntry {
+  const failed = result.error != null && result.error !== "";
+  return {
+    id: result.id,
+    label: result.label,
+    node,
+    phase: failed ? "error" : "done",
+    result,
+    error: failed ? (result.error ?? undefined) : undefined,
+  };
+}
+
+const initialSaved = readCache();
+
 export function useDataMapRun(enabled: boolean) {
   const [catalogue, setCatalogue] = useState<DataMapQuerySpec[] | null>(null);
   const [byId, setById] = useState<Record<string, LogEntry>>({});
-  const [entries, setEntries] = useState<LogEntry[]>([]);
+  const [entries, setEntries] = useState<LogEntry[]>(() => (initialSaved ? initialSaved.results.map((r) => entryFrom(r, r.id)) : []));
   const [fatal, setFatal] = useState<string | null>(null);
   const [nonce, setNonce] = useState(0);
+  const [clock, setClock] = useState<RunClock>(() =>
+    initialSaved
+      ? {
+          phase: "cached",
+          startedAt: initialSaved.startedAt,
+          durationMs: initialSaved.durationMs,
+          replayed: initialSaved.results.some((r) => r.replayed),
+        }
+      : { phase: "idle", startedAt: null, durationMs: null, replayed: false },
+  );
   const gen = useRef(0);
+  const forceLive = useRef(false);
+  const running = useRef(false);
+  const catalogueRef = useRef<DataMapQuerySpec[] | null>(null);
 
-  const rerun = useCallback(() => setNonce((n) => n + 1), []);
+  const paint = useCallback((queries: DataMapQuerySpec[], saved: SavedRun, phase: RunPhase) => {
+    const nodeOf = new Map(queries.map((q) => [q.id, q.node]));
+    const list = saved.results.map((r) => entryFrom(r, nodeOf.get(r.id) ?? r.id));
+    const map: Record<string, LogEntry> = {};
+    for (const item of list) map[item.id] = item;
+    catalogueRef.current = queries;
+    setCatalogue(queries);
+    setEntries(list);
+    setById(map);
+    setClock({
+      phase,
+      startedAt: saved.startedAt,
+      durationMs: saved.durationMs,
+      replayed: saved.results.some((r) => r.replayed),
+    });
+  }, []);
+
+  const rerun = useCallback(() => {
+    forceLive.current = true;
+    setNonce((n) => n + 1);
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== STORAGE_KEY || running.current) return;
+      const saved = readCache();
+      const queries = catalogueRef.current;
+      if (!saved || !queries || saved.results.length !== queries.length) return;
+      paint(queries, saved, "cached");
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [enabled, paint]);
 
   useEffect(() => {
     if (!enabled) return;
     const token = ++gen.current;
     const ctrl = new AbortController();
     const alive = () => token === gen.current && !ctrl.signal.aborted;
-    setCatalogue(null);
-    setById({});
-    setEntries([]);
+    const live = forceLive.current;
+    forceLive.current = false;
     setFatal(null);
 
     (async () => {
+      let queries = catalogueRef.current;
       try {
-        const cat = await api.dataMapQueries(ctrl.signal);
-        if (!alive()) return;
-        setCatalogue(cat.queries);
-        for (const query of cat.queries) {
+        if (!queries) {
+          const cat = await api.dataMapQueries(ctrl.signal);
           if (!alive()) return;
-          const running: LogEntry = { id: query.id, label: query.label, node: query.node, phase: "running" };
-          setById((m) => ({ ...m, [query.id]: running }));
-          setEntries((es) => [...es.filter((e) => e.id !== query.id), running]);
+          queries = cat.queries;
+          catalogueRef.current = queries;
+          setCatalogue(queries);
+        }
+      } catch (err) {
+        if (!alive() || (err instanceof DOMException && err.name === "AbortError")) return;
+        setFatal(err instanceof Error ? err.message : String(err));
+        return;
+      }
+
+      const saved = live ? null : readCache();
+      if (saved && saved.results.length === queries.length) {
+        paint(queries, saved, "cached");
+        return;
+      }
+
+      running.current = true;
+      const startedMs = Date.now();
+      const startedAt = new Date(startedMs).toISOString();
+      setClock({ phase: "running", startedAt, durationMs: null, replayed: false });
+      setById({});
+      setEntries([]);
+      const collected: StoredResult[] = [];
+      let sawReplay = false;
+      try {
+        for (const query of queries) {
+          if (!alive()) return;
+          const runningEntry: LogEntry = { id: query.id, label: query.label, node: query.node, phase: "running" };
+          setById((m) => ({ ...m, [query.id]: runningEntry }));
+          setEntries((es) => [...es.filter((e) => e.id !== query.id), runningEntry]);
           try {
             const result = await api.dataMapQuery(query.id, ctrl.signal);
             if (!alive()) return;
+            collected.push(result);
+            if (result.replayed) sawReplay = true;
             const done: LogEntry = { id: query.id, label: query.label, node: query.node, phase: "done", result };
             setById((m) => ({ ...m, [query.id]: done }));
             setEntries((es) => es.map((e) => (e.id === query.id ? done : e)));
           } catch (err) {
             if (!alive() || (err instanceof DOMException && err.name === "AbortError")) return;
             const message = err instanceof Error ? err.message : String(err);
+            collected.push({
+              id: query.id,
+              label: query.label,
+              sql: query.sql,
+              headers: [],
+              data: [],
+              row_count: null,
+              latency_ms: null,
+              executed_at: "",
+              replayed: false,
+              error: message,
+            });
             const failed: LogEntry = { id: query.id, label: query.label, node: query.node, phase: "error", error: message };
             setById((m) => ({ ...m, [query.id]: failed }));
             setEntries((es) => es.map((e) => (e.id === query.id ? failed : e)));
           }
         }
-      } catch (err) {
-        if (!alive() || (err instanceof DOMException && err.name === "AbortError")) return;
-        setFatal(err instanceof Error ? err.message : String(err));
+        if (!alive() || collected.length !== queries.length) return;
+        const durationMs = Date.now() - startedMs;
+        writeCache({ startedAt, durationMs, results: collected });
+        setClock({ phase: "done", startedAt, durationMs, replayed: sawReplay });
+      } finally {
+        if (token === gen.current) running.current = false;
       }
     })();
 
     return () => ctrl.abort();
-  }, [enabled, nonce]);
+  }, [enabled, nonce, paint]);
 
-  return { catalogue, byId, entries, fatal, rerun };
+  return { catalogue, byId, entries, fatal, rerun, clock };
+}
+
+export function RunStatus({ clock, onRerun }: { clock: RunClock; onRerun: () => void }) {
+  const ticking = clock.phase === "running" || clock.phase === "cached";
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!ticking) return;
+    const id = window.setInterval(() => setNow(Date.now()), clock.phase === "running" ? 1000 : 30000);
+    return () => window.clearInterval(id);
+  }, [ticking, clock.phase]);
+
+  if (clock.phase === "idle" || !clock.startedAt) return null;
+  const source = clock.replayed ? "Replayed" : "Live from Zetaris";
+  if (clock.phase === "running") {
+    const elapsed = Math.max(0, now - Date.parse(clock.startedAt));
+    return <p className="dm-status">● {source} · running {formatElapsed(elapsed)}</p>;
+  }
+  if (clock.phase === "cached") {
+    const started = Date.parse(clock.startedAt);
+    const mins = Number.isFinite(started) ? Math.max(0, Math.floor((now - started) / 60000)) : 0;
+    const origin = clock.replayed ? "Replayed" : "live Zetaris";
+    return (
+      <p className="dm-status">
+        Results from the {origin} run at {clockTime(clock.startedAt)} ({formatCount(mins)} min ago) ·{" "}
+        <button type="button" className="lnk" onClick={onRerun}>
+          Run live again
+        </button>
+      </p>
+    );
+  }
+  const duration = clock.durationMs ?? 0;
+  const minutes = Math.floor(duration / 60000);
+  const seconds = Math.floor((duration % 60000) / 1000);
+  const finishedAt = new Date(Date.parse(clock.startedAt) + duration).toISOString();
+  return (
+    <p className="dm-status">
+      ● {source} · Last run {clockTime(finishedAt)} · took {formatCount(minutes)} min {formatCount(seconds)} s
+    </p>
+  );
+}
+
+function formatElapsed(ms: number): string {
+  const minutes = Math.floor(ms / 60000);
+  const seconds = Math.floor((ms % 60000) / 1000);
+  if (minutes <= 0) return `${formatCount(seconds)} s`;
+  return `${formatCount(minutes)} min ${formatCount(seconds)} s`;
+}
+
+function clockTime(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
 const SRC_X = 12;
