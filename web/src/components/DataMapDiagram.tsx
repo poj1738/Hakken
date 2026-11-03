@@ -2,8 +2,7 @@
 // The data map and the presenter view both render this. Positions are layout,
 // not counts: a number appears only after that node's query has answered.
 
-import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type HTMLAttributes, type MouseEvent as ReactMouseEvent } from "react";
-import { NodeDetail } from "./DataMapDetail";
+import { useCallback, useEffect, useRef, useState, type HTMLAttributes } from "react";
 import { api } from "../api";
 import type { DataMapQueryResult, DataMapQuerySpec } from "../types";
 
@@ -301,17 +300,18 @@ function clockTime(iso: string): string {
 
 const VB_W = 1440;
 const PAD = 16;
-const SRC_W = 420;
-const SRC_H = 64;
-const SRC_GAP = 8;
-const LABEL_H = 16;
-const USL_W = 440;
-const USL_H = 248;
-const AGENT_W = 236;
-const AGENT_H = 80;
+const SRC_W = 400;
+const ROW_H = 50;
+const LIST_HEAD = 28;
+const LIST_PAD = 8;
+const LIST_GAP = 16;
+const USL_W = 280;
+const USL_H = 168;
+const AGENT_W = 188;
+const AGENT_H = 52;
 const AGENT_GAP = 12;
-const GROUP_PAD = 12;
-const RETRY_GUTTER = 36;
+const GROUP_PAD = 8;
+const RETRY_GUTTER = 42;
 const GROUP_W = GROUP_PAD + AGENT_W + RETRY_GUTTER + GROUP_PAD;
 const GROUP_H = GROUP_PAD + 4 * AGENT_H + 3 * AGENT_GAP + GROUP_PAD;
 const TRACE_HEAD = 40;
@@ -353,49 +353,38 @@ interface Props {
   present?: boolean;
   /** Slow dots along lit edges, only once every query has finished. */
   flow?: boolean;
-  /** Presenter: this node's card stays open beside the diagram. */
-  forcedNode?: string;
-  showQuality?: boolean;
 }
 
 const SKIP = new Set(["merge", "usl", "high_risk", "dq"]);
 const XHTML = { xmlns: "http://www.w3.org/1999/xhtml" } as HTMLAttributes<HTMLDivElement>;
-const XHTML_BTN = { xmlns: "http://www.w3.org/1999/xhtml" } as ButtonHTMLAttributes<HTMLButtonElement>;
 
-const OpenCtx = createContext<{
-  openId: string | null;
-  enter: (id: string) => void;
-  leave: (event: ReactMouseEvent) => void;
-  focus: (id: string) => void;
-  blur: () => void;
-  toggle: (id: string) => void;
-} | null>(null);
+/** The short line from each source's description, shown on the card itself. */
+const BLURB: Record<string, string> = {
+  emr: "What was charted in hospital.",
+  gp: "What the GP prescribed.",
+  pharmacy: "What was actually supplied, and when.",
+  patient: "What the patient says they take, in their own words.",
+  lexicon: "Australia's list of subsidised medicines.",
+  apinchs: "Medicines a pharmacist must review first.",
+  tga: "Medicine shortages reported to the TGA.",
+};
 
-export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = false, forcedNode, showQuality = false }: Props) {
+export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = false }: Props) {
   const reduced = useReducedMotion();
-  const stageRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [pinned, setPinned] = useState<string | null>(null);
-  const [hover, setHover] = useState<string | null>(null);
-  const [focusId, setFocusId] = useState<string | null>(null);
-  const [suppressed, setSuppressed] = useState(false);
-  const [pos, setPos] = useState<{ left: number; top: number; width: number; maxH: number } | null>(null);
-  const openId = present ? forcedNode ?? null : suppressed ? null : focusId ?? pinned ?? hover;
-  const detailNode = openId && AGENTS.some((agent) => agent.id === openId) ? "medtrace" : openId;
+  const [hoverId, setHoverId] = useState<string | null>(null);
   const sources = catalogue.filter((q) => !SKIP.has(q.node) && q.node !== "tga");
   const tgaQuery = catalogue.find((q) => q.node === "tga");
-  const srcH = SRC_H;
   const srcW = SRC_W;
-  const siloIdxEarly = sources.findIndex((q) => q.node === "patient");
-  const lastSiloEarly = siloIdxEarly >= 0 ? siloIdxEarly : Math.min(3, sources.length - 1);
-  const yOf = (i: number) => {
-    let y = PAD + LABEL_H + i * (srcH + SRC_GAP);
-    if (i > lastSiloEarly) y += LABEL_H;
-    return y;
-  };
-  const cyOf = (i: number) => yOf(i) + srcH / 2;
-  const columnTop = sources.length ? yOf(0) : PAD;
-  const columnBottom = sources.length ? yOf(sources.length - 1) + srcH : 200;
+  const clinical = sources.filter((q) => q.node === "emr" || q.node === "gp" || q.node === "pharmacy" || q.node === "patient");
+  const reference = sources.filter((q) => q.node === "lexicon" || q.node === "apinchs");
+  const listH = (n: number) => LIST_PAD + LIST_HEAD + n * ROW_H + LIST_PAD;
+  const clinicalY = PAD;
+  const clinicalH = listH(clinical.length);
+  const referenceY = clinicalY + clinicalH + LIST_GAP;
+  const referenceH = listH(reference.length);
+  const rowCy = (listY: number, i: number) => listY + LIST_PAD + LIST_HEAD + i * ROW_H + ROW_H / 2;
+  const columnTop = clinicalY;
+  const columnBottom = reference.length ? referenceY + referenceH : clinicalY + clinicalH;
   const columnMid = (columnTop + columnBottom) / 2;
   const uslBox = { x: USL_X, y: Math.max(PAD, columnMid - USL_H / 2), w: USL_W, h: USL_H };
   const spec = (node: string) => catalogue.find((q) => q.node === node);
@@ -412,12 +401,8 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
     return phase === "done";
   };
 
-  const siloIdx = sources.findIndex((q) => q.node === "patient");
-  const lastSilo = siloIdx >= 0 ? siloIdx : Math.min(3, sources.length - 1);
-  const mergeY = sources.length ? (cyOf(0) + cyOf(Math.max(lastSilo, 0))) / 2 : uslBox.y + uslBox.h / 2;
+  const mergeY = clinical.length ? (rowCy(clinicalY, 0) + rowCy(clinicalY, clinical.length - 1)) / 2 : uslBox.y + uslBox.h / 2;
   const uslCy = uslBox.y + uslBox.h / 2;
-  const lexiconI = sources.findIndex((q) => q.node === "lexicon");
-  const apinchsI = sources.findIndex((q) => q.node === "apinchs");
   // Top to bottom on the semantic layer's left edge, matching source order, so the lines do not cross.
   const entryPad = 28;
   const entryY = (i: number) => uslBox.y + entryPad + ((uslBox.h - entryPad * 2) * i) / 2;
@@ -442,8 +427,8 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
   const boxY = (i: number) => groupTop + GROUP_PAD + i * (AGENT_H + AGENT_GAP);
   const execCy = boxY(1) + AGENT_H / 2;
   const evalCy = boxY(2) + AGENT_H / 2;
-  const tgaY = groupTop + GROUP_H + 28;
-  const tgaH = SRC_H;
+  const tgaY = groupTop + GROUP_H + 16;
+  const tgaH = 72;
   const tgaCy = tgaY + tgaH / 2;
   const uslRight = uslBox.x + uslBox.w;
   const sqlLine = `M ${uslRight} ${execCy} L ${agentX} ${execCy}`;
@@ -457,115 +442,8 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
   const retry = `M ${agentRight} ${evalCy} C ${agentRight + 22} ${evalCy}, ${agentRight + 22} ${execCy}, ${agentRight} ${execCy}`;
   const vbH = Math.max(columnBottom, uslBox.y + uslBox.h + 24, tgaY + tgaH + 16);
 
-  useEffect(() => {
-    if (present) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      setPinned(null);
-      setSuppressed(true);
-    };
-    const onDown = (event: PointerEvent) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      if (target.closest(".dm-node-btn") || target.closest(".dm-detail")) return;
-      setPinned(null);
-      setSuppressed(true);
-    };
-    const onFocusIn = (event: FocusEvent) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      const btn = target.closest(".dm-node-btn");
-      if (!btn || !stageRef.current?.contains(btn)) return;
-      const id = btn.closest("[data-node]")?.getAttribute("data-node");
-      if (!id) return;
-      setSuppressed(false);
-      setFocusId(id);
-    };
-    const onFocusOut = (event: FocusEvent) => {
-      const next = event.relatedTarget;
-      if (next instanceof Element && next.closest(".dm-node-btn")) return;
-      setFocusId(null);
-    };
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("pointerdown", onDown);
-    document.addEventListener("focusin", onFocusIn, true);
-    document.addEventListener("focusout", onFocusOut, true);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("pointerdown", onDown);
-      document.removeEventListener("focusin", onFocusIn, true);
-      document.removeEventListener("focusout", onFocusOut, true);
-    };
-  }, [present]);
-
-  useLayoutEffect(() => {
-    if (present || !openId || !stageRef.current || !cardRef.current) {
-      setPos(null);
-      return;
-    }
-    const node = stageRef.current.querySelector(`[data-node="${openId}"]`);
-    if (!node) return;
-    const box = stageRef.current.getBoundingClientRect();
-    const nr = node.getBoundingClientRect();
-    const gap = 8;
-    const roomRight = box.width - (nr.right - box.left) - gap * 2;
-    const roomLeft = nr.left - box.left - gap * 2;
-    const right = roomRight >= roomLeft;
-    const width = Math.max(160, Math.min(360, right ? roomRight : roomLeft));
-    let left = right ? nr.right - box.left + gap : nr.left - box.left - width - gap;
-    left = Math.max(gap, Math.min(left, box.width - width - gap));
-    const cr = cardRef.current.getBoundingClientRect();
-    let top = nr.top - box.top;
-    if (top + cr.height > box.height - gap) top = box.height - cr.height - gap;
-    top = Math.max(gap, top);
-    const maxH = Math.max(120, Math.round(box.height - gap * 2));
-    const next = { left: Math.round(left), top: Math.round(top), width: Math.round(width), maxH };
-    setPos((prev) =>
-      prev && prev.left === next.left && prev.top === next.top && prev.width === next.width && prev.maxH === next.maxH ? prev : next,
-    );
-  }, [present, openId, byId, pos?.width, pos?.maxH]);
-
-  const ui = {
-    openId,
-    enter: (id: string) => {
-      if (present) return;
-      setSuppressed(false);
-      setHover(id);
-    },
-    leave: (event: ReactMouseEvent) => {
-      const next = event.relatedTarget;
-      if (next instanceof Element && (next.closest(".dm-detail") || next.closest(".dm-node-btn"))) return;
-      setHover(null);
-      setSuppressed(false);
-    },
-    focus: (id: string) => {
-      if (present) return;
-      setSuppressed(false);
-      setFocusId(id);
-    },
-    blur: () => setFocusId(null),
-    toggle: (id: string) => {
-      if (present) return;
-      const closing = pinned === id;
-      setSuppressed(closing);
-      setPinned(closing ? null : id);
-    },
-  };
-
-  const detail = openId ? (
-    <div
-      ref={cardRef}
-      className={present ? "dm-detail-present-wrap" : "dm-detail-slot"}
-      style={present ? undefined : { left: pos?.left ?? 8, top: pos?.top ?? 8, width: pos?.width ?? 360, maxHeight: pos?.maxH, visibility: pos ? "visible" : "hidden" }}
-      onMouseEnter={() => openId && ui.enter(openId)}
-    >
-      <NodeDetail nodeId={detailNode ?? openId} entry={entry(detailNode ?? openId)} showQuality={showQuality} quality={showQuality ? byId.dq : undefined} present={present} />
-    </div>
-  ) : null;
-
   return (
-    <OpenCtx.Provider value={ui}>
-    <div ref={stageRef} className={present ? "dm-stage dm-stage-present" : "dm-stage"} onMouseLeave={ui.leave}>
+    <div className={present ? "dm-stage dm-stage-present" : "dm-stage"}>
     <svg
       className={`dm-svg${present ? " present" : ""}`}
       viewBox={`0 0 ${VB_W} ${vbH}`}
@@ -578,10 +456,10 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
           <path d="M0 0 L8 4 L0 8 Z" className="dm-arr" />
         </marker>
       </defs>
-      {sources.slice(0, lastSilo + 1).map((query, i) => (
+      {clinical.map((query, i) => (
         <Edge
           key={query.id}
-          d={curve(SRC_X + srcW, cyOf(i), BUS_X, mergeY)}
+          d={curve(SRC_X + srcW, rowCy(clinicalY, i), BUS_X, mergeY)}
           on={edgeOn(query.node)}
           faint={dimming && !isLit(query.node)}
           reduced={reduced}
@@ -589,24 +467,16 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
         />
       ))}
       <Edge d={trunk} on={mergeOn} faint={dimming && !isLit("merge")} reduced={reduced} flow={flow} />
-      {lexiconI >= 0 && (
+      {reference.map((query, i) => (
         <Edge
-          d={curve(SRC_X + srcW, cyOf(lexiconI), uslBox.x, lexiconEntryY)}
-          on={edgeOn("lexicon")}
-          faint={dimming && !isLit("lexicon")}
+          key={query.id}
+          d={curve(SRC_X + srcW, rowCy(referenceY, i), uslBox.x, i === 0 ? lexiconEntryY : apinchsEntryY)}
+          on={edgeOn(query.node)}
+          faint={dimming && !isLit(query.node)}
           reduced={reduced}
           flow={flow}
         />
-      )}
-      {apinchsI >= 0 && (
-        <Edge
-          d={curve(SRC_X + srcW, cyOf(apinchsI), uslBox.x, apinchsEntryY)}
-          on={edgeOn("apinchs")}
-          faint={dimming && !isLit("apinchs")}
-          reduced={reduced}
-          flow={flow}
-        />
-      )}
+      ))}
       <rect x={groupX} y={groupTop} width={GROUP_W} height={GROUP_H} rx={14} className="dm-trace-frame" />
       <Edge d={sqlLine} on={linkOn} faint={dimming && !isLit("usl") && !isLit("medtrace")} reduced={reduced} flow={flow} />
       <Edge d={recheckLine} on={linkOn} faint={dimming && !isLit("usl") && !isLit("medtrace")} reduced={reduced} flow={flow} />
@@ -614,26 +484,34 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
         <Edge d={shortage} on={edgeOn("tga")} optional faint={dimming && !isLit("tga")} reduced={reduced} flow={flow} />
       )}
 
-      <GroupLabel x={SRC_X} y={yOf(0) - 20} w={srcW} text="Clinical records · synthetic" />
-      {lexiconI >= 0 && <GroupLabel x={SRC_X} y={yOf(lexiconI) - 20} w={srcW} text="Australian reference data · real" />}
+      <SourceList
+        x={SRC_X}
+        y={clinicalY}
+        w={srcW}
+        h={clinicalH}
+        title="Patient records · synthetic"
+        queries={clinical}
+        byId={byId}
+        dimming={dimming}
+        isLit={isLit}
+        hoverId={hoverId}
+        onHover={setHoverId}
+      />
+      <SourceList
+        x={SRC_X}
+        y={referenceY}
+        w={srcW}
+        h={referenceH}
+        title="Australian reference data · real"
+        queries={reference}
+        byId={byId}
+        dimming={dimming}
+        isLit={isLit}
+        hoverId={hoverId}
+        onHover={setHoverId}
+      />
 
-      {sources.map((query, i) => (
-        <NodeBox
-          key={query.id}
-          x={SRC_X}
-          y={yOf(i)}
-          w={srcW}
-          h={srcH}
-          label={query.label}
-          optional={query.node === "tga"}
-          entry={byId[query.id]}
-          active={dimming && isLit(query.node)}
-          faint={dimming && !isLit(query.node)}
-          nodeId={query.node}
-        />
-      ))}
-
-      <MergeLabel x={BUS_X + 8} y={mergeY - 36} entry={mergeEntry} faint={dimming && !isLit("merge")} />
+      <MergeLabel x={BUS_X - 100} y={mergeY - 28} w={Math.max(120, COL_GAP - 12)} entry={mergeEntry} faint={dimming && !isLit("merge")} />
 
       <NodeBox
         x={uslBox.x}
@@ -704,12 +582,102 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
           active={dimming && isLit("tga")}
           faint={dimming && !isLit("tga")}
           nodeId="tga"
+          blurb={BLURB.tga}
         />
       )}
     </svg>
-    {detail}
+    {hoverId && <QueryHover id={hoverId} catalogue={catalogue} byId={byId} onLeave={() => setHoverId(null)} />}
     </div>
-    </OpenCtx.Provider>
+  );
+}
+
+function SourceList({
+  x,
+  y,
+  w,
+  h,
+  title,
+  queries,
+  byId,
+  dimming,
+  isLit,
+  hoverId,
+  onHover,
+}: {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  title: string;
+  queries: DataMapQuerySpec[];
+  byId: Record<string, LogEntry>;
+  dimming: boolean;
+  isLit: (node: string) => boolean;
+  hoverId: string | null;
+  onHover: (id: string | null) => void;
+}) {
+  return (
+    <foreignObject x={x} y={y} width={w} height={h}>
+      <div {...XHTML} className="dm-list">
+        <div className="dm-list-head dm-group">
+          <span>{title}</span>
+          <span>Rows</span>
+        </div>
+        {queries.map((query) => {
+          const entry = byId[query.id];
+          const phase = entry?.phase;
+          const count = phase === "done" ? soleCell(entry?.result) : null;
+          const waiting = phase === "running";
+          const failed = phase === "error";
+          return (
+            <div
+              {...XHTML}
+              key={query.id}
+              className={`dm-list-row${dimming && !isLit(query.node) ? " dm-faint" : ""}${hoverId === query.id ? " on" : ""}`}
+              data-node={query.node}
+              onMouseEnter={() => onHover(query.id)}
+              onMouseLeave={() => onHover(null)}
+              onFocus={() => onHover(query.id)}
+              onBlur={() => onHover(null)}
+              tabIndex={0}
+              role="group"
+              aria-label={`${query.label}. ${BLURB[query.node] ?? ""}`}
+            >
+              <span className={`dm-dot-status${phase === "done" ? " done" : ""}${waiting ? " run" : ""}${failed ? " bad" : ""}`} />
+              <div className="dm-list-copy">
+                <div className="dm-name">{query.label}</div>
+                <div className="dm-blurb">{failed ? entry?.error ?? "The query failed" : waiting ? "querying Zetaris…" : BLURB[query.node]}</div>
+              </div>
+              <div className="dm-count dm-num">{count != null ? formatCount(count) : ""}</div>
+            </div>
+          );
+        })}
+      </div>
+    </foreignObject>
+  );
+}
+
+function QueryHover({
+  id,
+  catalogue,
+  byId,
+  onLeave,
+}: {
+  id: string;
+  catalogue: DataMapQuerySpec[];
+  byId: Record<string, LogEntry>;
+  onLeave: () => void;
+}) {
+  const query = catalogue.find((q) => q.id === id || q.node === id);
+  const entry = query ? byId[query.id] : undefined;
+  const blurb = BLURB[id] ?? (id === "usl" ? "Every question after this is one SELECT." : AGENTS.find((agent) => agent.id === id)?.job ?? "");
+  const sql = entry?.result?.sql ?? query?.sql ?? "";
+  return (
+    <div className="dm-hover" onMouseLeave={onLeave} role="note">
+      <p className="dm-name">{query?.label ?? id}</p>
+      {blurb && <p className="dm-blurb">{blurb}</p>}
+      {sql && <pre className="dm-code">{sql}</pre>}
+    </div>
   );
 }
 
@@ -755,6 +723,7 @@ function NodeBox({
   faint,
   noCount = false,
   nodeId,
+  blurb,
 }: {
   x: number;
   y: number;
@@ -770,8 +739,8 @@ function NodeBox({
   faint: boolean;
   noCount?: boolean;
   nodeId: string;
+  blurb?: string;
 }) {
-  const ui = useContext(OpenCtx);
   const phase = entry?.phase;
   const count = phase === "done" ? soleCell(entry?.result) : null;
   const tgaMiss = optional && phase === "error";
@@ -783,7 +752,8 @@ function NodeBox({
     : [
         label,
         optional ? "optional overlay" : "",
-        shown ? `${formatCount(shown) ?? shown} rows in Zetaris` : "",
+        blurb ?? "",
+        shown ? `${formatCount(shown) ?? shown} rows` : "",
         waiting ?? "",
         detail ?? "",
         !shown && !waiting && !detail ? "waiting for its query" : "",
@@ -798,18 +768,10 @@ function NodeBox({
     <g className={cls} data-node={nodeId}>
       <rect x={x} y={y} width={w} height={h} rx={usl ? 24 : 12} className={`dm-box${optional ? " dm-box-opt" : ""}${usl ? " dm-box-usl" : " dm-box-ghost"}`} />
       <foreignObject x={x} y={y} width={w} height={h}>
-        <button
-          {...XHTML_BTN}
-          type="button"
-          className={`dm-node-btn dm-node-body ${state}${usl ? " dm-usl-body" : " panel dm-src"}${optional ? " dm-opt" : ""}${phase === "done" && !usl ? " dm-arrived" : ""}`}
+        <div
+          {...XHTML}
+          className={`dm-node-body ${state}${usl ? " dm-usl-body" : " panel dm-src"}${optional ? " dm-opt" : ""}${phase === "done" && !usl ? " dm-arrived" : ""}`}
           aria-label={aria}
-          aria-expanded={ui?.openId === nodeId}
-          aria-controls={ui?.openId === nodeId ? `dm-detail-${nodeId}` : undefined}
-          onMouseEnter={() => ui?.enter(nodeId)}
-          onMouseLeave={ui?.leave}
-          onFocus={() => ui?.focus(nodeId)}
-          onBlur={() => ui?.blur()}
-          onClick={() => ui?.toggle(nodeId)}
         >
           <div className={usl ? undefined : "dm-src-line"}>
             <div className="dm-name">
@@ -818,7 +780,7 @@ function NodeBox({
             </div>
             {!usl && shown && <div className="dm-count dm-num">{formatCount(shown)}</div>}
           </div>
-          {!usl && waiting && <div className="dm-wait">{waiting}</div>}
+          {!usl && waiting && !blurb && <div className="dm-wait">{waiting}</div>}
           {usl && waiting && <div className="dm-wait">{waiting}</div>}
           {detail && (
             <div className="dm-err" title={detail}>
@@ -826,8 +788,8 @@ function NodeBox({
             </div>
           )}
           {usl && shown && <div className="dm-count dm-num">{formatCount(shown)}</div>}
-          {shown && <div className="dm-cap">{caption ?? "rows in Zetaris"}</div>}
-          {shown && optional && <div className="dm-cap">optional overlay</div>}
+          {blurb && !detail && <div className="dm-blurb">{blurb}</div>}
+          {usl && shown && caption && <div className="dm-cap">{caption}</div>}
           {shown && chips && (
             <div className="dm-chips">
               {chips.map((name) => (
@@ -837,7 +799,7 @@ function NodeBox({
               ))}
             </div>
           )}
-        </button>
+        </div>
       </foreignObject>
     </g>
   );
@@ -862,51 +824,26 @@ function AgentBox({
   job: string;
   faint: boolean;
 }) {
-  const ui = useContext(OpenCtx);
-  const open = ui?.openId === id;
   return (
     <g className={faint ? "dm-faint" : undefined} data-node={id}>
       <rect x={x} y={y} width={w} height={h} rx={12} className="dm-box dm-box-ghost" />
       <foreignObject x={x} y={y} width={w} height={h}>
-        <button
-          {...XHTML_BTN}
-          type="button"
-          className="dm-node-btn dm-node-body panel dm-src dm-agent"
-          data-node={id}
-          aria-label={`${name}. ${job}`}
-          aria-expanded={open}
-          aria-controls={open ? "dm-detail-medtrace" : undefined}
-          onMouseEnter={() => ui?.enter(id)}
-          onMouseLeave={ui?.leave}
-          onFocus={() => ui?.focus(id)}
-          onBlur={() => ui?.blur()}
-          onClick={() => ui?.toggle(id)}
-        >
+        <div {...XHTML} className="dm-node-body panel dm-src dm-agent" aria-label={`${name}. ${job}`}>
           <div className="dm-agent-name">{name}</div>
           <div className="dm-agent-job">{job}</div>
-        </button>
+        </div>
       </foreignObject>
     </g>
   );
 }
 
-function GroupLabel({ x, y, w, text }: { x: number; y: number; w: number; text: string }) {
-  return (
-    <foreignObject x={x} y={y} width={w} height={20} aria-hidden="true">
-      <div {...XHTML} className="dm-group">
-        {text}
-      </div>
-    </foreignObject>
-  );
-}
-
-function MergeLabel({ x, y, entry, faint }: { x: number; y: number; entry?: LogEntry; faint: boolean }) {
+function MergeLabel({ x, y, w, entry, faint }: { x: number; y: number; w: number; entry?: LogEntry; faint: boolean }) {
   const count = entry?.phase === "done" ? soleCell(entry.result) : null;
   const text =
     entry?.phase === "running" ? "querying Zetaris…" : count ? `4 systems → ${formatCount(count)} medicine lines` : "";
   if (!text) return null;
   return (
-    <foreignObject x={x} y={y} width={168} height={52} className={faint ? "dm-faint" : undefined}>
+    <foreignObject x={x} y={y} width={w} height={22} className={faint ? "dm-faint" : undefined}>
       <div {...XHTML} className="dm-merge" role="img" aria-label={text}>
         {text}
       </div>

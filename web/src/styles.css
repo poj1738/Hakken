@@ -783,6 +783,15 @@ html.shot-full .side { height: auto; }
 .dm-faint { opacity: 0.35; }
 .dm-merge { background: transparent; color: var(--muted); font-family: var(--sans); font-size: 13px; line-height: 1.3; padding: 0; }
 .dm-group { color: var(--muted); font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; font-variant: normal; line-height: 16px; display: flex; justify-content: space-between; gap: 8px; }
+
+.dm-list { box-sizing: border-box; height: 100%; background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; font-family: var(--sans); }
+.dm-list-head { padding: 8px 12px 4px; }
+.dm-list-row { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 8px; align-items: start; padding: 6px 12px; border-top: 1px solid var(--line-soft); min-width: 0; background: #fff; }
+.dm-list-row:focus { outline: none; }
+.dm-list-row:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+.dm-list-copy { min-width: 0; }
+.dm-hover { position: absolute; z-index: 4; left: 8px; right: 8px; bottom: 8px; max-width: 100%; max-height: 38%; overflow: auto; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.dm-merge { white-space: nowrap; font-size: 12px; color: var(--muted); font-family: var(--sans); }
 .dm-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
 .dm-chip { border: 1px solid currentColor; border-radius: 999px; padding: 1px 6px; font-size: 10px; line-height: 1.3; font-family: var(--mono); }
 .dm-trace-head { display: flex; flex-direction: column; gap: 2px; font-family: var(--sans); }
