@@ -168,6 +168,7 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false }: Props)
     <svg
       className={`dm-svg${present ? " present" : ""}`}
       viewBox={`0 0 ${VB_W} ${vbH}`}
+      preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="Sources flowing through the Zetaris semantic layer into MedTrace"
     >

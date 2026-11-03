@@ -14,10 +14,7 @@ export function DataMap({ onPresent }: { onPresent: () => void }) {
     return (
       <div className="dm-page">
         <header className="dm-head">
-          <div>
-            <h1 className="dm-title">Data map</h1>
-            <p className="dm-sub">Where MedTrace's facts come from: every number below is a live Zetaris query.</p>
-          </div>
+          <h1 className="dm-title">Data map</h1>
         </header>
         <section className="panel panel-pad">
           <p>The Data map needs the API (live or SAMPLE_MODE).</p>
@@ -44,10 +41,7 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
   return (
     <div className="dm-page">
       <header className="dm-head">
-        <div>
-          <h1 className="dm-title">Data map</h1>
-          <p className="dm-sub">Where MedTrace's facts come from: every number below is a live Zetaris query.</p>
-        </div>
+        <h1 className="dm-title">Data map</h1>
         <div className="dm-actions">
           <button type="button" className="btn btn-line" onClick={rerun}>
             Run again
