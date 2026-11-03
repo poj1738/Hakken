@@ -19,8 +19,9 @@ vertical slice, then improve.
    README, video or slides. Traces must show which model handled each request.
 4. **AI coding tools:** we build with **Claude Code**. This file is the single source
    of our working rules — no mirrored rules file, because a copy drifts and then
-   misleads. Cursor is not used; the official resources disagree on whether it is
-   mandatory, and we declare what we actually used rather than what looks compliant.
+   misleads. Cursor was used for one feature only — the Data map, built by Grok in
+   Cursor on 2026-11-03 and logged — and we declare what we actually used rather than
+   what looks compliant.
    What the AI Usage Policy requires is an **honest declaration** — log every session
    in `docs/AI_TOOLS_USAGE.md`.
 5. **Secrets only from environment variables.** `.env` is gitignored; only

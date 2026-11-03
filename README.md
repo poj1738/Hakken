@@ -267,7 +267,8 @@ this.
 
 - **AI coding tools:** built with **Claude Code**. Every session is logged in
   [`docs/AI_TOOLS_USAGE.md`](docs/AI_TOOLS_USAGE.md), and `CLAUDE.md` holds the working
-  rules. Cursor was not used; the log explains why.
+  rules. Cursor (with Grok) was used for one feature, the Data map screen; the log
+  records which tool built what.
 - **Open-source code adapted:** the World Model and H-MEM reference implementations and
   conformance runners from the Meterless repository (Apache-2.0, commit `1742dec`), ported
   to Python. Every ported file carries an Apache-2.0 attribution header, and the official
