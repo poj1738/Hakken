@@ -67,7 +67,6 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
           <h2 className="h2" id="dm-diagram-title">
             From six sources to one view
           </h2>
-          <p className="dm-cap">Hover any box to see what it is and the query behind it.</p>
           <div className="dm-diagram">
             {catalogue ? (
               <DataMapDiagram catalogue={catalogue} byId={byId} flow={clock.phase === "done" || clock.phase === "cached"} />

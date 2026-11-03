@@ -295,17 +295,17 @@ function clockTime(iso: string): string {
   return date.toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
-const VB_W = 1440;
+const VB_W = 1180;
 const PAD = 16;
 const SRC_W = 400;
-const ROW_H = 50;
+const ROW_H = 72;
 const LIST_HEAD = 28;
 const LIST_PAD = 8;
 const LIST_GAP = 16;
 const USL_W = 280;
-const USL_H = 168;
+const USL_H = 200;
 const AGENT_W = 188;
-const AGENT_H = 52;
+const AGENT_H = 72;
 const AGENT_GAP = 12;
 const GROUP_PAD = 8;
 const RETRY_GUTTER = 42;
@@ -368,7 +368,6 @@ const BLURB: Record<string, string> = {
 
 export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = false }: Props) {
   const reduced = useReducedMotion();
-  const [hoverId, setHoverId] = useState<string | null>(null);
   const sources = catalogue.filter((q) => !SKIP.has(q.node) && q.node !== "tga");
   const tgaQuery = catalogue.find((q) => q.node === "tga");
   const srcW = SRC_W;
@@ -425,7 +424,7 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
   const execCy = boxY(1) + AGENT_H / 2;
   const evalCy = boxY(2) + AGENT_H / 2;
   const tgaY = groupTop + GROUP_H + 28;
-  const tgaH = 108;
+  const tgaH = 132;
   const uslRight = uslBox.x + uslBox.w;
   const sqlLine = `M ${uslRight} ${execCy} L ${agentX} ${execCy}`;
   const recheckLine = `M ${agentX} ${evalCy} L ${uslRight} ${evalCy}`;
@@ -435,12 +434,28 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
   const retryBulge = Math.min(18, RETRY_GUTTER + GROUP_PAD - 20);
   const retry = `M ${agentRight} ${evalCy} C ${agentRight + retryBulge} ${evalCy}, ${agentRight + retryBulge} ${execCy}, ${agentRight} ${execCy}`;
   const vbH = Math.max(columnBottom, uslBox.y + uslBox.h + 24, tgaY + tgaH + 16);
+  const svgRef = useRef<SVGSVGElement>(null);
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return;
+    const apply = () => {
+      const width = el.getBoundingClientRect().width;
+      const inv = width > 8 ? Math.min(VB_W / width, 2.2) : 1;
+      el.style.setProperty("--dm-inv", inv.toFixed(4));
+    };
+    apply();
+    const watch = new ResizeObserver(apply);
+    watch.observe(el);
+    return () => watch.disconnect();
+  }, [vbH, present]);
 
   return (
     <div className={present ? "dm-stage dm-stage-present" : "dm-stage"}>
     <svg
+      ref={svgRef}
       className={`dm-svg${present ? " present" : ""}`}
       viewBox={`0 0 ${VB_W} ${vbH}`}
+      style={{ aspectRatio: `${VB_W} / ${vbH}` }}
       preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="Sources flowing through the Zetaris semantic layer into MedTrace"
@@ -488,8 +503,6 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
         byId={byId}
         dimming={dimming}
         isLit={isLit}
-        hoverId={hoverId}
-        onHover={setHoverId}
       />
       <SourceList
         x={SRC_X}
@@ -501,8 +514,6 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
         byId={byId}
         dimming={dimming}
         isLit={isLit}
-        hoverId={hoverId}
-        onHover={setHoverId}
       />
 
       <MergeLabel x={BUS_X - 100} y={mergeY - 28} w={Math.max(120, COL_GAP - 12)} entry={mergeEntry} faint={dimming && !isLit("merge")} />
@@ -580,7 +591,6 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
         />
       )}
     </svg>
-    {hoverId && <QueryHover id={hoverId} catalogue={catalogue} byId={byId} onLeave={() => setHoverId(null)} />}
     </div>
   );
 }
@@ -595,8 +605,6 @@ function SourceList({
   byId,
   dimming,
   isLit,
-  hoverId,
-  onHover,
 }: {
   x: number;
   y: number;
@@ -607,12 +615,10 @@ function SourceList({
   byId: Record<string, LogEntry>;
   dimming: boolean;
   isLit: (node: string) => boolean;
-  hoverId: string | null;
-  onHover: (id: string | null) => void;
 }) {
   return (
     <foreignObject x={x} y={y} width={w} height={h}>
-      <div {...XHTML} className="dm-list">
+      <div {...XHTML} className="dm-list" style={{ width: w, height: h }}>
         <div className="dm-list-head dm-group">
           <span>{title}</span>
           <span>Rows</span>
@@ -627,13 +633,8 @@ function SourceList({
             <div
               {...XHTML}
               key={query.id}
-              className={`dm-list-row${dimming && !isLit(query.node) ? " dm-faint" : ""}${hoverId === query.id ? " on" : ""}`}
+              className={`dm-list-row${dimming && !isLit(query.node) ? " dm-faint" : ""}`}
               data-node={query.node}
-              onMouseEnter={() => onHover(query.id)}
-              onMouseLeave={() => onHover(null)}
-              onFocus={() => onHover(query.id)}
-              onBlur={() => onHover(null)}
-              tabIndex={0}
               role="group"
               aria-label={`${query.label}. ${BLURB[query.node] ?? ""}`}
             >
@@ -648,30 +649,6 @@ function SourceList({
         })}
       </div>
     </foreignObject>
-  );
-}
-
-function QueryHover({
-  id,
-  catalogue,
-  byId,
-  onLeave,
-}: {
-  id: string;
-  catalogue: DataMapQuerySpec[];
-  byId: Record<string, LogEntry>;
-  onLeave: () => void;
-}) {
-  const query = catalogue.find((q) => q.id === id || q.node === id);
-  const entry = query ? byId[query.id] : undefined;
-  const blurb = BLURB[id] ?? (id === "usl" ? "Every question after this is one SELECT." : AGENTS.find((agent) => agent.id === id)?.job ?? "");
-  const sql = entry?.result?.sql ?? query?.sql ?? "";
-  return (
-    <div className="dm-hover" onMouseLeave={onLeave} role="note">
-      <p className="dm-name">{query?.label ?? id}</p>
-      {blurb && <p className="dm-blurb">{blurb}</p>}
-      {sql && <pre className="dm-code">{sql}</pre>}
-    </div>
   );
 }
 
@@ -765,6 +742,7 @@ function NodeBox({
         <div
           {...XHTML}
           className={`dm-node-body ${state}${usl ? " dm-usl-body" : " panel dm-src"}${optional ? " dm-opt" : ""}${phase === "done" && !usl ? " dm-arrived" : ""}`}
+          style={{ width: w, height: h }}
           aria-label={aria}
         >
           <div className={usl ? undefined : "dm-src-line"}>
@@ -822,7 +800,7 @@ function AgentBox({
     <g className={faint ? "dm-faint" : undefined} data-node={id}>
       <rect x={x} y={y} width={w} height={h} rx={12} className="dm-box dm-box-ghost" />
       <foreignObject x={x} y={y} width={w} height={h}>
-        <div {...XHTML} className="dm-node-body panel dm-src dm-agent" aria-label={`${name}. ${job}`}>
+        <div {...XHTML} className="dm-node-body panel dm-src dm-agent" style={{ width: w, height: h }} aria-label={`${name}. ${job}`}>
           <div className="dm-agent-name">{name}</div>
           <div className="dm-agent-job">{job}</div>
         </div>
