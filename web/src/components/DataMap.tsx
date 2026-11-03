@@ -132,6 +132,7 @@ function DataMapLive({ onPresent }: { onPresent: () => void }) {
           <QualityCard dq={find("dq")} rows={find("usl")} sql={catalogue?.find((q) => q.node === "dq")?.sql} examples={examplesQuery ? byId[examplesQuery.id] : undefined} />
         </section>
       </div>
+    </div>
   );
 }
 
