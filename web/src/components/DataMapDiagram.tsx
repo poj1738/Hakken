@@ -2,7 +2,7 @@
 // The data map and the presenter view both render this. Positions are layout,
 // not counts: a number appears only after that node's query has answered.
 
-import { useCallback, useEffect, useRef, useState, type HTMLAttributes } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type HTMLAttributes } from "react";
 import { api } from "../api";
 import type { DataMapQueryResult, DataMapQuerySpec } from "../types";
 
@@ -303,36 +303,37 @@ function clockTime(iso: string): string {
   return date.toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
-const VB_W = 1180;
-const PAD = 16;
-const SRC_W = 400;
-const ROW_H = 72;
-const LIST_HEAD = 28;
-const LIST_PAD = 8;
+// Screen pixels. The viewBox matches the card, so one unit is one pixel.
+// Floors: names 13, descriptions 11, connector labels 10, counts 14,
+// semantic-layer count 30. These sit above those floors.
+const NAME_PX = 14;
+const DESC_PX = 12;
+const USL_COUNT_PX = 32;
+const LABEL_PX = 11;
+const ROW_H = 56;
+const HEAD_H = 30;
 const LIST_GAP = 16;
-const USL_W = 280;
-const USL_H = 200;
-const AGENT_W = 188;
-const AGENT_H = 72;
+const AGENT_H = 52;
 const AGENT_GAP = 12;
-const GROUP_PAD = 8;
-const RETRY_GUTTER = 42;
-const GROUP_W = GROUP_PAD + AGENT_W + RETRY_GUTTER + GROUP_PAD;
-const GROUP_H = GROUP_PAD + 4 * AGENT_H + 3 * AGENT_GAP + GROUP_PAD;
-const TRACE_HEAD = 40;
-const TRACE_W = GROUP_W;
-const COL_GAP = (VB_W - PAD * 2 - SRC_W - USL_W - TRACE_W) / 2;
-const SRC_X = PAD;
-const USL_X = SRC_X + SRC_W + COL_GAP;
-const TRACE_X = USL_X + USL_W + COL_GAP;
-const BUS_X = SRC_X + SRC_W + COL_GAP / 2;
+const GROUP_PAD = 12;
+const TRACE_HEAD = 36;
 const USL_TABLES = ["medicine", "high_risk_class", "medication_statement"] as const;
 const AGENTS = [
-  { id: "planner", name: "Planner", job: "Splits the job into steps" },
-  { id: "executor", name: "Executor", job: "Runs the SQL in Zetaris" },
-  { id: "evaluator", name: "Evaluator", job: "Re-checks every cited row in Zetaris" },
-  { id: "writer", name: "Writer", job: "Explains each finding for a pharmacist" },
+  { id: "planner", name: "Planner", job: "Splits the job" },
+  { id: "executor", name: "Executor", job: "Runs SQL in Zetaris" },
+  { id: "evaluator", name: "Evaluator", job: "Re-checks each cited row" },
+  { id: "writer", name: "Writer", job: "Explains each finding" },
 ] as const;
+const TGA_LINES = ["Supply check for each patient's medicines", "Not part of the semantic layer"] as const;
+
+function textWidth(text: string, size: number, weight: number): number {
+  if (typeof document === "undefined") return text.length * size * 0.56;
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return text.length * size * 0.56;
+  ctx.font = `${weight} ${size}px "Public Sans", system-ui, sans-serif`;
+  return ctx.measureText(text).width;
+}
 
 function curve(x1: number, y1: number, x2: number, y2: number) {
   const c = (x1 + x2) / 2;
@@ -365,32 +366,44 @@ const XHTML = { xmlns: "http://www.w3.org/1999/xhtml" } as HTMLAttributes<HTMLDi
 
 /** The short line from each source's description, shown on the card itself. */
 const BLURB: Record<string, string> = {
-  emr: "What was charted in hospital.",
-  gp: "What the GP prescribed.",
-  pharmacy: "What was actually supplied, and when.",
-  patient: "What the patient says they take, in their own words.",
-  lexicon: "Australia's list of subsidised medicines.",
-  apinchs: "Medicines a pharmacist must review first.",
-  tga: "Supply check: MedTrace looks up each patient's medicines here for shortage notices. Not part of the semantic layer.",
+  emr: "Charted in hospital",
+  gp: "Prescribed by the GP",
+  pharmacy: "Supplied, and when",
+  patient: "In the patient's own words",
+  lexicon: "Subsidised medicines list",
+  apinchs: "Must be reviewed first",
 };
 
 export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = false }: Props) {
   const reduced = useReducedMotion();
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+  const [fontTick, setFontTick] = useState(0);
+  useLayoutEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const apply = () => setWidth(Math.round(el.clientWidth));
+    apply();
+    const watch = new ResizeObserver(apply);
+    watch.observe(el);
+    return () => watch.disconnect();
+  }, []);
+  useEffect(() => {
+    let live = true;
+    document.fonts.ready.then(() => {
+      if (live) setFontTick((n) => n + 1);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+
   const sources = catalogue.filter((q) => !SKIP.has(q.node) && q.node !== "tga");
   const tgaQuery = catalogue.find((q) => q.node === "tga");
-  const srcW = SRC_W;
   const clinical = sources.filter((q) => q.node === "emr" || q.node === "gp" || q.node === "pharmacy" || q.node === "patient");
   const reference = sources.filter((q) => q.node === "lexicon" || q.node === "apinchs");
-  const listH = (n: number) => LIST_PAD + LIST_HEAD + n * ROW_H + LIST_PAD;
-  const clinicalY = PAD;
-  const clinicalH = listH(clinical.length);
-  const referenceY = clinicalY + clinicalH + LIST_GAP;
-  const referenceH = listH(reference.length);
-  const rowCy = (listY: number, i: number) => listY + LIST_PAD + LIST_HEAD + i * ROW_H + ROW_H / 2;
-  const columnTop = clinicalY;
-  const columnBottom = reference.length ? referenceY + referenceH : clinicalY + clinicalH;
-  const columnMid = (columnTop + columnBottom) / 2;
-  const uslBox = { x: USL_X, y: Math.max(PAD, columnMid - USL_H / 2), w: USL_W, h: USL_H };
+  const geom = width > 0 ? layoutDiagram(width, clinical.length, reference.length, fontTick) : null;
+
   const spec = (node: string) => catalogue.find((q) => q.node === node);
   const entry = (node: string) => {
     const query = spec(node);
@@ -404,202 +417,307 @@ export function DataMapDiagram({ catalogue, byId, lit, present = false, flow = f
     if (dimming) return isLit(node);
     return phase === "done";
   };
-
-  const mergeY = clinical.length ? (rowCy(clinicalY, 0) + rowCy(clinicalY, clinical.length - 1)) / 2 : uslBox.y + uslBox.h / 2;
-  const uslCy = uslBox.y + uslBox.h / 2;
-  // Top to bottom on the semantic layer's left edge, matching source order, so the lines do not cross.
-  const entryPad = 28;
-  const entryY = (i: number) => uslBox.y + entryPad + ((uslBox.h - entryPad * 2) * i) / 2;
-  const mergeEntryY = entryY(0);
-  const lexiconEntryY = entryY(1);
-  const apinchsEntryY = entryY(2);
-  const mergeEntry = entry("merge");
-  const mergeOn = mergeEntry?.phase === "error" ? false : dimming ? isLit("merge") : mergeEntry?.phase === "done";
-  const trunk = curve(BUS_X, mergeY, uslBox.x, mergeEntryY);
-  // Sit the four agents so the Executor and Evaluator lines stay horizontal and inside the semantic layer's right edge.
-  const execOffset = GROUP_PAD + (AGENT_H + AGENT_GAP) + AGENT_H / 2;
-  const evalOffset = GROUP_PAD + 2 * (AGENT_H + AGENT_GAP) + AGENT_H / 2;
-  let groupTop = uslCy - (execOffset + evalOffset) / 2;
-  let headTop = groupTop - 8 - TRACE_HEAD;
-  if (headTop < 8) {
-    groupTop += 8 - headTop;
-    headTop = 8;
-  }
-  const groupX = TRACE_X;
-  const agentX = groupX + GROUP_PAD;
-  const agentRight = agentX + AGENT_W;
-  const boxY = (i: number) => groupTop + GROUP_PAD + i * (AGENT_H + AGENT_GAP);
-  const execCy = boxY(1) + AGENT_H / 2;
-  const evalCy = boxY(2) + AGENT_H / 2;
-  const tgaY = groupTop + GROUP_H + 28;
-  const tgaH = 132;
-  const uslRight = uslBox.x + uslBox.w;
-  const sqlLine = `M ${uslRight} ${execCy} L ${agentX} ${execCy}`;
-  const recheckLine = `M ${agentX} ${evalCy} L ${uslRight} ${evalCy}`;
   const linkOn = entry("usl")?.phase === "done" && (!dimming || isLit("usl") || isLit("medtrace"));
-  const dropX = Math.min(agentRight + 16, groupX + GROUP_W - 12);
-  const shortage = tgaQuery != null ? `M ${dropX} ${execCy} L ${dropX} ${tgaY - 14}` : "";
-  const retryBulge = Math.min(18, RETRY_GUTTER + GROUP_PAD - 20);
-  const retry = `M ${agentRight} ${evalCy} C ${agentRight + retryBulge} ${evalCy}, ${agentRight + retryBulge} ${execCy}, ${agentRight} ${execCy}`;
-  const vbH = Math.max(columnBottom, uslBox.y + uslBox.h + 24, tgaY + tgaH + 16);
-  const svgRef = useRef<SVGSVGElement>(null);
-  useEffect(() => {
-    const el = svgRef.current;
-    if (!el) return;
-    const apply = () => {
-      const width = el.getBoundingClientRect().width;
-      const inv = width > 8 ? Math.min(VB_W / width, 2.2) : 1;
-      el.style.setProperty("--dm-inv", inv.toFixed(4));
-    };
-    apply();
-    const watch = new ResizeObserver(apply);
-    watch.observe(el);
-    return () => watch.disconnect();
-  }, [vbH, present]);
+
+  const ordered = [...clinical, ...reference];
 
   return (
-    <div className={present ? "dm-stage dm-stage-present" : "dm-stage"}>
-    <svg
-      ref={svgRef}
-      className={`dm-svg${present ? " present" : ""}`}
-      viewBox={`0 0 ${VB_W} ${vbH}`}
-      style={{ aspectRatio: `${VB_W} / ${vbH}` }}
-      preserveAspectRatio="xMidYMid meet"
-      role="img"
-      aria-label="Sources flowing through the Zetaris semantic layer into MedTrace"
-    >
-      <defs>
-        <marker id="dm-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-          <path d="M0 0 L10 5 L0 10 Z" className="dm-arr" />
-        </marker>
-      </defs>
-      {clinical.map((query, i) => (
-        <Edge
-          key={query.id}
-          d={curve(SRC_X + srcW, rowCy(clinicalY, i), BUS_X, mergeY)}
-          on={edgeOn(query.node)}
-          faint={dimming && !isLit(query.node)}
-          reduced={reduced}
-          flow={flow}
-        />
-      ))}
-      <Edge d={trunk} on={mergeOn} faint={dimming && !isLit("merge")} reduced={reduced} flow={flow} />
-      {reference.map((query, i) => (
-        <Edge
-          key={query.id}
-          d={curve(SRC_X + srcW, rowCy(referenceY, i), uslBox.x, i === 0 ? lexiconEntryY : apinchsEntryY)}
-          on={edgeOn(query.node)}
-          faint={dimming && !isLit(query.node)}
-          reduced={reduced}
-          flow={flow}
-        />
-      ))}
-      <rect x={groupX} y={groupTop} width={GROUP_W} height={GROUP_H} rx={14} className="dm-trace-frame" />
-      <Edge d={sqlLine} on={linkOn} faint={dimming && !isLit("usl") && !isLit("medtrace")} reduced={reduced} flow={flow} />
-      <Edge d={recheckLine} on={linkOn} faint={dimming && !isLit("usl") && !isLit("medtrace")} reduced={reduced} flow={flow} />
-      {shortage && (
-        <Edge d={shortage} on={edgeOn("tga")} optional faint={dimming && !isLit("tga")} reduced={reduced} flow={flow} />
+    <div ref={stageRef} className={present ? "dm-stage dm-stage-present" : "dm-stage"}>
+      {geom && (
+        <svg
+          className={`dm-svg${present ? " present" : ""}`}
+          viewBox={`0 0 ${geom.width} ${geom.height}`}
+          style={present ? undefined : { width: "100%", height: geom.height }}
+          preserveAspectRatio="xMidYMid meet"
+          role="img"
+          aria-label="Sources flowing through the Zetaris semantic layer into MedTrace"
+        >
+          <defs>
+            <marker id="dm-into" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="9" markerHeight="9" orient="auto">
+              <path d="M1 1.2 L11 6 L1 10.8 Z" fill="context-stroke" />
+            </marker>
+            <marker id="dm-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+              <path d="M0 0 L10 5 L0 10 Z" className="dm-arr" />
+            </marker>
+          </defs>
+          {ordered.map((query, i) => {
+            const inClinical = i < clinical.length;
+            const listY = inClinical ? geom.clinicalY : geom.referenceY;
+            const row = inClinical ? i : i - clinical.length;
+            const y1 = listY + HEAD_H + row * ROW_H + ROW_H / 2;
+            const y2 = geom.usl.y + 22 + ((geom.usl.h - 44) * i) / Math.max(1, ordered.length - 1);
+            return (
+              <Edge
+                key={query.id}
+                d={curve(geom.src.x + geom.src.w, y1, geom.usl.x, y2)}
+                on={edgeOn(query.node)}
+                faint={dimming && !isLit(query.node)}
+                reduced={reduced}
+                flow={flow}
+              />
+            );
+          })}
+          <rect x={geom.group.x} y={geom.group.y} width={geom.group.w} height={geom.group.h} rx={14} className="dm-trace-frame" />
+          <Edge
+            d={`M ${geom.agent.x} ${geom.execCy} L ${geom.usl.x + geom.usl.w} ${geom.execCy}`}
+            on={linkOn}
+            into
+            faint={dimming && !isLit("usl") && !isLit("medtrace")}
+            reduced={reduced}
+            flow={flow}
+          />
+          <Edge
+            d={`M ${geom.agent.x} ${geom.evalCy} L ${geom.usl.x + geom.usl.w} ${geom.evalCy}`}
+            on={linkOn}
+            into
+            faint={dimming && !isLit("usl") && !isLit("medtrace")}
+            reduced={reduced}
+            flow={flow}
+          />
+          {tgaQuery && (
+            <Edge
+              d={`M ${geom.group.x + geom.group.w / 2} ${geom.group.y + geom.group.h} L ${geom.group.x + geom.group.w / 2} ${geom.tgaY}`}
+              on={edgeOn("tga")}
+              optional
+              faint={dimming && !isLit("tga")}
+              reduced={reduced}
+              flow={flow}
+            />
+          )}
+
+          <SourceList
+            x={geom.src.x}
+            y={geom.clinicalY}
+            w={geom.src.w}
+            h={geom.clinicalH}
+            title="Patient records · synthetic"
+            queries={clinical}
+            byId={byId}
+            dimming={dimming}
+            isLit={isLit}
+          />
+          <SourceList
+            x={geom.src.x}
+            y={geom.referenceY}
+            w={geom.src.w}
+            h={geom.referenceH}
+            title="Reference data · real"
+            queries={reference}
+            byId={byId}
+            dimming={dimming}
+            isLit={isLit}
+          />
+          <NodeBox
+            x={geom.usl.x}
+            y={geom.usl.y}
+            w={geom.usl.w}
+            h={geom.usl.h}
+            label={spec("usl")?.label ?? "Zetaris · semantic layer (medtrace_usl)"}
+            usl
+            chips={USL_TABLES}
+            caption="medicine lines · every source, one shape"
+            entry={entry("usl")}
+            active={dimming && isLit("usl")}
+            faint={dimming && !isLit("usl")}
+            nodeId="usl"
+          />
+          <foreignObject x={geom.group.x} y={geom.headY} width={geom.group.w} height={TRACE_HEAD} aria-hidden="true">
+            <div {...XHTML} className="dm-trace-head">
+              <div className="dm-trace-kicker">MedTrace</div>
+              <div className="dm-trace-sub">Asks Zetaris in SQL</div>
+            </div>
+          </foreignObject>
+          {AGENTS.slice(0, -1).map((agent, i) => (
+            <line
+              key={agent.id}
+              x1={geom.agent.x + geom.agent.w / 2}
+              y1={geom.boxY(i) + AGENT_H}
+              x2={geom.agent.x + geom.agent.w / 2}
+              y2={geom.boxY(i + 1)}
+              className="dm-join"
+              markerEnd="url(#dm-arr)"
+            />
+          ))}
+          <path
+            d={`M ${geom.agent.x + geom.agent.w} ${geom.evalCy} C ${geom.agent.x + geom.agent.w + 18} ${geom.evalCy}, ${geom.agent.x + geom.agent.w + 18} ${geom.execCy}, ${geom.agent.x + geom.agent.w} ${geom.execCy}`}
+            className="dm-join"
+            markerEnd="url(#dm-arr)"
+          />
+          <LinkLabel x1={geom.usl.x + geom.usl.w} x2={geom.agent.x} y={geom.execCy} text="SQL" />
+          <LinkLabel x1={geom.usl.x + geom.usl.w} x2={geom.agent.x} y={geom.evalCy} text="re-check" />
+          <RetryLabel
+            x={geom.agent.x + geom.agent.w + 24}
+            y={(geom.execCy + geom.evalCy) / 2}
+            maxX={geom.group.x + geom.group.w - 8}
+          />
+          {AGENTS.map((agent, i) => (
+            <AgentBox
+              key={agent.id}
+              x={geom.agent.x}
+              y={geom.boxY(i)}
+              w={geom.agent.w}
+              h={AGENT_H}
+              id={agent.id}
+              name={agent.name}
+              job={agent.job}
+              faint={dimming && !isLit("medtrace")}
+            />
+          ))}
+          {tgaQuery && (
+            <NodeBox
+              x={geom.group.x}
+              y={geom.tgaY}
+              w={geom.group.w}
+              h={geom.tgaH}
+              label={tgaQuery.label}
+              optional
+              lines={TGA_LINES}
+              entry={byId[tgaQuery.id]}
+              active={dimming && isLit("tga")}
+              faint={dimming && !isLit("tga")}
+              nodeId="tga"
+            />
+          )}
+        </svg>
       )}
-
-      <SourceList
-        x={SRC_X}
-        y={clinicalY}
-        w={srcW}
-        h={clinicalH}
-        title="Patient records · synthetic"
-        queries={clinical}
-        byId={byId}
-        dimming={dimming}
-        isLit={isLit}
-      />
-      <SourceList
-        x={SRC_X}
-        y={referenceY}
-        w={srcW}
-        h={referenceH}
-        title="Australian reference data · real"
-        queries={reference}
-        byId={byId}
-        dimming={dimming}
-        isLit={isLit}
-      />
-
-      <MergeLabel x={BUS_X - 100} y={mergeY - 28} w={Math.max(120, COL_GAP - 12)} entry={mergeEntry} faint={dimming && !isLit("merge")} />
-
-      <NodeBox
-        x={uslBox.x}
-        y={uslBox.y}
-        w={uslBox.w}
-        h={uslBox.h}
-        label={spec("usl")?.label ?? "Zetaris · semantic layer (medtrace_usl)"}
-        usl
-        chips={USL_TABLES}
-        caption="medicine lines, every source in one shape"
-        entry={entry("usl")}
-        active={dimming && isLit("usl")}
-        faint={dimming && !isLit("usl")}
-        nodeId="usl"
-      />
-      <foreignObject x={groupX} y={headTop} width={GROUP_W} height={TRACE_HEAD} aria-hidden="true">
-        <div {...XHTML} className="dm-trace-head">
-          <div className="dm-trace-kicker">MedTrace</div>
-          <div className="dm-trace-sub">Asks Zetaris in SQL</div>
-        </div>
-      </foreignObject>
-      {AGENTS.slice(0, -1).map((agent, i) => (
-        <line
-          key={agent.id}
-          x1={agentX + AGENT_W / 2}
-          y1={boxY(i) + AGENT_H}
-          x2={agentX + AGENT_W / 2}
-          y2={boxY(i + 1)}
-          className="dm-join"
-          markerEnd="url(#dm-arr)"
-        />
-      ))}
-      <path d={retry} className="dm-join" markerEnd="url(#dm-arr)" />
-      <text className="dm-mini" x={(uslRight + agentX) / 2} y={execCy - 8} textAnchor="middle">
-        SQL
-      </text>
-      <text className="dm-mini" x={(uslRight + agentX) / 2} y={evalCy - 8} textAnchor="middle">
-        re-check
-      </text>
-      <text className="dm-mini" x={agentRight + retryBulge} y={(execCy + evalCy) / 2 + 4} textAnchor="middle">
-        retry
-      </text>
-      <text className="dm-mini" x={groupX + GROUP_W / 2} y={tgaY - 4} textAnchor="middle">
-        shortage lookup
-      </text>
-      {AGENTS.map((agent, i) => (
-        <AgentBox
-          key={agent.id}
-          x={agentX}
-          y={boxY(i)}
-          w={AGENT_W}
-          h={AGENT_H}
-          id={agent.id}
-          name={agent.name}
-          job={agent.job}
-          faint={dimming && !isLit("medtrace")}
-        />
-      ))}
-      {tgaQuery && (
-        <NodeBox
-          x={groupX}
-          y={tgaY}
-          w={GROUP_W}
-          h={tgaH}
-          label={tgaQuery.label}
-          optional
-          entry={byId[tgaQuery.id]}
-          active={dimming && isLit("tga")}
-          faint={dimming && !isLit("tga")}
-          nodeId="tga"
-          blurb={BLURB.tga}
-        />
-      )}
-    </svg>
     </div>
+  );
+}
+
+function layoutDiagram(width: number, clinicalCount: number, referenceCount: number, _fontTick: number) {
+  void _fontTick;
+  const longestJob = AGENTS.map((agent) => agent.job).reduce((a, b) => (textWidth(b, DESC_PX, 400) > textWidth(a, DESC_PX, 400) ? b : a));
+  const agentInner = Math.ceil(textWidth(longestJob, DESC_PX, 400)) + 28;
+  const retryLabel = Math.ceil(textWidth("retry", LABEL_PX, 400));
+  const retryReserve = 18 + 6 + retryLabel + 10;
+  const groupMin = GROUP_PAD + agentInner + retryReserve;
+  const uslCaption = textWidth("medicine lines · every source, one shape", DESC_PX, 400);
+  const uslTitle = textWidth("Zetaris · semantic layer (medtrace_usl)", NAME_PX, 600);
+  const tgaLine = textWidth(TGA_LINES[0], DESC_PX, 400);
+  const sourceLine = Math.max(
+    ...Object.values(BLURB).map((line) => textWidth(line, DESC_PX, 400)),
+    textWidth("High-risk classes (ACSQHC)", NAME_PX, 600),
+    textWidth("Patient interview", NAME_PX, 600),
+  );
+  const countW = textWidth("00,000", 15, 600);
+  const srcNeed = 32 + 14 + 8 + Math.ceil(sourceLine) + 8 + Math.ceil(countW);
+  const grpNeed = Math.max(groupMin, Math.ceil(tgaLine) + 36);
+  const uslNeed = Math.ceil(Math.max(uslCaption, uslTitle)) + 68;
+  const gap2Floor = Math.max(56, Math.ceil(textWidth("re-check", LABEL_PX, 400)) + 16);
+
+  const col = {
+    src: Math.max(width * 0.32, srcNeed),
+    gap1: 48,
+    usl: Math.max(width * 0.26, uslNeed),
+    gap2: 72,
+    grp: Math.max(width * 0.26, grpNeed),
+  };
+  const textFloor = { src: srcNeed, gap1: 12, usl: uslNeed, gap2: gap2Floor, grp: grpNeed };
+  const share = { src: width * 0.32, usl: width * 0.26, grp: width * 0.26 };
+  const overflow = () => col.src + col.gap1 + col.usl + col.gap2 + col.grp + 32 - width;
+  // Columns may sit above their share so a line fits. Give that extra back
+  // before touching the 48px and 72px gaps.
+  for (const key of ["src", "grp", "usl"] as const) {
+    const over = overflow();
+    if (over <= 0) break;
+    const spare = col[key] - textFloor[key];
+    if (spare > 0) col[key] -= Math.min(spare, over);
+  }
+  for (const key of ["gap1", "gap2"] as const) {
+    const over = overflow();
+    if (over <= 0) break;
+    const spare = col[key] - textFloor[key];
+    if (spare > 0) col[key] -= Math.min(spare, over);
+  }
+  let extra = -overflow();
+  if (extra > 0) {
+    for (const key of ["src", "usl", "grp"] as const) {
+      const room = Math.max(0, share[key] - col[key]);
+      const add = Math.min(extra, room);
+      col[key] += add;
+      extra -= add;
+    }
+  }
+
+  const srcX = 0;
+  const uslX = col.src + col.gap1;
+  const groupX = uslX + col.usl + col.gap2;
+  const clinicalH = HEAD_H + clinicalCount * ROW_H;
+  const referenceH = HEAD_H + referenceCount * ROW_H;
+  const clinicalY = 0;
+  const referenceY = clinicalH + LIST_GAP;
+  const leftH = referenceY + referenceH;
+  const contentH = 48 + 20 + USL_COUNT_PX + 18 + 18 + 3 * 22;
+  const groupH = GROUP_PAD * 2 + 4 * AGENT_H + 3 * AGENT_GAP;
+  const execTop = GROUP_PAD + AGENT_H + AGENT_GAP;
+  const evalBottom = GROUP_PAD + 2 * (AGENT_H + AGENT_GAP) + AGENT_H;
+  const span = evalBottom - execTop;
+  let uslH = Math.max(contentH, span + 16);
+  let uslY = Math.max(0, (leftH - uslH) / 2);
+  const spanMid = (execTop + evalBottom) / 2;
+  let groupY = uslY + uslH / 2 - spanMid;
+  if (groupY < TRACE_HEAD + 4) {
+    const shift = TRACE_HEAD + 4 - groupY;
+    groupY += shift;
+    uslY += shift;
+  }
+  if (groupY + execTop < uslY) {
+    uslH += uslY - (groupY + execTop);
+    uslY = groupY + execTop;
+  }
+  if (groupY + evalBottom > uslY + uslH) uslH = groupY + evalBottom - uslY;
+
+  const tgaH = 84;
+  const tgaY = groupY + groupH + 28;
+  const agentX = groupX + GROUP_PAD;
+  const agentW = Math.max(40, groupX + col.grp - retryReserveOf(retryLabel) - agentX);
+
+  return {
+    width,
+    height: Math.max(leftH, tgaY + tgaH) + 4,
+    src: { x: srcX, w: col.src },
+    usl: { x: uslX, y: uslY, w: col.usl, h: uslH },
+    group: { x: groupX, y: groupY, w: col.grp, h: groupH },
+    agent: { x: agentX, w: agentW },
+    clinicalY,
+    clinicalH,
+    referenceY,
+    referenceH,
+    boxY: (i: number) => groupY + GROUP_PAD + i * (AGENT_H + AGENT_GAP),
+    execCy: groupY + execTop + AGENT_H / 2,
+    evalCy: groupY + GROUP_PAD + 2 * (AGENT_H + AGENT_GAP) + AGENT_H / 2,
+    tgaY,
+    tgaH,
+    headY: groupY - TRACE_HEAD,
+  };
+}
+
+function retryReserveOf(labelWidth: number): number {
+  return 18 + 6 + labelWidth + 10;
+}
+
+function LinkLabel({ x1, x2, y, text }: { x1: number; x2: number; y: number; text: string }) {
+  const width = Math.ceil(textWidth(text, LABEL_PX, 400)) + 2;
+  const mid = (x1 + x2) / 2;
+  const left = Math.min(x2 - 2, Math.max(x1 + 2, mid - width / 2));
+  const height = 14;
+  return (
+    <foreignObject x={left} y={y - 5 - height} width={Math.min(width, Math.abs(x2 - x1) - 4)} height={height}>
+      <div {...XHTML} className="dm-link-label">
+        {text}
+      </div>
+    </foreignObject>
+  );
+}
+
+function RetryLabel({ x, y, maxX }: { x: number; y: number; maxX: number }) {
+  const width = Math.min(Math.ceil(textWidth("retry", LABEL_PX, 400)) + 2, Math.max(20, maxX - x));
+  return (
+    <foreignObject x={x} y={y - 8} width={width} height={16}>
+      <div {...XHTML} className="dm-link-label">
+        retry
+      </div>
+    </foreignObject>
   );
 }
 
@@ -647,11 +765,9 @@ function SourceList({
               aria-label={`${query.label}. ${BLURB[query.node] ?? ""}`}
             >
               <span className={`dm-dot-status${phase === "done" ? " done" : ""}${waiting ? " run" : ""}${failed ? " bad" : ""}`} />
-              <div className="dm-list-copy">
-                <div className="dm-name">{query.label}</div>
-                <div className="dm-blurb">{failed ? entry?.error ?? "The query failed" : waiting ? "querying Zetaris…" : BLURB[query.node]}</div>
-              </div>
+              <div className="dm-name">{query.label}</div>
               <div className="dm-count dm-num">{count != null ? formatCount(count) : ""}</div>
+              <div className="dm-blurb">{failed ? entry?.error ?? "The query failed" : waiting ? "querying Zetaris…" : BLURB[query.node]}</div>
             </div>
           );
         })}
@@ -664,6 +780,7 @@ function Edge({
   d,
   on,
   optional = false,
+  into = false,
   faint,
   reduced,
   flow,
@@ -671,14 +788,20 @@ function Edge({
   d: string;
   on: boolean;
   optional?: boolean;
+  into?: boolean;
   faint: boolean;
   reduced: boolean;
   flow: boolean;
 }) {
   return (
     <g className={faint ? "dm-faint" : undefined} aria-hidden>
-      <path d={d} className={`dm-edge${on ? " dm-edge-on" : ""}${optional ? " dm-edge-opt" : ""}`} pathLength={optional ? undefined : 1} />
-      {on && flow && !reduced && (
+      <path
+        d={d}
+        className={`dm-edge${into ? " dm-edge-into" : ""}${on ? " dm-edge-on" : ""}${optional ? " dm-edge-opt" : ""}`}
+        markerEnd={into ? "url(#dm-into)" : undefined}
+        pathLength={optional || into ? undefined : 1}
+      />
+      {on && flow && !reduced && !into && (
         <circle r="3.5" className="dm-dot">
           <animateMotion dur="4s" repeatCount="indefinite" path={d} />
         </circle>
@@ -703,6 +826,7 @@ function NodeBox({
   noCount = false,
   nodeId,
   blurb,
+  lines,
 }: {
   x: number;
   y: number;
@@ -719,6 +843,7 @@ function NodeBox({
   noCount?: boolean;
   nodeId: string;
   blurb?: string;
+  lines?: readonly string[];
 }) {
   const phase = entry?.phase;
   const count = phase === "done" ? soleCell(entry?.result) : null;
@@ -769,8 +894,11 @@ function NodeBox({
           )}
           {usl && shown && <div className="dm-count dm-num">{formatCount(shown)}</div>}
           {blurb && !detail && <div className="dm-blurb">{blurb}</div>}
-          {usl && shown && caption && <div className="dm-cap">{caption}</div>}
-          {shown && chips && (
+          {lines && !detail && lines.map((line) => (
+            <div key={line} className="dm-blurb">{line}</div>
+          ))}
+          {usl && caption && <div className="dm-cap">{caption}</div>}
+          {chips && (
             <div className="dm-chips">
               {chips.map((name) => (
                 <span key={name} className="dm-chip">
@@ -814,19 +942,5 @@ function AgentBox({
         </div>
       </foreignObject>
     </g>
-  );
-}
-
-function MergeLabel({ x, y, w, entry, faint }: { x: number; y: number; w: number; entry?: LogEntry; faint: boolean }) {
-  const count = entry?.phase === "done" ? soleCell(entry.result) : null;
-  const text =
-    entry?.phase === "running" ? "querying Zetaris…" : count ? `4 systems → ${formatCount(count)} medicine lines` : "";
-  if (!text) return null;
-  return (
-    <foreignObject x={x} y={y} width={w} height={22} className={faint ? "dm-faint" : undefined}>
-      <div {...XHTML} className="dm-merge" role="img" aria-label={text}>
-        {text}
-      </div>
-    </foreignObject>
   );
 }
